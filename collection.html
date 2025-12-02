@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Character Collection - Battle of Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Baloo 2', cursive; }
+        /* Ensure minimum touch target size */
+        button { min-height: 44px; min-width: 44px; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-indigo-800 to-purple-900 min-h-screen">
+    <div class="absolute inset-0 bg-[url('assets/rice_background.png')] bg-cover bg-center opacity-20"></div>
+    
+    <!-- Language Toggle -->
+    <button id="langToggle" class="fixed top-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 md:border-4 border-orange-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-amber-900 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
+        🌐 <span id="langLabel" class="hidden sm:inline">TAGALOG</span>
+    </button>
+
+    <!-- Back Button -->
+    <button onclick="window.location.href='index.html'" class="fixed top-4 left-4 bg-gradient-to-r from-gray-300 to-gray-400 border-2 md:border-4 border-gray-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-gray-800 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
+        <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
+    </button>
+
+    <div class="relative z-10 container mx-auto px-4 py-16 md:py-20">
+        <h1 class="text-2xl sm:text-3xl md:text-5xl font-extrabold text-yellow-400 text-center mb-3 md:mb-4 drop-shadow-2xl" data-translate="📚 Character Collection 📚">
+            <span class="hidden sm:inline">📚 </span>Character Collection<span class="hidden sm:inline"> 📚</span>
+        </h1>
+        <p class="text-sm sm:text-base md:text-xl text-white text-center mb-6 md:mb-12 drop-shadow-lg px-2" data-translate="Learn about the Heroes and Villains of Philippine History">
+            Learn about the Heroes and Villains of Philippine History
+        </p>
+
+        <!-- Character Grid -->
+        <div id="characterGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-7xl mx-auto">
+            <!-- Characters will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Character Details Modal -->
+    <div id="characterModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl md:rounded-3xl border-4 md:border-8 border-amber-800 max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="p-4 sm:p-6 md:p-8">
+                <button onclick="closeModal()" class="float-right text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900 hover:text-red-600 transition-colors p-2">×</button>
+                
+                <div class="clear-both">
+                    <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-center mb-4 md:mb-6">
+                        <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 flex-shrink-0">
+                            <img id="modalCharacterImg" src="" alt="" class="w-full h-full object-contain">
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 id="modalCharacterName" class="text-xl sm:text-2xl md:text-4xl font-extrabold text-amber-900 mb-2"></h2>
+                            <p id="modalCharacterEra" class="text-sm sm:text-base md:text-xl font-bold text-amber-700 mb-2 md:mb-4"></p>
+                            <span id="modalCharacterType" class="inline-block px-3 sm:px-4 md:px-6 py-1 md:py-2 rounded-full text-white font-bold text-sm sm:text-base md:text-lg"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t-2 md:border-t-4 border-amber-600 pt-3 md:pt-6">
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-extrabold text-amber-900 mb-2 md:mb-4" data-translate="Historical Contributions">Historical Contributions</h3>
+                        <div id="modalCharacterContributions" class="text-sm md:text-lg text-amber-900 space-y-2 md:space-y-3">
+                            <!-- Contributions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/eraData.js"></script>
+    <script src="js/characterData.js"></script>
+    <script src="js/collection.js"></script>
+    <script src="js/language.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+@keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.6)); }
+    50% { filter: drop-shadow(0 0 25px rgba(251, 146, 60, 1)); }
+}
+
+@keyframes damage-popup {
+    0% { transform: translateY(0) scale(0.5) rotate(-10deg); opacity: 0; }
+    20% { transform: translateY(-10px) scale(1.3) rotate(5deg); opacity: 1; }
+    50% { transform: translateY(-40px) scale(1.2) rotate(-3deg); opacity: 1; }
+    100% { transform: translateY(-80px) scale(0.8) rotate(0deg); opacity: 0; }
+}
+
+@keyframes critical-popup {
+    0% { transform: translate(-50%, -50%) scale(0.3) rotate(-15deg); opacity: 0; }
+    30% { transform: translate(-50%, -50%) scale(1.4) rotate(5deg); opacity: 1; }
+    60% { transform: translate(-50%, -50%) scale(1.2) rotate(-3deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); opacity: 0; }
+}
+
+@keyframes attack-animation {
+    0% { transform: translateX(0) scale(1); }
+    30% { transform: translateX(40px) scale(1.1); }
+    50% { transform: translateX(35px) scale(1.08); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes attack-animation-flipped {
+    0% { transform: scaleX(-1) translateX(0) scaleY(1); }
+    30% { transform: scaleX(-1) translateX(-40px) scaleY(1.1); }
+    50% { transform: scaleX(-1) translateX(-35px) scaleY(1.08); }
+    100% { transform: scaleX(-1) translateX(0) scaleY(1); }
+}
+
+@keyframes hurt-animation-flipped {
+    0% { transform: scaleX(-1) translateX(0) scaleY(1); filter: brightness(1); }
+    15% { transform: scaleX(-1) translateX(-25px) scaleY(0.93); filter: brightness(1.5); }
+    30% { transform: scaleX(-1) translateX(5px) scaleY(0.97); filter: brightness(1.3); }
+    45% { transform: scaleX(-1) translateX(-15px) scaleY(0.95); filter: brightness(1.2); }
+    60% { transform: scaleX(-1) translateX(0) scaleY(0.98); filter: brightness(1.1); }
+    100% { transform: scaleX(-1) translateX(0) scaleY(1); filter: brightness(1); }
+}
+
+@keyframes victory-bounce-flipped {
+    0%, 100% { transform: scaleX(-1) translateY(0) scaleY(1); }
+    25% { transform: scaleX(-1) translateY(-15px) scaleY(1.08); }
+    50% { transform: scaleX(-1) translateY(0) scaleY(1.03); }
+    75% { transform: scaleX(-1) translateY(-8px) scaleY(1.05); }
+}
+
+@keyframes hurt-animation {
+    0% { transform: translateX(0) scale(1); filter: brightness(1); }
+    15% { transform: translateX(-25px) scale(0.93); filter: brightness(1.5); }
+    30% { transform: translateX(5px) scale(0.97); filter: brightness(1.3); }
+    45% { transform: translateX(-15px) scale(0.95); filter: brightness(1.2); }
+    60% { transform: translateX(0) scale(0.98); filter: brightness(1.1); }
+    100% { transform: translateX(0) scale(1); filter: brightness(1); }
+}
+
+@keyframes victory-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-15px) scale(1.08); }
+    50% { transform: scale(1.03); }
+    75% { transform: translateY(-8px) scale(1.05); }
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 1.5s ease infinite;
+}
+
+.character.attacking {
+    animation: attack-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.character.hurt {
+    animation: hurt-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.character.victory {
+    animation: victory-bounce 1s ease infinite;
+}
+
+.damage-number {
+    position: absolute;
+    font-size: 40px;
+    font-weight: 800;
+    color: #ef4444;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 15px #fbbf24, 0 0 25px #fb923c;
+    animation: damage-popup 1s ease forwards;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.critical-text {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+    font-weight: 800;
+    color: #fbbf24;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), 0 0 20px #ef4444, 0 0 40px #fb923c;
+    animation: critical-popup 1s ease forwards;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.answer-btn.correct {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    border-color: #15803d !important;
+    color: white !important;
+}
+
+.answer-btn.incorrect {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border-color: #b91c1c !important;
+    color: white !important;
+}
+
+/* Smooth sprite transitions */
+.sprite-image {
+    transition: opacity 0.15s ease-in-out;
+}
+
+/* Background transition */
+#battleBackground {
+    transition: background-image 0.5s ease-in-out;
+}
+
+/* Enemy character flipped to face left */
+#enemyCharacter {
+    transform: scaleX(-1);
+}
+
+/* Maintain flip during animations */
+#enemyCharacter.attacking {
+    animation: attack-animation-flipped 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#enemyCharacter.hurt {
+    animation: hurt-animation-flipped 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#enemyCharacter.victory {
+    animation: victory-bounce-flipped 1s ease infinite;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 640px) {
+    .damage-number {
+        font-size: 28px;
+    }
+    
+    .critical-text {
+        font-size: 40px;
+    }
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+    overflow-x: hidden;
+}
+
+/* Touch-friendly buttons */
+@media (hover: none) and (pointer: coarse) {
+    button {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
