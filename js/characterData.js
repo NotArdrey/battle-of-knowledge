@@ -2,152 +2,270 @@
 const characterContributions = {
     'Lapu-Lapu': {
         type: 'hero',
-        contributions: [
-            'First Filipino hero to resist Spanish colonization',
-            'Defeated Ferdinand Magellan in the Battle of Mactan on April 27, 1521',
-            'Chieftain of Mactan who defended Philippine sovereignty',
-            'Symbol of Filipino resistance and bravery',
-            'His victory delayed Spanish colonization for several decades'
-        ]
+        contributions: {
+            en: [
+                'First Filipino hero to resist Spanish colonization',
+                'Defeated Ferdinand Magellan in the Battle of Mactan on April 27, 1521',
+                'Chieftain of Mactan who defended Philippine sovereignty',
+                'Symbol of Filipino resistance and bravery',
+                'His victory delayed Spanish colonization for several decades'
+            ],
+            tl: [
+                'Unang bayaning Pilipino na lumaban sa kolonisasyon ng Espanya',
+                'Tinalo si Ferdinand Magellan sa Labanan ng Mactan noong Abril 27, 1521',
+                'Datu ng Mactan na ipinagtanggol ang soberanya ng Pilipinas',
+                'Simbolo ng paglaban at katapangan ng Pilipino',
+                'Ang kanyang tagumpay ay nagpahinto ng kolonisasyon ng Espanya ng ilang dekada'
+            ]
+        }
     },
     'Raja Humabon': {
         type: 'hero',
-        contributions: [
-            'Rajah of Cebu who initially allied with Magellan',
-            'First Filipino ruler to be baptized as a Christian (renamed Carlos)',
-            'Played a crucial role in early Spanish-Filipino relations',
-            'His alliance with Spain marked the beginning of Spanish influence',
-            'Helped facilitate early trade and cultural exchange'
-        ]
+        contributions: {
+            en: [
+                'Rajah of Cebu who initially allied with Magellan',
+                'First Filipino ruler to be baptized as a Christian (renamed Carlos)',
+                'Played a crucial role in early Spanish-Filipino relations',
+                'His alliance with Spain marked the beginning of Spanish influence',
+                'Helped facilitate early trade and cultural exchange'
+            ],
+            tl: [
+                'Rajah ng Cebu na nakipagtulungan kay Magellan',
+                'Unang pinunong Pilipino na nabinyagan bilang Kristiyano (pinalitan ng pangalang Carlos)',
+                'Gumampan ng mahalagang papel sa unang ugnayan ng Espanya at Pilipino',
+                'Ang kanyang alyansa sa Espanya ay nagsimula ng impluwensya ng Espanya',
+                'Tumulong sa pagpapadaloy ng unang kalakalan at palitan ng kultura'
+            ]
+        }
     },
     'Ferdinand Magellan': {
         type: 'villain',
-        contributions: [
-            'Portuguese explorer who led the first circumnavigation expedition',
-            'Arrived in the Philippines on March 16, 1521',
-            'Claimed the islands for Spain',
-            'Introduced Christianity to the Philippines',
-            'Killed in the Battle of Mactan by Lapu-Lapu\'s forces'
-        ]
+        contributions: {
+            en: [
+                'Portuguese explorer who led the first circumnavigation expedition',
+                'Arrived in the Philippines on March 16, 1521',
+                'Claimed the islands for Spain',
+                'Introduced Christianity to the Philippines',
+                'Killed in the Battle of Mactan by Lapu-Lapu\'s forces'
+            ],
+            tl: [
+                'Manlalakbay na Portuges na nanguna sa unang paglilibot sa mundo',
+                'Dumating sa Pilipinas noong Marso 16, 1521',
+                'Inangkin ang mga isla para sa Espanya',
+                'Nagpakilala ng Kristiyanismo sa Pilipinas',
+                'Napatay sa Labanan ng Mactan ng mga tauhan ni Lapu-Lapu'
+            ]
+        }
     },
     'Spanish Soldier': {
         type: 'villain',
-        contributions: [
-            'Represented Spanish colonial military forces',
-            'Enforced Spanish rule and colonial policies',
-            'Participated in the conquest and pacification of Philippine territories',
-            'Maintained Spanish military presence for over 300 years'
-        ]
+        contributions: {
+            en: [
+                'Represented Spanish colonial military forces',
+                'Enforced Spanish rule and colonial policies',
+                'Participated in the conquest and pacification of Philippine territories',
+                'Maintained Spanish military presence for over 300 years'
+            ],
+            tl: [
+                'Kumakatawan sa mga pwersang militar ng kolonyal na Espanya',
+                'Nagpatupad ng pamamahala at patakaran ng Espanya',
+                'Lumahok sa pagsakop at pagpapaamo ng mga teritoryo ng Pilipinas',
+                'Nagpanatili ng presensya militar ng Espanya ng mahigit 300 taon'
+            ]
+        }
     },
     'Jose Rizal': {
         type: 'hero',
-        contributions: [
-            'National hero of the Philippines',
-            'Wrote "Noli Me Tangere" (1887) and "El Filibusterismo" (1891)',
-            'Exposed Spanish colonial abuses through his writings',
-            'Founded La Liga Filipina to unite Filipinos',
-            'Executed on December 30, 1896, inspiring the Philippine Revolution',
-            'Advocated for peaceful reforms and education'
-        ]
+        contributions: {
+            en: [
+                'National hero of the Philippines',
+                'Wrote "Noli Me Tangere" (1887) and "El Filibusterismo" (1891)',
+                'Exposed Spanish colonial abuses through his writings',
+                'Founded La Liga Filipina to unite Filipinos',
+                'Executed on December 30, 1896, inspiring the Philippine Revolution',
+                'Advocated for peaceful reforms and education'
+            ],
+            tl: [
+                'Pambansang bayani ng Pilipinas',
+                'Sumulat ng "Noli Me Tangere" (1887) at "El Filibusterismo" (1891)',
+                'Inilantad ang mga pang-aabuso ng kolonyal na Espanya sa kanyang mga sinulat',
+                'Nagtayo ng La Liga Filipina upang pagsamahin ang mga Pilipino',
+                'Pinatay noong Disyembre 30, 1896, na nag-udyok sa Rebolusyong Pilipino',
+                'Ipinaglaban ang mapayapang reporma at edukasyon'
+            ]
+        }
     },
     'Andres Bonifacio': {
         type: 'hero',
-        contributions: [
-            'Founded the Katipunan (KKK) on July 7, 1892',
-            'Started the Philippine Revolution with the Cry of Pugad Lawin (1896)',
-            'Known as the "Father of the Philippine Revolution"',
-            'Led armed resistance against Spanish colonial rule',
-            'Symbolized the struggle of the common Filipino masses'
-        ]
+        contributions: {
+            en: [
+                'Founded the Katipunan (KKK) on July 7, 1892',
+                'Started the Philippine Revolution with the Cry of Pugad Lawin (1896)',
+                'Known as the "Father of the Philippine Revolution"',
+                'Led armed resistance against Spanish colonial rule',
+                'Symbolized the struggle of the common Filipino masses'
+            ],
+            tl: [
+                'Nagtayo ng Katipunan (KKK) noong Hulyo 7, 1892',
+                'Nagsimula ng Rebolusyong Pilipino sa Sigaw ng Pugad Lawin (1896)',
+                'Kilala bilang "Ama ng Rebolusyong Pilipino"',
+                'Nanguna sa armadong paglaban laban sa pamamahala ng kolonyal na Espanya',
+                'Sumisimbolo sa pakikibaka ng karaniwang masang Pilipino'
+            ]
+        }
     },
     'Emilio Aguinaldo': {
         type: 'hero',
-        contributions: [
-            'First President of the Philippines',
-            'Led Filipino forces during the Philippine Revolution',
-            'Declared Philippine Independence on June 12, 1898',
-            'Commander-in-chief of revolutionary forces',
-            'Led resistance during Philippine-American War',
-            'Youngest general in the revolutionary army at age 28'
-        ]
+        contributions: {
+            en: [
+                'First President of the Philippines',
+                'Led Filipino forces during the Philippine Revolution',
+                'Declared Philippine Independence on June 12, 1898',
+                'Commander-in-chief of revolutionary forces',
+                'Led resistance during Philippine-American War',
+                'Youngest general in the revolutionary army at age 28'
+            ],
+            tl: [
+                'Unang Pangulo ng Pilipinas',
+                'Nanguna sa mga pwersang Pilipino sa panahon ng Rebolusyong Pilipino',
+                'Ipinahayag ang Kalayaan ng Pilipinas noong Hunyo 12, 1898',
+                'Kumander-heneral ng mga pwersang rebolusyonaryo',
+                'Nanguna sa paglaban sa panahon ng Digmaang Pilipino-Amerikano',
+                'Pinakabatang heneral sa hukbong rebolusyonaryo sa edad na 28'
+            ]
+        }
     },
     'Apolinario Mabini': {
         type: 'hero',
-        contributions: [
-            'Known as the "Brains of the Revolution"',
-            'First Prime Minister and Foreign Minister of the Philippines',
-            'Chief adviser to President Emilio Aguinaldo',
-            'Wrote the Malolos Constitution',
-            'Advocated for Philippine independence and sovereignty',
-            'Continued to serve despite being paralyzed from polio'
-        ]
+        contributions: {
+            en: [
+                'Known as the "Brains of the Revolution"',
+                'First Prime Minister and Foreign Minister of the Philippines',
+                'Chief adviser to President Emilio Aguinaldo',
+                'Wrote the Malolos Constitution',
+                'Advocated for Philippine independence and sovereignty',
+                'Continued to serve despite being paralyzed from polio'
+            ],
+            tl: [
+                'Kilala bilang "Utak ng Rebolusyon"',
+                'Unang Punong Ministro at Kalihim ng Ugnayang Panlabas ng Pilipinas',
+                'Pangunahing tagapayo ni Pangulong Emilio Aguinaldo',
+                'Sumulat ng Saligang Batas ng Malolos',
+                'Ipinaglaban ang kalayaan at soberanya ng Pilipinas',
+                'Patuloy na naglingkod kahit paralizado mula sa polio'
+            ]
+        }
     },
     'Spanish Commander': {
         type: 'villain',
-        contributions: [
-            'Led Spanish military operations during the late colonial period',
-            'Commanded forces against Filipino revolutionaries',
-            'Enforced harsh colonial policies and martial law',
-            'Represented Spanish military authority during the revolution'
-        ]
+        contributions: {
+            en: [
+                'Led Spanish military operations during the late colonial period',
+                'Commanded forces against Filipino revolutionaries',
+                'Enforced harsh colonial policies and martial law',
+                'Represented Spanish military authority during the revolution'
+            ],
+            tl: [
+                'Nanguna sa mga operasyong militar ng Espanya sa huling panahon ng kolonyal',
+                'Nag-utos ng mga pwersa laban sa mga rebolusyonaryong Pilipino',
+                'Nagpatupad ng malupit na patakaran kolonyal at batas militar',
+                'Kumakatawan sa awtoridad militar ng Espanya sa panahon ng rebolusyon'
+            ]
+        }
     },
     'General Juan Luna': {
         type: 'hero',
-        contributions: [
-            'Brother of painter Juan Luna, one of the greatest Filipino military leaders',
-            'Led Filipino forces during the Philippine-American War',
-            'Known for brilliant military tactics and strategies',
-            'Commanded the defense of Northern Luzon',
-            'Assassinated in 1899, reportedly on orders from Aguinaldo',
-            'His death weakened Filipino resistance against Americans'
-        ]
+        contributions: {
+            en: [
+                'Brother of painter Juan Luna, one of the greatest Filipino military leaders',
+                'Led Filipino forces during the Philippine-American War',
+                'Known for brilliant military tactics and strategies',
+                'Commanded the defense of Northern Luzon',
+                'Assassinated in 1899, reportedly on orders from Aguinaldo',
+                'His death weakened Filipino resistance against Americans'
+            ],
+            tl: [
+                'Kapatid ng pintor na si Juan Luna, isa sa pinakadakilang pinunong militar na Pilipino',
+                'Nanguna sa mga pwersang Pilipino sa panahon ng Digmaang Pilipino-Amerikano',
+                'Kilala sa kahusayan ng taktika at estratehiya militar',
+                'Nag-utos ng depensa ng Hilagang Luzon',
+                'Pinaslang noong 1899, ulat ay sa utos ni Aguinaldo',
+                'Ang kanyang kamatayan ay nagpahina ng paglaban ng Pilipino laban sa mga Amerikano'
+            ]
+        }
     },
     'Commodore George Dewey': {
         type: 'villain',
-        contributions: [
-            'Commander of US Asiatic Squadron',
-            'Defeated Spanish fleet in Battle of Manila Bay (May 1, 1898)',
-            'His victory marked the end of Spanish colonial rule',
-            'Enabled American occupation of the Philippines',
-            'Famous for saying "You may fire when ready, Gridley"'
-        ]
+        contributions: {
+            en: [
+                'Commander of US Asiatic Squadron',
+                'Defeated Spanish fleet in Battle of Manila Bay (May 1, 1898)',
+                'His victory marked the end of Spanish colonial rule',
+                'Enabled American occupation of the Philippines',
+                'Famous for saying "You may fire when ready, Gridley"'
+            ],
+            tl: [
+                'Kumander ng US Asiatic Squadron',
+                'Tinalo ang hukbong-dagat ng Espanya sa Labanan ng Look ng Maynila (Mayo 1, 1898)',
+                'Ang kanyang tagumpay ay nagtanda ng wakas ng pamamahala ng kolonyal na Espanya',
+                'Nagbigay-daan sa pag-okupa ng Amerika sa Pilipinas',
+                'Sikat sa pagsasabi ng "You may fire when ready, Gridley"'
+            ]
+        }
     },
     'American Soldier': {
         type: 'villain',
-        contributions: [
-            'Represented American colonial forces',
-            'Fought in the Philippine-American War (1899-1902)',
-            'Enforced American colonial policies',
-            'Participated in campaigns against Filipino revolutionaries'
-        ]
+        contributions: {
+            en: [
+                'Represented American colonial forces',
+                'Fought in the Philippine-American War (1899-1902)',
+                'Enforced American colonial policies',
+                'Participated in campaigns against Filipino revolutionaries'
+            ],
+            tl: [
+                'Kumakatawan sa mga pwersang kolonyal ng Amerika',
+                'Lumaban sa Digmaang Pilipino-Amerikano (1899-1902)',
+                'Nagpatupad ng mga patakaran kolonyal ng Amerika',
+                'Lumahok sa mga kampanya laban sa mga rebolusyonaryong Pilipino'
+            ]
+        }
     },
     'Douglas MacArthur': {
         type: 'hero',
-        contributions: [
-            'American general who led Allied forces in the Pacific',
-            'Promised "I shall return" when forced to leave Philippines in 1942',
-            'Returned and liberated the Philippines in 1944',
-            'Led the recapture of Manila from Japanese forces',
-            'Helped restore Philippine independence after WWII',
-            'Received the rank of Field Marshal in the Philippine Army'
-        ]
-    },
-    'Japanese Commander': {
-        type: 'villain',
-        contributions: [
-            'Led Japanese occupation forces during WWII',
-            'Commanded military operations against Filipino and Allied forces',
-            'Enforced harsh Japanese occupation policies',
-            'Responsible for wartime atrocities and civilian suffering'
-        ]
+        contributions: {
+            en: [
+                'American general who led Allied forces in the Pacific',
+                'Promised "I shall return" when forced to leave Philippines in 1942',
+                'Returned and liberated the Philippines in 1944',
+                'Led the recapture of Manila from Japanese forces',
+                'Helped restore Philippine independence after WWII',
+                'Received the rank of Field Marshal in the Philippine Army'
+            ],
+            tl: [
+                'Heneral ng Amerika na nanguna sa mga pwersang Alyado sa Pasipiko',
+                'Nangako ng "Babalik ako" nang sapilitang umalis sa Pilipinas noong 1942',
+                'Bumalik at pinalaya ang Pilipinas noong 1944',
+                'Nanguna sa muling pagsakop ng Maynila mula sa mga pwersang Hapon',
+                'Tumulong sa pagbabalik ng kalayaan ng Pilipinas pagkatapos ng WWII',
+                'Nakatanggap ng ranggo ng Field Marshal sa Hukbong Pilipino'
+            ]
+        }
     },
     'Japanese Soldier': {
         type: 'villain',
-        contributions: [
-            'Participated in Japanese invasion of Philippines (1941)',
-            'Fought in the Battle of Bataan and Corregidor',
-            'Enforced Japanese occupation from 1942-1945',
-            'Represented Imperial Japanese military presence'
-        ]
+        contributions: {
+            en: [
+                'Participated in Japanese invasion of Philippines (1941)',
+                'Fought in the Battle of Bataan and Corregidor',
+                'Enforced Japanese occupation from 1942-1945',
+                'Represented Imperial Japanese military presence'
+            ],
+            tl: [
+                'Lumahok sa pagsalakay ng mga Hapon sa Pilipinas (1941)',
+                'Lumaban sa Labanan ng Bataan at Corregidor',
+                'Nagpatupad ng pag-okupang Hapon mula 1942-1945',
+                'Kumakatawan sa presensya militar ng Imperyong Hapon'
+            ]
+        }
     }
 };

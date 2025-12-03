@@ -53,7 +53,7 @@ function renderCharacterGrid() {
         
         card.innerHTML = `
             <div class="rounded-xl mb-3 bg-cover bg-center h-32 flex items-center justify-center" style="background-image: url('${eraData[character.eraKey].background}');">
-                <img src="${getCharacterSprite(character, 'idle')}" alt="${character.name}" class="max-w-full max-h-full object-contain">
+                <img src="${getCharacterSprite(character, 'idle')}" alt="${character.name}" class="max-w-full max-h-full object-contain character-image">
             </div>
             <h3 class="text-white font-bold text-center text-sm mb-1 drop-shadow-lg">${character.name}</h3>
             <p class="text-white text-xs text-center font-semibold">${eraName}</p>
@@ -68,8 +68,12 @@ function renderCharacterGrid() {
     });
 }
 
+// Store current character for re-rendering modal on language change
+let currentModalCharacter = null;
+
 // Show character details modal
 function showCharacterDetails(character) {
+    currentModalCharacter = character;
     const modal = document.getElementById('characterModal');
     const contributions = characterContributions[character.name];
     const lang = localStorage.getItem('selectedLanguage') || 'en';
@@ -99,23 +103,39 @@ function showCharacterDetails(character) {
     // Set contributions
     const contributionsDiv = document.getElementById('modalCharacterContributions');
     if (contributions && contributions.contributions) {
-        contributionsDiv.innerHTML = contributions.contributions.map(contribution => 
+        const contributionsList = contributions.contributions[lang] || contributions.contributions['en'] || [];
+        contributionsDiv.innerHTML = contributionsList.map(contribution => 
             `<div class="flex gap-3">
                 <span class="text-amber-600 font-bold flex-shrink-0">•</span>
                 <p>${contribution}</p>
             </div>`
         ).join('');
     } else {
-        contributionsDiv.innerHTML = '<p class="text-amber-700 italic">Historical information coming soon...</p>';
+        const noInfoText = lang === 'tl' ? 'Impormasyon sa kasaysayan ay paparating...' : 'Historical information coming soon...';
+        contributionsDiv.innerHTML = `<p class="text-amber-700 italic">${noInfoText}</p>`;
+    }
+    
+    // Update "Historical Contributions" heading translation
+    const contributionsHeading = document.querySelector('[data-translate="Historical Contributions"]');
+    if (contributionsHeading && translations[lang]['Historical Contributions']) {
+        contributionsHeading.textContent = translations[lang]['Historical Contributions'];
     }
     
     // Show modal
     modal.classList.remove('hidden');
 }
 
+// Update modal translations when language changes
+function updateModalTranslations() {
+    if (currentModalCharacter && !document.getElementById('characterModal').classList.contains('hidden')) {
+        showCharacterDetails(currentModalCharacter);
+    }
+}
+
 // Close modal
 function closeModal() {
     document.getElementById('characterModal').classList.add('hidden');
+    currentModalCharacter = null;
 }
 
 // Close modal when clicking outside
@@ -126,4 +146,9 @@ document.getElementById('characterModal')?.addEventListener('click', (e) => {
 });
 
 // Initialize on page load
-window.addEventListener('DOMContentLoaded', loadAllCharacters);
+window.addEventListener('DOMContentLoaded', () => {
+    // Wait for language system to initialize first
+    setTimeout(() => {
+        loadAllCharacters();
+    }, 100);
+});

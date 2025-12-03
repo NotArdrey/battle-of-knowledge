@@ -144,6 +144,23 @@
     animation: victory-bounce-flipped 1s ease infinite;
 }
 
+/* No flip for characters that already face left in their sprites */
+#enemyCharacter.no-flip {
+    transform: scaleX(1);
+}
+
+#enemyCharacter.no-flip.attacking {
+    animation: attack-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#enemyCharacter.no-flip.hurt {
+    animation: hurt-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#enemyCharacter.no-flip.victory {
+    animation: victory-bounce 1s ease infinite;
+}
+
 /* Mobile Responsive Adjustments */
 @media (max-width: 640px) {
     .damage-number {

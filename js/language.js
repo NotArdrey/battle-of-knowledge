@@ -131,6 +131,11 @@ function toggleLanguage() {
     if (typeof renderCharacterGrid === 'function') {
         renderCharacterGrid();
     }
+    
+    // Update modal if it's open on collection page
+    if (typeof updateModalTranslations === 'function') {
+        updateModalTranslations();
+    }
 }
 
 function updateLanguage() {

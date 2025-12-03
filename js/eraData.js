@@ -153,14 +153,6 @@ const eraData = {
         ],
         villains: [
             {
-                name: 'Japanese Commander',
-                folder: 'assets/Characters/4. Bonus Stage - WW2 Era/Villains/2. Japanese Commander',
-                idle: 'Japanese Commander - Idle.png',
-                attack: 'Japanese Commander - Attack.png',
-                hurt: 'Japanese Commander - Hurt.png',
-                victory: 'Japanese Commander - Victory.png'
-            },
-            {
                 name: 'Japanese Soldier',
                 folder: 'assets/Characters/4. Bonus Stage - WW2 Era/Villains/1. Japanese Soldier',
                 idle: 'Japanese Soldier - Idle.png',

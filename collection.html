@@ -13,6 +13,17 @@
         body { font-family: 'Baloo 2', cursive; }
         /* Ensure minimum touch target size */
         button { min-height: 44px; min-width: 44px; }
+        /* Prevent image pixelation */
+        img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+        /* Smooth scaling for better quality */
+        .character-image {
+            image-rendering: auto;
+            image-rendering: smooth;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-purple-900 via-indigo-800 to-purple-900 min-h-screen">
@@ -51,7 +62,7 @@
                 <div class="clear-both">
                     <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-center mb-4 md:mb-6">
                         <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 flex-shrink-0">
-                            <img id="modalCharacterImg" src="" alt="" class="w-full h-full object-contain">
+                            <img id="modalCharacterImg" src="" alt="" class="w-full h-full object-contain character-image">
                         </div>
                         <div class="flex-1 text-center sm:text-left">
                             <h2 id="modalCharacterName" class="text-xl sm:text-2xl md:text-4xl font-extrabold text-amber-900 mb-2"></h2>
