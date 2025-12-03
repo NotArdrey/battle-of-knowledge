@@ -100,15 +100,10 @@
                 return;
             }
             
-            // Check if era has multiple heroes
-            if (eraData[era] && eraData[era].heroes.length > 1) {
-                showCharacterSelect(era);
-            } else {
-                // Only one hero, go directly to battlefield
-                localStorage.setItem('selectedEra', era);
-                localStorage.removeItem('selectedHero');
-                window.location.href = 'battlefield.html';
-            }
+            // Save selected era and go to learning module
+            localStorage.setItem('selectedEra', era);
+            localStorage.removeItem('selectedHero');
+            window.location.href = 'learning-module.html';
         }
 
         function showCharacterSelect(era) {
@@ -150,7 +145,7 @@
         function selectCharacter(heroIndex) {
             localStorage.setItem('selectedEra', selectedEraKey);
             localStorage.setItem('selectedHero', heroIndex);
-            window.location.href = 'battlefield.html';
+            window.location.href = 'learning-module.html';
         }
 
         function closeCharacterSelect() {
