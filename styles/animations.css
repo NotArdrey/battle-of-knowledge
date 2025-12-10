@@ -68,15 +68,15 @@
 }
 
 .character.attacking {
-    animation: attack-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: attack-animation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .character.hurt {
-    animation: hurt-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: hurt-animation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .character.victory {
-    animation: victory-bounce 1s ease infinite;
+    animation: victory-bounce 1.5s ease infinite;
 }
 
 .damage-number {
@@ -85,7 +85,7 @@
     font-weight: 800;
     color: #ef4444;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 15px #fbbf24, 0 0 25px #fb923c;
-    animation: damage-popup 1s ease forwards;
+    animation: damage-popup 1.5s ease forwards;
     pointer-events: none;
     z-index: 100;
 }
@@ -99,7 +99,7 @@
     font-weight: 800;
     color: #fbbf24;
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), 0 0 20px #ef4444, 0 0 40px #fb923c;
-    animation: critical-popup 1s ease forwards;
+    animation: critical-popup 1.5s ease forwards;
     pointer-events: none;
     z-index: 100;
 }
@@ -133,15 +133,15 @@
 
 /* Maintain flip during animations */
 #enemyCharacter.attacking {
-    animation: attack-animation-flipped 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: attack-animation-flipped 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #enemyCharacter.hurt {
-    animation: hurt-animation-flipped 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: hurt-animation-flipped 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #enemyCharacter.victory {
-    animation: victory-bounce-flipped 1s ease infinite;
+    animation: victory-bounce-flipped 1.5s ease infinite;
 }
 
 /* No flip for characters that already face left in their sprites */
@@ -150,15 +150,15 @@
 }
 
 #enemyCharacter.no-flip.attacking {
-    animation: attack-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: attack-animation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #enemyCharacter.no-flip.hurt {
-    animation: hurt-animation 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: hurt-animation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #enemyCharacter.no-flip.victory {
-    animation: victory-bounce 1s ease infinite;
+    animation: victory-bounce 1.5s ease infinite;
 }
 
 /* Mobile Responsive Adjustments */

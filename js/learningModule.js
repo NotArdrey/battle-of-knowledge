@@ -1,12 +1,13 @@
 // Learning Module Logic
 let currentEraKey = '';
-let currentLang = 'en';
+let currentLang = localStorage.getItem('selectedLanguage') || 'en';
 let completedLessons = new Set();
 let currentLessonId = null;
 
 // Initialize learning module
 function initLearningModule() {
     currentEraKey = localStorage.getItem('selectedEra') || 'early-spanish';
+    // Re-read language from localStorage to ensure we have the latest value
     currentLang = localStorage.getItem('selectedLanguage') || 'en';
     
     // Load completed lessons for this era from localStorage
@@ -32,6 +33,10 @@ function loadEraContent() {
     // Update title
     document.getElementById('eraTitle').textContent = eraContent.title;
     
+    // Get translations
+    const completedText = translations && translations[currentLang] ? translations[currentLang]['Completed'] : '✓ Completed';
+    const clickToLearnText = translations && translations[currentLang] ? translations[currentLang]['clickToLearn'] : 'Click to learn';
+    
     // Load lessons
     const container = document.getElementById('lessonsContainer');
     container.innerHTML = '';
@@ -51,7 +56,7 @@ function loadEraContent() {
             <div class="text-4xl md:text-5xl mb-3 md:mb-4 text-center">${lesson.icon}</div>
             <h3 class="text-base md:text-lg font-bold text-amber-900 text-center mb-2">${lesson.title}</h3>
             <p class="text-xs md:text-sm text-amber-700 text-center">
-                ${isCompleted ? '<span class="text-green-700 font-semibold">✓ Completed</span>' : 'Click to learn'}
+                ${isCompleted ? '<span class="text-green-700 font-semibold">' + completedText + '</span>' : clickToLearnText}
             </p>
         `;
         
@@ -72,8 +77,35 @@ function openLesson(lessonId) {
     document.getElementById('modalLessonContent').innerHTML = lesson.content;
     document.getElementById('lessonModal').classList.remove('hidden');
     
+    // Update Mark as Complete button state
+    updateMarkCompleteButton(lessonId);
+    
     // Auto-scroll to top of modal
     document.getElementById('lessonModal').scrollTop = 0;
+}
+
+// Update Mark as Complete button based on lesson completion status
+function updateMarkCompleteButton(lessonId) {
+    const markCompleteBtn = document.getElementById('markCompleteBtn');
+    if (!markCompleteBtn) return;
+    
+    const isCompleted = completedLessons.has(lessonId);
+    const markCompleteText = translations && translations[currentLang] ? translations[currentLang]['markComplete'] : '✓ Mark as Complete';
+    const completedText = translations && translations[currentLang] ? translations[currentLang]['Completed'] : '✓ Completed';
+    
+    if (isCompleted) {
+        // Already completed - show completed state
+        markCompleteBtn.disabled = true;
+        markCompleteBtn.classList.remove('from-green-500', 'to-green-600', 'border-green-700');
+        markCompleteBtn.classList.add('from-gray-400', 'to-gray-500', 'border-gray-600');
+        markCompleteBtn.querySelector('span').textContent = completedText;
+    } else {
+        // Not completed - show active state
+        markCompleteBtn.disabled = false;
+        markCompleteBtn.classList.remove('from-gray-400', 'to-gray-500', 'border-gray-600');
+        markCompleteBtn.classList.add('from-green-500', 'to-green-600', 'border-green-700');
+        markCompleteBtn.querySelector('span').textContent = markCompleteText;
+    }
 }
 
 // Close lesson modal
@@ -168,6 +200,12 @@ function startBattle() {
     }
 }
 
+// Get unlocked heroes for an era
+function getUnlockedHeroesForEra(eraKey) {
+    const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
+    return unlockedHeroes[eraKey] || [0]; // First hero (index 0) is always unlocked by default
+}
+
 // Show character selection
 function showCharacterSelect() {
     const era = currentEraKey;
@@ -176,17 +214,36 @@ function showCharacterSelect() {
     modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
     
     const heroes = eraData[era].heroes;
+    const unlockedIndices = getUnlockedHeroesForEra(era);
     let heroesHTML = '';
     
     heroes.forEach((hero, index) => {
-        heroesHTML += `
-            <div class="bg-gradient-to-br from-blue-400 to-cyan-400 border-3 md:border-4 border-blue-600 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-pointer hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl" onclick="selectCharacter(${index})">
-                <div class="bg-white rounded-lg md:rounded-xl p-2 mb-3 h-24 md:h-32 flex items-center justify-center shadow-inner" style="box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.1);">
-                    <img src="${hero.folder}/${hero.idle}" alt="${hero.name}" class="max-w-full max-h-full object-contain">
+        const isUnlocked = unlockedIndices.includes(index);
+        
+        if (isUnlocked) {
+            heroesHTML += `
+                <div class="bg-gradient-to-br from-blue-400 to-cyan-400 border-3 md:border-4 border-blue-600 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-pointer hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl" onclick="selectCharacter(${index})">
+                    <div class="bg-white rounded-lg md:rounded-xl p-2 mb-3 h-24 md:h-32 flex items-center justify-center shadow-inner" style="box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.1);">
+                        <img src="${hero.folder}/${hero.idle}" alt="${hero.name}" class="max-w-full max-h-full object-contain">
+                    </div>
+                    <h3 class="text-white font-bold text-center text-sm md:text-base drop-shadow-lg">${hero.name}</h3>
                 </div>
-                <h3 class="text-white font-bold text-center text-sm md:text-base drop-shadow-lg">${hero.name}</h3>
-            </div>
-        `;
+            `;
+        } else {
+            // Locked hero
+            heroesHTML += `
+                <div class="bg-gradient-to-br from-gray-400 to-gray-500 border-3 md:border-4 border-gray-600 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-not-allowed opacity-70 shadow-xl relative">
+                    <div class="absolute inset-0 flex items-center justify-center z-10">
+                        <span class="text-4xl">🔒</span>
+                    </div>
+                    <div class="bg-gray-300 rounded-lg md:rounded-xl p-2 mb-3 h-24 md:h-32 flex items-center justify-center shadow-inner filter grayscale" style="box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.1);">
+                        <img src="${hero.folder}/${hero.idle}" alt="${hero.name}" class="max-w-full max-h-full object-contain opacity-50">
+                    </div>
+                    <h3 class="text-gray-600 font-bold text-center text-sm md:text-base drop-shadow-lg">${hero.name}</h3>
+                    <p class="text-gray-500 text-xs text-center mt-1">Win battles to unlock</p>
+                </div>
+            `;
+        }
     });
     
     modal.innerHTML = `
@@ -239,10 +296,27 @@ function skipToCharacterSelection() {
     }
 }
 
+// Show skip confirmation modal
+function showSkipConfirmation() {
+    document.getElementById('skipConfirmModal').classList.remove('hidden');
+}
+
+// Close skip confirmation modal
+function closeSkipConfirmation() {
+    document.getElementById('skipConfirmModal').classList.add('hidden');
+}
+
+// Confirm skip and proceed
+function confirmSkip() {
+    closeSkipConfirmation();
+    skipToCharacterSelection();
+}
+
 // Language change handler
 function handleLanguageChange() {
     currentLang = localStorage.getItem('selectedLanguage') || 'en';
     loadEraContent();
+    updateProgress();
 }
 
 // Listen for language changes
@@ -256,11 +330,13 @@ window.addEventListener('storage', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
     initLearningModule();
     
-    // Setup language toggle
+    // Setup language toggle - override to also reload content
     const langToggle = document.getElementById('langToggle');
     if (langToggle) {
+        // Remove existing listener and add new one that also updates learning content
         langToggle.addEventListener('click', () => {
-            setTimeout(handleLanguageChange, 100);
+            // Wait a bit for the language.js toggleLanguage to complete
+            setTimeout(handleLanguageChange, 50);
         });
     }
 });

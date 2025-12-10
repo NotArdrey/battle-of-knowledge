@@ -49,8 +49,30 @@ const translations = {
         'defeated': '💔 DEFEATED 💔',
         'tryHarder': 'Study harder and try again!',
         'tryAgain': 'Try Again',
+        'retry': 'Retry Battle',
+        'mainMenu': 'Main Menu',
         'victory': '🎉 VICTORY! 🎉',
-        'conqueredEra': 'You have conquered this era!'
+        'conqueredEra': 'You have conquered this era!',
+        
+        // Learning Module
+        'Learn About': 'Learn About',
+        'studyBeforeBattle': 'Study these lessons before your battle!',
+        'lessonsCompleted': 'lessons completed',
+        'startBattle': '⚔️ Start Battle!',
+        'readAllLessons': '💡 Read all lessons to unlock the battle!',
+        'skipLearning': '⏭️ Skip Learning (Not Recommended)',
+        'skipWarning': 'Learning helps you answer questions in battle!',
+        'markComplete': '✓ Mark as Complete',
+        'Close': 'Close',
+        'clickToLearn': 'Click to learn',
+        'Completed': '✓ Completed',
+        'skipConfirmTitle': 'Skip Learning?',
+        'skipConfirmMessage': 'Skipping lessons will make the battle harder. Are you sure you want to continue?',
+        'yesSkip': 'Yes, Skip',
+        'noStay': 'No, Stay',
+        'newHeroUnlocked': '🏆 New Hero Unlocked! 🏆',
+        'allHeroesUnlocked': '🎉 All Heroes Unlocked! 🎉',
+        'congratulations': 'Congratulations! You have unlocked all heroes in this era!'
     },
     tl: {
         // Index page
@@ -102,16 +124,41 @@ const translations = {
         'defeated': '💔 NATALO 💔',
         'tryHarder': 'Mag-aral pa at subukan muli!',
         'tryAgain': 'Subukan Muli',
+        'retry': 'Subukan Muli ang Labanan',
+        'mainMenu': 'Pangunahing Menu',
         'victory': '🎉 TAGUMPAY! 🎉',
-        'conqueredEra': 'Nasakop mo ang panahong ito!'
+        'conqueredEra': 'Nasakop mo ang panahong ito!',
+        
+        // Learning Module
+        'Learn About': 'Alamin Tungkol sa',
+        'studyBeforeBattle': 'Pag-aralan ang mga aral na ito bago ang labanan!',
+        'lessonsCompleted': 'na aral ang nakumpleto',
+        'startBattle': '⚔️ Simulan ang Labanan!',
+        'readAllLessons': '💡 Basahin lahat ng aral upang ma-unlock ang labanan!',
+        'skipLearning': '⏭️ Laktawan ang Pag-aaral (Hindi Inirerekomenda)',
+        'skipWarning': 'Ang pag-aaral ay tumutulong sa pagsagot ng mga tanong sa labanan!',
+        'markComplete': '✓ Markahan bilang Kumpleto',
+        'Close': 'Isara',
+        'clickToLearn': 'I-click upang matuto',
+        'Completed': '✓ Nakumpleto',
+        'skipConfirmTitle': 'Laktawan ang Pag-aaral?',
+        'skipConfirmMessage': 'Ang paglaktaw sa mga aral ay magpapahirap sa labanan. Sigurado ka bang gusto mong magpatuloy?',
+        'yesSkip': 'Oo, Laktawan',
+        'noStay': 'Hindi, Manatili',
+        'newHeroUnlocked': '🏆 Bagong Bayani Na-unlock! 🏆',
+        'allHeroesUnlocked': '🎉 Lahat ng Bayani Na-unlock! 🎉',
+        'congratulations': 'Binabati kita! Na-unlock mo na ang lahat ng bayani sa panahong ito!'
     }
 };
 
+// Initialize language from localStorage immediately
 let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
 
 function initializeLanguage() {
     // Apply saved language on page load
     currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+    // Ensure we save it back to localStorage (persistence fix)
+    localStorage.setItem('selectedLanguage', currentLanguage);
     updateLanguage();
     updateToggleButton();
 }

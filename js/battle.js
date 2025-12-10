@@ -9,6 +9,12 @@ let currentVillain = null;
 let currentLanguageLoaded = ''; // Track which language questions are loaded
 let currentShuffledAnswers = []; // Store shuffled answers
 
+// Get unlocked heroes for an era (needed before initBattle)
+function getUnlockedHeroesForEra(eraKey) {
+    const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
+    return unlockedHeroes[eraKey] || [0]; // First hero (index 0) is always unlocked by default
+}
+
 // Initialize battle
 function initBattle() {
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
@@ -37,13 +43,22 @@ function initBattle() {
     const battleBackground = document.getElementById('battleBackground');
     battleBackground.style.backgroundImage = `url('${eraData[currentEra].background}')`;
     
-    // Select hero (either player selected or random)
+    // Select hero (either player selected or first unlocked)
     const selectedHeroIndex = localStorage.getItem('selectedHero');
+    const unlockedHeroes = getUnlockedHeroesForEra(currentEra);
+    
     if (selectedHeroIndex !== null && eraData[currentEra].heroes[selectedHeroIndex]) {
-        currentHero = eraData[currentEra].heroes[selectedHeroIndex];
+        // Check if the selected hero is unlocked
+        if (unlockedHeroes.includes(parseInt(selectedHeroIndex))) {
+            currentHero = eraData[currentEra].heroes[parseInt(selectedHeroIndex)];
+        } else {
+            // Fall back to first unlocked hero
+            currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
+        }
         localStorage.removeItem('selectedHero'); // Clear selection for next battle
     } else {
-        currentHero = getRandomHero(currentEra);
+        // Use first unlocked hero by default
+        currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
     }
     
     // Select random villain
@@ -83,7 +98,7 @@ function setCharacterState(character, state) {
     if (state !== 'idle') {
         setTimeout(() => {
             sprite.src = getCharacterSprite(characterData, 'idle');
-        }, 800);
+        }, 1200);
     }
 }
 
@@ -191,7 +206,7 @@ function selectAnswer(index) {
             currentShuffledAnswers = []; // Clear shuffled answers for next question
             loadQuestion();
         }
-    }, 2000);
+    }, 2500);
 }
 
 // Attack enemy
@@ -218,8 +233,8 @@ function attackEnemy() {
             if (enemyHp <= 0) {
                 victory();
             }
-        }, 800);
-    }, 400);
+        }, 1200);
+    }, 600);
 }
 
 // Attack player
@@ -246,8 +261,8 @@ function attackPlayer() {
             if (playerHp <= 0) {
                 defeat();
             }
-        }, 800);
-    }, 400);
+        }, 1200);
+    }, 600);
 }
 
 function animatePlayerAttack() {
@@ -314,7 +329,7 @@ function showDamage(damage, target) {
     
     setTimeout(() => {
         damageEl.remove();
-    }, 1000);
+    }, 1500);
 }
 
 // Update HP bars
@@ -380,35 +395,97 @@ function checkBattleEnd() {
     }
 }
 
+// Get era order for progression
+const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
+
+// Save unlocked heroes for an era
+function saveUnlockedHeroesForEra(eraKey, heroIndices) {
+    const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
+    unlockedHeroes[eraKey] = heroIndices;
+    localStorage.setItem('unlockedHeroes', JSON.stringify(unlockedHeroes));
+}
+
+// Unlock next hero for the current era
+function unlockNextHero(eraKey) {
+    const heroes = eraData[eraKey].heroes;
+    const unlockedIndices = getUnlockedHeroesForEra(eraKey);
+    
+    // Find the next hero to unlock
+    const nextHeroIndex = unlockedIndices.length;
+    
+    if (nextHeroIndex < heroes.length) {
+        // There's a hero to unlock
+        unlockedIndices.push(nextHeroIndex);
+        saveUnlockedHeroesForEra(eraKey, unlockedIndices);
+        return heroes[nextHeroIndex]; // Return the newly unlocked hero
+    }
+    
+    return null; // All heroes already unlocked
+}
+
 // Unlock hero and show victory
 function unlockHeroAndShowVictory() {
-    const currentEraIndex = parseInt(localStorage.getItem('selectedEraIndex')) || 0;
-    const currentEra = eras[currentEraIndex];
-    
-    // Unlock hero for this era
-    let unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || [];
-    if (!unlockedHeroes.includes(currentEra.hero)) {
-        unlockedHeroes.push(currentEra.hero);
-        localStorage.setItem('unlockedHeroes', JSON.stringify(unlockedHeroes));
-    }
+    const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
     
     // Mark era as completed
     let completedEras = JSON.parse(localStorage.getItem('completedEras')) || [];
-    if (!completedEras.includes(currentEraIndex)) {
-        completedEras.push(currentEraIndex);
+    if (!completedEras.includes(currentEra)) {
+        completedEras.push(currentEra);
         localStorage.setItem('completedEras', JSON.stringify(completedEras));
     }
     
-    // Display hero achievement
-    document.getElementById('unlockedHeroImage').src = `assets/${currentEra.hero.toLowerCase().replace(/\s+/g, '')}-idle.png`;
-    document.getElementById('unlockedHeroName').textContent = currentEra.hero;
-    document.getElementById('unlockedHeroDescription').textContent = currentEra.heroDescription || `${currentEra.hero} - Hero of ${currentEra.title}`;
+    // Try to unlock the next hero
+    const unlockedHero = unlockNextHero(currentEra);
+    const heroAchievementDiv = document.querySelector('#victoryModal .bg-gradient-to-br.from-amber-50');
+    const heroUnlockedTitle = document.querySelector('#victoryModal [data-lang-key="heroUnlocked"]');
+    
+    if (unlockedHero) {
+        // Show hero achievement
+        if (heroAchievementDiv) {
+            heroAchievementDiv.style.display = 'block';
+        }
+        
+        // Update hero unlocked title
+        if (heroUnlockedTitle) {
+            const newHeroText = translations && translations[currentLanguage] 
+                ? translations[currentLanguage]['newHeroUnlocked'] || '🏆 New Hero Unlocked! 🏆'
+                : '🏆 New Hero Unlocked! 🏆';
+            heroUnlockedTitle.textContent = newHeroText;
+        }
+        
+        // Display hero achievement with correct image path
+        const heroImageEl = document.getElementById('unlockedHeroImage');
+        heroImageEl.style.display = 'block'; // Make sure image is visible
+        heroImageEl.src = `${unlockedHero.folder}/${unlockedHero.idle}`;
+        document.getElementById('unlockedHeroName').textContent = unlockedHero.name;
+        document.getElementById('unlockedHeroDescription').textContent = unlockedHero.description || `${unlockedHero.name} - Hero of ${eraData[currentEra].name}`;
+    } else {
+        // All heroes already unlocked - show different message or hide the section
+        if (heroAchievementDiv) {
+            const allHeroesUnlockedText = translations && translations[currentLanguage]
+                ? translations[currentLanguage]['allHeroesUnlocked'] || '🎉 All Heroes Unlocked! 🎉'
+                : '🎉 All Heroes Unlocked! 🎉';
+            const congratsText = translations && translations[currentLanguage]
+                ? translations[currentLanguage]['congratulations'] || 'Congratulations! You have unlocked all heroes in this era!'
+                : 'Congratulations! You have unlocked all heroes in this era!';
+            
+            if (heroUnlockedTitle) {
+                heroUnlockedTitle.textContent = allHeroesUnlockedText;
+            }
+            
+            // Hide the hero image and show congrats message
+            document.getElementById('unlockedHeroImage').style.display = 'none';
+            document.getElementById('unlockedHeroName').textContent = '';
+            document.getElementById('unlockedHeroDescription').textContent = congratsText;
+        }
+    }
     
     // Check if there's a next era
     const nextEraBtn = document.getElementById('nextEraBtn');
-    if (currentEraIndex < eras.length - 1) {
+    const currentEraIndex = eraOrder.indexOf(currentEra);
+    
+    if (currentEraIndex < eraOrder.length - 1) {
         nextEraBtn.style.display = 'inline-block';
-        nextEraBtn.onclick = () => proceedToNextEra();
     } else {
         nextEraBtn.style.display = 'none';
     }
@@ -417,14 +494,17 @@ function unlockHeroAndShowVictory() {
 }
 
 function proceedToNextEra() {
-    const currentEraIndex = parseInt(localStorage.getItem('selectedEraIndex')) || 0;
-    if (currentEraIndex < eras.length - 1) {
-        localStorage.setItem('selectedEraIndex', currentEraIndex + 1);
-        localStorage.setItem('selectedEra', eras[currentEraIndex + 1].period);
-        location.reload(); // Reload with next era
+    const currentEraIndex = eraOrder.indexOf(currentEra);
+    
+    if (currentEraIndex < eraOrder.length - 1) {
+        const nextEra = eraOrder[currentEraIndex + 1];
+        localStorage.setItem('selectedEra', nextEra);
+        localStorage.removeItem('selectedHero'); // Clear hero selection
+        // Go to learning module for the next era
+        window.location.href = 'learning-module.html';
     } else {
         // All eras completed
-        location.href = 'collection.html';
+        window.location.href = 'collection.html';
     }
 }
 
