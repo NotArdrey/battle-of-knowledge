@@ -50,6 +50,15 @@
                 bottom: 9rem !important;
                 right: 0.5rem !important;
             }
+            /* Adjust question-answer container for mobile */
+            .question-answer-container {
+                margin-top: 0.5rem !important;
+                padding: 0.5rem !important;
+            }
+            .question-container {
+                margin-bottom: 0.5rem !important;
+                padding: 0.75rem !important;
+            }
         }
         @media (max-width: 480px) {
             .battle-platform {
@@ -172,7 +181,7 @@
                     border-4 sm:border-6 md:border-8 border-amber-800 
                     rounded-2xl sm:rounded-3xl
                     shadow-2xl shadow-amber-900/30
-                    mb-4 sm:mb-6">
+                    mb-2 sm:mb-4">
             
             <!-- Platform Decorations - Responsive -->
             <div class="absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-6 sm:h-6 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full border-2 border-amber-900"></div>
@@ -231,102 +240,138 @@
             </div>
         </div>
 
-        <!-- Question Container - Mobile Optimized -->
-        <div class="relative 
-                    w-full max-w-2xl 
+        <!-- Question & Answer Container - Single Unified Container -->
+        <div class="question-answer-container relative 
+                    w-full max-w-4xl
                     bg-gradient-to-br from-amber-50 to-yellow-100 
-                    border-3 sm:border-4 border-amber-800 
-                    rounded-xl sm:rounded-2xl
-                    p-3 sm:p-4 md:p-6
+                    border-4 sm:border-6 border-amber-800 
+                    rounded-2xl sm:rounded-3xl
+                    p-3 sm:p-4 md:p-5
                     shadow-2xl shadow-amber-900/30
-                    mb-4">
+                    mt-2 mb-4">
             
-            <div class="absolute -top-1 left-0 w-full h-2 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 rounded-t-xl"></div>
-            <div class="absolute -bottom-1 left-0 w-full h-2 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 rounded-b-xl"></div>
+            <!-- Decorative top and bottom borders -->
+            <div class="absolute -top-2 left-0 w-full h-3 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 rounded-t-xl"></div>
+            <div class="absolute -bottom-2 left-0 w-full h-3 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 rounded-b-xl"></div>
             
-            <p id="questionText" class="text-sm sm:text-base md:text-lg font-bold text-amber-900 
-                     text-center 
-                     min-h-[60px] sm:min-h-[70px] md:min-h-[80px]
-                     flex items-center justify-center 
-                     px-2 leading-tight sm:leading-normal">
-                Loading question...
-            </p>
-        </div>
+            <!-- Corner decorations -->
+            <div class="absolute -top-3 -left-3 w-6 h-6 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full border-2 border-amber-900"></div>
+            <div class="absolute -top-3 -right-3 w-6 h-6 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full border-2 border-amber-900"></div>
+            <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full border-2 border-amber-900"></div>
+            <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full border-2 border-amber-900"></div>
 
-        <!-- Answer Panel - Mobile Optimized -->
-        <div class="w-full max-w-4xl px-2">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <button id="answerA" onclick="selectAnswer(0)" 
-                        class="touch-target answer-btn 
-                               bg-gradient-to-r from-yellow-400 to-amber-400 
-                               border-3 sm:border-4 border-orange-600 
-                               rounded-xl sm:rounded-2xl 
-                               p-3 sm:p-4 
-                               text-left 
-                               text-sm sm:text-base font-bold text-amber-900 
-                               hover:scale-105 active:scale-95 
-                               transition-all duration-200 
-                               shadow-lg shadow-orange-900/20
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               min-h-[60px] sm:min-h-[70px]
-                               flex items-center">
-                    <span class="flex-shrink-0 mr-2 bg-amber-600 text-white rounded-lg px-2 py-1 text-xs">A</span>
-                    <span id="answerAText" class="break-words flex-grow">Loading...</span>
-                </button>
+            <!-- Question Container -->
+            <div class="question-container relative 
+                        bg-gradient-to-br from-yellow-200 to-amber-200
+                        border-3 border-amber-700
+                        rounded-xl sm:rounded-2xl
+                        p-3 sm:p-4
+                        mb-4 sm:mb-6
+                        shadow-inner shadow-amber-900/20">
                 
-                <button id="answerB" onclick="selectAnswer(1)" 
-                        class="touch-target answer-btn 
-                               bg-gradient-to-r from-yellow-400 to-amber-400 
-                               border-3 sm:border-4 border-orange-600 
-                               rounded-xl sm:rounded-2xl 
-                               p-3 sm:p-4 
-                               text-left 
-                               text-sm sm:text-base font-bold text-amber-900 
-                               hover:scale-105 active:scale-95 
-                               transition-all duration-200 
-                               shadow-lg shadow-orange-900/20
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               min-h-[60px] sm:min-h-[70px]
-                               flex items-center">
-                    <span class="flex-shrink-0 mr-2 bg-amber-600 text-white rounded-lg px-2 py-1 text-xs">B</span>
-                    <span id="answerBText" class="break-words flex-grow">Loading...</span>
-                </button>
+                <div class="absolute -top-1 left-0 w-full h-2 bg-gradient-to-r from-amber-600 to-amber-700 rounded-t-xl"></div>
+                <div class="absolute -bottom-1 left-0 w-full h-2 bg-gradient-to-r from-amber-600 to-amber-700 rounded-b-xl"></div>
                 
-                <button id="answerC" onclick="selectAnswer(2)" 
-                        class="touch-target answer-btn 
-                               bg-gradient-to-r from-yellow-400 to-amber-400 
-                               border-3 sm:border-4 border-orange-600 
-                               rounded-xl sm:rounded-2xl 
-                               p-3 sm:p-4 
-                               text-left 
-                               text-sm sm:text-base font-bold text-amber-900 
-                               hover:scale-105 active:scale-95 
-                               transition-all duration-200 
-                               shadow-lg shadow-orange-900/20
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               min-h-[60px] sm:min-h-[70px]
-                               flex items-center">
-                    <span class="flex-shrink-0 mr-2 bg-amber-600 text-white rounded-lg px-2 py-1 text-xs">C</span>
-                    <span id="answerCText" class="break-words flex-grow">Loading...</span>
-                </button>
+                <div class="flex items-center justify-center mb-2">
+                    <span class="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-3 py-1 text-sm font-bold shadow-md">
+                        ❓ QUESTION
+                    </span>
+                </div>
                 
-                <button id="answerD" onclick="selectAnswer(3)" 
-                        class="touch-target answer-btn 
-                               bg-gradient-to-r from-yellow-400 to-amber-400 
-                               border-3 sm:border-4 border-orange-600 
-                               rounded-xl sm:rounded-2xl 
-                               p-3 sm:p-4 
-                               text-left 
-                               text-sm sm:text-base font-bold text-amber-900 
-                               hover:scale-105 active:scale-95 
-                               transition-all duration-200 
-                               shadow-lg shadow-orange-900/20
-                               disabled:opacity-50 disabled:cursor-not-allowed
-                               min-h-[60px] sm:min-h-[70px]
-                               flex items-center">
-                    <span class="flex-shrink-0 mr-2 bg-amber-600 text-white rounded-lg px-2 py-1 text-xs">D</span>
-                    <span id="answerDText" class="break-words flex-grow">Loading...</span>
-                </button>
+                <p id="questionText" class="text-sm sm:text-base md:text-lg font-bold text-amber-900 
+                         text-center 
+                         min-h-[60px] sm:min-h-[70px] md:min-h-[80px]
+                         flex items-center justify-center 
+                         px-2 leading-tight sm:leading-normal">
+                    Loading question...
+                </p>
+            </div>
+
+            <!-- Answer Panel -->
+            <div class="answer-panel">
+                <div class="flex items-center justify-center mb-3 sm:mb-4">
+                    <span class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg px-3 py-1 text-sm font-bold shadow-md">
+                        🔘 ANSWERS
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <button id="answerA" onclick="selectAnswer(0)" 
+                            class="touch-target answer-btn 
+                                   bg-gradient-to-r from-yellow-300 to-amber-300
+                                   hover:from-yellow-400 hover:to-amber-400
+                                   border-3 sm:border-4 border-orange-500 
+                                   rounded-xl sm:rounded-2xl 
+                                   p-3 sm:p-4 
+                                   text-left 
+                                   text-sm sm:text-base font-bold text-amber-900 
+                                   hover:scale-105 active:scale-95 
+                                   transition-all duration-200 
+                                   shadow-lg shadow-orange-900/20
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   min-h-[60px] sm:min-h-[70px]
+                                   flex items-center">
+                        <span class="flex-shrink-0 mr-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-3 py-1 text-sm font-bold">A</span>
+                        <span id="answerAText" class="break-words flex-grow">Loading...</span>
+                    </button>
+                    
+                    <button id="answerB" onclick="selectAnswer(1)" 
+                            class="touch-target answer-btn 
+                                   bg-gradient-to-r from-yellow-300 to-amber-300
+                                   hover:from-yellow-400 hover:to-amber-400
+                                   border-3 sm:border-4 border-orange-500 
+                                   rounded-xl sm:rounded-2xl 
+                                   p-3 sm:p-4 
+                                   text-left 
+                                   text-sm sm:text-base font-bold text-amber-900 
+                                   hover:scale-105 active:scale-95 
+                                   transition-all duration-200 
+                                   shadow-lg shadow-orange-900/20
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   min-h-[60px] sm:min-h-[70px]
+                                   flex items-center">
+                        <span class="flex-shrink-0 mr-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-3 py-1 text-sm font-bold">B</span>
+                        <span id="answerBText" class="break-words flex-grow">Loading...</span>
+                    </button>
+                    
+                    <button id="answerC" onclick="selectAnswer(2)" 
+                            class="touch-target answer-btn 
+                                   bg-gradient-to-r from-yellow-300 to-amber-300
+                                   hover:from-yellow-400 hover:to-amber-400
+                                   border-3 sm:border-4 border-orange-500 
+                                   rounded-xl sm:rounded-2xl 
+                                   p-3 sm:p-4 
+                                   text-left 
+                                   text-sm sm:text-base font-bold text-amber-900 
+                                   hover:scale-105 active:scale-95 
+                                   transition-all duration-200 
+                                   shadow-lg shadow-orange-900/20
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   min-h-[60px] sm:min-h-[70px]
+                                   flex items-center">
+                        <span class="flex-shrink-0 mr-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-3 py-1 text-sm font-bold">C</span>
+                        <span id="answerCText" class="break-words flex-grow">Loading...</span>
+                    </button>
+                    
+                    <button id="answerD" onclick="selectAnswer(3)" 
+                            class="touch-target answer-btn 
+                                   bg-gradient-to-r from-yellow-300 to-amber-300
+                                   hover:from-yellow-400 hover:to-amber-400
+                                   border-3 sm:border-4 border-orange-500 
+                                   rounded-xl sm:rounded-2xl 
+                                   p-3 sm:p-4 
+                                   text-left 
+                                   text-sm sm:text-base font-bold text-amber-900 
+                                   hover:scale-105 active:scale-95 
+                                   transition-all duration-200 
+                                   shadow-lg shadow-orange-900/20
+                                   disabled:opacity-50 disabled:cursor-not-allowed
+                                   min-h-[60px] sm:min-h-[70px]
+                                   flex items-center">
+                        <span class="flex-shrink-0 mr-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-3 py-1 text-sm font-bold">D</span>
+                        <span id="answerDText" class="break-words flex-grow">Loading...</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
