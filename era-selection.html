@@ -14,20 +14,20 @@
         /* Ensure minimum touch target size */
         button { min-height: 44px; min-width: 44px; }
         
-        /* Era button styles */
+        /* Era button styles - EVEN LARGER */
         .era-card {
             display: flex;
             align-items: center;
             text-align: left;
-            gap: 1.75rem;
-            height: 180px; /* Even larger height */
+            gap: 2rem; /* Increased gap */
+            height: 220px; /* Significantly increased height */
             position: relative;
         }
         
         .era-img-container {
             flex-shrink: 0;
-            width: 120px; /* Increased size */
-            height: 120px; /* Increased size */
+            width: 150px; /* Significantly larger */
+            height: 150px; /* Significantly larger */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -36,10 +36,10 @@
         .era-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Changed to cover for better image fill */
-            border-radius: 16px; /* More rounded corners */
-            border: 3px solid rgba(120, 53, 15, 0.4); /* Slightly thicker border */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Added shadow for depth */
+            object-fit: cover;
+            border-radius: 20px; /* More rounded corners */
+            border: 4px solid rgba(120, 53, 15, 0.5); /* Thicker border */
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); /* Deeper shadow */
         }
         
         .era-content {
@@ -47,80 +47,106 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            padding-right: 1rem;
         }
         
         .era-description {
-            font-size: 0.85rem;
-            color: #7c2d12; /* Darker amber color */
-            margin-top: 4px;
-            line-height: 1.3;
+            font-size: 0.95rem; /* Slightly larger font */
+            color: #7c2d12;
+            margin-top: 6px;
+            line-height: 1.4;
             max-width: 100%;
         }
         
+        /* Larger gap between grid items */
+        .era-grid {
+            gap: 1.5rem !important;
+        }
+        
         /* Responsive adjustments */
+        @media (max-width: 1280px) {
+            .era-card {
+                height: 200px;
+                gap: 1.75rem;
+            }
+            .era-img-container {
+                width: 140px;
+                height: 140px;
+            }
+            .era-img {
+                border-radius: 18px;
+            }
+        }
+        
         @media (max-width: 1024px) {
             .era-card {
-                height: 160px;
+                height: 190px;
                 gap: 1.5rem;
             }
             .era-img-container {
-                width: 110px;
-                height: 110px;
+                width: 130px;
+                height: 130px;
+            }
+            .era-img {
+                border-radius: 16px;
             }
         }
         
         @media (max-width: 768px) {
             .era-card {
-                height: 150px;
+                height: 180px;
                 gap: 1.25rem;
+            }
+            .era-img-container {
+                width: 120px;
+                height: 120px;
+            }
+            .era-img {
+                border-radius: 14px;
+            }
+            .era-description {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .era-card {
+                height: 170px;
+                gap: 1rem;
+            }
+            .era-img-container {
+                width: 110px;
+                height: 110px;
+            }
+            .era-img {
+                border-radius: 12px;
+                border-width: 3px;
+            }
+            .era-description {
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .era-card {
+                height: 160px;
+                gap: 0.9rem;
             }
             .era-img-container {
                 width: 100px;
                 height: 100px;
             }
             .era-img {
-                border-radius: 14px;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .era-card {
-                height: 140px;
-                gap: 1rem;
-            }
-            .era-img-container {
-                width: 90px;
-                height: 90px;
-            }
-            .era-img {
-                border-radius: 12px;
-                border-width: 2px;
+                border-radius: 10px;
             }
             .era-description {
                 font-size: 0.8rem;
             }
         }
         
-        @media (max-width: 480px) {
-            .era-card {
-                height: 130px;
-                gap: 0.85rem;
-            }
-            .era-img-container {
-                width: 80px;
-                height: 80px;
-            }
-            .era-img {
-                border-radius: 10px;
-            }
-            .era-description {
-                font-size: 0.75rem;
-            }
-        }
-        
         /* WW2 card specific styles */
         .ww2-card .era-description {
-            color: #9a3412; /* Slightly lighter for red theme */
+            color: #9a3412;
         }
     </style>
 </head>
@@ -137,23 +163,23 @@
         <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
     </button>
 
-    <div class="relative z-10 w-full max-w-5xl px-2 sm:px-4 md:px-6">
-        <h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-yellow-400 text-center mb-6 sm:mb-8 md:mb-12 drop-shadow-2xl">
+    <div class="relative z-10 w-full max-w-6xl px-3 sm:px-5 md:px-8"> <!-- Increased max-width -->
+        <h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-yellow-400 text-center mb-8 sm:mb-10 md:mb-14 drop-shadow-2xl">
             <span data-translate="Choose Your Historical Era">Choose Your Historical Era</span>
         </h1>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 md:gap-8 mb-8 md:mb-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7 md:gap-10 mb-10 md:mb-12 era-grid">
             <!-- Early Spanish Era Button -->
             <button onclick="selectEra('early-spanish')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-5 sm:p-6 md:p-8 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/Early Spanish Era/Button-Spanish-Early.png" 
                          alt="Early Spanish Era" 
                          class="era-img">
                 </div>
                 <div class="era-content">
-                    <h3 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-amber-900 mb-1 md:mb-2" data-translate="Early Spanish Era">Early Spanish Era</h3>
-                    <p class="text-sm md:text-base text-amber-700 font-semibold mb-2" data-translate="Battle of Mactan (1521)">Battle of Mactan (1521)</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-amber-900 mb-2 md:mb-3" data-translate="Early Spanish Era">Early Spanish Era</h3>
+                    <p class="text-base md:text-lg text-amber-700 font-semibold mb-3 md:mb-4" data-translate="Battle of Mactan (1521)">Battle of Mactan (1521)</p>
                     <p class="era-description">
                         Experience the dawn of Spanish colonization. Witness the epic Battle of Mactan where Lapu-Lapu's forces defeated Magellan's expedition.
                     </p>
@@ -162,15 +188,15 @@
 
             <!-- Late Spanish Era Button -->
             <button onclick="selectEra('late-spanish')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-5 sm:p-6 md:p-8 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/Late Spanish Era/Button-Spanish-Late.png" 
                          alt="Late Spanish Era" 
                          class="era-img">
                 </div>
                 <div class="era-content">
-                    <h3 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-amber-900 mb-1 md:mb-2" data-translate="Late Spanish Era">Late Spanish Era</h3>
-                    <p class="text-sm md:text-base text-amber-700 font-semibold mb-2" data-translate="Revolution (1896-1898)">Revolution (1896-1898)</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-amber-900 mb-2 md:mb-3" data-translate="Late Spanish Era">Late Spanish Era</h3>
+                    <p class="text-base md:text-lg text-amber-700 font-semibold mb-3 md:mb-4" data-translate="Revolution (1896-1898)">Revolution (1896-1898)</p>
                     <p class="era-description">
                         Join the Philippine Revolution! Fight alongside heroes like Andres Bonifacio and Jose Rizal in the struggle against 333 years of Spanish rule.
                     </p>
@@ -179,15 +205,15 @@
 
             <!-- American Colonial Button -->
             <button onclick="selectEra('american-colonial')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-5 sm:p-6 md:p-8 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/American Era/Button-American.png" 
                          alt="American Colonial Era" 
                          class="era-img">
                 </div>
                 <div class="era-content">
-                    <h3 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-amber-900 mb-1 md:mb-2" data-translate="American Colonial">American Colonial</h3>
-                    <p class="text-sm md:text-base text-amber-700 font-semibold mb-2" data-translate="Philippine-American War">Philippine-American War</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-amber-900 mb-2 md:mb-3" data-translate="American Colonial">American Colonial</h3>
+                    <p class="text-base md:text-lg text-amber-700 font-semibold mb-3 md:mb-4" data-translate="Philippine-American War">Philippine-American War</p>
                     <p class="era-description">
                         Enter the Philippine-American War. Experience the resistance against American colonization and the fight for true independence.
                     </p>
@@ -196,15 +222,15 @@
 
             <!-- WW2 Bonus Stage Button -->
             <button onclick="selectEra('ww2')" 
-                    class="era-card ww2-card bg-gradient-to-br from-red-100 to-orange-200 border-2 sm:border-3 md:border-4 border-red-700 rounded-xl md:rounded-2xl p-5 sm:p-6 md:p-8 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card ww2-card bg-gradient-to-br from-red-100 to-orange-200 border-3 sm:border-4 md:border-6 border-red-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/WWII Era/Button-WWII.png" 
                          alt="WWII Era" 
                          class="era-img">
                 </div>
                 <div class="era-content">
-                    <h3 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-red-900 mb-1 md:mb-2" data-translate="WW2 Bonus Stage">WW2 Bonus Stage</h3>
-                    <p class="text-sm md:text-base text-red-700 font-semibold mb-2" data-translate="Pacific Theater (1941-1945)">Pacific Theater (1941-1945)</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-red-900 mb-2 md:mb-3" data-translate="WW2 Bonus Stage">WW2 Bonus Stage</h3>
+                    <p class="text-base md:text-lg text-red-700 font-semibold mb-3 md:mb-4" data-translate="Pacific Theater (1941-1945)">Pacific Theater (1941-1945)</p>
                     <p class="era-description">
                         Survive World War II in the Pacific! Battle through Japanese occupation, guerrilla warfare, and the fight to liberate the Philippines.
                     </p>
