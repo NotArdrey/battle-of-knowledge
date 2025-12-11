@@ -193,44 +193,50 @@
         z-index: 20; /* Increased from 10 */
     }
     
-    /* Default mobile sizes - HUGE but moved closer together */
+    /* Default mobile sizes - HUGE and CLOSE TOGETHER */
     .character-left {
-        left: 10px; /* Moved from 0 to 10px */
+        left: 5%; /* Positioned closer to center */
         width: 200px !important;
         height: 200px !important;
+        transform: translateX(-50%); /* Center the character on this position */
     }
     
     .character-right {
-        right: 10px; /* Moved from 0 to 10px */
+        right: 5%; /* Positioned closer to center */
         width: 200px !important;
         height: 200px !important;
+        transform: translateX(50%); /* Center the character on this position */
     }
     
     @media (min-width: 480px) {
         .character-left {
-            left: 20px; /* Moved closer from edge */
+            left: 15%; /* Much closer to center */
             width: 240px !important;
             height: 240px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 20px; /* Moved closer from edge */
+            right: 15%; /* Much closer to center */
             width: 240px !important;
             height: 240px !important;
+            transform: translateX(50%);
         }
     }
     
     @media (min-width: 640px) {
         .character-left {
-            left: 30px; /* Moved closer from edge */
+            left: 20%; /* Even closer to center */
             width: 280px !important;
             height: 280px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 30px; /* Moved closer from edge */
+            right: 20%; /* Even closer to center */
             width: 280px !important;
             height: 280px !important;
+            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -241,15 +247,17 @@
     
     @media (min-width: 768px) {
         .character-left {
-            left: 40px; /* Moved closer from edge */
+            left: 25%; /* Very close to center */
             width: 320px !important;
             height: 320px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 40px; /* Moved closer from edge */
+            right: 25%; /* Very close to center */
             width: 320px !important;
             height: 320px !important;
+            transform: translateX(50%);
         }
         
         .hp-bar-left {
@@ -265,15 +273,17 @@
     
     @media (min-width: 1024px) {
         .character-left {
-            left: 50px; /* Moved closer from edge */
+            left: 30%; /* Extremely close to center for PC */
             width: 360px !important;
             height: 360px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 50px; /* Moved closer from edge */
+            right: 30%; /* Extremely close to center for PC */
             width: 360px !important;
             height: 360px !important;
+            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -284,15 +294,17 @@
     
     @media (min-width: 1280px) {
         .character-left {
-            left: 60px; /* Moved closer from edge */
+            left: 35%; /* Very close together for large PC */
             width: 380px !important;
             height: 380px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 60px; /* Moved closer from edge */
+            right: 35%; /* Very close together for large PC */
             width: 380px !important;
             height: 380px !important;
+            transform: translateX(50%);
         }
         
         .hp-bar-left {
@@ -306,15 +318,17 @@
     
     @media (min-width: 1536px) {
         .character-left {
-            left: 80px; /* Moved closer from edge */
+            left: 38%; /* Almost touching for extra large screens */
             width: 420px !important;
             height: 420px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 80px; /* Moved closer from edge */
+            right: 38%; /* Almost touching for extra large screens */
             width: 420px !important;
             height: 420px !important;
+            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -502,15 +516,17 @@
         }
         
         .character-left {
-            left: 5px; /* Moved closer from edge */
+            left: 10%; /* Closer together on small screens */
             width: 180px !important;
             height: 180px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 5px; /* Moved closer from edge */
+            right: 10%; /* Closer together on small screens */
             width: 180px !important;
             height: 180px !important;
+            transform: translateX(50%);
         }
         
         .question-box {
@@ -552,15 +568,17 @@
         }
         
         .character-left {
-            left: 30px; /* Moved closer from edge */
+            left: 22%; /* Very close together on tablets */
             width: 300px !important;
             height: 300px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 30px; /* Moved closer from edge */
+            right: 22%; /* Very close together on tablets */
             width: 300px !important;
             height: 300px !important;
+            transform: translateX(50%);
         }
         
         .question-box {
@@ -598,15 +616,17 @@
         }
         
         .character-left {
-            left: 40px; /* Moved closer from edge */
+            left: 35%; /* EXTREMELY close for PC - characters almost touching */
             width: 340px !important;
             height: 340px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 40px; /* Moved closer from edge */
+            right: 35%; /* EXTREMELY close for PC - characters almost touching */
             width: 340px !important;
             height: 340px !important;
+            transform: translateX(50%);
         }
         
         .question-box {
@@ -632,30 +652,34 @@
     /* Large Desktop */
     @media (min-width: 1280px) {
         .character-left {
-            left: 50px; /* Moved closer from edge */
+            left: 38%; /* Almost overlapping on large PC */
             width: 380px !important;
             height: 380px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 50px; /* Moved closer from edge */
+            right: 38%; /* Almost overlapping on large PC */
             width: 380px !important;
             height: 380px !important;
+            transform: translateX(50%);
         }
     }
     
     /* Extra Large Desktop */
     @media (min-width: 1536px) {
         .character-left {
-            left: 60px; /* Moved closer from edge */
+            left: 40%; /* Characters very close together */
             width: 420px !important;
             height: 420px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 60px; /* Moved closer from edge */
+            right: 40%; /* Characters very close together */
             width: 420px !important;
             height: 420px !important;
+            transform: translateX(50%);
         }
     }
     
@@ -674,15 +698,17 @@
         }
         
         .character-left {
-            left: 5px; /* Moved closer from edge */
+            left: 15%; /* Close together in landscape */
             width: 200px !important;
             height: 200px !important;
+            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 5px; /* Moved closer from edge */
+            right: 15%; /* Close together in landscape */
             width: 200px !important;
             height: 200px !important;
+            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -860,13 +886,13 @@
                 <p class="hp-bar-text" id="enemyHpText">100/100</p>
             </div>
             
-            <!-- Player Character - EXTREMELY LARGE but closer to center -->
+            <!-- Player Character - EXTREMELY LARGE and VERY CLOSE TO ENEMY -->
             <div id="playerCharacter" class="character-left character-container">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
             </div>
             
-            <!-- Enemy Character - EXTREMELY LARGE but closer to center -->
+            <!-- Enemy Character - EXTREMELY LARGE and VERY CLOSE TO PLAYER -->
             <div id="enemyCharacter" class="character-right character-container">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
