@@ -1,4 +1,4 @@
-// battle.js - COMPLETE MOBILE-OPTIMIZED VERSION
+// battle.js - COMPLETE VERSION WITH IMPACTFUL EFFECTS
 
 // Battle game logic
 let playerHp = 100;
@@ -320,10 +320,10 @@ function selectAnswer(index) {
 }
 
 // ============================================
-// MOBILE-OPTIMIZED ATTACK EFFECT FUNCTIONS
+// IMPACTFUL ATTACK EFFECT FUNCTIONS
 // ============================================
 
-// Mobile-optimized screen shake
+// Mobile-optimized screen shake (keeping as is)
 function mobileShake() {
     if (isMobile) {
         // For mobile: Simple translate animation
@@ -353,221 +353,8 @@ function mobileShake() {
     }
 }
 
-// Mobile-optimized sword effect
-function createMobileSwordEffect(isAttacker) {
-    const characterElement = isAttacker ? 
-        document.getElementById('playerCharacter') : 
-        document.getElementById('enemyCharacter');
-    
-    const rect = characterElement.getBoundingClientRect();
-    const startX = isAttacker ? rect.right - 50 : rect.left + 50;
-    const startY = rect.top + rect.height * 0.3;
-    
-    // Simple slash effect
-    const slash = document.createElement('div');
-    slash.style.cssText = `
-        position: fixed;
-        width: 80px;
-        height: 40px;
-        background: linear-gradient(45deg, 
-            transparent 0%,
-            rgba(251, 191, 36, 0.9) 50%,
-            transparent 100%);
-        z-index: 50;
-        pointer-events: none;
-        left: ${startX}px;
-        top: ${startY}px;
-        transform: rotate(${isAttacker ? '15' : '165'}deg) scale(0);
-        transform-origin: center;
-    `;
-    
-    document.body.appendChild(slash);
-    
-    // Simple animation
-    slash.animate([
-        { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, opacity: 0 },
-        { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(1.5)`, opacity: 0.8 },
-        { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, opacity: 0 }
-    ], {
-        duration: isMobile ? 300 : 500,
-        easing: 'ease-out'
-    });
-    
-    setTimeout(() => slash.remove(), isMobile ? 300 : 500);
-    
-    return slash;
-}
-
-// Mobile-optimized gun effect
-function createMobileGunEffect(isAttacker) {
-    const characterElement = isAttacker ? 
-        document.getElementById('playerCharacter') : 
-        document.getElementById('enemyCharacter');
-    
-    const rect = characterElement.getBoundingClientRect();
-    const flashX = isAttacker ? rect.right - 30 : rect.left + 30;
-    const flashY = rect.top + rect.height * 0.4;
-    
-    // Simple muzzle flash
-    const flash = document.createElement('div');
-    const flashSize = isMobile ? 40 : 60;
-    flash.style.cssText = `
-        position: fixed;
-        width: ${flashSize}px;
-        height: ${flashSize}px;
-        background: radial-gradient(circle, 
-            rgba(255, 255, 255, 1) 0%,
-            rgba(251, 191, 36, 0.8) 50%,
-            rgba(220, 38, 38, 0.6) 100%);
-        border-radius: 50%;
-        z-index: 50;
-        pointer-events: none;
-        left: ${flashX}px;
-        top: ${flashY}px;
-        transform: translate(-50%, -50%) scale(0);
-    `;
-    
-    document.body.appendChild(flash);
-    
-    flash.animate([
-        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 1 },
-        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-    ], {
-        duration: isMobile ? 200 : 400,
-        easing: 'ease-out'
-    });
-    
-    // Simple bullet trail
-    setTimeout(() => {
-        const trail = document.createElement('div');
-        trail.style.cssText = `
-            position: fixed;
-            width: 50px;
-            height: 3px;
-            background: linear-gradient(90deg, 
-                rgba(251, 191, 36, 1) 0%,
-                rgba(220, 38, 38, 1) 100%);
-            z-index: 49;
-            pointer-events: none;
-            left: ${flashX}px;
-            top: ${flashY}px;
-            transform: translate(-50%, -50%) scaleX(0);
-            transform-origin: ${isAttacker ? 'left' : 'right'} center;
-        `;
-        
-        document.body.appendChild(trail);
-        
-        trail.animate([
-            { transform: `translate(-50%, -50%) scaleX(0)`, opacity: 0 },
-            { transform: `translate(-50%, -50%) scaleX(${isAttacker ? '1' : '-1'})`, opacity: 1 },
-            { transform: `translate(-50%, -50%) scaleX(0)`, opacity: 0 }
-        ], {
-            duration: isMobile ? 150 : 300,
-            easing: 'ease-out'
-        });
-        
-        setTimeout(() => {
-            flash.remove();
-            trail.remove();
-        }, isMobile ? 200 : 400);
-    }, 30);
-    
-    return flash;
-}
-
-// Mobile-optimized magic effect
-function createMobileMagicEffect(isAttacker) {
-    const characterElement = isAttacker ? 
-        document.getElementById('playerCharacter') : 
-        document.getElementById('enemyCharacter');
-    
-    const rect = characterElement.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    // Simple magic orb
-    const orb = document.createElement('div');
-    const orbSize = isMobile ? 50 : 80;
-    orb.style.cssText = `
-        position: fixed;
-        width: ${orbSize}px;
-        height: ${orbSize}px;
-        background: radial-gradient(circle, 
-            rgba(139, 92, 246, 0.8) 0%,
-            rgba(79, 70, 229, 0.6) 50%,
-            rgba(67, 56, 202, 0.4) 100%);
-        border-radius: 50%;
-        z-index: 50;
-        pointer-events: none;
-        left: ${centerX}px;
-        top: ${centerY}px;
-        transform: translate(-50%, -50%) scale(0);
-    `;
-    
-    document.body.appendChild(orb);
-    
-    orb.animate([
-        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0.8 },
-        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-    ], {
-        duration: isMobile ? 400 : 600,
-        easing: 'ease-out'
-    });
-    
-    setTimeout(() => orb.remove(), isMobile ? 400 : 600);
-    
-    return orb;
-}
-
-// Mobile-optimized impact effect
-function createMobileImpactEffect(isAttacker, damage) {
-    const targetElement = isAttacker ? 
-        document.getElementById('enemyCharacter') : 
-        document.getElementById('playerCharacter');
-    
-    const rect = targetElement.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    // Simple impact circle
-    const impact = document.createElement('div');
-    const impactSize = isMobile ? 30 + damage : 50 + damage * 2;
-    impact.style.cssText = `
-        position: fixed;
-        width: ${impactSize}px;
-        height: ${impactSize}px;
-        background: radial-gradient(circle, 
-            rgba(251, 191, 36, 0.6) 0%,
-            rgba(220, 38, 38, 0.4) 50%,
-            transparent 100%);
-        border-radius: 50%;
-        z-index: 60;
-        pointer-events: none;
-        left: ${centerX}px;
-        top: ${centerY}px;
-        transform: translate(-50%, -50%) scale(0);
-    `;
-    
-    document.body.appendChild(impact);
-    
-    impact.animate([
-        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.7 },
-        { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0 }
-    ], {
-        duration: isMobile ? 300 : 500,
-        easing: 'ease-out'
-    });
-    
-    setTimeout(() => impact.remove(), isMobile ? 300 : 500);
-    
-    return impact;
-}
-
-// Desktop massive effects (kept for desktop users)
-function createMassiveSwordAttackEffect(isAttacker) {
+// Create GIANT sword effect
+function createGiantSwordEffect(isAttacker) {
     const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
@@ -576,72 +363,140 @@ function createMassiveSwordAttackEffect(isAttacker) {
     const rect = characterElement.getBoundingClientRect();
     const battleRect = battleArea.getBoundingClientRect();
     
-    // Sword slash effect
+    // GIANT sword slash that covers most of the screen
     const swordSlash = document.createElement('div');
     swordSlash.style.cssText = `
         position: fixed;
-        width: 200px;
-        height: 100px;
+        width: ${isMobile ? '200px' : '350px'};
+        height: ${isMobile ? '100px' : '180px'};
         background: linear-gradient(45deg, 
             transparent 0%,
-            rgba(251, 191, 36, 0.8) 20%,
-            rgba(245, 158, 11, 1) 40%,
-            rgba(220, 38, 38, 1) 60%,
-            rgba(251, 191, 36, 0.8) 80%,
-            transparent 100%);
-        z-index: 50;
+            rgba(251, 191, 36, 0.95) 25%,
+            rgba(245, 158, 11, 1) 50%,
+            rgba(220, 38, 38, 1) 75%,
+            rgba(251, 191, 36, 0.95) 100%);
+        z-index: 9999;
         pointer-events: none;
-        clip-path: polygon(0% 50%, 20% 40%, 40% 30%, 60% 40%, 80% 50%, 100% 60%, 80% 70%, 60% 80%, 40% 70%, 20% 60%);
+        filter: drop-shadow(0 0 ${isMobile ? '20px' : '40px'} #fbbf24) 
+                drop-shadow(0 0 ${isMobile ? '40px' : '80px'} #dc2626);
+        clip-path: polygon(0% 40%, 20% 30%, 40% 20%, 60% 30%, 80% 40%, 100% 60%, 80% 70%, 60% 80%, 40% 70%, 20% 60%);
+        mix-blend-mode: screen;
     `;
     
-    const startX = isAttacker ? rect.right - 100 : rect.left + 100;
+    const startX = isAttacker ? rect.right - (isMobile ? 80 : 150) : rect.left + (isMobile ? 80 : 150);
     const startY = rect.top + rect.height * 0.3;
-    const endX = isAttacker ? battleRect.right - 100 : battleRect.left + 100;
+    const endX = isAttacker ? battleRect.right - (isMobile ? 80 : 150) : battleRect.left + (isMobile ? 80 : 150);
     
     swordSlash.style.left = `${startX}px`;
     swordSlash.style.top = `${startY}px`;
-    swordSlash.style.transform = `rotate(${isAttacker ? '15' : '165'}deg)`;
+    swordSlash.style.transform = `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`;
     
     document.body.appendChild(swordSlash);
     
-    // Animation
+    // Create multiple sword trails for impact
+    for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+        setTimeout(() => {
+            const trail = document.createElement('div');
+            trail.style.cssText = `
+                position: fixed;
+                width: ${isMobile ? '100px' : '200px'};
+                height: ${isMobile ? '30px' : '60px'};
+                background: linear-gradient(45deg, 
+                    rgba(251, 191, 36, 0.8) 0%,
+                    rgba(220, 38, 38, 0.6) 100%);
+                z-index: 9998;
+                pointer-events: none;
+                filter: blur(${isMobile ? '3px' : '5px'});
+                opacity: 0.8;
+                left: ${startX + (isAttacker ? i * 20 : -i * 20)}px;
+                top: ${startY + (i * 10)}px;
+                transform: rotate(${isAttacker ? '15' : '165'}deg) scale(0);
+                border-radius: ${isMobile ? '5px' : '10px'};
+            `;
+            
+            document.body.appendChild(trail);
+            
+            trail.animate([
+                { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, opacity: 0 },
+                { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${1.5 + i * 0.2})`, opacity: 0.7 },
+                { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, opacity: 0 }
+            ], {
+                duration: isMobile ? 400 : 600,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => trail.remove(), isMobile ? 400 : 600);
+        }, i * 50);
+    }
+    
+    // Main sword animation
     swordSlash.animate([
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0.2)`, 
-            opacity: 0,
-            left: `${startX}px`,
-            top: `${startY}px`
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, 
+            opacity: 0
         },
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(1.5)`, 
-            opacity: 1,
-            left: `${startX}px`,
-            top: `${startY}px`
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${isMobile ? '1.8' : '2.5'})`, 
+            opacity: 1
         },
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(2)`, 
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${isMobile ? '2.2' : '3'})`, 
             opacity: 0.8,
-            left: `${endX}px`,
-            top: `${startY}px`
+            left: `${endX}px`
         },
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(3)`, 
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${isMobile ? '2.5' : '3.5'})`, 
             opacity: 0,
             left: `${endX}px`,
-            top: `${startY + 100}px`
+            top: `${startY + (isMobile ? 80 : 150)}px`
         }
     ], {
-        duration: 500,
+        duration: isMobile ? 500 : 700,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
     
-    setTimeout(() => swordSlash.remove(), 500);
+    // ENERGY WAVES from sword impact
+    setTimeout(() => {
+        for (let i = 0; i < (isMobile ? 2 : 4); i++) {
+            const wave = document.createElement('div');
+            wave.style.cssText = `
+                position: fixed;
+                width: ${isMobile ? '100px' : '200px'};
+                height: ${isMobile ? '100px' : '200px'};
+                border: ${isMobile ? '4px' : '8px'} solid rgba(251, 191, 36, 0.6);
+                border-radius: 50%;
+                z-index: 9997;
+                pointer-events: none;
+                left: ${endX}px;
+                top: ${startY + (isMobile ? 40 : 80)}px;
+                transform: translate(-50%, -50%) scale(0);
+            `;
+            
+            document.body.appendChild(wave);
+            
+            wave.animate([
+                { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.7 },
+                { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+            ], {
+                duration: isMobile ? 600 : 800,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => wave.remove(), isMobile ? 600 : 800);
+        }
+    }, isMobile ? 200 : 300);
+    
+    setTimeout(() => swordSlash.remove(), isMobile ? 500 : 700);
     
     return swordSlash;
 }
 
-function createMassiveGunAttackEffect(isAttacker) {
+// Create GIANT gun effect
+function createGiantGunEffect(isAttacker) {
     const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
@@ -650,57 +505,63 @@ function createMassiveGunAttackEffect(isAttacker) {
     const rect = characterElement.getBoundingClientRect();
     const battleRect = battleArea.getBoundingClientRect();
     
-    // Muzzle flash
+    // HUGE muzzle flash
     const muzzleFlash = document.createElement('div');
-    const flashSize = 80;
+    const flashSize = isMobile ? 100 : 180;
     muzzleFlash.style.cssText = `
         position: fixed;
         width: ${flashSize}px;
         height: ${flashSize}px;
         background: radial-gradient(circle, 
             rgba(255, 255, 255, 1) 0%,
-            rgba(251, 191, 36, 0.9) 30%,
-            rgba(220, 38, 38, 0.8) 60%,
-            transparent 80%);
+            rgba(251, 191, 36, 1) 25%,
+            rgba(245, 158, 11, 0.9) 50%,
+            rgba(220, 38, 38, 0.8) 75%,
+            rgba(153, 27, 27, 0.6) 100%);
         border-radius: 50%;
-        z-index: 50;
+        z-index: 9999;
         pointer-events: none;
-        left: ${isAttacker ? rect.right - 40 : rect.left + 40}px;
+        filter: drop-shadow(0 0 ${isMobile ? '30px' : '60px'} #dc2626);
+        mix-blend-mode: screen;
+        left: ${isAttacker ? rect.right - (isMobile ? 60 : 100) : rect.left + (isMobile ? 60 : 100)}px;
         top: ${rect.top + rect.height * 0.4}px;
         transform: translate(-50%, -50%) scale(0);
     `;
     
     document.body.appendChild(muzzleFlash);
     
-    // Flash animation
+    // EXPLOSIVE flash animation
     muzzleFlash.animate([
-        { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(2)', opacity: 1 },
-        { transform: 'translate(-50%, -50%) scale(3)', opacity: 0.6 },
-        { transform: 'translate(-50%, -50%) scale(4)', opacity: 0 }
+        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 1 },
+        { transform: 'translate(-50%, -50%) scale(3.5)', opacity: 0.8 },
+        { transform: 'translate(-50%, -50%) scale(5)', opacity: 0 }
     ], {
-        duration: 400,
+        duration: isMobile ? 400 : 600,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
     
-    // Bullet trail
+    // GIANT bullet trail - LASER BEAM
     setTimeout(() => {
         const bulletTrail = document.createElement('div');
         const trailLength = Math.abs(battleRect.right - rect.right);
         bulletTrail.style.cssText = `
             position: fixed;
             width: ${trailLength}px;
-            height: 20px;
+            height: ${isMobile ? '15px' : '30px'};
             background: linear-gradient(90deg, 
                 rgba(255, 255, 255, 1) 0%,
                 rgba(251, 191, 36, 1) 20%,
-                rgba(220, 38, 38, 1) 50%,
+                rgba(245, 158, 11, 1) 40%,
+                rgba(220, 38, 38, 1) 60%,
                 rgba(251, 191, 36, 0.8) 80%,
                 rgba(255, 255, 255, 0) 100%);
-            z-index: 49;
+            z-index: 9998;
             pointer-events: none;
-            border-radius: 10px;
+            filter: drop-shadow(0 0 ${isMobile ? '15px' : '30px'} #dc2626);
+            border-radius: ${isMobile ? '8px' : '15px'};
+            mix-blend-mode: screen;
             left: ${isAttacker ? rect.right : rect.left}px;
             top: ${rect.top + rect.height * 0.45}px;
             transform-origin: ${isAttacker ? 'left center' : 'right center'};
@@ -709,51 +570,107 @@ function createMassiveGunAttackEffect(isAttacker) {
         
         document.body.appendChild(bulletTrail);
         
-        // Trail animation
+        // LASER beam animation
         bulletTrail.animate([
             { transform: `${isAttacker ? 'scaleX(0.1)' : 'scaleX(-0.1)'}`, opacity: 0 },
-            { transform: `${isAttacker ? 'scaleX(1.5)' : 'scaleX(-1.5)'}`, opacity: 1 },
-            { transform: `${isAttacker ? 'scaleX(2)' : 'scaleX(-2)'}`, opacity: 0.6 },
+            { transform: `${isAttacker ? 'scaleX(2)' : 'scaleX(-2)'}`, opacity: 1 },
+            { transform: `${isAttacker ? 'scaleX(2.5)' : 'scaleX(-2.5)'}`, opacity: 0.7 },
             { transform: `${isAttacker ? 'scaleX(0.1)' : 'scaleX(-0.1)'}`, opacity: 0 }
         ], {
-            duration: 300,
+            duration: isMobile ? 300 : 500,
             easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
             fill: 'forwards'
         });
         
+        // SHELL CASINGS flying everywhere
+        for (let i = 0; i < (isMobile ? 5 : 10); i++) {
+            setTimeout(() => {
+                const casing = document.createElement('div');
+                casing.style.cssText = `
+                    position: fixed;
+                    width: ${isMobile ? '20px' : '40px'};
+                    height: ${isMobile ? '10px' : '20px'};
+                    background: linear-gradient(45deg, 
+                        rgba(251, 191, 36, 1) 0%,
+                        rgba(153, 27, 27, 1) 100%);
+                    border-radius: ${isMobile ? '2px' : '4px'};
+                    z-index: 9997;
+                    pointer-events: none;
+                    filter: drop-shadow(0 0 ${isMobile ? '8px' : '15px'} #fbbf24);
+                    left: ${(isAttacker ? rect.right : rect.left) - (isMobile ? 10 : 20)}px;
+                    top: ${rect.top + rect.height * 0.4}px;
+                    transform: rotate(${Math.random() * 360}deg);
+                `;
+                
+                document.body.appendChild(casing);
+                
+                const angle = (Math.random() * 80 + 50) * (isAttacker ? -1 : 1);
+                const distance = (isMobile ? 60 : 120) + Math.random() * (isMobile ? 80 : 160);
+                
+                casing.animate([
+                    { 
+                        transform: `rotate(0deg) translate(0, 0)`,
+                        opacity: 1 
+                    },
+                    { 
+                        transform: `rotate(${angle}deg) translate(${distance}px, ${-distance}px)`,
+                        opacity: 0.6 
+                    },
+                    { 
+                        transform: `rotate(${angle * 2}deg) translate(${distance * 1.5}px, ${-distance * 0.5}px)`,
+                        opacity: 0 
+                    }
+                ], {
+                    duration: isMobile ? 500 : 800,
+                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    fill: 'forwards'
+                });
+                
+                setTimeout(() => casing.remove(), isMobile ? 500 : 800);
+            }, i * (isMobile ? 40 : 60));
+        }
+        
         setTimeout(() => {
             muzzleFlash.remove();
             bulletTrail.remove();
-        }, 400);
+        }, isMobile ? 400 : 600);
     }, 50);
     
     return muzzleFlash;
 }
 
-function createMassiveMagicAttackEffect(isAttacker) {
+// Create GIANT magic effect
+function createGiantMagicEffect(isAttacker) {
     const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
     
+    const battleArea = document.querySelector('.battle-area');
     const rect = characterElement.getBoundingClientRect();
+    const battleRect = battleArea.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    // Magic sphere
+    // HUGE magic sphere
     const magicSphere = document.createElement('div');
-    const sphereSize = 120;
+    const sphereSize = isMobile ? 120 : 240;
     magicSphere.style.cssText = `
         position: fixed;
         width: ${sphereSize}px;
         height: ${sphereSize}px;
         background: radial-gradient(circle, 
-            rgba(139, 92, 246, 0.8) 0%,
-            rgba(79, 70, 229, 0.6) 50%,
-            rgba(67, 56, 202, 0.4) 80%,
-            transparent 100%);
+            rgba(255, 255, 255, 1) 0%,
+            rgba(199, 210, 254, 0.9) 20%,
+            rgba(139, 92, 246, 0.8) 40%,
+            rgba(79, 70, 229, 0.7) 60%,
+            rgba(67, 56, 202, 0.6) 80%,
+            rgba(49, 46, 129, 0.4) 100%);
         border-radius: 50%;
-        z-index: 50;
+        z-index: 9999;
         pointer-events: none;
+        filter: drop-shadow(0 0 ${isMobile ? '40px' : '80px'} #8b5cf6) 
+                drop-shadow(0 0 ${isMobile ? '80px' : '160px'} #4f46e5);
+        mix-blend-mode: screen;
         left: ${centerX}px;
         top: ${centerY}px;
         transform: translate(-50%, -50%) scale(0);
@@ -761,54 +678,152 @@ function createMassiveMagicAttackEffect(isAttacker) {
     
     document.body.appendChild(magicSphere);
     
-    // Sphere animation
+    // ENERGY SPHERE animation
     magicSphere.animate([
-        { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
-        { transform: 'translate(-50%, -50%) scale(2)', opacity: 0.7 },
+        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 0.9 },
+        { transform: 'translate(-50%, -50%) scale(2.2)', opacity: 0.8 },
         { transform: 'translate(-50%, -50%) scale(3)', opacity: 0 }
     ], {
-        duration: 600,
+        duration: isMobile ? 600 : 900,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
     
-    // Magic ring
-    const ring = document.createElement('div');
-    ring.style.cssText = `
-        position: fixed;
-        width: 100px;
-        height: 100px;
-        border: 4px solid rgba(139, 92, 246, 0.6);
-        border-radius: 50%;
-        z-index: 49;
-        pointer-events: none;
-        left: ${centerX}px;
-        top: ${centerY}px;
-        transform: translate(-50%, -50%) scale(0);
-    `;
+    // ENERGY WAVES expanding outward
+    for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+        setTimeout(() => {
+            const wave = document.createElement('div');
+            const waveSize = (isMobile ? 100 : 200) + i * (isMobile ? 40 : 80);
+            wave.style.cssText = `
+                position: fixed;
+                width: ${waveSize}px;
+                height: ${waveSize}px;
+                border: ${isMobile ? '5px' : '10px'} solid rgba(139, 92, 246, 0.5);
+                border-radius: 50%;
+                z-index: 9998;
+                pointer-events: none;
+                filter: drop-shadow(0 0 ${isMobile ? '15px' : '30px'} #8b5cf6);
+                left: ${centerX}px;
+                top: ${centerY}px;
+                transform: translate(-50%, -50%) scale(0);
+            `;
+            
+            document.body.appendChild(wave);
+            
+            wave.animate([
+                { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.7 },
+                { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+            ], {
+                duration: isMobile ? 800 : 1200,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => wave.remove(), isMobile ? 800 : 1200);
+        }, i * (isMobile ? 150 : 200));
+    }
     
-    document.body.appendChild(ring);
+    // MAGIC PARTICLES STORM
+    for (let i = 0; i < (isMobile ? 15 : 30); i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            const size = (isMobile ? 8 : 15) + Math.random() * (isMobile ? 12 : 25);
+            const angle = Math.random() * Math.PI * 2;
+            const distance = (isMobile ? 80 : 160) + Math.random() * (isMobile ? 120 : 240);
+            
+            particle.style.cssText = `
+                position: fixed;
+                width: ${size}px;
+                height: ${size}px;
+                background: radial-gradient(circle, 
+                    rgba(255, 255, 255, 1) 0%,
+                    rgba(199, 210, 254, 0.8) 50%,
+                    rgba(139, 92, 246, 0.6) 100%);
+                border-radius: 50%;
+                z-index: 9997;
+                pointer-events: none;
+                filter: drop-shadow(0 0 ${isMobile ? '5px' : '10px'} #a78bfa);
+                left: ${centerX}px;
+                top: ${centerY}px;
+                transform: translate(-50%, -50%);
+            `;
+            
+            document.body.appendChild(particle);
+            
+            const targetX = centerX + Math.cos(angle) * distance;
+            const targetY = centerY + Math.sin(angle) * distance;
+            
+            particle.animate([
+                { 
+                    transform: 'translate(-50%, -50%) scale(0)',
+                    opacity: 0 
+                },
+                { 
+                    transform: 'translate(-50%, -50%) scale(1.2)',
+                    opacity: 1 
+                },
+                { 
+                    transform: `translate(${targetX - centerX}px, ${targetY - centerY}px) scale(0)`,
+                    opacity: 0 
+                }
+            ], {
+                duration: isMobile ? 500 : 800,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => particle.remove(), isMobile ? 500 : 800);
+        }, i * (isMobile ? 30 : 50));
+    }
     
-    ring.animate([
-        { transform: 'translate(-50%, -50%) scale(0.5) rotate(0deg)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(2) rotate(180deg)', opacity: 0.8 },
-        { transform: 'translate(-50%, -50%) scale(3) rotate(360deg)', opacity: 0 }
-    ], {
-        duration: 800,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        fill: 'forwards'
-    });
+    // ARCANE RUNES floating around
+    for (let i = 0; i < (isMobile ? 6 : 12); i++) {
+        setTimeout(() => {
+            const rune = document.createElement('div');
+            rune.style.cssText = `
+                position: fixed;
+                width: ${isMobile ? '40px' : '80px'};
+                height: ${isMobile ? '40px' : '80px'};
+                background: radial-gradient(circle, 
+                    rgba(139, 92, 246, 0.7) 0%,
+                    rgba(79, 70, 229, 0.5) 100%);
+                clip-path: polygon(${Array.from({length: 6}, (_, j) => 
+                    `${50 + 30 * Math.cos((j * 60 + Math.random() * 30) * Math.PI/180)}% ` +
+                    `${50 + 30 * Math.sin((j * 60 + Math.random() * 30) * Math.PI/180)}%`
+                ).join(', ')});
+                z-index: 9996;
+                pointer-events: none;
+                filter: drop-shadow(0 0 ${isMobile ? '10px' : '20px'} #8b5cf6);
+                left: ${centerX + Math.random() * (isMobile ? 100 : 200) - (isMobile ? 50 : 100)}px;
+                top: ${centerY + Math.random() * (isMobile ? 100 : 200) - (isMobile ? 50 : 100)}px;
+                transform: scale(0) rotate(0deg);
+            `;
+            
+            document.body.appendChild(rune);
+            
+            rune.animate([
+                { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+                { transform: 'scale(1.5) rotate(180deg)', opacity: 0.6 },
+                { transform: 'scale(2) rotate(360deg)', opacity: 0 }
+            ], {
+                duration: isMobile ? 400 : 700,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => rune.remove(), isMobile ? 400 : 700);
+        }, i * (isMobile ? 80 : 100));
+    }
     
-    setTimeout(() => {
-        magicSphere.remove();
-        ring.remove();
-    }, 800);
+    setTimeout(() => magicSphere.remove(), isMobile ? 600 : 900);
     
     return magicSphere;
 }
 
-function createMassiveAttackImpactEffect(isAttacker, damage) {
+// Create GIANT impact effect
+function createGiantImpactEffect(isAttacker, damage) {
     const targetElement = isAttacker ? 
         document.getElementById('enemyCharacter') : 
         document.getElementById('playerCharacter');
@@ -817,20 +832,25 @@ function createMassiveAttackImpactEffect(isAttacker, damage) {
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    // Impact explosion
+    // MASSIVE impact explosion
     const impactExplosion = document.createElement('div');
-    const explosionSize = 100 + damage * 2;
+    const explosionSize = (isMobile ? 80 : 160) + damage * (isMobile ? 3 : 6);
     impactExplosion.style.cssText = `
         position: fixed;
         width: ${explosionSize}px;
         height: ${explosionSize}px;
         background: radial-gradient(circle, 
-            rgba(251, 191, 36, 0.6) 0%,
-            rgba(220, 38, 38, 0.4) 50%,
-            transparent 80%);
+            rgba(255, 255, 255, 1) 0%,
+            rgba(251, 191, 36, 0.95) 25%,
+            rgba(245, 158, 11, 0.9) 50%,
+            rgba(220, 38, 38, 0.85) 75%,
+            rgba(153, 27, 27, 0.7) 100%);
         border-radius: 50%;
-        z-index: 60;
+        z-index: 9999;
         pointer-events: none;
+        filter: drop-shadow(0 0 ${isMobile ? '30px' : '60px'} #dc2626) 
+                drop-shadow(0 0 ${isMobile ? '60px' : '120px'} #fbbf24);
+        mix-blend-mode: screen;
         left: ${centerX}px;
         top: ${centerY}px;
         transform: translate(-50%, -50%) scale(0);
@@ -838,56 +858,162 @@ function createMassiveAttackImpactEffect(isAttacker, damage) {
     
     document.body.appendChild(impactExplosion);
     
-    // Explosion animation
+    // EXPLOSION animation
     impactExplosion.animate([
-        { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0.9 },
-        { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 0.7 },
-        { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
+        { transform: 'translate(-50%, -50%) scale(2)', opacity: 0.8 },
+        { transform: 'translate(-50%, -50%) scale(3)', opacity: 0 }
     ], {
-        duration: 500,
+        duration: isMobile ? 500 : 800,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
     
-    setTimeout(() => impactExplosion.remove(), 500);
+    // SHOCKWAVE RINGS
+    for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+        setTimeout(() => {
+            const shockwave = document.createElement('div');
+            shockwave.style.cssText = `
+                position: fixed;
+                width: ${isMobile ? '80px' : '160px'};
+                height: ${isMobile ? '80px' : '160px'};
+                border: ${isMobile ? '6px' : '12px'} solid rgba(251, 191, 36, 0.6);
+                border-radius: 50%;
+                z-index: 9998;
+                pointer-events: none;
+                filter: drop-shadow(0 0 ${isMobile ? '10px' : '20px'} #fbbf24);
+                left: ${centerX}px;
+                top: ${centerY}px;
+                transform: translate(-50%, -50%) scale(0);
+            `;
+            
+            document.body.appendChild(shockwave);
+            
+            shockwave.animate([
+                { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.7 },
+                { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+            ], {
+                duration: isMobile ? 600 : 900,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => shockwave.remove(), isMobile ? 600 : 900);
+        }, i * (isMobile ? 80 : 120));
+    }
+    
+    // CRACK EFFECT for critical hits
+    if (damage > 25) {
+        const crack = document.createElement('div');
+        crack.style.cssText = `
+            position: fixed;
+            width: ${isMobile ? '150px' : '300px'};
+            height: ${isMobile ? '150px' : '300px'};
+            background: 
+                linear-gradient(45deg, transparent 45%, rgba(220, 38, 38, 0.7) 50%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, rgba(220, 38, 38, 0.7) 50%, transparent 55%),
+                linear-gradient(135deg, transparent 45%, rgba(220, 38, 38, 0.7) 50%, transparent 55%),
+                linear-gradient(-135deg, transparent 45%, rgba(220, 38, 38, 0.7) 50%, transparent 55%);
+            z-index: 9997;
+            pointer-events: none;
+            filter: drop-shadow(0 0 ${isMobile ? '15px' : '30px'} #dc2626);
+            left: ${centerX}px;
+            top: ${centerY}px;
+            transform: translate(-50%, -50%) scale(0);
+        `;
+        
+        document.body.appendChild(crack);
+        
+        crack.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(2)', opacity: 0 }
+        ], {
+            duration: isMobile ? 400 : 600,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'forwards'
+        });
+        
+        setTimeout(() => crack.remove(), isMobile ? 400 : 600);
+    }
+    
+    // IMPACT PARTICLES flying out
+    for (let i = 0; i < (isMobile ? 20 : 40); i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            const size = (isMobile ? 6 : 12) + Math.random() * (isMobile ? 9 : 18);
+            const angle = Math.random() * Math.PI * 2;
+            const distance = (isMobile ? 60 : 120) + Math.random() * (isMobile ? 90 : 180);
+            
+            particle.style.cssText = `
+                position: fixed;
+                width: ${size}px;
+                height: ${size}px;
+                background: radial-gradient(circle, 
+                    rgba(255, 255, 255, 1) 0%,
+                    rgba(251, 191, 36, 1) 50%,
+                    rgba(220, 38, 38, 1) 100%);
+                border-radius: 50%;
+                z-index: 9996;
+                pointer-events: none;
+                filter: drop-shadow(0 0 ${isMobile ? '4px' : '8px'} #fbbf24);
+                left: ${centerX}px;
+                top: ${centerY}px;
+                transform: translate(-50%, -50%);
+            `;
+            
+            document.body.appendChild(particle);
+            
+            const targetX = centerX + Math.cos(angle) * distance;
+            const targetY = centerY + Math.sin(angle) * distance;
+            
+            particle.animate([
+                { 
+                    transform: 'translate(-50%, -50%) scale(0)',
+                    opacity: 0 
+                },
+                { 
+                    transform: 'translate(-50%, -50%) scale(1)',
+                    opacity: 1 
+                },
+                { 
+                    transform: `translate(${targetX - centerX}px, ${targetY - centerY}px) scale(0)`,
+                    opacity: 0 
+                }
+            ], {
+                duration: isMobile ? 400 : 700,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => particle.remove(), isMobile ? 400 : 700);
+        }, i * (isMobile ? 15 : 25));
+    }
+    
+    setTimeout(() => impactExplosion.remove(), isMobile ? 500 : 800);
     
     return impactExplosion;
 }
 
-// Effect creators with mobile/desktop detection
+// Effect creators
 function createAttackEffectForAttacker(characterName, isAttacker) {
-    if (isMobile) {
-        // Mobile version
-        if (swordUsers.some(name => characterName.includes(name))) {
-            return createMobileSwordEffect(isAttacker);
-        } else if (gunUsers.some(name => characterName.includes(name))) {
-            return createMobileGunEffect(isAttacker);
-        } else if (magicUsers.some(name => characterName.includes(name))) {
-            return createMobileMagicEffect(isAttacker);
-        }
-    } else {
-        // Desktop version
-        if (swordUsers.some(name => characterName.includes(name))) {
-            return createMassiveSwordAttackEffect(isAttacker);
-        } else if (gunUsers.some(name => characterName.includes(name))) {
-            return createMassiveGunAttackEffect(isAttacker);
-        } else if (magicUsers.some(name => characterName.includes(name))) {
-            return createMassiveMagicAttackEffect(isAttacker);
-        }
+    if (swordUsers.some(name => characterName.includes(name))) {
+        return createGiantSwordEffect(isAttacker);
+    } else if (gunUsers.some(name => characterName.includes(name))) {
+        return createGiantGunEffect(isAttacker);
+    } else if (magicUsers.some(name => characterName.includes(name))) {
+        return createGiantMagicEffect(isAttacker);
     }
     return null;
 }
 
 function createAttackEffectForHurtCharacter(characterName, isHurtOnPlayer, damage) {
-    if (isMobile) {
-        return createMobileImpactEffect(!isHurtOnPlayer, damage);
-    } else {
-        return createMassiveAttackImpactEffect(!isHurtOnPlayer, damage);
-    }
+    return createGiantImpactEffect(!isHurtOnPlayer, damage);
 }
 
-// Show damage number
+// Show damage number - MASSIVE and impactful
 function showDamage(damage, target) {
     const character = target === 'player' ? 
         document.getElementById('playerCharacter') : 
@@ -897,51 +1023,98 @@ function showDamage(damage, target) {
     damageEl.className = 'damage-number';
     damageEl.textContent = `-${damage}`;
     
-    // Styling based on device and damage
+    // GIANT damage numbers
     if (isMobile) {
         damageEl.style.cssText = `
             position: fixed;
-            font-size: ${damage > 25 ? '36px' : '28px'};
+            font-size: ${damage > 25 ? '52px' : '42px'};
             font-weight: 900;
             color: ${damage > 25 ? '#fbbf24' : '#ef4444'};
-            text-shadow: ${damage > 25 ? 
-                '2px 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px #ef4444' : 
-                '2px 2px 4px rgba(0, 0, 0, 0.9), 0 0 15px #ef4444'};
-            z-index: 70;
+            text-shadow: 
+                3px 3px 6px rgba(0, 0, 0, 0.9), 
+                0 0 25px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 
+                0 0 50px ${damage > 25 ? '#fb923c' : '#dc2626'},
+                0 0 75px ${damage > 25 ? '#f59e0b' : '#b91c1c'};
+            z-index: 9999;
             pointer-events: none;
-            animation: damage-popup 1s ease-out forwards;
+            animation: damage-popup 1.2s ease-out forwards;
+            font-family: 'Baloo 2', cursive;
+            letter-spacing: 1px;
         `;
     } else {
         damageEl.style.cssText = `
             position: fixed;
-            font-size: ${damage > 25 ? '56px' : '44px'};
+            font-size: ${damage > 25 ? '72px' : '58px'};
             font-weight: 900;
             color: ${damage > 25 ? '#fbbf24' : '#ef4444'};
-            text-shadow: ${damage > 25 ? 
-                '4px 4px 8px rgba(0, 0, 0, 0.9), 0 0 30px #ef4444, 0 0 60px #fb923c' : 
-                '3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 20px #ef4444, 0 0 40px #fb923c'};
-            z-index: 70;
+            text-shadow: 
+                5px 5px 10px rgba(0, 0, 0, 0.9), 
+                0 0 35px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 
+                0 0 70px ${damage > 25 ? '#fb923c' : '#dc2626'},
+                0 0 105px ${damage > 25 ? '#f59e0b' : '#b91c1c'};
+            z-index: 9999;
             pointer-events: none;
             animation: damage-popup 1.5s ease-out forwards;
+            font-family: 'Baloo 2', cursive;
+            letter-spacing: 2px;
         `;
     }
     
     const rect = character.getBoundingClientRect();
     damageEl.style.left = `${rect.left + rect.width / 2}px`;
-    damageEl.style.top = `${rect.top + rect.height * 0.2}px`;
+    damageEl.style.top = `${rect.top + rect.height * 0.15}px`; // Higher for more visibility
     damageEl.style.transform = 'translateX(-50%)';
     
     document.body.appendChild(damageEl);
     
+    // For critical hits, add a second damage number for emphasis
+    if (damage > 25) {
+        setTimeout(() => {
+            const critEl = document.createElement('div');
+            critEl.textContent = 'CRITICAL!';
+            critEl.style.cssText = `
+                position: fixed;
+                font-size: ${isMobile ? '28px' : '36px'};
+                font-weight: 900;
+                color: #fbbf24;
+                text-shadow: 
+                    2px 2px 4px rgba(0, 0, 0, 0.9), 
+                    0 0 20px #fbbf24, 
+                    0 0 40px #fb923c;
+                z-index: 9998;
+                pointer-events: none;
+                left: ${rect.left + rect.width / 2}px;
+                top: ${rect.top + rect.height * 0.05}px;
+                transform: translateX(-50%);
+                animation: damage-popup 1s ease-out forwards;
+                font-family: 'Baloo 2', cursive;
+                opacity: 0;
+            `;
+            
+            document.body.appendChild(critEl);
+            
+            critEl.animate([
+                { opacity: 0, transform: 'translateX(-50%) translateY(0)' },
+                { opacity: 1, transform: 'translateX(-50%) translateY(10px)' },
+                { opacity: 0, transform: 'translateX(-50%) translateY(30px)' }
+            ], {
+                duration: 1000,
+                easing: 'ease-out'
+            });
+            
+            setTimeout(() => critEl.remove(), 1000);
+        }, 200);
+    }
+    
     setTimeout(() => {
         damageEl.remove();
-    }, isMobile ? 1000 : 1500);
+    }, isMobile ? 1200 : 1500);
     
     return damageEl;
 }
 
 // ============================================
-// ATTACK FUNCTIONS
+// ATTACK FUNCTIONS WITH GIANT EFFECTS
 // ============================================
 
 // Attack enemy
@@ -953,7 +1126,7 @@ function attackEnemy() {
     setCharacterState('player', 'attack');
     document.getElementById('playerCharacter').classList.add('attacking');
     
-    // Create attack effect
+    // Create GIANT attack effect
     createAttackEffectForAttacker(currentHero.name, true);
     
     // Screen shake
@@ -968,7 +1141,7 @@ function attackEnemy() {
         showDamage(damage, 'enemy');
         updateHP();
         
-        // Create impact effect
+        // Create GIANT impact effect
         createAttackEffectForHurtCharacter(currentHero.name, false, damage);
         
         setTimeout(() => {
@@ -977,8 +1150,8 @@ function attackEnemy() {
             if (enemyHp <= 0) {
                 victory();
             }
-        }, 800);
-    }, isMobile ? 300 : 500);
+        }, isMobile ? 1000 : 1200);
+    }, isMobile ? 400 : 600);
 }
 
 // Attack player
@@ -990,7 +1163,7 @@ function attackPlayer() {
     setCharacterState('enemy', 'attack');
     document.getElementById('enemyCharacter').classList.add('attacking');
     
-    // Create attack effect
+    // Create GIANT attack effect
     createAttackEffectForAttacker(currentVillain.name, false);
     
     // Screen shake
@@ -1005,7 +1178,7 @@ function attackPlayer() {
         showDamage(damage, 'player');
         updateHP();
         
-        // Create impact effect
+        // Create GIANT impact effect
         createAttackEffectForHurtCharacter(currentVillain.name, true, damage);
         
         setTimeout(() => {
@@ -1014,8 +1187,8 @@ function attackPlayer() {
             if (playerHp <= 0) {
                 defeat();
             }
-        }, 800);
-    }, isMobile ? 300 : 500);
+        }, isMobile ? 1000 : 1200);
+    }, isMobile ? 400 : 600);
 }
 
 // Update HP bars
