@@ -191,3 +191,12 @@ body {
         drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3))
         drop-shadow(0 0 10px rgba(0, 0, 0, 0.2));
 }
+
+/* Add to animations.css */
+
+/* HP Bar color transition */
+.hp-bar-fill {
+    transition: 
+        width 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+        background 0.5s ease-in-out;
+}
