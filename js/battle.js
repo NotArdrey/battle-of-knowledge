@@ -1,4 +1,4 @@
-// battle.js - COMPLETE VERSION WITH ALL ATTACK EFFECTS
+// battle.js - COMPLETE VERSION WITH MASSIVE IMPACTFUL ATTACK EFFECTS
 
 // Battle game logic
 let playerHp = 100;
@@ -316,497 +316,673 @@ function selectAnswer(index) {
 }
 
 // ============================================
-// ATTACK EFFECT FUNCTIONS
+// MASSIVE IMPACTFUL ATTACK EFFECT FUNCTIONS
 // ============================================
 
-function createSwordEffect(characterName, isPlayer) {
-    const characterElement = isPlayer ? 
+function createMassiveSwordAttackEffect(isAttacker) {
+    const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
     
-    const effect = document.createElement('div');
-    effect.style.cssText = `
-        position: absolute;
-        width: 80px;
-        height: 25px;
-        background: linear-gradient(90deg, 
-            rgba(203, 213, 225, 0) 0%, 
-            rgba(248, 250, 252, 0.8) 20%, 
-            rgba(251, 191, 36, 1) 50%, 
-            rgba(248, 250, 252, 0.8) 80%, 
-            rgba(203, 213, 225, 0) 100%);
-        border-radius: 4px;
-        z-index: 30;
+    const battleArea = document.querySelector('.battle-area');
+    const rect = characterElement.getBoundingClientRect();
+    const battleRect = battleArea.getBoundingClientRect();
+    
+    // GIANT SWORD SLASH EFFECT
+    const swordSlash = document.createElement('div');
+    swordSlash.style.cssText = `
+        position: fixed;
+        width: 300px;
+        height: 150px;
+        background: linear-gradient(45deg, 
+            transparent 0%,
+            rgba(251, 191, 36, 0.8) 20%,
+            rgba(245, 158, 11, 1) 40%,
+            rgba(220, 38, 38, 1) 60%,
+            rgba(251, 191, 36, 0.8) 80%,
+            transparent 100%);
+        z-index: 50;
         pointer-events: none;
-        filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 25px #f59e0b);
-        transform-origin: ${isPlayer ? 'left center' : 'right center'};
+        filter: blur(5px) drop-shadow(0 0 30px #fbbf24) drop-shadow(0 0 60px #dc2626);
+        clip-path: polygon(0% 50%, 20% 40%, 40% 30%, 60% 40%, 80% 50%, 100% 60%, 80% 70%, 60% 80%, 40% 70%, 20% 60%);
+        mix-blend-mode: screen;
     `;
     
-    const rect = characterElement.getBoundingClientRect();
-    const offsetX = isPlayer ? rect.width * 0.7 : -rect.width * 0.2;
-    const offsetY = rect.height * 0.3;
+    const startX = isAttacker ? rect.right - 100 : rect.left + 100;
+    const startY = rect.top + rect.height * 0.3;
+    const endX = isAttacker ? battleRect.right - 100 : battleRect.left + 100;
     
-    effect.style.left = `${offsetX}px`;
-    effect.style.top = `${offsetY}px`;
+    swordSlash.style.left = `${startX}px`;
+    swordSlash.style.top = `${startY}px`;
+    swordSlash.style.transform = `rotate(${isAttacker ? '15' : '165'}deg)`;
     
-    // Sword swing animation
-    const keyframes = [
-        { transform: `rotate(0deg) scale(0.8)`, opacity: 0 },
-        { transform: `rotate(${isPlayer ? '45' : '-45'}deg) scale(1.5)`, opacity: 1 },
-        { transform: `rotate(${isPlayer ? '90' : '-90'}deg) scale(1.8)`, opacity: 0.8 },
-        { transform: `rotate(${isPlayer ? '135' : '-135'}deg) scale(1.5)`, opacity: 0.6 },
-        { transform: `rotate(${isPlayer ? '180' : '-180'}deg) scale(1.2)`, opacity: 0.4 },
-        { transform: `rotate(${isPlayer ? '225' : '-225'}deg) scale(0.8)`, opacity: 0 }
-    ];
+    document.body.appendChild(swordSlash);
     
-    effect.animate(keyframes, {
-        duration: 800,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        fill: 'forwards'
-    });
-    
-    characterElement.appendChild(effect);
-    
-    // Create sword trail
-    setTimeout(() => {
-        const trail = document.createElement('div');
-        trail.style.cssText = `
-            position: absolute;
-            width: 50px;
-            height: 20px;
-            background: linear-gradient(90deg, 
-                rgba(251, 191, 36, 0.6) 0%, 
-                rgba(245, 158, 11, 0.8) 50%, 
-                rgba(251, 191, 36, 0.6) 100%);
-            border-radius: 3px;
-            z-index: 28;
-            pointer-events: none;
-            filter: blur(2px);
-            opacity: 0.7;
-        `;
-        
-        trail.style.left = `${offsetX}px`;
-        trail.style.top = `${offsetY}px`;
-        
-        const trailKeyframes = [
-            { transform: `rotate(${isPlayer ? '0' : '0'}deg) scale(0.8)`, opacity: 0 },
-            { transform: `rotate(${isPlayer ? '60' : '-60'}deg) scale(1.3)`, opacity: 0.8 },
-            { transform: `rotate(${isPlayer ? '120' : '-120'}deg) scale(1.6)`, opacity: 0.6 },
-            { transform: `rotate(${isPlayer ? '180' : '-180'}deg) scale(1.2)`, opacity: 0.4 },
-            { transform: `rotate(${isPlayer ? '240' : '-240'}deg) scale(0.8)`, opacity: 0 }
-        ];
-        
-        trail.animate(trailKeyframes, {
-            duration: 600,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            fill: 'forwards'
-        });
-        
-        characterElement.appendChild(trail);
-        
-        // Remove effects after animation
+    // SWORD TRAIL PARTICLE STORM
+    for (let i = 0; i < 25; i++) {
         setTimeout(() => {
-            effect.remove();
-            trail.remove();
-        }, 800);
-    }, 100);
+            const particle = document.createElement('div');
+            const size = 15 + Math.random() * 20;
+            particle.style.cssText = `
+                position: fixed;
+                width: ${size}px;
+                height: ${size}px;
+                background: radial-gradient(circle, 
+                    rgba(255, 255, 255, 1) 0%,
+                    rgba(251, 191, 36, 1) 50%,
+                    rgba(220, 38, 38, 1) 100%);
+                border-radius: 50%;
+                z-index: 49;
+                pointer-events: none;
+                filter: blur(2px) drop-shadow(0 0 10px #fbbf24);
+                left: ${startX + (isAttacker ? i * 10 : -i * 10)}px;
+                top: ${startY + Math.random() * 100 - 50}px;
+                transform: scale(0);
+            `;
+            
+            document.body.appendChild(particle);
+            
+            particle.animate([
+                { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+                { transform: `scale(1.5) rotate(${Math.random() * 360}deg)`, opacity: 1 },
+                { transform: `scale(2.5) rotate(${Math.random() * 720}deg)`, opacity: 0.5 },
+                { transform: 'scale(0) rotate(0deg)', opacity: 0 }
+            ], {
+                duration: 800 + Math.random() * 400,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => particle.remove(), 1200);
+        }, i * 20);
+    }
     
-    return effect;
-}
-
-function createGunEffect(characterName, isPlayer) {
-    const characterElement = isPlayer ? 
-        document.getElementById('playerCharacter') : 
-        document.getElementById('enemyCharacter');
-    
-    // Create muzzle flash
-    const flash = document.createElement('div');
-    flash.style.cssText = `
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        background: radial-gradient(circle, 
-            rgba(255, 255, 255, 1) 0%, 
-            rgba(251, 191, 36, 0.9) 30%, 
-            rgba(220, 38, 38, 0.8) 70%, 
-            rgba(0, 0, 0, 0) 100%);
-        border-radius: 50%;
-        z-index: 30;
-        pointer-events: none;
-        filter: blur(3px);
-    `;
-    
-    const rect = characterElement.getBoundingClientRect();
-    const offsetX = isPlayer ? rect.width * 0.85 : -rect.width * 0.15;
-    const offsetY = rect.height * 0.4;
-    
-    flash.style.left = `${offsetX}px`;
-    flash.style.top = `${offsetY}px`;
-    
-    // Flash animation
-    const flashKeyframes = [
-        { transform: 'scale(0.5)', opacity: 0 },
-        { transform: 'scale(2)', opacity: 1 },
-        { transform: 'scale(1.8)', opacity: 0.8 },
-        { transform: 'scale(1.4)', opacity: 0.6 },
-        { transform: 'scale(1)', opacity: 0.4 },
-        { transform: 'scale(0.5)', opacity: 0 }
-    ];
-    
-    flash.animate(flashKeyframes, {
+    // ANIMATION
+    swordSlash.animate([
+        { 
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0.2)`, 
+            opacity: 0,
+            left: `${startX}px`,
+            top: `${startY}px`
+        },
+        { 
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(1.5)`, 
+            opacity: 1,
+            left: `${startX}px`,
+            top: `${startY}px`
+        },
+        { 
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(2)`, 
+            opacity: 0.8,
+            left: `${endX}px`,
+            top: `${startY}px`
+        },
+        { 
+            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(3)`, 
+            opacity: 0,
+            left: `${endX}px`,
+            top: `${startY + 100}px`
+        }
+    ], {
         duration: 600,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
     
-    characterElement.appendChild(flash);
+    setTimeout(() => swordSlash.remove(), 600);
     
-    // Create bullet trail
-    setTimeout(() => {
-        const bullet = document.createElement('div');
-        bullet.style.cssText = `
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: radial-gradient(circle, 
-                rgba(255, 255, 255, 1) 0%, 
-                rgba(251, 191, 36, 1) 50%, 
-                rgba(220, 38, 38, 1) 100%);
-            border-radius: 50%;
-            z-index: 29;
-            pointer-events: none;
-            box-shadow: 0 0 15px #dc2626, 0 0 30px #fbbf24;
-        `;
-        
-        bullet.style.left = `${offsetX}px`;
-        bullet.style.top = `${offsetY + 5}px`;
-        
-        // Bullet trail animation
-        const distance = isPlayer ? 200 : -200;
-        const bulletKeyframes = [
-            { transform: 'translateX(0) scale(0.2)', opacity: 0 },
-            { transform: `translateX(${distance * 0.2}px) scale(0.5)`, opacity: 1 },
-            { transform: `translateX(${distance * 0.4}px) scale(0.8)`, opacity: 0.8 },
-            { transform: `translateX(${distance * 0.6}px) scale(1)`, opacity: 0.6 },
-            { transform: `translateX(${distance * 0.8}px) scale(1.2)`, opacity: 0.4 },
-            { transform: `translateX(${distance}px) scale(1.5)`, opacity: 0 }
-        ];
-        
-        bullet.animate(bulletKeyframes, {
-            duration: 500,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            fill: 'forwards'
-        });
-        
-        characterElement.appendChild(bullet);
-        
-        // Remove effects after animation
-        setTimeout(() => {
-            flash.remove();
-            bullet.remove();
-        }, 600);
-    }, 50);
+    // SCREEN FLASH
+    const screenFlash = document.createElement('div');
+    screenFlash.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: radial-gradient(circle at ${isAttacker ? '30%' : '70%'} 50%, 
+            rgba(251, 191, 36, 0.6) 0%,
+            rgba(245, 158, 11, 0.3) 30%,
+            transparent 70%);
+        z-index: 40;
+        pointer-events: none;
+        mix-blend-mode: overlay;
+    `;
     
-    return flash;
+    document.body.appendChild(screenFlash);
+    
+    screenFlash.animate([
+        { opacity: 0 },
+        { opacity: 0.8 },
+        { opacity: 0 }
+    ], {
+        duration: 400,
+        easing: 'ease-out',
+        fill: 'forwards'
+    });
+    
+    setTimeout(() => screenFlash.remove(), 400);
+    
+    return swordSlash;
 }
 
-function createMagicEffect(characterName, isPlayer) {
-    const characterElement = isPlayer ? 
+function createMassiveGunAttackEffect(isAttacker) {
+    const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
     
+    const battleArea = document.querySelector('.battle-area');
     const rect = characterElement.getBoundingClientRect();
-    const centerX = rect.width * 0.5;
-    const centerY = rect.height * 0.5;
+    const battleRect = battleArea.getBoundingClientRect();
     
-    // Create magic burst
-    const burst = document.createElement('div');
-    burst.style.cssText = `
-        position: absolute;
-        width: 100px;
-        height: 100px;
+    // GIANT MUZZLE FLASH
+    const muzzleFlash = document.createElement('div');
+    const flashSize = 120;
+    muzzleFlash.style.cssText = `
+        position: fixed;
+        width: ${flashSize}px;
+        height: ${flashSize}px;
         background: radial-gradient(circle, 
-            rgba(79, 70, 229, 0.8) 0%, 
-            rgba(129, 140, 248, 0.6) 50%, 
-            rgba(199, 210, 254, 0.4) 100%);
+            rgba(255, 255, 255, 1) 0%,
+            rgba(251, 191, 36, 0.9) 20%,
+            rgba(220, 38, 38, 0.8) 40%,
+            rgba(153, 27, 27, 0.6) 60%,
+            transparent 80%);
         border-radius: 50%;
-        z-index: 30;
+        z-index: 50;
         pointer-events: none;
-        filter: blur(8px);
+        filter: blur(10px) drop-shadow(0 0 40px #dc2626);
+        mix-blend-mode: screen;
+        left: ${isAttacker ? rect.right - 50 : rect.left + 50}px;
+        top: ${rect.top + rect.height * 0.4}px;
+        transform: translate(-50%, -50%);
+    `;
+    
+    document.body.appendChild(muzzleFlash);
+    
+    // FLASH ANIMATION
+    muzzleFlash.animate([
+        { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(3)', opacity: 1 },
+        { transform: 'translate(-50%, -50%) scale(5)', opacity: 0.6 },
+        { transform: 'translate(-50%, -50%) scale(8)', opacity: 0 }
+    ], {
+        duration: 500,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        fill: 'forwards'
+    });
+    
+    // BULLET TRAIL - GIANT LASER BEAM
+    const bulletTrail = document.createElement('div');
+    const trailLength = Math.abs(battleRect.right - rect.right);
+    bulletTrail.style.cssText = `
+        position: fixed;
+        width: ${trailLength}px;
+        height: 40px;
+        background: linear-gradient(90deg, 
+            rgba(255, 255, 255, 1) 0%,
+            rgba(251, 191, 36, 1) 20%,
+            rgba(220, 38, 38, 1) 50%,
+            rgba(251, 191, 36, 0.8) 80%,
+            rgba(255, 255, 255, 0) 100%);
+        z-index: 49;
+        pointer-events: none;
+        filter: blur(5px) drop-shadow(0 0 20px #dc2626);
+        border-radius: 20px;
+        mix-blend-mode: screen;
+        left: ${isAttacker ? rect.right : rect.left}px;
+        top: ${rect.top + rect.height * 0.45}px;
+        transform-origin: ${isAttacker ? 'left center' : 'right center'};
+        transform: ${isAttacker ? 'none' : 'scaleX(-1)'};
+    `;
+    
+    document.body.appendChild(bulletTrail);
+    
+    // TRAIL ANIMATION
+    bulletTrail.animate([
+        { transform: `${isAttacker ? 'scaleX(0.1)' : 'scaleX(-0.1)'}`, opacity: 0 },
+        { transform: `${isAttacker ? 'scaleX(1.5)' : 'scaleX(-1.5)'}`, opacity: 1 },
+        { transform: `${isAttacker ? 'scaleX(2)' : 'scaleX(-2)'}`, opacity: 0.6 },
+        { transform: `${isAttacker ? 'scaleX(0.1)' : 'scaleX(-0.1)'}`, opacity: 0 }
+    ], {
+        duration: 400,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        fill: 'forwards'
+    });
+    
+    // SHELL CASINGS
+    for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+            const casing = document.createElement('div');
+            casing.style.cssText = `
+                position: fixed;
+                width: 30px;
+                height: 15px;
+                background: linear-gradient(45deg, 
+                    rgba(251, 191, 36, 1) 0%,
+                    rgba(153, 27, 27, 1) 100%);
+                border-radius: 3px;
+                z-index: 48;
+                pointer-events: none;
+                filter: drop-shadow(0 0 10px #fbbf24);
+                left: ${(isAttacker ? rect.right : rect.left) - 15}px;
+                top: ${rect.top + rect.height * 0.4}px;
+                transform: rotate(${Math.random() * 360}deg);
+            `;
+            
+            document.body.appendChild(casing);
+            
+            const angle = (Math.random() * 60 + 60) * (isAttacker ? -1 : 1);
+            const distance = 50 + Math.random() * 100;
+            
+            casing.animate([
+                { 
+                    transform: `rotate(0deg) translate(0, 0)`,
+                    opacity: 1 
+                },
+                { 
+                    transform: `rotate(${angle}deg) translate(${distance}px, ${-distance}px)`,
+                    opacity: 0.5 
+                },
+                { 
+                    transform: `rotate(${angle * 2}deg) translate(${distance * 2}px, ${-distance * 0.5}px)`,
+                    opacity: 0 
+                }
+            ], {
+                duration: 800 + Math.random() * 400,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => casing.remove(), 1200);
+        }, i * 60);
+    }
+    
+    setTimeout(() => {
+        muzzleFlash.remove();
+        bulletTrail.remove();
+    }, 500);
+    
+    return { muzzleFlash, bulletTrail };
+}
+
+function createMassiveMagicAttackEffect(isAttacker) {
+    const characterElement = isAttacker ? 
+        document.getElementById('playerCharacter') : 
+        document.getElementById('enemyCharacter');
+    
+    const battleArea = document.querySelector('.battle-area');
+    const rect = characterElement.getBoundingClientRect();
+    const battleRect = battleArea.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // GIANT MAGIC SPHERE
+    const magicSphere = document.createElement('div');
+    const sphereSize = 200;
+    magicSphere.style.cssText = `
+        position: fixed;
+        width: ${sphereSize}px;
+        height: ${sphereSize}px;
+        background: radial-gradient(circle, 
+            rgba(255, 255, 255, 1) 0%,
+            rgba(139, 92, 246, 0.9) 20%,
+            rgba(79, 70, 229, 0.8) 40%,
+            rgba(67, 56, 202, 0.6) 60%,
+            rgba(49, 46, 129, 0.4) 80%,
+            transparent 100%);
+        border-radius: 50%;
+        z-index: 50;
+        pointer-events: none;
+        filter: blur(15px) drop-shadow(0 0 50px #8b5cf6) drop-shadow(0 0 100px #4f46e5);
         mix-blend-mode: screen;
         left: ${centerX}px;
         top: ${centerY}px;
         transform: translate(-50%, -50%);
     `;
     
-    // Burst animation
-    const burstKeyframes = [
-        { transform: 'translate(-50%, -50%) scale(0.3)', filter: 'blur(0px)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.8)', filter: 'blur(8px)', opacity: 0.8 },
-        { transform: 'translate(-50%, -50%) scale(2.5)', filter: 'blur(12px)', opacity: 0.6 },
-        { transform: 'translate(-50%, -50%) scale(1.8)', filter: 'blur(8px)', opacity: 0.4 },
-        { transform: 'translate(-50%, -50%) scale(0.3)', filter: 'blur(0px)', opacity: 0 }
-    ];
+    document.body.appendChild(magicSphere);
     
-    burst.animate(burstKeyframes, {
-        duration: 1000,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        fill: 'forwards'
-    });
-    
-    characterElement.appendChild(burst);
-    
-    // Create magic orb
-    const orb = document.createElement('div');
-    orb.style.cssText = `
-        position: absolute;
-        width: 60px;
-        height: 60px;
-        background: radial-gradient(circle, 
-            rgba(139, 92, 246, 1) 0%, 
-            rgba(167, 139, 250, 0.8) 50%, 
-            rgba(221, 214, 254, 0.6) 100%);
-        border-radius: 50%;
-        z-index: 30;
-        pointer-events: none;
-        filter: drop-shadow(0 0 20px #8b5cf6);
-        left: ${centerX}px;
-        top: ${centerY}px;
-        transform: translate(-50%, -50%);
-    `;
-    
-    // Orb animation
-    const orbKeyframes = [
-        { transform: 'translate(-50%, -50%) scale(0.5) rotate(0deg)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.4) rotate(45deg)', opacity: 1 },
-        { transform: 'translate(-50%, -50%) scale(1.8) rotate(90deg)', opacity: 0.8 },
-        { transform: 'translate(-50%, -50%) scale(1.4) rotate(135deg)', opacity: 0.6 },
-        { transform: 'translate(-50%, -50%) scale(0.8) rotate(180deg)', opacity: 0.4 },
-        { transform: 'translate(-50%, -50%) scale(0.5) rotate(225deg)', opacity: 0 }
-    ];
-    
-    orb.animate(orbKeyframes, {
+    // SPHERE ANIMATION
+    magicSphere.animate([
+        { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
+        { transform: 'translate(-50%, -50%) scale(2)', opacity: 0.7 },
+        { transform: 'translate(-50%, -50%) scale(3)', opacity: 0 }
+    ], {
         duration: 800,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
     
-    characterElement.appendChild(orb);
-    
-    // Create magic ring
-    const ring = document.createElement('div');
-    ring.style.cssText = `
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        border: 4px solid rgba(167, 139, 250, 0.8);
-        border-radius: 50%;
-        z-index: 29;
-        pointer-events: none;
-        filter: drop-shadow(0 0 15px #a78bfa);
-        left: ${centerX}px;
-        top: ${centerY}px;
-        transform: translate(-50%, -50%);
-    `;
-    
-    // Ring animation
-    const ringKeyframes = [
-        { transform: 'translate(-50%, -50%) scale(0.5) rotate(0deg)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(2.5) rotate(180deg)', opacity: 0.8 },
-        { transform: 'translate(-50%, -50%) scale(3.5) rotate(360deg)', opacity: 0.6 },
-        { transform: 'translate(-50%, -50%) scale(4.5) rotate(540deg)', opacity: 0.4 },
-        { transform: 'translate(-50%, -50%) scale(5.5) rotate(720deg)', opacity: 0 }
-    ];
-    
-    ring.animate(ringKeyframes, {
-        duration: 1200,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        fill: 'forwards'
-    });
-    
-    characterElement.appendChild(ring);
-    
-    // Create multiple sparkles
-    for (let i = 0; i < 8; i++) {
+    // MAGIC ENERGY WAVES
+    for (let i = 0; i < 5; i++) {
         setTimeout(() => {
-            const sparkle = document.createElement('div');
-            sparkle.style.cssText = `
-                position: absolute;
-                width: 25px;
-                height: 25px;
-                background: radial-gradient(circle, 
-                    rgba(255, 255, 255, 1) 0%, 
-                    rgba(240, 171, 252, 0.8) 50%, 
-                    rgba(217, 70, 239, 0.6) 100%);
+            const wave = document.createElement('div');
+            const waveSize = 150 + i * 50;
+            wave.style.cssText = `
+                position: fixed;
+                width: ${waveSize}px;
+                height: ${waveSize}px;
+                border: 8px solid rgba(139, 92, 246, 0.6);
                 border-radius: 50%;
-                z-index: 31;
+                z-index: 49;
                 pointer-events: none;
-                filter: drop-shadow(0 0 10px #ffffff);
+                filter: blur(5px) drop-shadow(0 0 20px #8b5cf6);
                 left: ${centerX}px;
                 top: ${centerY}px;
                 transform: translate(-50%, -50%);
             `;
             
-            // Random direction for sparkle
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 60;
+            document.body.appendChild(wave);
             
-            const sparkleKeyframes = [
-                { 
-                    transform: 'translate(-50%, -50%) scale(1)', 
-                    opacity: 0 
-                },
-                { 
-                    transform: `translate(-50%, -50%) translate(${Math.cos(angle) * distance * 0.3}px, ${Math.sin(angle) * distance * 0.3}px) scale(1.3) rotate(180deg)`, 
-                    opacity: 1 
-                },
-                { 
-                    transform: `translate(-50%, -50%) translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(1.6) rotate(360deg)`, 
-                    opacity: 0.5 
-                },
-                { 
-                    transform: `translate(-50%, -50%) translate(${Math.cos(angle) * distance * 1.3}px, ${Math.sin(angle) * distance * 1.3}px) scale(1.3) rotate(540deg)`, 
-                    opacity: 0.3 
-                },
-                { 
-                    transform: `translate(-50%, -50%) translate(${Math.cos(angle) * distance * 1.6}px, ${Math.sin(angle) * distance * 1.6}px) scale(1) rotate(720deg)`, 
-                    opacity: 0 
-                }
-            ];
-            
-            sparkle.animate(sparkleKeyframes, {
-                duration: 600 + Math.random() * 400,
+            wave.animate([
+                { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8 },
+                { transform: 'translate(-50%, -50%) scale(3)', opacity: 0 }
+            ], {
+                duration: 1000,
                 easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
                 fill: 'forwards'
             });
             
-            characterElement.appendChild(sparkle);
-            
-            setTimeout(() => sparkle.remove(), 1000);
-        }, i * 120);
+            setTimeout(() => wave.remove(), 1000);
+        }, i * 150);
     }
     
-    // Remove effects after animation
-    setTimeout(() => {
-        burst.remove();
-        orb.remove();
-        ring.remove();
-    }, 1200);
-    
-    return { burst, orb, ring };
-}
-
-function createAttackEffect(characterName, isPlayer) {
-    // Check character type and create appropriate effect
-    if (swordUsers.some(name => characterName.includes(name))) {
-        return createSwordEffect(characterName, isPlayer);
-    } else if (gunUsers.some(name => characterName.includes(name))) {
-        return createGunEffect(characterName, isPlayer);
-    } else if (magicUsers.some(name => characterName.includes(name))) {
-        return createMagicEffect(characterName, isPlayer);
-    }
-    return null;
-}
-
-function createHitEffect(target, damage) {
-    const targetElement = target === 'player' ? 
-        document.getElementById('playerCharacter') : 
-        document.getElementById('enemyCharacter');
-    
-    // Create hit flash
-    const hitFlash = document.createElement('div');
-    hitFlash.style.cssText = `
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, 
-            rgba(255, 50, 50, 0.4) 0%, 
-            rgba(255, 100, 100, 0.2) 50%, 
-            rgba(255, 150, 150, 0) 100%);
-        border-radius: 50%;
-        z-index: 25;
-        pointer-events: none;
-    `;
-    
-    // Hit flash animation
-    const flashKeyframes = [
-        { opacity: 0.8, transform: 'scale(1)' },
-        { opacity: 0.4, transform: 'scale(1.1)' },
-        { opacity: 0, transform: 'scale(1)' }
-    ];
-    
-    hitFlash.animate(flashKeyframes, {
-        duration: 300,
-        easing: 'ease-out',
-        fill: 'forwards'
-    });
-    
-    targetElement.appendChild(hitFlash);
-    
-    // Remove after animation
-    setTimeout(() => {
-        hitFlash.remove();
-    }, 300);
-    
-    // Create hit particles for critical hits
-    if (damage > 25) {
-        createHitParticles(targetElement);
-    }
-}
-
-function createHitParticles(targetElement) {
-    for (let i = 0; i < 12; i++) {
+    // MAGIC PARTICLES STORM
+    for (let i = 0; i < 40; i++) {
         setTimeout(() => {
             const particle = document.createElement('div');
+            const size = 10 + Math.random() * 20;
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 100 + Math.random() * 200;
+            
             particle.style.cssText = `
-                position: absolute;
-                width: 10px;
-                height: 10px;
-                background: linear-gradient(135deg, 
-                    #ff6b6b 0%, 
-                    #ff8e8e 50%, 
-                    #ffb3b3 100%);
+                position: fixed;
+                width: ${size}px;
+                height: ${size}px;
+                background: radial-gradient(circle, 
+                    rgba(255, 255, 255, 1) 0%,
+                    rgba(199, 210, 254, 0.8) 50%,
+                    rgba(139, 92, 246, 0.6) 100%);
                 border-radius: 50%;
-                z-index: 26;
+                z-index: 48;
                 pointer-events: none;
-                filter: drop-shadow(0 0 5px #ff6b6b);
-                left: 50%;
-                top: 50%;
+                filter: blur(2px) drop-shadow(0 0 10px #a78bfa);
+                left: ${centerX}px;
+                top: ${centerY}px;
                 transform: translate(-50%, -50%);
             `;
             
-            // Random direction and distance
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 40 + Math.random() * 60;
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
+            document.body.appendChild(particle);
             
-            const particleKeyframes = [
+            const targetX = centerX + Math.cos(angle) * distance;
+            const targetY = centerY + Math.sin(angle) * distance;
+            
+            particle.animate([
+                { 
+                    transform: 'translate(-50%, -50%) scale(0)',
+                    opacity: 0 
+                },
+                { 
+                    transform: 'translate(-50%, -50%) scale(1.5)',
+                    opacity: 1 
+                },
+                { 
+                    transform: `translate(${targetX - centerX}px, ${targetY - centerY}px) scale(0)`,
+                    opacity: 0 
+                }
+            ], {
+                duration: 800 + Math.random() * 400,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => particle.remove(), 1200);
+        }, i * 20);
+    }
+    
+    // ARCANE RUNES
+    for (let i = 0; i < 12; i++) {
+        setTimeout(() => {
+            const rune = document.createElement('div');
+            rune.style.cssText = `
+                position: fixed;
+                width: 60px;
+                height: 60px;
+                background: radial-gradient(circle, 
+                    rgba(139, 92, 246, 0.8) 0%,
+                    rgba(79, 70, 229, 0.6) 100%);
+                clip-path: polygon(${Array.from({length: 6}, (_, j) => 
+                    `${50 + 40 * Math.cos((j * 60 + Math.random() * 30) * Math.PI/180)}% ` +
+                    `${50 + 40 * Math.sin((j * 60 + Math.random() * 30) * Math.PI/180)}%`
+                ).join(', ')});
+                z-index: 47;
+                pointer-events: none;
+                filter: drop-shadow(0 0 15px #8b5cf6);
+                left: ${centerX + Math.random() * 200 - 100}px;
+                top: ${centerY + Math.random() * 200 - 100}px;
+                transform: scale(0) rotate(0deg);
+            `;
+            
+            document.body.appendChild(rune);
+            
+            rune.animate([
+                { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+                { transform: 'scale(1.5) rotate(180deg)', opacity: 0.7 },
+                { transform: 'scale(2) rotate(360deg)', opacity: 0 }
+            ], {
+                duration: 600 + Math.random() * 300,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => rune.remove(), 900);
+        }, i * 50);
+    }
+    
+    setTimeout(() => magicSphere.remove(), 800);
+    
+    return magicSphere;
+}
+
+function createMassiveAttackImpactEffect(isAttacker, damage) {
+    const targetElement = isAttacker ? 
+        document.getElementById('enemyCharacter') : 
+        document.getElementById('playerCharacter');
+    
+    const rect = targetElement.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // GIANT IMPACT EXPLOSION
+    const impactExplosion = document.createElement('div');
+    const explosionSize = 150 + damage * 2;
+    impactExplosion.style.cssText = `
+        position: fixed;
+        width: ${explosionSize}px;
+        height: ${explosionSize}px;
+        background: radial-gradient(circle, 
+            rgba(255, 255, 255, 1) 0%,
+            rgba(251, 191, 36, 0.9) 20%,
+            rgba(220, 38, 38, 0.8) 40%,
+            rgba(153, 27, 27, 0.6) 60%,
+            transparent 80%);
+        border-radius: 50%;
+        z-index: 60;
+        pointer-events: none;
+        filter: blur(20px) drop-shadow(0 0 60px #dc2626);
+        mix-blend-mode: screen;
+        left: ${centerX}px;
+        top: ${centerY}px;
+        transform: translate(-50%, -50%);
+    `;
+    
+    document.body.appendChild(impactExplosion);
+    
+    // EXPLOSION ANIMATION
+    impactExplosion.animate([
+        { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0.9 },
+        { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 0.7 },
+        { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+    ], {
+        duration: 600,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        fill: 'forwards'
+    });
+    
+    // SHOCKWAVE RINGS
+    for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+            const shockwave = document.createElement('div');
+            shockwave.style.cssText = `
+                position: fixed;
+                width: 100px;
+                height: 100px;
+                border: ${8 - i * 2}px solid rgba(251, 191, 36, 0.7);
+                border-radius: 50%;
+                z-index: 59;
+                pointer-events: none;
+                filter: blur(3px) drop-shadow(0 0 15px #fbbf24);
+                left: ${centerX}px;
+                top: ${centerY}px;
+                transform: translate(-50%, -50%);
+            `;
+            
+            document.body.appendChild(shockwave);
+            
+            shockwave.animate([
+                { transform: 'translate(-50%, -50%) scale(0.1)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8 },
+                { transform: 'translate(-50%, -50%) scale(3)', opacity: 0 }
+            ], {
+                duration: 800,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => shockwave.remove(), 800);
+        }, i * 100);
+    }
+    
+    // CRACK EFFECT (for high damage)
+    if (damage > 25) {
+        const crack = document.createElement('div');
+        crack.style.cssText = `
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            background: 
+                linear-gradient(45deg, transparent 45%, rgba(220, 38, 38, 0.6) 50%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, rgba(220, 38, 38, 0.6) 50%, transparent 55%),
+                linear-gradient(135deg, transparent 45%, rgba(220, 38, 38, 0.6) 50%, transparent 55%),
+                linear-gradient(-135deg, transparent 45%, rgba(220, 38, 38, 0.6) 50%, transparent 55%);
+            z-index: 58;
+            pointer-events: none;
+            filter: blur(2px) drop-shadow(0 0 10px #dc2626);
+            left: ${centerX}px;
+            top: ${centerY}px;
+            transform: translate(-50%, -50%) scale(0);
+        `;
+        
+        document.body.appendChild(crack);
+        
+        crack.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0 }
+        ], {
+            duration: 400,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'forwards'
+        });
+        
+        setTimeout(() => crack.remove(), 400);
+    }
+    
+    // DAMAGE PARTICLES
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            const size = 5 + Math.random() * 15;
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 50 + Math.random() * 150;
+            
+            particle.style.cssText = `
+                position: fixed;
+                width: ${size}px;
+                height: ${size}px;
+                background: radial-gradient(circle, 
+                    rgba(255, 255, 255, 1) 0%,
+                    rgba(251, 191, 36, 1) 50%,
+                    rgba(220, 38, 38, 1) 100%);
+                border-radius: 50%;
+                z-index: 57;
+                pointer-events: none;
+                filter: blur(1px) drop-shadow(0 0 5px #fbbf24);
+                left: ${centerX}px;
+                top: ${centerY}px;
+                transform: translate(-50%, -50%);
+            `;
+            
+            document.body.appendChild(particle);
+            
+            const targetX = centerX + Math.cos(angle) * distance;
+            const targetY = centerY + Math.sin(angle) * distance;
+            
+            particle.animate([
+                { 
+                    transform: 'translate(-50%, -50%) scale(0)',
+                    opacity: 0 
+                },
                 { 
                     transform: 'translate(-50%, -50%) scale(1)',
                     opacity: 1 
                 },
                 { 
-                    transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(0.2)`,
+                    transform: `translate(${targetX - centerX}px, ${targetY - centerY}px) scale(0)`,
                     opacity: 0 
                 }
-            ];
-            
-            particle.animate(particleKeyframes, {
-                duration: 500 + Math.random() * 300,
+            ], {
+                duration: 600 + Math.random() * 300,
                 easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
                 fill: 'forwards'
             });
             
-            targetElement.appendChild(particle);
-            
-            setTimeout(() => particle.remove(), 800);
-        }, i * 30);
+            setTimeout(() => particle.remove(), 900);
+        }, i * 15);
     }
+    
+    setTimeout(() => impactExplosion.remove(), 600);
+    
+    return impactExplosion;
+}
+
+function createAttackEffectForHurtCharacter(characterName, isHurtOnPlayer, damage) {
+    if (swordUsers.some(name => characterName.includes(name))) {
+        return createMassiveAttackImpactEffect(!isHurtOnPlayer, damage);
+    } else if (gunUsers.some(name => characterName.includes(name))) {
+        return createMassiveAttackImpactEffect(!isHurtOnPlayer, damage);
+    } else if (magicUsers.some(name => characterName.includes(name))) {
+        return createMassiveAttackImpactEffect(!isHurtOnPlayer, damage);
+    }
+    return null;
+}
+
+function createAttackEffectForAttacker(characterName, isAttacker) {
+    if (swordUsers.some(name => characterName.includes(name))) {
+        return createMassiveSwordAttackEffect(isAttacker);
+    } else if (gunUsers.some(name => characterName.includes(name))) {
+        return createMassiveGunAttackEffect(isAttacker);
+    } else if (magicUsers.some(name => characterName.includes(name))) {
+        return createMassiveMagicAttackEffect(isAttacker);
+    }
+    return null;
 }
 
 // ============================================
-// ATTACK FUNCTIONS WITH EFFECTS
+// ATTACK FUNCTIONS WITH MASSIVE IMPACT EFFECTS
 // ============================================
 
 // Attack enemy
@@ -814,28 +990,28 @@ function attackEnemy() {
     const damage = Math.floor(Math.random() * 15) + 15; // 15-30 damage
     enemyHp = Math.max(0, enemyHp - damage);
     
-    // Player attacks
+    // Player attacks - MASSIVE ATTACK EFFECT
     setCharacterState('player', 'attack');
     document.getElementById('playerCharacter').classList.add('attacking');
     
-    // Create attack effect
-    createAttackEffect(currentHero.name, true);
+    // Create massive attack effect from attacker
+    createAttackEffectForAttacker(currentHero.name, true);
     
-    // Screen shake effect
-    document.body.style.animation = 'shake 0.5s ease-out';
+    // Extreme screen shake
+    document.body.style.animation = 'extreme-shake 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
     
     setTimeout(() => {
         document.getElementById('playerCharacter').classList.remove('attacking');
         document.body.style.animation = '';
         
-        // Enemy gets hurt
+        // Enemy gets hurt - MASSIVE IMPACT EFFECT ON HURT CHARACTER
         setCharacterState('enemy', 'hurt');
         document.getElementById('enemyCharacter').classList.add('hurt');
         showDamage(damage, 'enemy');
         updateHP();
         
-        // Create hit effect on enemy
-        createHitEffect('enemy', damage);
+        // Create massive impact effect on hurt enemy
+        createAttackEffectForHurtCharacter(currentHero.name, false, damage);
         
         setTimeout(() => {
             document.getElementById('enemyCharacter').classList.remove('hurt');
@@ -852,28 +1028,28 @@ function attackPlayer() {
     const damage = Math.floor(Math.random() * 15) + 15; // 15-30 damage
     playerHp = Math.max(0, playerHp - damage);
     
-    // Enemy attacks
+    // Enemy attacks - MASSIVE ATTACK EFFECT
     setCharacterState('enemy', 'attack');
     document.getElementById('enemyCharacter').classList.add('attacking');
     
-    // Create attack effect
-    createAttackEffect(currentVillain.name, false);
+    // Create massive attack effect from attacker
+    createAttackEffectForAttacker(currentVillain.name, false);
     
-    // Screen shake effect
-    document.body.style.animation = 'shake 0.5s ease-out';
+    // Extreme screen shake
+    document.body.style.animation = 'extreme-shake 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
     
     setTimeout(() => {
         document.getElementById('enemyCharacter').classList.remove('attacking');
         document.body.style.animation = '';
         
-        // Player gets hurt
+        // Player gets hurt - MASSIVE IMPACT EFFECT ON HURT CHARACTER
         setCharacterState('player', 'hurt');
         document.getElementById('playerCharacter').classList.add('hurt');
         showDamage(damage, 'player');
         updateHP();
         
-        // Create hit effect on player
-        createHitEffect('player', damage);
+        // Create massive impact effect on hurt player
+        createAttackEffectForHurtCharacter(currentVillain.name, true, damage);
         
         setTimeout(() => {
             document.getElementById('playerCharacter').classList.remove('hurt');
@@ -899,11 +1075,24 @@ function showDamage(damage, target) {
     damageEl.className = 'damage-number';
     damageEl.textContent = `-${damage}`;
     
-    // Critical hit styling
+    // Critical hit styling (MASSIVE for high damage)
     if (damage > 25) {
         damageEl.style.color = '#fbbf24';
+        damageEl.style.fontSize = '60px';
+        damageEl.style.fontWeight = '900';
+        damageEl.style.textShadow = `
+            5px 5px 10px rgba(0, 0, 0, 0.9), 
+            0 0 30px #ef4444, 
+            0 0 60px #fb923c,
+            0 0 90px #fbbf24`;
+        damageEl.style.zIndex = '70';
+    } else {
         damageEl.style.fontSize = '48px';
-        damageEl.style.textShadow = '4px 4px 8px rgba(0, 0, 0, 0.9), 0 0 20px #ef4444, 0 0 40px #fb923c';
+        damageEl.style.fontWeight = '800';
+        damageEl.style.textShadow = `
+            4px 4px 8px rgba(0, 0, 0, 0.9), 
+            0 0 20px #ef4444, 
+            0 0 40px #fb923c`;
     }
     
     // Append to body with fixed position for enemy to avoid flip
