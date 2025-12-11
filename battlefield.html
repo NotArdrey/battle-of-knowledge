@@ -23,7 +23,38 @@
             width: 100vw;
             height: 100vh;
             position: fixed;
+            /* Default background, will be overridden by JavaScript */
             background: linear-gradient(to bottom, #7dd3fc, #3b82f6);
+        }
+        
+        /* Era-specific background with transition */
+        .era-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.7;
+            z-index: -1;
+            transition: background-image 0.5s ease-in-out;
+        }
+        
+        /* Battle area background with era-specific theme */
+        .battle-area-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.8;
+            z-index: -1;
+            transition: background-image 0.5s ease-in-out;
         }
         
         .sprite-image { 
@@ -48,13 +79,23 @@
             left: 0;
         }
         
-        /* Battle Area - TOP (65%) - Increased for bigger characters */
+        /* Battle Area - TOP (65%) */
         .battle-area {
             flex: 0 0 65%;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-bottom: 6px solid #92400e;
             position: relative;
             overflow: hidden;
+            border-bottom: 6px solid #92400e;
+        }
+        
+        /* Battle platform overlay for contrast */
+        .battle-platform-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.8), rgba(245, 158, 11, 0.8));
+            z-index: 0;
         }
         
         /* Question Area - BOTTOM (35%) */
@@ -85,10 +126,10 @@
             right: 10px;
         }
         
-        /* Characters - EXTREMELY LARGE - Almost fill the battle area */
+        /* Characters - EXTREMELY LARGE */
         .character-container {
             position: absolute;
-            bottom: 0; /* Directly at bottom */
+            bottom: 0;
             z-index: 10;
         }
         
@@ -590,10 +631,8 @@
     </style>
 </head>
 <body>
-    <!-- Background Image -->
-    <div class="fixed inset-0 bg-cover bg-center opacity-30 z-0" 
-         style="background-image: url('assets/rice_background.png');" 
-         id="battleBackground"></div>
+    <!-- Era-specific background (set by JavaScript) -->
+    <div id="eraBackground" class="era-background"></div>
     
     <!-- Back Button -->
     <button onclick="window.location.href='era-selection.html'" 
@@ -611,6 +650,12 @@
     <div class="battle-screen">
         <!-- TOP SECTION: Battle Arena (65%) -->
         <div class="battle-area">
+            <!-- Battle area background (era-specific) -->
+            <div id="battleAreaBackground" class="battle-area-bg"></div>
+            
+            <!-- Battle platform overlay for contrast -->
+            <div class="battle-platform-overlay"></div>
+            
             <!-- Player HP -->
             <div class="hp-bar-container hp-bar-left">
                 <p id="playerName" class="text-black font-bold text-center mb-1 text-sm sm:text-base truncate">
@@ -772,8 +817,32 @@
     <script src="js/language.js"></script>
     
     <script>
+        // Function to set era-specific backgrounds
+        function setEraBackground(eraKey) {
+            const eraData = window.eraData || {};
+            const era = eraData[eraKey];
+            
+            if (era && era.background) {
+                // Set the background for the entire page
+                const eraBackground = document.getElementById('eraBackground');
+                if (eraBackground) {
+                    eraBackground.style.backgroundImage = `url('${era.background}')`;
+                }
+                
+                // Set the battle area background
+                const battleAreaBg = document.getElementById('battleAreaBackground');
+                if (battleAreaBg) {
+                    battleAreaBg.style.backgroundImage = `url('${era.background}')`;
+                }
+            }
+        }
+        
         // Simple initialization
         document.addEventListener('DOMContentLoaded', function() {
+            // Set era background if era is already determined
+            const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
+            setEraBackground(selectedEra);
+            
             // Hide loading overlay
             setTimeout(() => {
                 document.getElementById('loadingOverlay')?.classList.add('hidden');
@@ -796,6 +865,7 @@
         // Ensure battle.js functions are available globally
         window.selectAnswer = selectAnswer;
         window.proceedToNextEra = proceedToNextEra;
+        window.setEraBackground = setEraBackground;
     </script>
 </body>
 </html>
