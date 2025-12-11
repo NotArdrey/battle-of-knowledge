@@ -38,16 +38,17 @@
             .battle-platform {
                 transform: scale(0.95);
                 transform-origin: top center;
+                min-height: 280px !important;
             }
             /* Mobile: Position HP bars closer to characters */
             .hp-container-left {
                 top: auto !important;
-                bottom: 9rem !important;
+                bottom: 12rem !important;
                 left: 0.5rem !important;
             }
             .hp-container-right {
                 top: auto !important;
-                bottom: 9rem !important;
+                bottom: 12rem !important;
                 right: 0.5rem !important;
             }
             /* Adjust question-answer container for mobile */
@@ -63,73 +64,65 @@
         @media (max-width: 480px) {
             .battle-platform {
                 transform: scale(0.9);
+                min-height: 260px !important;
             }
             .hp-container-left {
-                bottom: 8.5rem !important;
+                bottom: 10.5rem !important;
             }
             .hp-container-right {
-                bottom: 8.5rem !important;
+                bottom: 10.5rem !important;
             }
         }
         @media (max-width: 400px) {
             .battle-platform {
                 transform: scale(0.88);
+                min-height: 250px !important;
             }
             .hp-container-left {
-                bottom: 8rem !important;
+                bottom: 9.5rem !important;
                 left: 0.25rem !important;
             }
             .hp-container-right {
-                bottom: 8rem !important;
+                bottom: 9.5rem !important;
                 right: 0.25rem !important;
             }
         }
         @media (max-width: 375px) {
             .battle-platform {
                 transform: scale(0.86);
+                min-height: 240px !important;
             }
             .hp-container-left {
-                bottom: 7.5rem !important;
+                bottom: 9rem !important;
             }
             .hp-container-right {
-                bottom: 7.5rem !important;
-            }
-            /* Reduce character size */
-            .character {
-                width: 6rem !important;
-                height: 6rem !important;
+                bottom: 9rem !important;
             }
         }
         @media (max-width: 360px) {
             .battle-platform {
                 transform: scale(0.85);
+                min-height: 230px !important;
             }
             .hp-container-left {
-                bottom: 7rem !important;
+                bottom: 8.5rem !important;
             }
             .hp-container-right {
-                bottom: 7rem !important;
-            }
-            .character {
-                width: 5.5rem !important;
-                height: 5.5rem !important;
+                bottom: 8.5rem !important;
             }
         }
         @media (max-width: 344px) {
             .battle-platform {
                 transform: scale(0.82);
+                min-height: 220px !important;
             }
             .hp-container-left {
-                bottom: 6.5rem !important;
+                bottom: 8rem !important;
                 left: 0.15rem !important;
             }
             .hp-container-right {
-                bottom: 6.5rem !important;
+                bottom: 8rem !important;
                 right: 0.15rem !important;
-            }
-            .character {
-                width: 5rem !important;
-                height: 5rem !important;
             }
         }
     </style>
@@ -176,7 +169,7 @@
         <!-- Battle Platform - Responsive -->
         <div class="battle-platform relative 
                     w-full max-w-3xl 
-                    h-[35vh] min-h-[250px] max-h-[300px]
+                    h-[40vh] min-h-[300px] max-h-[350px]
                     bg-gradient-to-br from-amber-200 via-yellow-200 to-amber-300 
                     border-4 sm:border-6 md:border-8 border-amber-800 
                     rounded-2xl sm:rounded-3xl
@@ -191,52 +184,52 @@
 
             <!-- HP Containers - Mobile First -->
             <div class="hp-container-left absolute top-3 left-3 sm:top-4 sm:left-4 md:top-6 md:left-6 
-                        w-32 sm:w-32 md:w-40">
+                        w-36 sm:w-40 md:w-48">
                 <p id="playerName" class="text-black font-bold 
-                          text-sm sm:text-sm md:text-base 
+                          text-sm sm:text-base md:text-lg 
                           mb-1 text-center truncate">
                     Lapu-Lapu
                 </p>
-                <div class="h-4 sm:h-4 md:h-5 
+                <div class="h-5 sm:h-5 md:h-6 
                           bg-gradient-to-b from-gray-800 to-gray-900 
                           rounded-lg border border-yellow-600 
                           overflow-hidden shadow-inner">
                     <div id="playerHpBar" class="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-700" 
                          style="width: 100%"></div>
                 </div>
-                <p class="text-xs text-gray-700 text-center mt-1" id="playerHpText">100/100</p>
+                <p class="text-xs sm:text-sm text-gray-700 text-center mt-1" id="playerHpText">100/100</p>
             </div>
 
             <div class="hp-container-right absolute top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 
-                        w-32 sm:w-32 md:w-40">
+                        w-36 sm:w-40 md:w-48">
                 <p id="enemyName" class="text-black font-bold 
-                          text-sm sm:text-sm md:text-base 
+                          text-sm sm:text-base md:text-lg 
                           mb-1 text-center truncate">
                     Ferdinand Magellan
                 </p>
-                <div class="h-4 sm:h-4 md:h-5 
+                <div class="h-5 sm:h-5 md:h-6 
                           bg-gradient-to-b from-gray-800 to-gray-900 
                           rounded-lg border border-yellow-600 
                           overflow-hidden shadow-inner">
                     <div id="enemyHpBar" class="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-700" 
                          style="width: 100%"></div>
                 </div>
-                <p class="text-xs text-gray-700 text-center mt-1" id="enemyHpText">100/100</p>
+                <p class="text-xs sm:text-sm text-gray-700 text-center mt-1" id="enemyHpText">100/100</p>
             </div>
 
-            <!-- Characters - Responsive Sizing - Larger on Mobile -->
-            <div id="playerCharacter" class="character absolute bottom-4 left-3 sm:bottom-6 sm:left-4 md:bottom-8 md:left-8
-                        w-28 h-28 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40
-                        transition-all duration-300">
+            <!-- Characters - MUCH LARGER SIZES -->
+            <div id="playerCharacter" class="character absolute bottom-2 left-1 sm:bottom-4 sm:left-2 md:bottom-6 md:left-4
+                        w-36 h-36 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-72 lg:h-72
+                        transition-all duration-300 z-10">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
-                     class="sprite-image w-full h-full object-contain">
+                     class="sprite-image w-full h-full object-contain drop-shadow-2xl">
             </div>
 
-            <div id="enemyCharacter" class="character absolute bottom-4 right-3 sm:bottom-6 sm:right-4 md:bottom-8 md:right-8
-                        w-28 h-28 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40
-                        transition-all duration-300">
+            <div id="enemyCharacter" class="character absolute bottom-2 right-1 sm:bottom-4 sm:right-2 md:bottom-6 md:right-4
+                        w-36 h-36 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-72 lg:h-72
+                        transition-all duration-300 z-10">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
-                     class="sprite-image w-full h-full object-contain">
+                     class="sprite-image w-full h-full object-contain drop-shadow-2xl">
             </div>
         </div>
 
