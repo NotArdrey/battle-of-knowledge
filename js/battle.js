@@ -9,10 +9,77 @@ let currentVillain = null;
 let currentLanguageLoaded = ''; // Track which language questions are loaded
 let currentShuffledAnswers = []; // Store shuffled answers
 
-// Get unlocked heroes for an era (needed before initBattle)
+// Set era-specific backgrounds
+function setEraBackground(eraKey) {
+    const era = eraData[eraKey];
+    
+    if (era && era.background) {
+        // Set the background for the entire page
+        const eraBackground = document.getElementById('eraBackground');
+        if (eraBackground) {
+            eraBackground.style.backgroundImage = `url('${era.background}')`;
+        }
+        
+        // Set the battle area background
+        const battleAreaBg = document.getElementById('battleAreaBackground');
+        if (battleAreaBg) {
+            battleAreaBg.style.backgroundImage = `url('${era.background}')`;
+        }
+        
+        console.log(`Set background for era: ${eraKey} - ${era.background}`);
+    } else {
+        console.warn(`No background found for era: ${eraKey}`);
+        // Set default background
+        const eraBackground = document.getElementById('eraBackground');
+        if (eraBackground) {
+            eraBackground.style.backgroundImage = `url('assets/rice_background.png')`;
+        }
+        const battleAreaBg = document.getElementById('battleAreaBackground');
+        if (battleAreaBg) {
+            battleAreaBg.style.backgroundImage = `url('assets/rice_background.png')`;
+        }
+    }
+}
+
+// Get unlocked heroes for an era
 function getUnlockedHeroesForEra(eraKey) {
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     return unlockedHeroes[eraKey] || [0]; // First hero (index 0) is always unlocked by default
+}
+
+// Get a random era (for "all" battles)
+function getRandomEra() {
+    const eras = Object.keys(eraData);
+    const randomIndex = Math.floor(Math.random() * eras.length);
+    return eras[randomIndex];
+}
+
+// Get random villain for current era
+function getRandomVillain(eraKey) {
+    const villains = eraData[eraKey].villains;
+    const randomIndex = Math.floor(Math.random() * villains.length);
+    return villains[randomIndex];
+}
+
+// Get character sprite based on state
+function getCharacterSprite(characterData, state) {
+    if (!characterData || !characterData.folder) {
+        // Fallback to default sprites
+        if (characterData && characterData.type === 'hero') {
+            return state === 'attack' ? 'assets/lapulapu-attack.png' :
+                   state === 'hurt' ? 'assets/lapulapu-hurt.png' :
+                   state === 'victory' ? 'assets/lapulapu-victory.png' :
+                   'assets/lapulapu-idle.png';
+        } else {
+            return state === 'attack' ? 'assets/magellan-attack.png' :
+                   state === 'hurt' ? 'assets/magellan-hurt.png' :
+                   state === 'victory' ? 'assets/magellan-victory.png' :
+                   'assets/magellan-idle.png';
+        }
+    }
+    
+    const spriteFile = characterData[state] || characterData.idle;
+    return `${characterData.folder}/${spriteFile}`;
 }
 
 // Initialize battle
@@ -26,6 +93,9 @@ function initBattle() {
         currentEra = selectedEra;
     }
     
+    // Set era-specific backgrounds
+    setEraBackground(currentEra);
+    
     // Load questions based on current language and era
     const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
     if (questionsData[currentEra] && questionsData[currentEra][currentLanguage]) {
@@ -38,10 +108,6 @@ function initBattle() {
         shuffleArray(questions);
     }
     currentLanguageLoaded = currentLanguage; // Track loaded language
-    
-    // Set background
-    const battleBackground = document.getElementById('battleBackground');
-    battleBackground.style.backgroundImage = `url('${eraData[currentEra].background}')`;
     
     // Select hero (either player selected or first unlocked)
     const selectedHeroIndex = localStorage.getItem('selectedHero');
@@ -102,6 +168,15 @@ function setCharacterState(character, state) {
     }
 }
 
+// Shuffle array helper
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 // Load question
 function loadQuestion() {
     // Check if language changed - if so, just translate the current question
@@ -153,22 +228,19 @@ function loadQuestion() {
         shuffleArray(currentShuffledAnswers);
     }
     
-    document.getElementById('answerA').innerHTML = `A. ${currentShuffledAnswers[0]}`;
-    document.getElementById('answerB').innerHTML = `B. ${currentShuffledAnswers[1]}`;
-    document.getElementById('answerC').innerHTML = `C. ${currentShuffledAnswers[2]}`;
-    document.getElementById('answerD').innerHTML = `D. ${currentShuffledAnswers[3]}`;
+    // Update answer buttons
+    const answerElements = ['answerA', 'answerB', 'answerC', 'answerD'];
+    answerElements.forEach((elementId, index) => {
+        const button = document.getElementById(elementId);
+        const textSpan = document.getElementById(elementId + 'Text');
+        if (button && textSpan) {
+            textSpan.textContent = currentShuffledAnswers[index] || '...';
+        }
+    });
     
     currentQuestion.shuffledAnswers = currentShuffledAnswers;
     
     enableAnswers();
-}
-
-// Shuffle array helper
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
 }
 
 // Select answer
@@ -265,44 +337,6 @@ function attackPlayer() {
     }, 600);
 }
 
-function animatePlayerAttack() {
-    const player = document.getElementById('playerCharacter');
-    const playerSprite = document.getElementById('playerSprite');
-    
-    player.classList.add('attacking');
-    playerSprite.src = 'assets/lapulapu-attack.png';
-    
-    // Move forward (to the right)
-    setTimeout(() => {
-        player.style.transform = 'translateX(80px)';
-    }, 100);
-    
-    setTimeout(() => {
-        player.style.transform = '';
-        player.classList.remove('attacking');
-        playerSprite.src = 'assets/lapulapu-idle.png';
-    }, 800);
-}
-
-function animateEnemyAttack() {
-    const enemy = document.getElementById('enemyCharacter');
-    const enemySprite = document.getElementById('enemySprite');
-    
-    enemy.classList.add('attacking');
-    enemySprite.src = 'assets/magellan-attack.png';
-    
-    // Move forward (to the left) while maintaining flip
-    setTimeout(() => {
-        enemy.style.transform = 'scaleX(-1) translateX(80px)';
-    }, 100);
-    
-    setTimeout(() => {
-        enemy.style.transform = 'scaleX(-1)';
-        enemy.classList.remove('attacking');
-        enemySprite.src = 'assets/magellan-idle.png';
-    }, 800);
-}
-
 // Show damage number
 function showDamage(damage, target) {
     const character = target === 'player' ? 
@@ -340,19 +374,25 @@ function updateHP() {
     playerHpBar.style.width = `${playerHp}%`;
     enemyHpBar.style.width = `${enemyHp}%`;
     
-
+    // Update HP text
+    document.getElementById('playerHpText').textContent = `${playerHp}/100`;
+    document.getElementById('enemyHpText').textContent = `${enemyHp}/100`;
     
     // Change HP bar color based on health
     if (playerHp < 30) {
         playerHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626)';
     } else if (playerHp < 60) {
         playerHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316)';
+    } else {
+        playerHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a)';
     }
     
     if (enemyHp < 30) {
         enemyHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626)';
     } else if (enemyHp < 60) {
         enemyHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316)';
+    } else {
+        enemyHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a)';
     }
 }
 
@@ -512,16 +552,28 @@ function proceedToNextEra() {
 function enableAnswers() {
     const buttons = ['answerA', 'answerB', 'answerC', 'answerD'];
     buttons.forEach(btnId => {
-        document.getElementById(btnId).disabled = false;
+        const button = document.getElementById(btnId);
+        if (button) {
+            button.disabled = false;
+        }
     });
 }
 
 function disableAnswers() {
     const buttons = ['answerA', 'answerB', 'answerC', 'answerD'];
     buttons.forEach(btnId => {
-        document.getElementById(btnId).disabled = true;
+        const button = document.getElementById(btnId);
+        if (button) {
+            button.disabled = true;
+        }
     });
 }
 
 // Initialize battle when page loads
-window.addEventListener('DOMContentLoaded', initBattle);
+window.addEventListener('DOMContentLoaded', function() {
+    // Initialize the battle
+    initBattle();
+    
+    // Update HP bars initially
+    updateHP();
+});
