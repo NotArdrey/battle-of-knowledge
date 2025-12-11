@@ -161,19 +161,28 @@
         z-index: 1;
     }
     
-    /* HP Bars - Moved higher */
+    /* HP Bars - POSITIONED TO AVOID BUTTON CONFLICTS */
     .hp-bar-container {
         position: absolute;
-        top: 10px;
-        width: 160px;
         z-index: 20;
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 8px;
+        padding: 8px;
+        border: 2px solid #92400e;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        min-width: 140px;
+        max-width: 180px;
     }
     
+    /* Player HP - positioned below back button */
     .hp-bar-left {
+        top: 60px; /* Positioned below the back button */
         left: 10px;
     }
     
+    /* Enemy HP - positioned below language button */
     .hp-bar-right {
+        top: 60px; /* Positioned below the language button */
         right: 10px;
     }
     
@@ -219,6 +228,11 @@
             width: 280px !important;
             height: 280px !important;
         }
+        
+        .hp-bar-container {
+            min-width: 160px;
+            max-width: 200px;
+        }
     }
     
     @media (min-width: 768px) {
@@ -230,6 +244,16 @@
         .character-right {
             width: 320px !important;
             height: 320px !important;
+        }
+        
+        .hp-bar-left {
+            top: 65px;
+            left: 15px;
+        }
+        
+        .hp-bar-right {
+            top: 65px;
+            right: 15px;
         }
     }
     
@@ -243,6 +267,11 @@
             width: 360px !important;
             height: 360px !important;
         }
+        
+        .hp-bar-container {
+            min-width: 180px;
+            max-width: 220px;
+        }
     }
     
     @media (min-width: 1280px) {
@@ -255,6 +284,14 @@
             width: 380px !important;
             height: 380px !important;
         }
+        
+        .hp-bar-left {
+            left: 20px;
+        }
+        
+        .hp-bar-right {
+            right: 20px;
+        }
     }
     
     @media (min-width: 1536px) {
@@ -266,6 +303,11 @@
         .character-right {
             width: 420px !important;
             height: 420px !important;
+        }
+        
+        .hp-bar-container {
+            min-width: 200px;
+            max-width: 240px;
         }
     }
     
@@ -364,6 +406,7 @@
         cursor: pointer;
         transition: all 0.2s;
         font-size: 13px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
     .control-btn:hover, .control-btn:active {
@@ -440,8 +483,10 @@
         }
         
         .hp-bar-container {
-            width: 140px;
-            top: 8px;
+            min-width: 130px;
+            max-width: 150px;
+            padding: 6px;
+            top: 55px;
         }
         
         .character-left {
@@ -616,6 +661,26 @@
             height: 200px !important;
         }
         
+        .hp-bar-container {
+            top: 50px;
+            min-width: 120px;
+            max-width: 140px;
+            padding: 4px;
+        }
+        
+        .hp-bar-left {
+            left: 5px;
+        }
+        
+        .hp-bar-right {
+            right: 5px;
+        }
+        
+        .control-btn {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        
         .question-box {
             padding: 10px;
             min-height: 70px;
@@ -692,11 +757,43 @@
             drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3))
             drop-shadow(0 0 10px rgba(0, 0, 0, 0.2));
     }
+    
+    /* HP Bar styling */
+    .hp-bar-bg {
+        height: 16px;
+        background: linear-gradient(to bottom, #374151, #111827);
+        border-radius: 8px;
+        border: 1px solid #92400e;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .hp-bar-fill {
+        height: 100%;
+        transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 8px;
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    }
+    
+    .hp-bar-text {
+        font-size: 12px;
+        color: #1f2937;
+        text-align: center;
+        margin-top: 2px;
+        font-weight: bold;
+    }
+    
+    .character-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #78350f;
+        text-align: center;
+        margin-bottom: 4px;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    }
 </style>
 </head>
 <body>
-    <!-- REMOVED: <div id="eraBackground" class="era-background"></div> -->
-    
     <!-- Back Button -->
     <button onclick="window.location.href='era-selection.html'" 
             class="control-btn back-btn">
@@ -721,26 +818,22 @@
             
             <!-- Player HP -->
             <div class="hp-bar-container hp-bar-left">
-                <p id="playerName" class="text-black font-bold text-center mb-1 text-sm sm:text-base truncate">
-                    Lapu-Lapu
-                </p>
-                <div class="h-5 sm:h-6 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-yellow-600 overflow-hidden shadow-inner">
-                    <div id="playerHpBar" class="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-700" 
+                <p id="playerName" class="character-name">Lapu-Lapu</p>
+                <div class="hp-bar-bg">
+                    <div id="playerHpBar" class="hp-bar-fill bg-gradient-to-r from-green-500 via-green-400 to-green-300" 
                          style="width: 100%"></div>
                 </div>
-                <p class="text-xs sm:text-sm text-gray-700 text-center mt-1" id="playerHpText">100/100</p>
+                <p class="hp-bar-text" id="playerHpText">100/100</p>
             </div>
             
             <!-- Enemy HP -->
             <div class="hp-bar-container hp-bar-right">
-                <p id="enemyName" class="text-black font-bold text-center mb-1 text-sm sm:text-base truncate">
-                    Ferdinand Magellan
-                </p>
-                <div class="h-5 sm:h-6 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-yellow-600 overflow-hidden shadow-inner">
-                    <div id="enemyHpBar" class="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-700" 
+                <p id="enemyName" class="character-name">Ferdinand Magellan</p>
+                <div class="hp-bar-bg">
+                    <div id="enemyHpBar" class="hp-bar-fill bg-gradient-to-r from-green-500 via-green-400 to-green-300" 
                          style="width: 100%"></div>
                 </div>
-                <p class="text-xs sm:text-sm text-gray-700 text-center mt-1" id="enemyHpText">100/100</p>
+                <p class="hp-bar-text" id="enemyHpText">100/100</p>
             </div>
             
             <!-- Player Character - EXTREMELY LARGE -->
