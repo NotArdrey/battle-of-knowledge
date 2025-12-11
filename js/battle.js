@@ -18,7 +18,7 @@ const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan',
                     'Commodore George Dewey', 'General Juan Luna'];
 
 const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
-                  'Spanish Commander', 'Late Spanish Commander Era'];
+                  'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era']; // Added here
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
