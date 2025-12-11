@@ -11,13 +11,14 @@ let currentVillain = null;
 let currentLanguageLoaded = ''; // Track which language questions are loaded
 let currentShuffledAnswers = []; // Store shuffled answers
 
-// Character type definitions
+// Character type definitions - UPDATED WITH SPANISH COMMANDER
 const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 
                     'Spanish Soldier', 'Early Spanish Soldier Era', 
                     'Andres Bonifacio', 'Emilio Aguinaldo', 
                     'Commodore George Dewey', 'General Juan Luna'];
 
-const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier'];
+const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
+                  'Spanish Commander', 'Late Spanish Commander Era']; // ADDED SPANISH COMMANDER
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
