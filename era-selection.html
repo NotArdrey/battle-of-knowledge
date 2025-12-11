@@ -10,24 +10,61 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Baloo 2', cursive; }
+        body { 
+            font-family: 'Baloo 2', cursive; 
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7); /* Match button gradient */
+        }
+        
         /* Ensure minimum touch target size */
         button { min-height: 44px; min-width: 44px; }
         
-        /* Era button styles - EVEN LARGER */
+        /* Main container with era selection background */
+        .main-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .era-bg-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: url('assets/ERA SELECT BG/ERA Selection BG.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15; /* Transparent overlay */
+            z-index: 1;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+        
+        /* Era button styles */
         .era-card {
             display: flex;
             align-items: center;
             text-align: left;
-            gap: 2rem; /* Increased gap */
-            height: 220px; /* Significantly increased height */
+            gap: 2rem;
+            height: 220px;
             position: relative;
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(4px);
+        }
+        
+        .ww2-card {
+            background: linear-gradient(to bottom right, rgba(254, 226, 226, 0.95), rgba(254, 215, 170, 0.95));
         }
         
         .era-img-container {
             flex-shrink: 0;
-            width: 150px; /* Significantly larger */
-            height: 150px; /* Significantly larger */
+            width: 150px;
+            height: 150px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -37,9 +74,9 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 20px; /* More rounded corners */
-            border: 4px solid rgba(120, 53, 15, 0.5); /* Thicker border */
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); /* Deeper shadow */
+            border-radius: 20px;
+            border: 4px solid rgba(120, 53, 15, 0.5);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
         }
         
         .era-content {
@@ -51,36 +88,47 @@
         }
         
         .era-title {
-            font-size: 1.5rem; /* 24px */
+            font-size: 1.5rem;
             line-height: 1.2;
             margin-bottom: 0.5rem;
+            color: #7c2d12;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
         }
         
         .era-period {
-            font-size: 1.125rem; /* 18px */
+            font-size: 1.125rem;
             font-weight: 700;
             margin-bottom: 0.75rem;
-            color: #b45309; /* Darker amber */
+            color: #b45309;
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.6);
         }
         
         .era-description {
-            font-size: 0.95rem; /* ~15px */
+            font-size: 0.95rem;
             color: #7c2d12;
             line-height: 1.4;
             max-width: 100%;
+            text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.5);
         }
         
         .ww2-period {
-            color: #dc2626; /* Red for WW2 */
+            color: #dc2626;
         }
         
         .ww2-description {
-            color: #9a3412; /* Slightly lighter for red theme */
+            color: #9a3412;
         }
         
         /* Larger gap between grid items */
         .era-grid {
             gap: 1.5rem !important;
+        }
+        
+        /* Page title styling */
+        .page-title {
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            color: #92400e;
+            margin-bottom: 3rem;
         }
         
         /* Responsive text adjustments */
@@ -97,10 +145,10 @@
                 border-radius: 18px;
             }
             .era-title {
-                font-size: 1.375rem; /* 22px */
+                font-size: 1.375rem;
             }
             .era-period {
-                font-size: 1rem; /* 16px */
+                font-size: 1rem;
             }
         }
         
@@ -117,13 +165,16 @@
                 border-radius: 16px;
             }
             .era-title {
-                font-size: 1.25rem; /* 20px */
+                font-size: 1.25rem;
             }
             .era-period {
-                font-size: 0.95rem; /* ~15px */
+                font-size: 0.95rem;
             }
             .era-description {
-                font-size: 0.9rem; /* ~14px */
+                font-size: 0.9rem;
+            }
+            .page-title {
+                margin-bottom: 2.5rem;
             }
         }
         
@@ -140,15 +191,18 @@
                 border-radius: 14px;
             }
             .era-title {
-                font-size: 1.125rem; /* 18px */
+                font-size: 1.125rem;
             }
             .era-period {
-                font-size: 0.875rem; /* 14px */
+                font-size: 0.875rem;
                 margin-bottom: 0.5rem;
             }
             .era-description {
-                font-size: 0.85rem; /* ~13.5px */
+                font-size: 0.85rem;
                 line-height: 1.3;
+            }
+            .page-title {
+                margin-bottom: 2rem;
             }
         }
         
@@ -166,14 +220,14 @@
                 border-width: 3px;
             }
             .era-title {
-                font-size: 1rem; /* 16px */
+                font-size: 1rem;
             }
             .era-period {
-                font-size: 0.85rem; /* ~13.5px */
+                font-size: 0.85rem;
                 margin-bottom: 0.4rem;
             }
             .era-description {
-                font-size: 0.8rem; /* ~13px */
+                font-size: 0.8rem;
             }
         }
         
@@ -190,107 +244,109 @@
                 border-radius: 10px;
             }
             .era-title {
-                font-size: 0.95rem; /* ~15px */
+                font-size: 0.95rem;
             }
             .era-period {
-                font-size: 0.8rem; /* ~13px */
+                font-size: 0.8rem;
                 margin-bottom: 0.35rem;
             }
             .era-description {
-                font-size: 0.75rem; /* ~12px */
+                font-size: 0.75rem;
                 line-height: 1.25;
             }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-900 via-blue-800 to-indigo-900 min-h-screen flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-[url('assets/bohol.png')] bg-cover bg-center opacity-30"></div>
-    
-    <!-- Language Toggle -->
-    <button id="langToggle" class="fixed top-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 md:border-4 border-orange-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-amber-900 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
-        🌐 <span id="langLabel" class="hidden sm:inline">TAGALOG</span>
-    </button>
+<body>
+    <div class="main-container">
+        <!-- Transparent Era Selection Background -->
+        <div class="era-bg-overlay"></div>
+        
+        <!-- Language Toggle -->
+        <button id="langToggle" class="fixed top-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 md:border-4 border-orange-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-amber-900 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
+            🌐 <span id="langLabel" class="hidden sm:inline">TAGALOG</span>
+        </button>
 
-    <!-- Back Button -->
-    <button onclick="window.location.href='index.html'" class="fixed top-4 left-4 bg-gradient-to-r from-gray-300 to-gray-400 border-2 md:border-4 border-gray-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-gray-800 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
-        <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
-    </button>
+        <!-- Back Button -->
+        <button onclick="window.location.href='index.html'" class="fixed top-4 left-4 bg-gradient-to-r from-gray-300 to-gray-400 border-2 md:border-4 border-gray-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-gray-800 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
+            <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
+        </button>
 
-    <div class="relative z-10 w-full max-w-6xl px-3 sm:px-5 md:px-8">
-        <h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-yellow-400 text-center mb-8 sm:mb-10 md:mb-14 drop-shadow-2xl">
-            <span data-translate="Choose Your Historical Era">Choose Your Historical Era</span>
-        </h1>
+        <div class="content-wrapper w-full max-w-6xl px-3 sm:px-5 md:px-8 py-8">
+            <h1 class="page-title text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-8 sm:mb-10 md:mb-14">
+                <span data-translate="Choose Your Historical Era">Choose Your Historical Era</span>
+            </h1>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7 md:gap-10 mb-10 md:mb-12 era-grid">
-            <!-- Early Spanish Era Button -->
-            <button onclick="selectEra('early-spanish')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                <div class="era-img-container">
-                    <img src="assets/ERA Buttons/Early Spanish Era/Button-Spanish-Early.png" 
-                         alt="Early Spanish Era" 
-                         class="era-img">
-                </div>
-                <div class="era-content">
-                    <h3 class="era-title font-extrabold text-amber-900" data-translate="Early Spanish Era">Early Spanish Era</h3>
-                    <p class="era-period" data-translate="Battle of Mactan (1521)">Battle of Mactan (1521)</p>
-                    <p class="era-description">
-                        Experience the dawn of Spanish colonization. Witness the epic Battle of Mactan where Lapu-Lapu's forces defeated Magellan's expedition.
-                    </p>
-                </div>
-            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7 md:gap-10 mb-10 md:mb-12 era-grid">
+                <!-- Early Spanish Era Button -->
+                <button onclick="selectEra('early-spanish')" 
+                        class="era-card border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
+                    <div class="era-img-container">
+                        <img src="assets/ERA Buttons/Early Spanish Era/Button-Spanish-Early.png" 
+                             alt="Early Spanish Era" 
+                             class="era-img">
+                    </div>
+                    <div class="era-content">
+                        <h3 class="era-title font-extrabold" data-translate="Early Spanish Era">Early Spanish Era</h3>
+                        <p class="era-period" data-translate="Battle of Mactan (1521)">Battle of Mactan (1521)</p>
+                        <p class="era-description">
+                            Experience the dawn of Spanish colonization. Witness the epic Battle of Mactan where Lapu-Lapu's forces defeated Magellan's expedition.
+                        </p>
+                    </div>
+                </button>
 
-            <!-- Late Spanish Era Button -->
-            <button onclick="selectEra('late-spanish')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                <div class="era-img-container">
-                    <img src="assets/ERA Buttons/Late Spanish Era/Button-Spanish-Late.png" 
-                         alt="Late Spanish Era" 
-                         class="era-img">
-                </div>
-                <div class="era-content">
-                    <h3 class="era-title font-extrabold text-amber-900" data-translate="Late Spanish Era">Late Spanish Era</h3>
-                    <p class="era-period" data-translate="Revolution (1896-1898)">Revolution (1896-1898)</p>
-                    <p class="era-description">
-                        Join the Philippine Revolution! Fight alongside heroes like Andres Bonifacio and Jose Rizal in the struggle against 333 years of Spanish rule.
-                    </p>
-                </div>
-            </button>
+                <!-- Late Spanish Era Button -->
+                <button onclick="selectEra('late-spanish')" 
+                        class="era-card border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
+                    <div class="era-img-container">
+                        <img src="assets/ERA Buttons/Late Spanish Era/Button-Spanish-Late.png" 
+                             alt="Late Spanish Era" 
+                             class="era-img">
+                    </div>
+                    <div class="era-content">
+                        <h3 class="era-title font-extrabold" data-translate="Late Spanish Era">Late Spanish Era</h3>
+                        <p class="era-period" data-translate="Revolution (1896-1898)">Revolution (1896-1898)</p>
+                        <p class="era-description">
+                            Join the Philippine Revolution! Fight alongside heroes like Andres Bonifacio and Jose Rizal in the struggle against 333 years of Spanish rule.
+                        </p>
+                    </div>
+                </button>
 
-            <!-- American Colonial Button -->
-            <button onclick="selectEra('american-colonial')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                <div class="era-img-container">
-                    <img src="assets/ERA Buttons/American Era/Button-American.png" 
-                         alt="American Colonial Era" 
-                         class="era-img">
-                </div>
-                <div class="era-content">
-                    <h3 class="era-title font-extrabold text-amber-900" data-translate="American Colonial">American Colonial</h3>
-                    <p class="era-period" data-translate="Philippine-American War">Philippine-American War</p>
-                    <p class="era-description">
-                        Enter the Philippine-American War. Experience the resistance against American colonization and the fight for true independence.
-                    </p>
-                </div>
-            </button>
+                <!-- American Colonial Button -->
+                <button onclick="selectEra('american-colonial')" 
+                        class="era-card border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
+                    <div class="era-img-container">
+                        <img src="assets/ERA Buttons/American Era/Button-American.png" 
+                             alt="American Colonial Era" 
+                             class="era-img">
+                    </div>
+                    <div class="era-content">
+                        <h3 class="era-title font-extrabold" data-translate="American Colonial">American Colonial</h3>
+                        <p class="era-period" data-translate="Philippine-American War">Philippine-American War</p>
+                        <p class="era-description">
+                            Enter the Philippine-American War. Experience the resistance against American colonization and the fight for true independence.
+                        </p>
+                    </div>
+                </button>
 
-            <!-- WW2 Bonus Stage Button -->
-            <button onclick="selectEra('ww2')" 
-                    class="era-card bg-gradient-to-br from-red-100 to-orange-200 border-3 sm:border-4 md:border-6 border-red-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                <div class="era-img-container">
-                    <img src="assets/ERA Buttons/WWII Era/Button-WWII.png" 
-                         alt="WWII Era" 
-                         class="era-img">
-                </div>
-                <div class="era-content">
-                    <h3 class="era-title font-extrabold text-red-900" data-translate="WW2 Bonus Stage">WW2 Bonus Stage</h3>
-                    <p class="era-period ww2-period" data-translate="Pacific Theater (1941-1945)">Pacific Theater (1941-1945)</p>
-                    <p class="era-description ww2-description">
-                        Survive World War II in the Pacific! Battle through Japanese occupation, guerrilla warfare, and the fight to liberate the Philippines.
-                    </p>
-                </div>
-            </button>
+                <!-- WW2 Bonus Stage Button -->
+                <button onclick="selectEra('ww2')" 
+                        class="era-card ww2-card border-3 sm:border-4 md:border-6 border-red-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
+                    <div class="era-img-container">
+                        <img src="assets/ERA Buttons/WWII Era/Button-WWII.png" 
+                             alt="WWII Era" 
+                             class="era-img">
+                    </div>
+                    <div class="era-content">
+                        <h3 class="era-title font-extrabold text-red-900" data-translate="WW2 Bonus Stage">WW2 Bonus Stage</h3>
+                        <p class="era-period ww2-period" data-translate="Pacific Theater (1941-1945)">Pacific Theater (1941-1945)</p>
+                        <p class="era-description ww2-description">
+                            Survive World War II in the Pacific! Battle through Japanese occupation, guerrilla warfare, and the fight to liberate the Philippines.
+                        </p>
+                    </div>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <!-- Character Selection Modal -->
