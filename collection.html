@@ -10,70 +10,451 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Baloo 2', cursive; }
+        body { 
+            font-family: 'Baloo 2', cursive; 
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+        }
+        
         /* Ensure minimum touch target size */
         button { min-height: 44px; min-width: 44px; }
-        /* Prevent image pixelation */
-        img {
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
+        
+        /* Main container with collection background */
+        .main-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            padding: 20px 0;
         }
-        /* Smooth scaling for better quality */
+        
+        .collection-bg-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+                url('assets/Collection BG/Collection-BG.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            z-index: 1;
+        }
+        
+        /* Pattern overlay for texture */
+        .pattern-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(254, 243, 199, 0.2), rgba(254, 243, 199, 0.2)),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(120, 53, 15, 0.05) 2px,
+                    rgba(120, 53, 15, 0.05) 4px
+                );
+            z-index: 2;
+            mix-blend-mode: multiply;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Content area */
+        .content-backdrop {
+            position: relative;
+            background: rgba(254, 243, 199, 0.85);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(120, 53, 15, 0.3);
+            margin: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Page title - Same style */
+        .page-title {
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            color: #92400e;
+            background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(4px);
+            padding: 1.5rem 3rem;
+            border-radius: 20px;
+            border: 4px solid rgba(120, 53, 15, 0.4);
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Page subtitle */
+        .page-subtitle {
+            color: #7c2d12;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        /* Character grid */
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        /* Character card */
+        .character-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(6px);
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 320px;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+            border-color: rgba(120, 53, 15, 0.5);
+        }
+        
+        .character-image-container {
+            width: 140px;
+            height: 140px;
+            background: rgba(254, 243, 199, 0.9);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            overflow: hidden;
+            padding: 10px;
+        }
+        
         .character-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             image-rendering: auto;
             image-rendering: smooth;
         }
+        
+        .character-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #7c2d12;
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
+            line-height: 1.3;
+            text-align: center;
+        }
+        
+        .character-era {
+            font-size: 0.95rem;
+            color: #92400e;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+        
+        .character-type {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.8);
+            margin-top: auto;
+        }
+        
+        .type-hero {
+            background: rgba(59, 130, 246, 0.3);
+            color: #1e40af;
+            border: 2px solid rgba(59, 130, 246, 0.4);
+        }
+        
+        .type-villain {
+            background: rgba(239, 68, 68, 0.3);
+            color: #991b1b;
+            border: 2px solid rgba(239, 68, 68, 0.4);
+        }
+        
+        /* Modal styling */
+        .modal-container {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
+            backdrop-filter: blur(10px);
+            border: 6px solid rgba(120, 53, 15, 0.6);
+            border-radius: 24px;
+        }
+        
+        .modal-title {
+            color: #7c2d12;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        
+        .modal-subtitle {
+            color: #92400e;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .modal-content {
+            color: #7c2d12;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        
+        .section-title {
+            color: #92400e;
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid rgba(120, 53, 15, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .contribution-item {
+            background: rgba(254, 243, 199, 0.5);
+            border-left: 4px solid rgba(120, 53, 15, 0.5);
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+        }
+        
+        /* Custom scrollbar for content backdrop */
+        .content-backdrop::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .content-backdrop::-webkit-scrollbar-track {
+            background: rgba(254, 243, 199, 0.5);
+            border-radius: 4px;
+        }
+        
+        .content-backdrop::-webkit-scrollbar-thumb {
+            background: rgba(120, 53, 15, 0.3);
+            border-radius: 4px;
+        }
+        
+        .content-backdrop::-webkit-scrollbar-thumb:hover {
+            background: rgba(120, 53, 15, 0.5);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1400px) {
+            .content-wrapper {
+                max-width: 95%;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1.25rem;
+            }
+            .character-image-container {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .content-backdrop {
+                padding: 2rem;
+            }
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+            .character-card {
+                padding: 1.25rem;
+                min-height: 300px;
+            }
+            .character-name {
+                font-size: 1.2rem;
+            }
+            .page-title {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 10px 0;
+            }
+            .content-backdrop {
+                padding: 1.5rem;
+                margin: 15px;
+                max-height: 85vh;
+            }
+            .page-title {
+                padding: 1rem 2rem;
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 0.75rem;
+            }
+            .character-card {
+                padding: 1rem;
+                min-height: 280px;
+            }
+            .character-image-container {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 1rem;
+            }
+            .character-name {
+                font-size: 1.1rem;
+            }
+            .page-subtitle {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .content-backdrop {
+                padding: 1rem;
+                margin: 10px;
+            }
+            .page-title {
+                padding: 0.75rem 1.5rem;
+                font-size: 1.25rem;
+            }
+            .page-subtitle {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 0.5rem;
+            }
+            .character-card {
+                padding: 0.75rem;
+                min-height: 260px;
+            }
+            .character-image-container {
+                width: 80px;
+                height: 80px;
+            }
+            .character-name {
+                font-size: 1rem;
+            }
+            .character-era {
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content-backdrop {
+                padding: 0.75rem;
+                margin: 8px;
+            }
+            .character-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            .character-card {
+                padding: 0.5rem;
+                min-height: 240px;
+            }
+            .character-image-container {
+                width: 70px;
+                height: 70px;
+                border-width: 2px;
+            }
+            .character-name {
+                font-size: 0.9rem;
+            }
+            .character-era {
+                font-size: 0.8rem;
+            }
+            .character-type {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-900 via-indigo-800 to-purple-900 min-h-screen">
-    <div class="absolute inset-0 bg-[url('assets/rice_background.png')] bg-cover bg-center opacity-20"></div>
-    
-    <!-- Language Toggle -->
-    <button id="langToggle" class="fixed top-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 md:border-4 border-orange-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-amber-900 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
-        🌐 <span id="langLabel" class="hidden sm:inline">TAGALOG</span>
-    </button>
+<body>
+    <div class="main-container">
+        <!-- Collection Background -->
+        <div class="collection-bg-overlay"></div>
+        
+        <!-- Pattern overlay for texture -->
+        <div class="pattern-overlay"></div>
+        
+        <!-- Language Toggle -->
+        <button id="langToggle" class="fixed top-4 right-4 bg-gradient-to-r from-yellow-400 to-amber-500 border-2 md:border-4 border-orange-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-amber-900 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
+            🌐 <span id="langLabel" class="hidden sm:inline">TAGALOG</span>
+        </button>
 
-    <!-- Back Button -->
-    <button onclick="window.location.href='index.html'" class="fixed top-4 left-4 bg-gradient-to-r from-gray-300 to-gray-400 border-2 md:border-4 border-gray-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-gray-800 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
-        <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
-    </button>
+        <!-- Back Button -->
+        <button onclick="window.location.href='index.html'" class="fixed top-4 left-4 bg-gradient-to-r from-gray-300 to-gray-400 border-2 md:border-4 border-gray-600 rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 text-sm md:text-lg font-bold text-gray-800 hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg z-50">
+            <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
+        </button>
 
-    <div class="relative z-10 container mx-auto px-4 py-16 md:py-20">
-        <h1 class="text-2xl sm:text-3xl md:text-5xl font-extrabold text-yellow-400 text-center mb-3 md:mb-4 drop-shadow-2xl" data-translate="📚 Character Collection 📚">
-            <span class="hidden sm:inline">📚 </span>Character Collection<span class="hidden sm:inline"> 📚</span>
-        </h1>
-        <p class="text-sm sm:text-base md:text-xl text-white text-center mb-6 md:mb-12 drop-shadow-lg px-2" data-translate="Learn about the Heroes and Villains of Philippine History">
-            Learn about the Heroes and Villains of Philippine History
-        </p>
+        <div class="content-wrapper">
+            <div class="content-backdrop">
+                <!-- Header -->
+                <div class="text-center">
+                    <h1 class="page-title text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold">
+                        📚 <span data-translate="Character Collection">Character Collection</span> 📚
+                    </h1>
+                    <p class="page-subtitle" data-translate="Learn about the Heroes and Villains of Philippine History">
+                        Learn about the Heroes and Villains of Philippine History
+                    </p>
+                </div>
 
-        <!-- Character Grid -->
-        <div id="characterGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-7xl mx-auto">
-            <!-- Characters will be loaded here -->
+                <!-- Character Grid -->
+                <div id="characterGrid" class="character-grid">
+                    <!-- Characters will be loaded here -->
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Character Details Modal -->
     <div id="characterModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl md:rounded-3xl border-4 md:border-8 border-amber-800 max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+        <div class="modal-container rounded-2xl md:rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
             <div class="p-4 sm:p-6 md:p-8">
                 <button onclick="closeModal()" class="float-right text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900 hover:text-red-600 transition-colors p-2">×</button>
                 
                 <div class="clear-both">
                     <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-center mb-4 md:mb-6">
-                        <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 flex-shrink-0">
-                            <img id="modalCharacterImg" src="" alt="" class="w-full h-full object-contain character-image">
+                        <div class="character-image-container w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 flex-shrink-0">
+                            <img id="modalCharacterImg" src="" alt="" class="character-image">
                         </div>
                         <div class="flex-1 text-center sm:text-left">
-                            <h2 id="modalCharacterName" class="text-xl sm:text-2xl md:text-4xl font-extrabold text-amber-900 mb-2"></h2>
-                            <p id="modalCharacterEra" class="text-sm sm:text-base md:text-xl font-bold text-amber-700 mb-2 md:mb-4"></p>
-                            <span id="modalCharacterType" class="inline-block px-3 sm:px-4 md:px-6 py-1 md:py-2 rounded-full text-white font-bold text-sm sm:text-base md:text-lg"></span>
+                            <h2 id="modalCharacterName" class="modal-title text-xl sm:text-2xl md:text-4xl mb-2"></h2>
+                            <p id="modalCharacterEra" class="modal-subtitle mb-2 md:mb-4"></p>
+                            <span id="modalCharacterType" class="character-type"></span>
                         </div>
                     </div>
                     
-                    <div class="border-t-2 md:border-t-4 border-amber-600 pt-3 md:pt-6">
-                        <h3 class="text-lg sm:text-xl md:text-2xl font-extrabold text-amber-900 mb-2 md:mb-4" data-translate="Historical Contributions">Historical Contributions</h3>
-                        <div id="modalCharacterContributions" class="text-sm md:text-lg text-amber-900 space-y-2 md:space-y-3">
+                    <div class="border-t-4 border-amber-600 pt-4 md:pt-6">
+                        <h3 class="section-title" data-translate="Historical Contributions">Historical Contributions</h3>
+                        <div id="modalCharacterContributions" class="modal-content">
                             <!-- Contributions will be loaded here -->
                         </div>
                     </div>
