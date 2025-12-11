@@ -1,4 +1,4 @@
-// battle.js - COMPLETE VERSION WITH IMPACTFUL EFFECTS
+// battle.js - COMPLETE VERSION WITH SOUND EFFECTS
 
 // Battle game logic
 let playerHp = 100;
@@ -24,6 +24,36 @@ const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
 // Mobile detection
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+// Sound effects - preload them
+const soundEffects = {
+    sword: new Audio('assets/SFX/Attacks/Sword.mp3'),
+    gun: new Audio('assets/SFX/Attacks/Gun.mp3'),
+    magic: new Audio('assets/SFX/Attacks/Magic.mp3'),
+    hit: new Audio('assets/SFX/Attacks/Hit.mp3'), // Optional: add a hit sound
+    damage: new Audio('assets/SFX/Attacks/Damage.mp3') // Optional: add damage sound
+};
+
+// Configure sound settings
+Object.values(soundEffects).forEach(sound => {
+    sound.preload = 'auto';
+    sound.volume = isMobile ? 0.5 : 0.7; // Lower volume on mobile
+});
+
+// Play sound effect with error handling
+function playSound(soundName) {
+    try {
+        const sound = soundEffects[soundName];
+        if (sound) {
+            // Create a new instance to allow overlapping sounds
+            const soundClone = new Audio(sound.src);
+            soundClone.volume = sound.volume;
+            soundClone.play().catch(e => console.log('Sound play failed:', e));
+        }
+    } catch (error) {
+        console.log('Sound error:', error);
+    }
+}
 
 // Enhanced setEraBackground function with error handling
 function setEraBackground(eraKey) {
@@ -320,10 +350,10 @@ function selectAnswer(index) {
 }
 
 // ============================================
-// IMPACTFUL ATTACK EFFECT FUNCTIONS
+// IMPACTFUL ATTACK EFFECT FUNCTIONS WITH SOUND
 // ============================================
 
-// Mobile-optimized screen shake (keeping as is)
+// Mobile-optimized screen shake
 function mobileShake() {
     if (isMobile) {
         // For mobile: Simple translate animation
@@ -353,8 +383,11 @@ function mobileShake() {
     }
 }
 
-// Create GIANT sword effect
+// Create GIANT sword effect WITH SOUND
 function createGiantSwordEffect(isAttacker) {
+    // Play sword sound
+    playSound('sword');
+    
     const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
@@ -495,8 +528,15 @@ function createGiantSwordEffect(isAttacker) {
     return swordSlash;
 }
 
-// Create GIANT gun effect
+// Create GIANT gun effect WITH SOUND
 function createGiantGunEffect(isAttacker) {
+    // Play gun sound with slight variation for multiple shots
+    setTimeout(() => playSound('gun'), 0);
+    if (!isMobile) {
+        setTimeout(() => playSound('gun'), 50); // Second shot for desktop
+        setTimeout(() => playSound('gun'), 100); // Third shot for desktop
+    }
+    
     const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
@@ -639,8 +679,11 @@ function createGiantGunEffect(isAttacker) {
     return muzzleFlash;
 }
 
-// Create GIANT magic effect
+// Create GIANT magic effect WITH SOUND
 function createGiantMagicEffect(isAttacker) {
+    // Play magic sound
+    playSound('magic');
+    
     const characterElement = isAttacker ? 
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
@@ -822,8 +865,17 @@ function createGiantMagicEffect(isAttacker) {
     return magicSphere;
 }
 
-// Create GIANT impact effect
+// Create GIANT impact effect WITH SOUND
 function createGiantImpactEffect(isAttacker, damage) {
+    // Play hit sound (if available)
+    if (soundEffects.hit) {
+        playSound('hit');
+    }
+    // Play damage sound for critical hits
+    if (damage > 25 && soundEffects.damage) {
+        setTimeout(() => playSound('damage'), 100);
+    }
+    
     const targetElement = isAttacker ? 
         document.getElementById('enemyCharacter') : 
         document.getElementById('playerCharacter');
@@ -1114,7 +1166,7 @@ function showDamage(damage, target) {
 }
 
 // ============================================
-// ATTACK FUNCTIONS WITH GIANT EFFECTS
+// ATTACK FUNCTIONS WITH GIANT EFFECTS & SOUND
 // ============================================
 
 // Attack enemy
@@ -1126,7 +1178,7 @@ function attackEnemy() {
     setCharacterState('player', 'attack');
     document.getElementById('playerCharacter').classList.add('attacking');
     
-    // Create GIANT attack effect
+    // Create GIANT attack effect (includes sound)
     createAttackEffectForAttacker(currentHero.name, true);
     
     // Screen shake
@@ -1141,7 +1193,7 @@ function attackEnemy() {
         showDamage(damage, 'enemy');
         updateHP();
         
-        // Create GIANT impact effect
+        // Create GIANT impact effect (includes hit sound)
         createAttackEffectForHurtCharacter(currentHero.name, false, damage);
         
         setTimeout(() => {
@@ -1163,7 +1215,7 @@ function attackPlayer() {
     setCharacterState('enemy', 'attack');
     document.getElementById('enemyCharacter').classList.add('attacking');
     
-    // Create GIANT attack effect
+    // Create GIANT attack effect (includes sound)
     createAttackEffectForAttacker(currentVillain.name, false);
     
     // Screen shake
@@ -1178,7 +1230,7 @@ function attackPlayer() {
         showDamage(damage, 'player');
         updateHP();
         
-        // Create GIANT impact effect
+        // Create GIANT impact effect (includes hit sound)
         createAttackEffectForHurtCharacter(currentVillain.name, true, damage);
         
         setTimeout(() => {
