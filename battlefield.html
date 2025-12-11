@@ -193,50 +193,44 @@
         z-index: 20; /* Increased from 10 */
     }
     
-    /* Default mobile sizes - HUGE and CLOSE TOGETHER */
+    /* Default mobile sizes - HUGE but moved closer together */
     .character-left {
-        left: 5%; /* Positioned closer to center */
+        left: 10px; /* Moved from 0 to 10px */
         width: 200px !important;
         height: 200px !important;
-        transform: translateX(-50%); /* Center the character on this position */
     }
     
     .character-right {
-        right: 5%; /* Positioned closer to center */
+        right: 10px; /* Moved from 0 to 10px */
         width: 200px !important;
         height: 200px !important;
-        transform: translateX(50%); /* Center the character on this position */
     }
     
     @media (min-width: 480px) {
         .character-left {
-            left: 15%; /* Much closer to center */
+            left: 20px; /* Moved closer from edge */
             width: 240px !important;
             height: 240px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 15%; /* Much closer to center */
+            right: 20px; /* Moved closer from edge */
             width: 240px !important;
             height: 240px !important;
-            transform: translateX(50%);
         }
     }
     
     @media (min-width: 640px) {
         .character-left {
-            left: 20%; /* Even closer to center */
+            left: 30px; /* Moved closer from edge */
             width: 280px !important;
             height: 280px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 20%; /* Even closer to center */
+            right: 30px; /* Moved closer from edge */
             width: 280px !important;
             height: 280px !important;
-            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -247,17 +241,15 @@
     
     @media (min-width: 768px) {
         .character-left {
-            left: 25%; /* Very close to center */
+            left: 40px; /* Moved closer from edge */
             width: 320px !important;
             height: 320px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 25%; /* Very close to center */
+            right: 40px; /* Moved closer from edge */
             width: 320px !important;
             height: 320px !important;
-            transform: translateX(50%);
         }
         
         .hp-bar-left {
@@ -273,17 +265,15 @@
     
     @media (min-width: 1024px) {
         .character-left {
-            left: 30%; /* Extremely close to center for PC */
+            left: 50px; /* Moved closer from edge */
             width: 360px !important;
             height: 360px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 30%; /* Extremely close to center for PC */
+            right: 50px; /* Moved closer from edge */
             width: 360px !important;
             height: 360px !important;
-            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -294,17 +284,15 @@
     
     @media (min-width: 1280px) {
         .character-left {
-            left: 35%; /* Very close together for large PC */
+            left: 60px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 35%; /* Very close together for large PC */
+            right: 60px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
-            transform: translateX(50%);
         }
         
         .hp-bar-left {
@@ -318,17 +306,15 @@
     
     @media (min-width: 1536px) {
         .character-left {
-            left: 38%; /* Almost touching for extra large screens */
+            left: 80px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 38%; /* Almost touching for extra large screens */
+            right: 80px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
-            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -516,17 +502,15 @@
         }
         
         .character-left {
-            left: 10%; /* Closer together on small screens */
+            left: 5px; /* Moved closer from edge */
             width: 180px !important;
             height: 180px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 10%; /* Closer together on small screens */
+            right: 5px; /* Moved closer from edge */
             width: 180px !important;
             height: 180px !important;
-            transform: translateX(50%);
         }
         
         .question-box {
@@ -568,17 +552,15 @@
         }
         
         .character-left {
-            left: 22%; /* Very close together on tablets */
+            left: 30px; /* Moved closer from edge */
             width: 300px !important;
             height: 300px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 22%; /* Very close together on tablets */
+            right: 30px; /* Moved closer from edge */
             width: 300px !important;
             height: 300px !important;
-            transform: translateX(50%);
         }
         
         .question-box {
@@ -616,17 +598,15 @@
         }
         
         .character-left {
-            left: 35%; /* EXTREMELY close for PC - characters almost touching */
+            left: 40px; /* Moved closer from edge */
             width: 340px !important;
             height: 340px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 35%; /* EXTREMELY close for PC - characters almost touching */
+            right: 40px; /* Moved closer from edge */
             width: 340px !important;
             height: 340px !important;
-            transform: translateX(50%);
         }
         
         .question-box {
@@ -652,34 +632,30 @@
     /* Large Desktop */
     @media (min-width: 1280px) {
         .character-left {
-            left: 38%; /* Almost overlapping on large PC */
+            left: 50px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 38%; /* Almost overlapping on large PC */
+            right: 50px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
-            transform: translateX(50%);
         }
     }
     
     /* Extra Large Desktop */
     @media (min-width: 1536px) {
         .character-left {
-            left: 40%; /* Characters very close together */
+            left: 60px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 40%; /* Characters very close together */
+            right: 60px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
-            transform: translateX(50%);
         }
     }
     
@@ -698,17 +674,15 @@
         }
         
         .character-left {
-            left: 15%; /* Close together in landscape */
+            left: 5px; /* Moved closer from edge */
             width: 200px !important;
             height: 200px !important;
-            transform: translateX(-50%);
         }
         
         .character-right {
-            right: 15%; /* Close together in landscape */
+            right: 5px; /* Moved closer from edge */
             width: 200px !important;
             height: 200px !important;
-            transform: translateX(50%);
         }
         
         .hp-bar-container {
@@ -886,13 +860,13 @@
                 <p class="hp-bar-text" id="enemyHpText">100/100</p>
             </div>
             
-            <!-- Player Character - EXTREMELY LARGE and VERY CLOSE TO ENEMY -->
+            <!-- Player Character - EXTREMELY LARGE but closer to center -->
             <div id="playerCharacter" class="character-left character-container">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
             </div>
             
-            <!-- Enemy Character - EXTREMELY LARGE and VERY CLOSE TO PLAYER -->
+            <!-- Enemy Character - EXTREMELY LARGE but closer to center -->
             <div id="enemyCharacter" class="character-right character-container">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
