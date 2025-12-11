@@ -193,28 +193,26 @@
         z-index: 20; /* Increased from 10 */
     }
     
-    /* Default mobile sizes - HUGE but moved closer together */
+    /* Default mobile sizes - HUGE */
     .character-left {
-        left: 10px; /* Moved from 0 to 10px */
+        left: 0;
         width: 200px !important;
         height: 200px !important;
     }
     
     .character-right {
-        right: 10px; /* Moved from 0 to 10px */
+        right: 0;
         width: 200px !important;
         height: 200px !important;
     }
     
     @media (min-width: 480px) {
         .character-left {
-            left: 20px; /* Moved closer from edge */
             width: 240px !important;
             height: 240px !important;
         }
         
         .character-right {
-            right: 20px; /* Moved closer from edge */
             width: 240px !important;
             height: 240px !important;
         }
@@ -222,13 +220,11 @@
     
     @media (min-width: 640px) {
         .character-left {
-            left: 30px; /* Moved closer from edge */
             width: 280px !important;
             height: 280px !important;
         }
         
         .character-right {
-            right: 30px; /* Moved closer from edge */
             width: 280px !important;
             height: 280px !important;
         }
@@ -241,13 +237,11 @@
     
     @media (min-width: 768px) {
         .character-left {
-            left: 40px; /* Moved closer from edge */
             width: 320px !important;
             height: 320px !important;
         }
         
         .character-right {
-            right: 40px; /* Moved closer from edge */
             width: 320px !important;
             height: 320px !important;
         }
@@ -265,13 +259,11 @@
     
     @media (min-width: 1024px) {
         .character-left {
-            left: 50px; /* Moved closer from edge */
             width: 360px !important;
             height: 360px !important;
         }
         
         .character-right {
-            right: 50px; /* Moved closer from edge */
             width: 360px !important;
             height: 360px !important;
         }
@@ -284,13 +276,11 @@
     
     @media (min-width: 1280px) {
         .character-left {
-            left: 60px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
         }
         
         .character-right {
-            right: 60px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
         }
@@ -306,13 +296,11 @@
     
     @media (min-width: 1536px) {
         .character-left {
-            left: 80px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
         }
         
         .character-right {
-            right: 80px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
         }
@@ -502,13 +490,11 @@
         }
         
         .character-left {
-            left: 5px; /* Moved closer from edge */
             width: 180px !important;
             height: 180px !important;
         }
         
         .character-right {
-            right: 5px; /* Moved closer from edge */
             width: 180px !important;
             height: 180px !important;
         }
@@ -552,13 +538,11 @@
         }
         
         .character-left {
-            left: 30px; /* Moved closer from edge */
             width: 300px !important;
             height: 300px !important;
         }
         
         .character-right {
-            right: 30px; /* Moved closer from edge */
             width: 300px !important;
             height: 300px !important;
         }
@@ -598,13 +582,11 @@
         }
         
         .character-left {
-            left: 40px; /* Moved closer from edge */
             width: 340px !important;
             height: 340px !important;
         }
         
         .character-right {
-            right: 40px; /* Moved closer from edge */
             width: 340px !important;
             height: 340px !important;
         }
@@ -632,13 +614,11 @@
     /* Large Desktop */
     @media (min-width: 1280px) {
         .character-left {
-            left: 50px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
         }
         
         .character-right {
-            right: 50px; /* Moved closer from edge */
             width: 380px !important;
             height: 380px !important;
         }
@@ -647,13 +627,11 @@
     /* Extra Large Desktop */
     @media (min-width: 1536px) {
         .character-left {
-            left: 60px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
         }
         
         .character-right {
-            right: 60px; /* Moved closer from edge */
             width: 420px !important;
             height: 420px !important;
         }
@@ -674,13 +652,11 @@
         }
         
         .character-left {
-            left: 5px; /* Moved closer from edge */
             width: 200px !important;
             height: 200px !important;
         }
         
         .character-right {
-            right: 5px; /* Moved closer from edge */
             width: 200px !important;
             height: 200px !important;
         }
@@ -860,13 +836,13 @@
                 <p class="hp-bar-text" id="enemyHpText">100/100</p>
             </div>
             
-            <!-- Player Character - EXTREMELY LARGE but closer to center -->
+            <!-- Player Character - EXTREMELY LARGE -->
             <div id="playerCharacter" class="character-left character-container">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
             </div>
             
-            <!-- Enemy Character - EXTREMELY LARGE but closer to center -->
+            <!-- Enemy Character - EXTREMELY LARGE -->
             <div id="enemyCharacter" class="character-right character-container">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
