@@ -186,33 +186,36 @@
         right: 10px;
     }
     
-    /* Characters - EXTREMELY LARGE */
+    /* Characters - EXTREMELY LARGE AND CLOSER TOGETHER */
     .character-container {
         position: absolute;
         bottom: 0;
         z-index: 20; /* Increased from 10 */
     }
     
-    /* Default mobile sizes - HUGE */
+    /* Player character - moved to the right (towards center) */
     .character-left {
-        left: 0;
+        left: 15%; /* Reduced from 0% or left: 0 - CLOSER TO CENTER */
         width: 200px !important;
         height: 200px !important;
     }
     
+    /* Enemy character - moved to the left (towards center) */
     .character-right {
-        right: 0;
+        right: 15%; /* Reduced from 0% or right: 0 - CLOSER TO CENTER */
         width: 200px !important;
         height: 200px !important;
     }
     
     @media (min-width: 480px) {
         .character-left {
+            left: 15%;
             width: 240px !important;
             height: 240px !important;
         }
         
         .character-right {
+            right: 15%;
             width: 240px !important;
             height: 240px !important;
         }
@@ -220,11 +223,13 @@
     
     @media (min-width: 640px) {
         .character-left {
+            left: 18%;
             width: 280px !important;
             height: 280px !important;
         }
         
         .character-right {
+            right: 18%;
             width: 280px !important;
             height: 280px !important;
         }
@@ -237,11 +242,13 @@
     
     @media (min-width: 768px) {
         .character-left {
+            left: 20%;
             width: 320px !important;
             height: 320px !important;
         }
         
         .character-right {
+            right: 20%;
             width: 320px !important;
             height: 320px !important;
         }
@@ -259,11 +266,13 @@
     
     @media (min-width: 1024px) {
         .character-left {
+            left: 22%;
             width: 360px !important;
             height: 360px !important;
         }
         
         .character-right {
+            right: 22%;
             width: 360px !important;
             height: 360px !important;
         }
@@ -276,11 +285,13 @@
     
     @media (min-width: 1280px) {
         .character-left {
+            left: 25%;
             width: 380px !important;
             height: 380px !important;
         }
         
         .character-right {
+            right: 25%;
             width: 380px !important;
             height: 380px !important;
         }
@@ -296,11 +307,13 @@
     
     @media (min-width: 1536px) {
         .character-left {
+            left: 28%;
             width: 420px !important;
             height: 420px !important;
         }
         
         .character-right {
+            right: 28%;
             width: 420px !important;
             height: 420px !important;
         }
@@ -308,6 +321,21 @@
         .hp-bar-container {
             min-width: 200px;
             max-width: 240px;
+        }
+    }
+    
+    /* For very small screens, adjust slightly */
+    @media (max-width: 380px) {
+        .character-left {
+            left: 10%;
+            width: 180px !important;
+            height: 180px !important;
+        }
+        
+        .character-right {
+            right: 10%;
+            width: 180px !important;
+            height: 180px !important;
         }
     }
     
@@ -490,11 +518,13 @@
         }
         
         .character-left {
+            left: 10%;
             width: 180px !important;
             height: 180px !important;
         }
         
         .character-right {
+            right: 10%;
             width: 180px !important;
             height: 180px !important;
         }
@@ -538,11 +568,13 @@
         }
         
         .character-left {
+            left: 20%;
             width: 300px !important;
             height: 300px !important;
         }
         
         .character-right {
+            right: 20%;
             width: 300px !important;
             height: 300px !important;
         }
@@ -582,11 +614,13 @@
         }
         
         .character-left {
+            left: 22%;
             width: 340px !important;
             height: 340px !important;
         }
         
         .character-right {
+            right: 22%;
             width: 340px !important;
             height: 340px !important;
         }
@@ -614,11 +648,13 @@
     /* Large Desktop */
     @media (min-width: 1280px) {
         .character-left {
+            left: 25%;
             width: 380px !important;
             height: 380px !important;
         }
         
         .character-right {
+            right: 25%;
             width: 380px !important;
             height: 380px !important;
         }
@@ -627,11 +663,13 @@
     /* Extra Large Desktop */
     @media (min-width: 1536px) {
         .character-left {
+            left: 28%;
             width: 420px !important;
             height: 420px !important;
         }
         
         .character-right {
+            right: 28%;
             width: 420px !important;
             height: 420px !important;
         }
@@ -652,11 +690,13 @@
         }
         
         .character-left {
+            left: 12%;
             width: 200px !important;
             height: 200px !important;
         }
         
         .character-right {
+            right: 12%;
             width: 200px !important;
             height: 200px !important;
         }
@@ -836,13 +876,13 @@
                 <p class="hp-bar-text" id="enemyHpText">100/100</p>
             </div>
             
-            <!-- Player Character - EXTREMELY LARGE -->
+            <!-- Player Character - EXTREMELY LARGE AND CLOSER -->
             <div id="playerCharacter" class="character-left character-container">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
             </div>
             
-            <!-- Enemy Character - EXTREMELY LARGE -->
+            <!-- Enemy Character - EXTREMELY LARGE AND CLOSER -->
             <div id="enemyCharacter" class="character-right character-container">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
