@@ -390,6 +390,7 @@ function showDamage(damage, target) {
 }
 
 // Update HP bars
+// Update HP bars
 function updateHP() {
     const playerHpBar = document.getElementById('playerHpBar');
     const enemyHpBar = document.getElementById('enemyHpBar');
@@ -403,22 +404,21 @@ function updateHP() {
     
     // Change HP bar color based on health
     if (playerHp < 30) {
-        playerHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626)';
+        playerHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626, #b91c1c)';
     } else if (playerHp < 60) {
-        playerHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316)';
+        playerHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316, #ea580c)';
     } else {
-        playerHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a)';
+        playerHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a, #15803d)';
     }
     
     if (enemyHp < 30) {
-        enemyHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626)';
+        enemyHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626, #b91c1c)';
     } else if (enemyHp < 60) {
-        enemyHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316)';
+        enemyHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316, #ea580c)';
     } else {
-        enemyHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a)';
+        enemyHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a, #15803d)';
     }
 }
-
 // Victory
 function victory() {
     setCharacterState('player', 'victory');
