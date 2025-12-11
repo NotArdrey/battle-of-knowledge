@@ -325,6 +325,21 @@ body {
     100% { transform: scaleX(-1) scale(3.5) rotate(-720deg); opacity: 0; }
 }
 
+/* Add to animations.css */
+
+@keyframes extreme-shake {
+    0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+    10% { transform: translateX(-15px) translateY(-5px) rotate(-1deg); }
+    20% { transform: translateX(15px) translateY(5px) rotate(1deg); }
+    30% { transform: translateX(-20px) translateY(-10px) rotate(-2deg); }
+    40% { transform: translateX(20px) translateY(10px) rotate(2deg); }
+    50% { transform: translateX(-15px) translateY(-5px) rotate(-1deg); }
+    60% { transform: translateX(15px) translateY(5px) rotate(1deg); }
+    70% { transform: translateX(-10px) translateY(-3px) rotate(-0.5deg); }
+    80% { transform: translateX(10px) translateY(3px) rotate(0.5deg); }
+    90% { transform: translateX(-5px) translateY(-2px) rotate(-0.25deg); }
+}
+
 /* Effect classes */
 .sword-effect {
     position: absolute;
@@ -433,3 +448,4 @@ body {
 .gun-users = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier'];
 
 .magic-users = ['Jose Rizal', 'Apolinario Mabini'];
+
