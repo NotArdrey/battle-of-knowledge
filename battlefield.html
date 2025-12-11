@@ -186,36 +186,36 @@
         right: 10px;
     }
     
-    /* Characters - EXTREMELY LARGE AND CLOSER TOGETHER */
+    /* Characters - EXTREMELY LARGE AND FARTHER APART */
     .character-container {
         position: absolute;
         bottom: 0;
         z-index: 20; /* Increased from 10 */
     }
     
-    /* Player character - moved to the right (towards center) */
+    /* Player character - moved back toward left edge */
     .character-left {
-        left: 50%; /* Reduced from 0% or left: 0 - CLOSER TO CENTER */
+        left: 5%; /* Farther from center (closer to edge) */
         width: 200px !important;
         height: 200px !important;
     }
     
-    /* Enemy character - moved to the left (towards center) */
+    /* Enemy character - moved back toward right edge */
     .character-right {
-        right: 50%; /* Reduced from 0% or right: 0 - CLOSER TO CENTER */
+        right: 5%; /* Farther from center (closer to edge) */
         width: 200px !important;
         height: 200px !important;
     }
     
     @media (min-width: 480px) {
         .character-left {
-            left: 25%;
+            left: 8%;
             width: 240px !important;
             height: 240px !important;
         }
         
         .character-right {
-            right: 25%;
+            right: 8%;
             width: 240px !important;
             height: 240px !important;
         }
@@ -223,13 +223,13 @@
     
     @media (min-width: 640px) {
         .character-left {
-            left: 30%;
+            left: 10%;
             width: 280px !important;
             height: 280px !important;
         }
         
         .character-right {
-            right: 30%;
+            right: 10%;
             width: 280px !important;
             height: 280px !important;
         }
@@ -242,13 +242,13 @@
     
     @media (min-width: 768px) {
         .character-left {
-            left: 45%;
+            left: 12%;
             width: 320px !important;
             height: 320px !important;
         }
         
         .character-right {
-            right: 45%;
+            right: 12%;
             width: 320px !important;
             height: 320px !important;
         }
@@ -266,13 +266,13 @@
     
     @media (min-width: 1024px) {
         .character-left {
-            left: 45%;
+            left: 15%;
             width: 360px !important;
             height: 360px !important;
         }
         
         .character-right {
-            right: 45%;
+            right: 15%;
             width: 360px !important;
             height: 360px !important;
         }
@@ -285,13 +285,13 @@
     
     @media (min-width: 1280px) {
         .character-left {
-            left: 35%;
+            left: 18%;
             width: 380px !important;
             height: 380px !important;
         }
         
         .character-right {
-            right: 35%;
+            right: 18%;
             width: 380px !important;
             height: 380px !important;
         }
@@ -307,13 +307,13 @@
     
     @media (min-width: 1536px) {
         .character-left {
-            left: 50%;
+            left: 22%;
             width: 420px !important;
             height: 420px !important;
         }
         
         .character-right {
-            right: 50%;
+            right: 22%;
             width: 420px !important;
             height: 420px !important;
         }
@@ -327,13 +327,13 @@
     /* For very small screens, adjust slightly */
     @media (max-width: 380px) {
         .character-left {
-            left: 20%;
+            left: 3%;
             width: 180px !important;
             height: 180px !important;
         }
         
         .character-right {
-            right: 20%;
+            right: 3%;
             width: 180px !important;
             height: 180px !important;
         }
@@ -518,13 +518,13 @@
         }
         
         .character-left {
-            left: 10%;
+            left: 5%;
             width: 180px !important;
             height: 180px !important;
         }
         
         .character-right {
-            right: 10%;
+            right: 5%;
             width: 180px !important;
             height: 180px !important;
         }
@@ -568,13 +568,13 @@
         }
         
         .character-left {
-            left: 20%;
+            left: 12%;
             width: 300px !important;
             height: 300px !important;
         }
         
         .character-right {
-            right: 20%;
+            right: 12%;
             width: 300px !important;
             height: 300px !important;
         }
@@ -614,13 +614,13 @@
         }
         
         .character-left {
-            left: 22%;
+            left: 15%;
             width: 340px !important;
             height: 340px !important;
         }
         
         .character-right {
-            right: 22%;
+            right: 15%;
             width: 340px !important;
             height: 340px !important;
         }
@@ -648,13 +648,13 @@
     /* Large Desktop */
     @media (min-width: 1280px) {
         .character-left {
-            left: 25%;
+            left: 18%;
             width: 380px !important;
             height: 380px !important;
         }
         
         .character-right {
-            right: 25%;
+            right: 18%;
             width: 380px !important;
             height: 380px !important;
         }
@@ -663,13 +663,13 @@
     /* Extra Large Desktop */
     @media (min-width: 1536px) {
         .character-left {
-            left: 28%;
+            left: 22%;
             width: 420px !important;
             height: 420px !important;
         }
         
         .character-right {
-            right: 28%;
+            right: 22%;
             width: 420px !important;
             height: 420px !important;
         }
@@ -690,13 +690,13 @@
         }
         
         .character-left {
-            left: 12%;
+            left: 8%;
             width: 200px !important;
             height: 200px !important;
         }
         
         .character-right {
-            right: 12%;
+            right: 8%;
             width: 200px !important;
             height: 200px !important;
         }
@@ -876,13 +876,13 @@
                 <p class="hp-bar-text" id="enemyHpText">100/100</p>
             </div>
             
-            <!-- Player Character - EXTREMELY LARGE AND CLOSER -->
+            <!-- Player Character - EXTREMELY LARGE AND FARTHER APART -->
             <div id="playerCharacter" class="character-left character-container">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
             </div>
             
-            <!-- Enemy Character - EXTREMELY LARGE AND CLOSER -->
+            <!-- Enemy Character - EXTREMELY LARGE AND FARTHER APART -->
             <div id="enemyCharacter" class="character-right character-container">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain character-shadow">
