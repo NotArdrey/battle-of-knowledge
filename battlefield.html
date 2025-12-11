@@ -48,21 +48,21 @@
             left: 0;
         }
         
-        /* Battle Area - TOP (60%) */
+        /* Battle Area - TOP (70%) */
         .battle-area {
-            flex: 0 0 60%;
+            flex: 0 0 70%;
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             border-bottom: 8px solid #92400e;
             position: relative;
             overflow: hidden;
         }
         
-        /* Question Area - BOTTOM (40%) - BIGGER */
+        /* Question Area - BOTTOM (30%) */
         .question-area {
-            flex: 0 0 40%;
+            flex: 0 0 30%;
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             border-top: 8px solid #92400e;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -84,33 +84,33 @@
             right: 15px;
         }
         
-        /* Characters - Still Large but Adjusted for Smaller Battle Area */
+        /* Characters - Very Large */
         .character-container {
             position: absolute;
             bottom: 20px;
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             z-index: 10;
         }
         
         @media (min-width: 640px) {
             .character-container {
-                width: 180px;
-                height: 180px;
+                width: 200px;
+                height: 200px;
             }
         }
         
         @media (min-width: 768px) {
             .character-container {
-                width: 220px;
-                height: 220px;
+                width: 250px;
+                height: 250px;
             }
         }
         
         @media (min-width: 1024px) {
             .character-container {
-                width: 260px;
-                height: 260px;
+                width: 300px;
+                height: 300px;
             }
         }
         
@@ -122,26 +122,22 @@
             right: 20px;
         }
         
-        /* Question Box - BIGGER */
+        /* Question Box */
         .question-box {
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             border: 5px solid #92400e;
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
             flex-shrink: 0;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
         
-        /* Answers Grid - BIGGER */
+        /* Answers Grid */
         .answers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
             flex: 1;
         }
         
@@ -149,8 +145,8 @@
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             border: 4px solid #92400e;
             border-radius: 12px;
-            padding: 15px;
-            font-size: 16px;
+            padding: 12px;
+            font-size: 14px;
             font-weight: bold;
             color: #78350f;
             text-align: left;
@@ -158,7 +154,7 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            min-height: 75px;
+            min-height: 60px;
         }
         
         .answer-btn:hover, .answer-btn:active {
@@ -174,29 +170,27 @@
         .answer-letter {
             background: #92400e;
             color: white;
-            width: 35px;
-            height: 35px;
+            width: 30px;
+            height: 30px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-right: 12px;
+            margin-right: 10px;
             flex-shrink: 0;
-            font-size: 16px;
         }
         
         /* Control Buttons */
         .control-btn {
             position: fixed;
             z-index: 100;
-            padding: 12px 18px;
+            padding: 10px 15px;
             border-radius: 10px;
             font-weight: bold;
             border: 3px solid;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
         }
         
         .control-btn:hover, .control-btn:active {
@@ -261,11 +255,11 @@
         /* Responsive adjustments */
         @media (max-width: 480px) {
             .battle-area {
-                flex: 0 0 55%;
+                flex: 0 0 65%;
             }
             
             .question-area {
-                flex: 0 0 45%;
+                flex: 0 0 35%;
             }
             
             .hp-bar-container {
@@ -274,119 +268,13 @@
             }
             
             .character-container {
-                width: 110px;
-                height: 110px;
+                width: 120px;
+                height: 120px;
                 bottom: 15px;
             }
             
             .question-box {
-                padding: 15px;
-                margin-bottom: 10px;
-                min-height: 100px;
-            }
-            
-            .answer-btn {
-                padding: 12px;
-                font-size: 14px;
-                min-height: 65px;
-            }
-            
-            .answer-letter {
-                width: 30px;
-                height: 30px;
-                font-size: 14px;
-            }
-            
-            .question-text {
-                font-size: 16px !important;
-            }
-        }
-        
-        /* Tablet */
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .question-area {
-                padding: 20px;
-            }
-            
-            .question-box {
-                padding: 25px;
-                min-height: 140px;
-            }
-            
-            .answer-btn {
-                padding: 18px;
-                font-size: 18px;
-                min-height: 85px;
-            }
-            
-            .answer-letter {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-            }
-        }
-        
-        /* Desktop */
-        @media (min-width: 1024px) {
-            .battle-area {
-                flex: 0 0 58%;
-            }
-            
-            .question-area {
-                flex: 0 0 42%;
-                padding: 25px;
-            }
-            
-            .question-box {
-                padding: 30px;
-                margin-bottom: 20px;
-                min-height: 160px;
-            }
-            
-            .answer-btn {
-                padding: 20px;
-                font-size: 18px;
-                min-height: 90px;
-            }
-            
-            .answer-letter {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
-                margin-right: 15px;
-            }
-            
-            .character-container {
-                width: 240px;
-                height: 240px;
-            }
-        }
-        
-        /* Landscape mode */
-        @media (orientation: landscape) and (max-height: 600px) {
-            .battle-area {
-                flex: 0 0 55%;
-            }
-            
-            .question-area {
-                flex: 0 0 45%;
                 padding: 10px;
-            }
-            
-            .character-container {
-                width: 100px;
-                height: 100px;
-                bottom: 10px;
-            }
-            
-            .answers-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-            
-            .question-box {
-                padding: 12px;
-                min-height: 80px;
                 margin-bottom: 8px;
             }
             
@@ -400,44 +288,27 @@
                 width: 25px;
                 height: 25px;
                 font-size: 12px;
-                margin-right: 8px;
             }
         }
         
-        /* Very tall screens */
-        @media (min-height: 800px) {
+        /* Landscape mode */
+        @media (orientation: landscape) and (max-height: 600px) {
             .battle-area {
-                flex: 0 0 55%;
+                flex: 0 0 60%;
             }
             
             .question-area {
-                flex: 0 0 45%;
+                flex: 0 0 40%;
             }
             
-            .question-box {
-                min-height: 140px;
+            .character-container {
+                width: 120px;
+                height: 120px;
+                bottom: 10px;
             }
             
-            .answer-btn {
-                min-height: 85px;
-            }
-        }
-        
-        /* Question text styling */
-        .question-text {
-            font-size: 18px;
-            line-height: 1.4;
-        }
-        
-        @media (min-width: 768px) {
-            .question-text {
-                font-size: 20px;
-            }
-        }
-        
-        @media (min-width: 1024px) {
-            .question-text {
-                font-size: 22px;
+            .answers-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -462,7 +333,7 @@
     
     <!-- Main Battle Screen -->
     <div class="battle-screen">
-        <!-- TOP SECTION: Battle Arena (60%) -->
+        <!-- TOP SECTION: Battle Arena -->
         <div class="battle-area">
             <!-- Player HP -->
             <div class="hp-bar-container hp-bar-left">
@@ -501,21 +372,21 @@
             </div>
         </div>
         
-        <!-- BOTTOM SECTION: Questions & Answers (40% - BIGGER) -->
+        <!-- BOTTOM SECTION: Questions & Answers -->
         <div class="question-area">
-            <!-- Question - BIGGER -->
+            <!-- Question -->
             <div class="question-box">
                 <div class="flex items-center justify-center mb-3">
                     <span class="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-4 py-1 text-sm font-bold shadow-md">
                         ❓ QUESTION
                     </span>
                 </div>
-                <p id="questionText" class="question-text font-bold text-amber-900 text-center leading-tight">
+                <p id="questionText" class="text-base font-bold text-amber-900 text-center leading-tight">
                     Loading question...
                 </p>
             </div>
             
-            <!-- Answers - BIGGER -->
+            <!-- Answers -->
             <div class="answers-grid">
                 <button id="answerA" onclick="selectAnswer(0)" 
                         class="touch-target answer-btn">
