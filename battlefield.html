@@ -114,17 +114,17 @@
         left: 0;
     }
     
-    /* Battle Area - TOP (65%) */
+    /* Battle Area - TOP (55%) */
     .battle-area {
-        flex: 0 0 65%;
+        flex: 0 0 55%;
         position: relative;
         overflow: hidden;
         border-bottom: 6px solid #92400e;
     }
     
-    /* Question Area - BOTTOM (35%) with background */
+    /* Question Area - BOTTOM (45%) with background */
     .question-area {
-        flex: 0 0 35%;
+        flex: 0 0 45%;
         background-image: url('assets/QNA-BG/QuestionAndAnswerBG.png');
         background-size: cover;
         background-position: center;
@@ -471,11 +471,11 @@
     /* Responsive adjustments */
     @media (max-width: 480px) {
         .battle-area {
-            flex: 0 0 63%;
+            flex: 0 0 54%;
         }
         
         .question-area {
-            flex: 0 0 37%;
+            flex: 0 0 46%;
             padding: 10px;
             gap: 8px;
             background-size: cover;
@@ -526,11 +526,11 @@
     /* Tablet */
     @media (min-width: 768px) and (max-width: 1023px) {
         .battle-area {
-            flex: 0 0 63%;
+            flex: 0 0 54%;
         }
         
         .question-area {
-            flex: 0 0 37%;
+            flex: 0 0 46%;
             padding: 15px;
             gap: 12px;
             background-size: cover;
@@ -570,11 +570,11 @@
     /* Desktop */
     @media (min-width: 1024px) {
         .battle-area {
-            flex: 0 0 63%;
+            flex: 0 0 54%;
         }
         
         .question-area {
-            flex: 0 0 37%;
+            flex: 0 0 46%;
             padding: 18px;
             gap: 12px;
             background-size: cover;
@@ -640,11 +640,11 @@
     /* Landscape mode */
     @media (orientation: landscape) and (max-height: 600px) {
         .battle-area {
-            flex: 0 0 60%;
+            flex: 0 0 50%;
         }
         
         .question-area {
-            flex: 0 0 40%;
+            flex: 0 0 50%;
             padding: 8px;
             gap: 6px;
             background-size: cover;
@@ -808,7 +808,7 @@
     
     <!-- Main Battle Screen -->
     <div class="battle-screen">
-        <!-- TOP SECTION: Battle Arena (65%) -->
+        <!-- TOP SECTION: Battle Arena (55%) -->
         <div class="battle-area">
             <!-- Battle area background (era-specific) - THIS IS WHERE ERA BG GOES -->
             <div id="battleAreaBackground" class="battle-area-bg"></div>
@@ -849,7 +849,7 @@
             </div>
         </div>
         
-        <!-- BOTTOM SECTION: Questions & Answers (35%) -->
+        <!-- BOTTOM SECTION: Questions & Answers (45%) -->
         <div class="question-area">
             <!-- Question -->
             <div class="question-box">
