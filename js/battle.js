@@ -9,21 +9,43 @@ let currentVillain = null;
 let currentLanguageLoaded = ''; // Track which language questions are loaded
 let currentShuffledAnswers = []; // Store shuffled answers
 
-// Set era-specific backgrounds
+// Enhanced setEraBackground function
 function setEraBackground(eraKey) {
     const era = eraData[eraKey];
     
     if (era && era.background) {
+        // Preload the background image
+        const img = new Image();
+        img.src = era.background;
+        
         // Set the background for the entire page
         const eraBackground = document.getElementById('eraBackground');
         if (eraBackground) {
             eraBackground.style.backgroundImage = `url('${era.background}')`;
+            eraBackground.style.opacity = '0.7'; // Keep page background subtle
         }
         
-        // Set the battle area background
+        // Set the battle area background - make it more prominent
         const battleAreaBg = document.getElementById('battleAreaBackground');
         if (battleAreaBg) {
             battleAreaBg.style.backgroundImage = `url('${era.background}')`;
+            battleAreaBg.style.opacity = '0.9'; // Increased for better visibility
+            
+            // Create an overlay div if it doesn't exist
+            let overlay = document.getElementById('battleAreaOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'battleAreaOverlay';
+                overlay.style.position = 'absolute';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.width = '100%';
+                overlay.style.height = '100%';
+                overlay.style.background = 'linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.1))';
+                overlay.style.zIndex = '1';
+                overlay.style.pointerEvents = 'none';
+                battleAreaBg.appendChild(overlay);
+            }
         }
         
         console.log(`Set background for era: ${eraKey} - ${era.background}`);
@@ -32,11 +54,11 @@ function setEraBackground(eraKey) {
         // Set default background
         const eraBackground = document.getElementById('eraBackground');
         if (eraBackground) {
-            eraBackground.style.backgroundImage = `url('assets/rice_background.png')`;
+            eraBackground.style.backgroundImage = 'url("assets/Background/1. Early Spanish Era/Early Spanish Era.png")';
         }
         const battleAreaBg = document.getElementById('battleAreaBackground');
         if (battleAreaBg) {
-            battleAreaBg.style.backgroundImage = `url('assets/rice_background.png')`;
+            battleAreaBg.style.backgroundImage = 'url("assets/Background/1. Early Spanish Era/Early Spanish Era.png")';
         }
     }
 }
