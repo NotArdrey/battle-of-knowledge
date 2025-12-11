@@ -9,20 +9,19 @@ let currentVillain = null;
 let currentLanguageLoaded = ''; // Track which language questions are loaded
 let currentShuffledAnswers = []; // Store shuffled answers
 
-// Enhanced setEraBackground function
+// Enhanced setEraBackground function with error handling
 function setEraBackground(eraKey) {
     const era = eraData[eraKey];
     
     if (era && era.background) {
-        // Preload the background image
-        const img = new Image();
-        img.src = era.background;
+        console.log(`Setting background for era: ${eraKey}, path: ${era.background}`);
         
         // Set the background for the entire page
         const eraBackground = document.getElementById('eraBackground');
         if (eraBackground) {
             eraBackground.style.backgroundImage = `url('${era.background}')`;
-            eraBackground.style.opacity = '0.7'; // Keep page background subtle
+            eraBackground.style.opacity = '0.7';
+            eraBackground.style.transition = 'background-image 0.5s ease-in-out';
         }
         
         // Set the battle area background - make it more prominent
@@ -30,36 +29,42 @@ function setEraBackground(eraKey) {
         if (battleAreaBg) {
             battleAreaBg.style.backgroundImage = `url('${era.background}')`;
             battleAreaBg.style.opacity = '0.9'; // Increased for better visibility
+            battleAreaBg.style.backgroundSize = 'cover';
+            battleAreaBg.style.backgroundPosition = 'center';
+            battleAreaBg.style.backgroundRepeat = 'no-repeat';
+            battleAreaBg.style.transition = 'background-image 0.5s ease-in-out';
             
-            // Create an overlay div if it doesn't exist
-            let overlay = document.getElementById('battleAreaOverlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'battleAreaOverlay';
-                overlay.style.position = 'absolute';
-                overlay.style.top = '0';
-                overlay.style.left = '0';
-                overlay.style.width = '100%';
-                overlay.style.height = '100%';
-                overlay.style.background = 'linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.1))';
-                overlay.style.zIndex = '1';
-                overlay.style.pointerEvents = 'none';
-                battleAreaBg.appendChild(overlay);
-            }
+            // Test if background loads
+            const testImg = new Image();
+            testImg.onload = function() {
+                console.log(`Background image loaded successfully: ${era.background}`);
+            };
+            testImg.onerror = function() {
+                console.error(`Failed to load background image: ${era.background}`);
+                // Fallback to default
+                setDefaultBackground();
+            };
+            testImg.src = era.background;
         }
         
-        console.log(`Set background for era: ${eraKey} - ${era.background}`);
     } else {
         console.warn(`No background found for era: ${eraKey}`);
-        // Set default background
-        const eraBackground = document.getElementById('eraBackground');
-        if (eraBackground) {
-            eraBackground.style.backgroundImage = 'url("assets/Background/1. Early Spanish Era/Early Spanish Era.png")';
-        }
-        const battleAreaBg = document.getElementById('battleAreaBackground');
-        if (battleAreaBg) {
-            battleAreaBg.style.backgroundImage = 'url("assets/Background/1. Early Spanish Era/Early Spanish Era.png")';
-        }
+        setDefaultBackground();
+    }
+}
+
+// Set default background
+function setDefaultBackground() {
+    const defaultBg = 'assets/Background/1. Early Spanish Era/Early Spanish Era.png';
+    
+    const eraBackground = document.getElementById('eraBackground');
+    if (eraBackground) {
+        eraBackground.style.backgroundImage = `url('${defaultBg}')`;
+    }
+    
+    const battleAreaBg = document.getElementById('battleAreaBackground');
+    if (battleAreaBg) {
+        battleAreaBg.style.backgroundImage = `url('${defaultBg}')`;
     }
 }
 
@@ -114,6 +119,8 @@ function initBattle() {
     } else {
         currentEra = selectedEra;
     }
+    
+    console.log(`Initializing battle for era: ${currentEra}`);
     
     // Set era-specific backgrounds
     setEraBackground(currentEra);
