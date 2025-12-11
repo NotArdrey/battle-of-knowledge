@@ -200,3 +200,236 @@ body {
         width 0.7s cubic-bezier(0.4, 0, 0.2, 1),
         background 0.5s ease-in-out;
 }
+
+/* Add to animations.css */
+
+/* Sword Attack Effect */
+@keyframes sword-swing {
+    0% { transform: rotate(0deg) scale(0.8); opacity: 0; }
+    20% { transform: rotate(45deg) scale(1.3); opacity: 1; }
+    40% { transform: rotate(90deg) scale(1.5); opacity: 0.8; }
+    60% { transform: rotate(135deg) scale(1.3); opacity: 0.6; }
+    80% { transform: rotate(180deg) scale(1); opacity: 0.4; }
+    100% { transform: rotate(225deg) scale(0.8); opacity: 0; }
+}
+
+@keyframes sword-swing-flipped {
+    0% { transform: scaleX(-1) rotate(0deg) scale(0.8); opacity: 0; }
+    20% { transform: scaleX(-1) rotate(-45deg) scale(1.3); opacity: 1; }
+    40% { transform: scaleX(-1) rotate(-90deg) scale(1.5); opacity: 0.8; }
+    60% { transform: scaleX(-1) rotate(-135deg) scale(1.3); opacity: 0.6; }
+    80% { transform: scaleX(-1) rotate(-180deg) scale(1); opacity: 0.4; }
+    100% { transform: scaleX(-1) rotate(-225deg) scale(0.8); opacity: 0; }
+}
+
+@keyframes sword-trail {
+    0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+    30% { transform: scale(1.2) rotate(45deg); opacity: 0.8; }
+    50% { transform: scale(1.5) rotate(90deg); opacity: 0.6; }
+    70% { transform: scale(1.2) rotate(135deg); opacity: 0.4; }
+    100% { transform: scale(0.8) rotate(180deg); opacity: 0; }
+}
+
+@keyframes sword-trail-flipped {
+    0% { transform: scaleX(-1) scale(0.8) rotate(0deg); opacity: 0; }
+    30% { transform: scaleX(-1) scale(1.2) rotate(-45deg); opacity: 0.8; }
+    50% { transform: scaleX(-1) scale(1.5) rotate(-90deg); opacity: 0.6; }
+    70% { transform: scaleX(-1) scale(1.2) rotate(-135deg); opacity: 0.4; }
+    100% { transform: scaleX(-1) scale(0.8) rotate(-180deg); opacity: 0; }
+}
+
+/* Gun Attack Effect */
+@keyframes gun-flash {
+    0% { transform: scale(0.5); opacity: 0; }
+    15% { transform: scale(1.5); opacity: 1; }
+    30% { transform: scale(1.3); opacity: 0.8; }
+    45% { transform: scale(1.1); opacity: 0.6; }
+    60% { transform: scale(0.9); opacity: 0.4; }
+    100% { transform: scale(0.5); opacity: 0; }
+}
+
+@keyframes gun-flash-flipped {
+    0% { transform: scaleX(-1) scale(0.5); opacity: 0; }
+    15% { transform: scaleX(-1) scale(1.5); opacity: 1; }
+    30% { transform: scaleX(-1) scale(1.3); opacity: 0.8; }
+    45% { transform: scaleX(-1) scale(1.1); opacity: 0.6; }
+    60% { transform: scaleX(-1) scale(0.9); opacity: 0.4; }
+    100% { transform: scaleX(-1) scale(0.5); opacity: 0; }
+}
+
+@keyframes bullet-trail {
+    0% { transform: translateX(0) scale(0.2); opacity: 0; }
+    20% { transform: translateX(40px) scale(0.5); opacity: 1; }
+    40% { transform: translateX(80px) scale(0.8); opacity: 0.8; }
+    60% { transform: translateX(120px) scale(1); opacity: 0.6; }
+    80% { transform: translateX(160px) scale(1.2); opacity: 0.4; }
+    100% { transform: translateX(200px) scale(1.5); opacity: 0; }
+}
+
+@keyframes bullet-trail-flipped {
+    0% { transform: scaleX(-1) translateX(0) scale(0.2); opacity: 0; }
+    20% { transform: scaleX(-1) translateX(-40px) scale(0.5); opacity: 1; }
+    40% { transform: scaleX(-1) translateX(-80px) scale(0.8); opacity: 0.8; }
+    60% { transform: scaleX(-1) translateX(-120px) scale(1); opacity: 0.6; }
+    80% { transform: scaleX(-1) translateX(-160px) scale(1.2); opacity: 0.4; }
+    100% { transform: scaleX(-1) translateX(-200px) scale(1.5); opacity: 0; }
+}
+
+/* Magic Attack Effect */
+@keyframes magic-burst {
+    0% { transform: scale(0.3); filter: blur(0px); opacity: 0; }
+    25% { transform: scale(1.5); filter: blur(5px); opacity: 1; }
+    50% { transform: scale(2); filter: blur(10px); opacity: 0.8; }
+    75% { transform: scale(1.5); filter: blur(5px); opacity: 0.6; }
+    100% { transform: scale(0.3); filter: blur(0px); opacity: 0; }
+}
+
+@keyframes magic-orb {
+    0% { transform: scale(0.5) rotate(0deg); opacity: 0; }
+    20% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+    40% { transform: scale(1.5) rotate(90deg); opacity: 0.8; }
+    60% { transform: scale(1.2) rotate(135deg); opacity: 0.6; }
+    80% { transform: scale(0.8) rotate(180deg); opacity: 0.4; }
+    100% { transform: scale(0.5) rotate(225deg); opacity: 0; }
+}
+
+@keyframes magic-orb-flipped {
+    0% { transform: scaleX(-1) scale(0.5) rotate(0deg); opacity: 0; }
+    20% { transform: scaleX(-1) scale(1.2) rotate(-45deg); opacity: 1; }
+    40% { transform: scaleX(-1) scale(1.5) rotate(-90deg); opacity: 0.8; }
+    60% { transform: scaleX(-1) scale(1.2) rotate(-135deg); opacity: 0.6; }
+    80% { transform: scaleX(-1) scale(0.8) rotate(-180deg); opacity: 0.4; }
+    100% { transform: scaleX(-1) scale(0.5) rotate(-225deg); opacity: 0; }
+}
+
+@keyframes magic-sparkle {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    30% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+    60% { transform: translateY(-40px) rotate(360deg); opacity: 0.5; }
+    100% { transform: translateY(-60px) rotate(540deg); opacity: 0; }
+}
+
+@keyframes magic-ring {
+    0% { transform: scale(0.5) rotate(0deg); opacity: 0; }
+    30% { transform: scale(2) rotate(180deg); opacity: 0.8; }
+    60% { transform: scale(2.5) rotate(360deg); opacity: 0.6; }
+    90% { transform: scale(3) rotate(540deg); opacity: 0.4; }
+    100% { transform: scale(3.5) rotate(720deg); opacity: 0; }
+}
+
+@keyframes magic-ring-flipped {
+    0% { transform: scaleX(-1) scale(0.5) rotate(0deg); opacity: 0; }
+    30% { transform: scaleX(-1) scale(2) rotate(-180deg); opacity: 0.8; }
+    60% { transform: scaleX(-1) scale(2.5) rotate(-360deg); opacity: 0.6; }
+    90% { transform: scaleX(-1) scale(3) rotate(-540deg); opacity: 0.4; }
+    100% { transform: scaleX(-1) scale(3.5) rotate(-720deg); opacity: 0; }
+}
+
+/* Effect classes */
+.sword-effect {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-image: url('assets/Effects/sword.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 30;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px #ff6b00) brightness(1.5);
+}
+
+.gun-flash {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url('assets/Effects/gun-flash.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 30;
+    pointer-events: none;
+    filter: drop-shadow(0 0 15px #ffd700) brightness(2);
+}
+
+.bullet-trail {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-image: url('assets/Effects/bullet.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 29;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px #ff0000);
+}
+
+.magic-burst {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #4f46e5, #818cf8, #c7d2fe);
+    border-radius: 50%;
+    z-index: 30;
+    pointer-events: none;
+    filter: blur(5px);
+    mix-blend-mode: screen;
+}
+
+.magic-orb {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, #8b5cf6, #a78bfa, #ddd6fe);
+    border-radius: 50%;
+    z-index: 30;
+    pointer-events: none;
+    filter: drop-shadow(0 0 15px #8b5cf6);
+}
+
+.magic-sparkle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #ffffff, #f0abfc, #d946ef);
+    border-radius: 50%;
+    z-index: 31;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px #ffffff);
+}
+
+.magic-ring {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 3px solid #a78bfa;
+    border-radius: 50%;
+    z-index: 29;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px #a78bfa);
+}
+
+.sword-trail {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url('assets/Effects/sword-trail.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 28;
+    pointer-events: none;
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px #ffa500);
+}
+
+/* Character-specific effect lists */
+.sword-users = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 
+                'Spanish Soldier', 'Early Spanish Soldier Era', 
+                'Andres Bonifacio', 'Emilio Aguinaldo', 
+                'Commodore George Dewey', 'General Juan Luna'];
+
+.gun-users = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier'];
+
+.magic-users = ['Jose Rizal', 'Apolinario Mabini'];
