@@ -34,8 +34,8 @@
             -webkit-user-select: none;
         }
         
-        /* Battle container - fills entire screen */
-        .battle-container {
+        /* Main container - full screen with top-bottom layout */
+        .main-container {
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -44,111 +44,87 @@
             margin: 0;
         }
         
-        /* Battle platform - occupies most of the screen */
+        /* Battle Platform - Top section */
         .battle-platform {
-            flex: 0 0 65%; /* Takes 65% of screen height */
+            flex: 0 0 55%; /* Takes 55% of screen height */
             width: 100%;
-            max-width: none;
             margin: 0;
-            border-radius: 0;
-            border-left: 0;
-            border-right: 0;
+            position: relative;
+            overflow: hidden;
         }
         
-        /* Question & Answer Container - fits the remaining space */
+        /* Question & Answer Container - Bottom section */
         .question-answer-container {
-            flex: 1; /* Takes remaining space */
+            flex: 1; /* Takes remaining 45% of screen height */
             width: 100%;
-            max-width: none;
             margin: 0;
-            border-radius: 0;
-            border-left: 0;
-            border-right: 0;
             overflow-y: auto; /* Allow scrolling inside if needed */
-            max-height: 35vh; /* Prevent from growing too large */
         }
         
         /* Responsive adjustments */
         @media (max-width: 640px) {
             .battle-platform {
-                flex: 0 0 60%;
+                flex: 0 0 50%; /* Slightly smaller on mobile */
             }
             .question-answer-container {
-                max-height: 40vh;
-            }
-            /* Mobile: Position HP bars */
-            .hp-container-left {
-                top: 0.5rem !important;
-                left: 0.5rem !important;
-            }
-            .hp-container-right {
-                top: 0.5rem !important;
-                right: 0.5rem !important;
-            }
-            /* Adjust answer buttons for mobile */
-            .answer-btn {
-                padding: 0.5rem !important;
-                min-height: 40px !important;
+                flex: 1; /* Takes more space on mobile */
             }
         }
         
         @media (max-width: 480px) {
             .battle-platform {
-                flex: 0 0 58%;
-            }
-            .question-answer-container {
-                max-height: 42vh;
+                flex: 0 0 48%;
             }
         }
         
         @media (max-width: 375px) {
             .battle-platform {
-                flex: 0 0 55%;
-            }
-            .question-answer-container {
-                max-height: 45vh;
+                flex: 0 0 45%;
             }
         }
         
         /* For very tall screens (portrait mobile) */
         @media (min-height: 800px) and (max-width: 768px) {
             .battle-platform {
-                flex: 0 0 70%;
+                flex: 0 0 60%;
             }
             .question-answer-container {
-                max-height: 30vh;
+                flex: 1;
             }
         }
         
         /* For landscape orientation */
         @media (orientation: landscape) {
-            .battle-container {
+            .main-container {
                 flex-direction: row;
             }
             .battle-platform {
-                flex: 0 0 60%;
+                flex: 0 0 50%;
                 height: 100vh;
-                border-radius: 0;
-                border-top: 0;
-                border-bottom: 0;
             }
             .question-answer-container {
                 flex: 1;
-                max-height: 100vh;
-                border-radius: 0;
-                border-top: 0;
-                border-bottom: 0;
+                height: 100vh;
             }
         }
         
         /* For very wide screens (desktop landscape) */
         @media (min-width: 1024px) and (orientation: landscape) {
             .battle-platform {
-                flex: 0 0 70%;
+                flex: 0 0 60%;
             }
             .question-answer-container {
                 flex: 1;
             }
+        }
+        
+        /* Ensure buttons and text are properly sized */
+        .question-container {
+            min-height: 80px;
+        }
+        
+        .answer-btn {
+            min-height: 60px;
         }
     </style>
 </head>
@@ -188,16 +164,16 @@
         <span data-lang-key="Back" class="text-xs">Back</span>
     </button>
 
-    <!-- Battle Container - Fills entire screen -->
-    <div class="battle-container">
+    <!-- Main Container -->
+    <div class="main-container">
         
-        <!-- Battle Platform - Top section -->
-        <div class="battle-platform relative 
+        <!-- Battle Platform - Top Section -->
+        <div class="battle-platform 
                     bg-gradient-to-br from-amber-200 via-yellow-200 to-amber-300 
-                    border-4 sm:border-6 md:border-8 border-amber-800 
+                    border-b-4 sm:border-b-6 md:border-b-8 border-amber-800 
                     shadow-2xl shadow-amber-900/30">
             
-            <!-- HP Containers - Moved to top -->
+            <!-- HP Containers -->
             <div class="hp-container-left absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-8 
                         w-36 sm:w-40 md:w-48 z-20">
                 <p id="playerName" class="text-black font-bold 
@@ -232,28 +208,31 @@
                 <p class="text-xs sm:text-sm text-gray-700 text-center mt-1" id="enemyHpText">100/100</p>
             </div>
 
-            <!-- Characters - Very large to fill the space -->
-            <div id="playerCharacter" class="character absolute bottom-4 left-4 sm:bottom-6 sm:left-6 md:bottom-8 md:left-8
-                        w-44 h-44 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80
+            <!-- Characters -->
+            <div id="playerCharacter" class="character absolute bottom-8 left-4 sm:bottom-10 sm:left-6 md:bottom-12 md:left-8
+                        w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64
                         transition-all duration-300 z-10">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain drop-shadow-2xl">
             </div>
 
-            <div id="enemyCharacter" class="character absolute bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8
-                        w-44 h-44 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80
+            <div id="enemyCharacter" class="character absolute bottom-8 right-4 sm:bottom-10 sm:right-6 md:bottom-12 md:right-8
+                        w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64
                         transition-all duration-300 z-10">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain drop-shadow-2xl">
             </div>
         </div>
 
-        <!-- Question & Answer Container - Bottom section -->
-        <div class="question-answer-container relative 
+        <!-- Question & Answer Container - Bottom Section -->
+        <div class="question-answer-container 
                     bg-gradient-to-br from-amber-50 to-yellow-100 
-                    border-4 sm:border-6 border-amber-800 
+                    border-t-4 sm:border-t-6 border-amber-800 
                     p-3 sm:p-4 md:p-5
                     shadow-2xl shadow-amber-900/30">
+            
+            <!-- Decorative top border -->
+            <div class="absolute -top-1 left-0 w-full h-2 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700"></div>
             
             <!-- Question Container -->
             <div class="question-container relative 
@@ -275,14 +254,14 @@
                 
                 <p id="questionText" class="text-sm sm:text-base md:text-lg font-bold text-amber-900 
                          text-center 
-                         min-h-[40px] sm:min-h-[50px]
+                         min-h-[60px] sm:min-h-[70px]
                          flex items-center justify-center 
                          px-2 leading-tight sm:leading-normal">
                     Loading question...
                 </p>
             </div>
 
-            <!-- Answer Panel - Compact layout -->
+            <!-- Answer Panel -->
             <div class="answer-panel">
                 <div class="flex items-center justify-center mb-2 sm:mb-3">
                     <span class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg px-3 py-1 text-xs sm:text-sm font-bold shadow-md">
@@ -304,10 +283,10 @@
                                    transition-all duration-200 
                                    shadow-lg shadow-orange-900/20
                                    disabled:opacity-50 disabled:cursor-not-allowed
-                                   min-h-[40px] sm:min-h-[45px]
+                                   min-h-[50px] sm:min-h-[55px]
                                    flex items-center">
                         <span class="flex-shrink-0 mr-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-2 py-1 text-xs font-bold">A</span>
-                        <span id="answerAText" class="break-words flex-grow text-xs sm:text-sm">Loading...</span>
+                        <span id="answerAText" class="break-words flex-grow text-xs sm:text-sm md:text-base">Loading...</span>
                     </button>
                     
                     <button id="answerB" onclick="selectAnswer(1)" 
@@ -323,10 +302,10 @@
                                    transition-all duration-200 
                                    shadow-lg shadow-orange-900/20
                                    disabled:opacity-50 disabled:cursor-not-allowed
-                                   min-h-[40px] sm:min-h-[45px]
+                                   min-h-[50px] sm:min-h-[55px]
                                    flex items-center">
                         <span class="flex-shrink-0 mr-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-2 py-1 text-xs font-bold">B</span>
-                        <span id="answerBText" class="break-words flex-grow text-xs sm:text-sm">Loading...</span>
+                        <span id="answerBText" class="break-words flex-grow text-xs sm:text-sm md:text-base">Loading...</span>
                     </button>
                     
                     <button id="answerC" onclick="selectAnswer(2)" 
@@ -342,10 +321,10 @@
                                    transition-all duration-200 
                                    shadow-lg shadow-orange-900/20
                                    disabled:opacity-50 disabled:cursor-not-allowed
-                                   min-h-[40px] sm:min-h-[45px]
+                                   min-h-[50px] sm:min-h-[55px]
                                    flex items-center">
                         <span class="flex-shrink-0 mr-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-2 py-1 text-xs font-bold">C</span>
-                        <span id="answerCText" class="break-words flex-grow text-xs sm:text-sm">Loading...</span>
+                        <span id="answerCText" class="break-words flex-grow text-xs sm:text-sm md:text-base">Loading...</span>
                     </button>
                     
                     <button id="answerD" onclick="selectAnswer(3)" 
@@ -361,10 +340,10 @@
                                    transition-all duration-200 
                                    shadow-lg shadow-orange-900/20
                                    disabled:opacity-50 disabled:cursor-not-allowed
-                                   min-h-[40px] sm:min-h-[45px]
+                                   min-h-[50px] sm:min-h-[55px]
                                    flex items-center">
                         <span class="flex-shrink-0 mr-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-2 py-1 text-xs font-bold">D</span>
-                        <span id="answerDText" class="break-words flex-grow text-xs sm:text-sm">Loading...</span>
+                        <span id="answerDText" class="break-words flex-grow text-xs sm:text-sm md:text-base">Loading...</span>
                     </button>
                 </div>
             </div>
@@ -592,6 +571,32 @@
             document.addEventListener('wheel', function(e) {
                 e.preventDefault();
             }, { passive: false });
+            
+            // Adjust layout on window resize
+            function adjustLayout() {
+                const platform = document.querySelector('.battle-platform');
+                const qaContainer = document.querySelector('.question-answer-container');
+                
+                if (window.innerWidth > window.innerHeight) {
+                    // Landscape
+                    platform.style.borderRightWidth = '4px';
+                    platform.style.borderBottomWidth = '0px';
+                    qaContainer.style.borderLeftWidth = '4px';
+                    qaContainer.style.borderTopWidth = '0px';
+                } else {
+                    // Portrait
+                    platform.style.borderRightWidth = '0px';
+                    platform.style.borderBottomWidth = '4px';
+                    qaContainer.style.borderLeftWidth = '0px';
+                    qaContainer.style.borderTopWidth = '4px';
+                }
+            }
+            
+            // Initial adjustment
+            adjustLayout();
+            
+            // Adjust on resize
+            window.addEventListener('resize', adjustLayout);
         });
         
         function restartBattle() {
