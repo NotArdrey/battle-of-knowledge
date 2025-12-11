@@ -19,13 +19,14 @@
             display: flex;
             align-items: center;
             text-align: left;
-            gap: 1rem;
+            gap: 1.5rem;
+            height: 140px; /* Increased height */
         }
         
         .era-img-container {
             flex-shrink: 0;
-            width: 80px;
-            height: 80px;
+            width: 100px; /* Increased size */
+            height: 100px; /* Increased size */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -35,6 +36,8 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            border-radius: 12px; /* Added rounded corners */
+            border: 2px solid rgba(120, 53, 15, 0.3); /* Subtle border */
         }
         
         .era-content {
@@ -42,21 +45,43 @@
         }
         
         /* Responsive adjustments */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .era-card {
-                flex-direction: row;
-                gap: 0.75rem;
+                height: 120px;
+                gap: 1.25rem;
             }
             .era-img-container {
-                width: 60px;
-                height: 60px;
+                width: 85px;
+                height: 85px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .era-card {
+                height: 110px;
+                gap: 1rem;
+            }
+            .era-img-container {
+                width: 75px;
+                height: 75px;
+            }
+            .era-img {
+                border-radius: 10px;
             }
         }
         
         @media (max-width: 480px) {
+            .era-card {
+                height: 100px;
+                gap: 0.75rem;
+            }
             .era-img-container {
-                width: 50px;
-                height: 50px;
+                width: 65px;
+                height: 65px;
+            }
+            .era-img {
+                border-radius: 8px;
+                border-width: 1px;
             }
         }
     </style>
@@ -79,10 +104,10 @@
             <span data-translate="Choose Your Historical Era">Choose Your Historical Era</span>
         </h1>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mb-8 md:mb-10">
             <!-- Early Spanish Era Button -->
             <button onclick="selectEra('early-spanish')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/Early Spanish Era/Button-Spanish-Early.png" 
                          alt="Early Spanish Era" 
@@ -96,7 +121,7 @@
 
             <!-- Late Spanish Era Button -->
             <button onclick="selectEra('late-spanish')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/Late Spanish Era/Button-Spanish-Late.png" 
                          alt="Late Spanish Era" 
@@ -110,7 +135,7 @@
 
             <!-- American Colonial Button -->
             <button onclick="selectEra('american-colonial')" 
-                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-amber-100 to-yellow-200 border-2 sm:border-3 md:border-4 border-amber-700 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/American Era/Button-American.png" 
                          alt="American Colonial Era" 
@@ -124,7 +149,7 @@
 
             <!-- WW2 Bonus Stage Button -->
             <button onclick="selectEra('ww2')" 
-                    class="era-card bg-gradient-to-br from-red-100 to-orange-200 border-2 sm:border-3 md:border-4 border-red-700 rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
+                    class="era-card bg-gradient-to-br from-red-100 to-orange-200 border-2 sm:border-3 md:border-4 border-red-700 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl">
                 <div class="era-img-container">
                     <img src="assets/ERA Buttons/WWII Era/Button-WWII.png" 
                          alt="WWII Era" 
