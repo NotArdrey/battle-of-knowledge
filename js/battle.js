@@ -11,6 +11,8 @@ let currentShuffledAnswers = []; // Store shuffled answers
 
 // Enhanced setEraBackground function with error handling
 function setEraBackground(eraKey) {
+    console.log(`setEraBackground called with era: ${eraKey}`);
+    
     const era = eraData[eraKey];
     
     if (era && era.background) {
@@ -109,20 +111,23 @@ function getCharacterSprite(characterData, state) {
     return `${characterData.folder}/${spriteFile}`;
 }
 
-// Initialize battle
+// Initialize battle - UPDATED to handle era properly
 function initBattle() {
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
     
     // Determine which era to use for this battle
     if (selectedEra === 'all') {
         currentEra = getRandomEra();
+        console.log(`Random era selected: ${currentEra}`);
     } else {
         currentEra = selectedEra;
+        console.log(`Selected era: ${currentEra}`);
     }
     
-    console.log(`Initializing battle for era: ${currentEra}`);
+    // Save the current era for use in this battle
+    localStorage.setItem('currentBattleEra', currentEra);
     
-    // Set era-specific backgrounds
+    // Set era-specific backgrounds - THIS IS THE CRITICAL PART
     setEraBackground(currentEra);
     
     // Load questions based on current language and era
@@ -600,9 +605,19 @@ function disableAnswers() {
 
 // Initialize battle when page loads
 window.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded - Initializing battle...');
+    
     // Initialize the battle
     initBattle();
     
     // Update HP bars initially
     updateHP();
+    
+    // Hide loading overlay
+    setTimeout(() => {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+        }
+    }, 500);
 });
