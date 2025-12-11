@@ -10,27 +10,20 @@ let currentLanguageLoaded = ''; // Track which language questions are loaded
 let currentShuffledAnswers = []; // Store shuffled answers
 
 // Enhanced setEraBackground function with error handling
+// Enhanced setEraBackground function - ONLY sets battle area background
 function setEraBackground(eraKey) {
     console.log(`setEraBackground called with era: ${eraKey}`);
     
     const era = eraData[eraKey];
     
     if (era && era.background) {
-        console.log(`Setting background for era: ${eraKey}, path: ${era.background}`);
+        console.log(`Setting battle area background for era: ${eraKey}, path: ${era.background}`);
         
-        // Set the background for the entire page
-        const eraBackground = document.getElementById('eraBackground');
-        if (eraBackground) {
-            eraBackground.style.backgroundImage = `url('${era.background}')`;
-            eraBackground.style.opacity = '0.7';
-            eraBackground.style.transition = 'background-image 0.5s ease-in-out';
-        }
-        
-        // Set the battle area background - make it more prominent
+        // Set ONLY the battle area background - not the page background
         const battleAreaBg = document.getElementById('battleAreaBackground');
         if (battleAreaBg) {
             battleAreaBg.style.backgroundImage = `url('${era.background}')`;
-            battleAreaBg.style.opacity = '0.9'; // Increased for better visibility
+            battleAreaBg.style.opacity = '1'; // Full opacity
             battleAreaBg.style.backgroundSize = 'cover';
             battleAreaBg.style.backgroundPosition = 'center';
             battleAreaBg.style.backgroundRepeat = 'no-repeat';
@@ -39,10 +32,10 @@ function setEraBackground(eraKey) {
             // Test if background loads
             const testImg = new Image();
             testImg.onload = function() {
-                console.log(`Background image loaded successfully: ${era.background}`);
+                console.log(`Battle area background loaded successfully: ${era.background}`);
             };
             testImg.onerror = function() {
-                console.error(`Failed to load background image: ${era.background}`);
+                console.error(`Failed to load battle area background: ${era.background}`);
                 // Fallback to default
                 setDefaultBackground();
             };
@@ -55,18 +48,14 @@ function setEraBackground(eraKey) {
     }
 }
 
-// Set default background
+// Set default background for battle area
 function setDefaultBackground() {
     const defaultBg = 'assets/Background/1. Early Spanish Era/Early Spanish Era.png';
-    
-    const eraBackground = document.getElementById('eraBackground');
-    if (eraBackground) {
-        eraBackground.style.backgroundImage = `url('${defaultBg}')`;
-    }
     
     const battleAreaBg = document.getElementById('battleAreaBackground');
     if (battleAreaBg) {
         battleAreaBg.style.backgroundImage = `url('${defaultBg}')`;
+        battleAreaBg.style.opacity = '1';
     }
 }
 
