@@ -57,7 +57,7 @@
             overflow: hidden;
         }
         
-        /* Question Area - BOTTOM (40%) - OPTIMIZED */
+        /* Question Area - BOTTOM (40%) */
         .question-area {
             flex: 0 0 40%;
             background: linear-gradient(135deg, #fef3c7, #fde68a);
@@ -85,45 +85,53 @@
             right: 15px;
         }
         
-        /* Characters */
+        /* Characters - MUCH BIGGER */
         .character-container {
             position: absolute;
-            bottom: 20px;
-            width: 140px;
-            height: 140px;
+            bottom: 10px; /* Closer to bottom edge */
             z-index: 10;
+            /* Very large sizes */
+            width: 180px !important;
+            height: 180px !important;
         }
         
         @media (min-width: 640px) {
             .character-container {
-                width: 170px;
-                height: 170px;
+                width: 220px !important;
+                height: 220px !important;
             }
         }
         
         @media (min-width: 768px) {
             .character-container {
-                width: 200px;
-                height: 200px;
+                width: 260px !important;
+                height: 260px !important;
             }
         }
         
         @media (min-width: 1024px) {
             .character-container {
-                width: 230px;
-                height: 230px;
+                width: 300px !important;
+                height: 300px !important;
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .character-container {
+                width: 340px !important;
+                height: 340px !important;
             }
         }
         
         .character-left {
-            left: 20px;
+            left: 10px; /* Closer to left edge */
         }
         
         .character-right {
-            right: 20px;
+            right: 10px; /* Closer to right edge */
         }
         
-        /* Question Box - FIXED TEXT VISIBILITY */
+        /* Question Box */
         .question-box {
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             border: 4px solid #92400e;
@@ -154,7 +162,7 @@
             border-radius: 2px;
         }
         
-        /* Answers Grid - OPTIMIZED */
+        /* Answers Grid */
         .answers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -295,9 +303,9 @@
             }
             
             .character-container {
-                width: 120px;
-                height: 120px;
-                bottom: 15px;
+                width: 160px !important;
+                height: 160px !important;
+                bottom: 5px;
             }
             
             .question-box {
@@ -336,6 +344,12 @@
                 gap: 12px;
             }
             
+            .character-container {
+                width: 240px !important;
+                height: 240px !important;
+                bottom: 8px;
+            }
+            
             .question-box {
                 padding: 18px;
                 min-height: 100px;
@@ -368,6 +382,12 @@
                 gap: 12px;
             }
             
+            .character-container {
+                width: 280px !important;
+                height: 280px !important;
+                bottom: 5px;
+            }
+            
             .question-box {
                 padding: 20px;
                 min-height: 110px;
@@ -386,10 +406,14 @@
                 font-size: 17px;
                 margin-right: 12px;
             }
-            
+        }
+        
+        /* Large Desktop */
+        @media (min-width: 1280px) {
             .character-container {
-                width: 210px;
-                height: 210px;
+                width: 320px !important;
+                height: 320px !important;
+                bottom: 0;
             }
         }
         
@@ -406,9 +430,9 @@
             }
             
             .character-container {
-                width: 100px;
-                height: 100px;
-                bottom: 10px;
+                width: 140px !important;
+                height: 140px !important;
+                bottom: 5px;
             }
             
             .question-box {
@@ -442,6 +466,12 @@
                 padding: 15px;
             }
             
+            .character-container {
+                width: 200px !important;
+                height: 200px !important;
+                bottom: 15px;
+            }
+            
             .question-box {
                 min-height: 100px;
                 max-height: 110px;
@@ -452,7 +482,7 @@
             }
         }
         
-        /* Question text styling - FIXED */
+        /* Question text styling */
         .question-text {
             font-size: 16px;
             line-height: 1.4;
@@ -548,22 +578,22 @@
                 <p class="text-xs sm:text-sm text-gray-700 text-center mt-1" id="enemyHpText">100/100</p>
             </div>
             
-            <!-- Player Character -->
+            <!-- Player Character - MUCH BIGGER -->
             <div id="playerCharacter" class="character-container character-left">
                 <img src="assets/lapulapu-idle.png" alt="Hero" id="playerSprite" 
                      class="sprite-image w-full h-full object-contain drop-shadow-2xl">
             </div>
             
-            <!-- Enemy Character -->
+            <!-- Enemy Character - MUCH BIGGER -->
             <div id="enemyCharacter" class="character-container character-right">
                 <img src="assets/magellan-idle.png" alt="Enemy" id="enemySprite" 
                      class="sprite-image w-full h-full object-contain drop-shadow-2xl">
             </div>
         </div>
         
-        <!-- BOTTOM SECTION: Questions & Answers (40%) - IMPROVED -->
+        <!-- BOTTOM SECTION: Questions & Answers (40%) -->
         <div class="question-area">
-            <!-- Question - IMPROVED TEXT VISIBILITY -->
+            <!-- Question -->
             <div class="question-box">
                 <div class="flex items-center justify-center mb-2">
                     <span class="question-header bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg px-3 py-1 font-bold shadow-md">
@@ -577,7 +607,7 @@
                 </div>
             </div>
             
-            <!-- Answers - IMPROVED -->
+            <!-- Answers -->
             <div class="answers-grid">
                 <button id="answerA" onclick="selectAnswer(0)" 
                         class="touch-target answer-btn">
