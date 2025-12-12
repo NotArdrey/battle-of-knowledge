@@ -12,222 +12,353 @@
     <style>
         body { 
             font-family: 'Baloo 2', cursive; 
-            /* Set full screen.png as background */
-            background-image: url('assets/Background/Start Menu/Start Menu.png');
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+        }
+        
+        /* Ensure minimum touch target size */
+        button { min-height: 44px; min-width: 44px; }
+        
+        /* Main container with menu background */
+        .main-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .menu-bg-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+                url('assets/MAIN BG/Menu-BG.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
+            opacity: 0.5;
+            z-index: 1;
         }
         
-        /* Make images act like buttons */
-        .image-button {
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            display: block;
-            max-width: 100%;
+        /* Pattern overlay for texture */
+        .pattern-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(254, 243, 199, 0.2), rgba(254, 243, 199, 0.2)),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(120, 53, 15, 0.05) 2px,
+                    rgba(120, 53, 15, 0.05) 4px
+                );
+            z-index: 2;
+            mix-blend-mode: multiply;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        /* Title image styling - NO CONTAINER */
+        .title-image {
+            max-width: 90%;
             height: auto;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 1.5rem auto;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
         }
         
-        .image-button:hover {
-            transform: scale(1.05);
+        .title-glow {
+            animation: pulse-glow 2s infinite;
         }
         
-        .image-button:active {
-            transform: scale(0.98);
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 8px 16px rgba(245, 158, 11, 0.4)); }
+            50% { filter: drop-shadow(0 8px 24px rgba(245, 158, 11, 0.7)); }
         }
         
-        /* Language toggle button */
-        .lang-toggle-btn {
+        /* English title (default) */
+        .english-title {
+            display: block;
+        }
+        
+        /* Tagalog title (hidden by default) */
+        .tagalog-title {
+            display: none;
+        }
+        
+        /* Subtitle styling */
+        .main-subtitle {
+            color: #7c2d12;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, rgba(254, 243, 199, 0.8), rgba(253, 230, 138, 0.8));
+            backdrop-filter: blur(4px);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            display: inline-block;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Button container */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        /* Button styling - Consistent with other pages */
+        .main-button {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            font-weight: 800;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
+            padding: 1.5rem 2rem;
+            width: 100%;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .start-button {
+            background: linear-gradient(to bottom right, rgba(254, 226, 226, 0.95), rgba(254, 215, 170, 0.95));
+            border: 5px solid rgba(185, 28, 28, 0.6);
+            color: #7c2d12;
+        }
+        
+        .collection-button {
+            background: linear-gradient(to bottom right, rgba(219, 234, 254, 0.95), rgba(191, 219, 254, 0.95));
+            border: 5px solid rgba(59, 130, 246, 0.6);
+            color: #1e40af;
+        }
+        
+        .main-button:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .start-button:hover {
+            box-shadow: 0 16px 40px rgba(185, 28, 28, 0.3);
+        }
+        
+        .collection-button:hover {
+            box-shadow: 0 16px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Language toggle - Positioned absolutely */
+        .language-toggle {
             position: fixed;
             top: 20px;
             right: 20px;
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(6px);
+            border: 3px solid rgba(120, 53, 15, 0.4);
+            border-radius: 16px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
+            color: #7c2d12;
+            padding: 0.75rem 1.5rem;
             z-index: 50;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            border: none;
-            background: transparent;
-            padding: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         
-        .lang-toggle-btn:hover {
-            transform: scale(1.05);
+        .language-toggle:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
         
-        /* Logo container - positioned in the middle */
-        .logo-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 100%;
-            max-width: 600px;
-            padding: 0 20px;
-            z-index: 10;
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .title-image {
+                max-width: 85%;
+                margin-bottom: 1.25rem;
+            }
+            .main-subtitle {
+                font-size: 1.5rem;
+                padding: 0.75rem 1.5rem;
+            }
+            .main-button {
+                font-size: 1.6rem;
+                padding: 1.25rem 1.75rem;
+                border-width: 4px;
+            }
         }
         
-        /* Logo image - not clickable or selectable */
-        .logo-image {
-            margin-bottom: 60px;
-            max-width: 100%;
-            height: auto;
-            pointer-events: none; /* Prevents clicking */
-            user-select: none; /* Prevents text selection */
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE/Edge */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 15px;
+            }
+            .title-image {
+                max-width: 80%;
+                margin-bottom: 1rem;
+            }
+            .main-subtitle {
+                font-size: 1.3rem;
+                padding: 0.75rem 1.5rem;
+                margin-bottom: 2rem;
+            }
+            .main-button {
+                font-size: 1.4rem;
+                padding: 1rem 1.5rem;
+                border-width: 3px;
+            }
+            .button-container {
+                gap: 1rem;
+            }
+            .language-toggle {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                top: 15px;
+                right: 15px;
+            }
         }
         
-        /* Button container - positioned near bottom */
-        .button-container {
-            position: absolute;
-            bottom: 80px; /* Adjust this value to move buttons up/down */
-            left: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px; /* Space between buttons */
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            z-index: 20;
+        @media (max-width: 640px) {
+            .title-image {
+                max-width: 75%;
+            }
+            .main-subtitle {
+                font-size: 1.1rem;
+                padding: 0.5rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .main-button {
+                font-size: 1.2rem;
+                padding: 0.75rem 1.25rem;
+                border-width: 2px;
+            }
+            .button-container {
+                gap: 0.75rem;
+            }
         }
         
-        /* Make collection button smaller */
-        .collection-btn {
-            width: 85% !important; /* 85% of start button size */
-            max-width: 260px !important;
+        @media (max-width: 480px) {
+            .title-image {
+                max-width: 70%;
+            }
+            .main-subtitle {
+                font-size: 1rem;
+                padding: 0.5rem 1rem;
+            }
+            .main-button {
+                font-size: 1.1rem;
+                padding: 0.75rem 1rem;
+            }
+            .language-toggle {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                top: 10px;
+                right: 10px;
+            }
         }
         
-        /* Container for both sections */
-        .main-container {
-            position: relative;
-            min-height: 100vh;
-            width: 100%;
+        @media (max-width: 360px) {
+            .title-image {
+                max-width: 65%;
+            }
+            .main-subtitle {
+                font-size: 0.9rem;
+            }
+            .main-button {
+                font-size: 1rem;
+                padding: 0.6rem 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Language Toggle Button -->
-    <button id="langToggle" class="lang-toggle-btn">
-        <img src="assets/Background/Start Menu/english.png" 
-             alt="Toggle Language" 
-             class="image-button w-32 sm:w-40 md:w-48">
-    </button>
-    
-    <!-- Main Container -->
     <div class="main-container">
-        <!-- Logo Container - Centered in middle -->
-        <div class="logo-container">
-            <img src="assets/Background/Start Menu/Logo.png" 
-                 alt="Battle of Knowledge" 
-                 class="logo-image">
-        </div>
+        <!-- Menu Background -->
+        <div class="menu-bg-overlay"></div>
         
-        <!-- Buttons Container - Positioned lower -->
-        <div class="button-container">
-            <!-- START GAME Button (English by default) -->
-            <button id="startButton" onclick="window.location.href='era-selection.html'" 
-                    class="border-none bg-transparent p-0">
-                <img src="assets/Background/Start Menu/Start Game.png" 
-                     alt="START GAME" 
-                     class="image-button w-64 sm:w-72 md:w-80 lg:w-96">
-            </button>
+        <!-- Pattern overlay for texture -->
+        <div class="pattern-overlay"></div>
+        
+        <!-- Language Toggle -->
+        <button id="langToggle" class="language-toggle hover:-translate-y-1 hover:scale-105 transition-all duration-300">
+            🌐 <span id="langLabel" class="hidden sm:inline">TAGALOG</span>
+        </button>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Title Images - NO CONTAINER -->
+            <!-- English Title (default) -->
+            <img id="englishTitle" 
+                 src="assets/MAIN BG/Title/Game-English-Title.png" 
+                 alt="Battle of Knowledge" 
+                 class="title-image english-title title-glow">
             
-            <!-- COLLECTION Button (English by default) -->
-            <button id="collectionButton" onclick="window.location.href='collection.html'" 
-                    class="border-none bg-transparent p-0">
-                <img src="assets/Background/Start Menu/Collection.png" 
-                     alt="COLLECTION" 
-                     class="image-button collection-btn w-56 sm:w-64 md:w-72 lg:w-80">
-            </button>
+            <!-- Tagalog Title (hidden by default) -->
+            <img id="tagalogTitle" 
+                 src="assets/MAIN BG/Title/Game-Tagalog-Title.png" 
+                 alt="Labanan ng Kaalaman" 
+                 class="title-image tagalog-title title-glow">
+            
+            <div class="button-container">
+                <button onclick="window.location.href='era-selection.html'" 
+                        class="main-button start-button hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-2xl">
+                    <span data-translate="START">START</span>
+                </button>
+
+                <button onclick="window.location.href='collection.html'" 
+                        class="main-button collection-button hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-2xl">
+                    📚 <span data-translate="COLLECTION">COLLECTION</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <script src="js/achievements.js"></script>
     <script src="js/language.js"></script>
     
-    <!-- JavaScript for language switching -->
     <script>
+        // Language toggle functionality
         document.addEventListener('DOMContentLoaded', function() {
             const langToggle = document.getElementById('langToggle');
-            const startButton = document.getElementById('startButton');
-            const collectionButton = document.getElementById('collectionButton');
-            
-            // Check for saved language preference
-            let currentLanguage = localStorage.getItem('gameLanguage') || 'english';
+            const langLabel = document.getElementById('langLabel');
+            const englishTitle = document.getElementById('englishTitle');
+            const tagalogTitle = document.getElementById('tagalogTitle');
             
             // Set initial state
-            updateButtonImages(currentLanguage);
+            let isTagalog = false;
             
-            // Language toggle click handler
             langToggle.addEventListener('click', function() {
-                // Toggle between English and Tagalog
-                if (currentLanguage === 'english') {
-                    currentLanguage = 'tagalog';
+                isTagalog = !isTagalog;
+                
+                if (isTagalog) {
+                    // Switch to Tagalog
+                    englishTitle.style.display = 'none';
+                    tagalogTitle.style.display = 'block';
+                    langLabel.textContent = 'ENGLISH';
                 } else {
-                    currentLanguage = 'english';
+                    // Switch to English
+                    englishTitle.style.display = 'block';
+                    tagalogTitle.style.display = 'none';
+                    langLabel.textContent = 'TAGALOG';
                 }
                 
-                // Save preference
-                localStorage.setItem('gameLanguage', currentLanguage);
-                
-                // Update button images
-                updateButtonImages(currentLanguage);
-                
-                // Update page title
-                updatePageTitle(currentLanguage);
-                
-                // Trigger language change in your language.js if needed
-                if (typeof toggleLanguage === 'function') {
-                    toggleLanguage(currentLanguage);
-                }
+                // You might also want to integrate this with your existing language.js
+                // to change other text elements on the page
             });
-            
-            // Function to update button images based on language
-            function updateButtonImages(language) {
-                if (language === 'tagalog') {
-                    // Tagalog images
-                    startButton.querySelector('img').src = 'assets/Background/Start Menu/Simulan Laro.png';
-                    startButton.querySelector('img').alt = 'SIMULAN LARO';
-                    
-                    collectionButton.querySelector('img').src = 'assets/Background/Start Menu/Koleksyon.png';
-                    collectionButton.querySelector('img').alt = 'KOLEKSYON';
-                    
-                    // Update language toggle button to show "English" option
-                    langToggle.querySelector('img').src = 'assets/Background/Start Menu/tagalog.png';
-                    langToggle.querySelector('img').alt = 'Switch to English';
-                } else {
-                    // English images
-                    startButton.querySelector('img').src = 'assets/Background/Start Menu/Start Game.png';
-                    startButton.querySelector('img').alt = 'START GAME';
-                    
-                    collectionButton.querySelector('img').src = 'assets/Background/Start Menu/Collection.png';
-                    collectionButton.querySelector('img').alt = 'COLLECTION';
-                    
-                    // Update language toggle button to show "Tagalog" option
-                    langToggle.querySelector('img').src = 'assets/Background/Start Menu/english.png';
-                    langToggle.querySelector('img').alt = 'Switch to Tagalog';
-                }
-            }
-            
-            // Function to update page title based on language
-            function updatePageTitle(language) {
-                if (language === 'tagalog') {
-                    document.title = 'Battle of Knowledge: Kasaysayan ng Pilipinas';
-                } else {
-                    document.title = 'Battle of Knowledge: Philippine History';
-                }
-            }
-            
-            // Initialize with saved language
-            updatePageTitle(currentLanguage);
         });
     </script>
 </body>

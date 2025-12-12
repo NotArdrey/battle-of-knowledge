@@ -12,7 +12,8 @@
     <style>
         body { 
             font-family: 'Baloo 2', cursive; 
-            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7); /* Match button gradient */
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            overflow-x: hidden;
         }
         
         /* Ensure minimum touch target size */
@@ -26,52 +27,103 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         
         .era-bg-overlay {
             position: absolute;
             inset: 0;
-            background-image: url('assets/ERA SELECT BG/ERA Selection BG.png');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                            url('assets/ERA SELECT BG/ERA Selection BG.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.50; /* Transparent overlay */
+            opacity: 0.50;
             z-index: 1;
         }
-
-        .era-bg-overlay {
-    /* Add this inside .era-bg-overlay or create a new overlay */
-    background-image: 
-        linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), /* Dark overlay */
-        url('assets/ERA SELECT BG/ERA Selection BG.png');
-}
         
         .content-wrapper {
             position: relative;
             z-index: 2;
             width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
         
-        /* Era button styles */
+        /* Slideshow container */
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        /* Era slide styles */
+        .era-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .era-slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: all;
+            z-index: 2;
+        }
+        
+        .era-slide.prev {
+            opacity: 0.3;
+            transform: translateX(-100%) scale(0.9);
+            z-index: 0;
+        }
+        
+        .era-slide.next {
+            opacity: 0.3;
+            transform: translateX(100%) scale(0.9);
+            z-index: 0;
+        }
+        
+        /* Era card styling */
         .era-card {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            text-align: left;
-            gap: 2rem;
-            height: 220px;
-            position: relative;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             backdrop-filter: blur(4px);
+            border: 6px solid #92400e;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .era-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
         }
         
         .ww2-card {
             background: linear-gradient(to bottom right, rgba(254, 226, 226, 0.95), rgba(254, 215, 170, 0.95));
+            border-color: #dc2626;
         }
         
         .era-img-container {
-            flex-shrink: 0;
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -83,38 +135,35 @@
             object-fit: cover;
             border-radius: 20px;
             border: 4px solid rgba(120, 53, 15, 0.5);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
         
         .era-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-right: 1rem;
+            width: 100%;
+            max-width: 600px;
         }
         
         .era-title {
-            font-size: 1.5rem;
+            font-size: 2rem;
             line-height: 1.2;
             margin-bottom: 0.5rem;
             color: #7c2d12;
-            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
         }
         
         .era-period {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             color: #b45309;
-            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.6);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.6);
         }
         
         .era-description {
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             color: #7c2d12;
-            line-height: 1.4;
-            max-width: 100%;
+            line-height: 1.6;
+            margin-bottom: 2rem;
             text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.5);
         }
         
@@ -126,140 +175,289 @@
             color: #9a3412;
         }
         
-        /* Larger gap between grid items */
-        .era-grid {
-            gap: 1.5rem !important;
+        /* Navigation buttons */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: linear-gradient(to right, #f59e0b, #d97706);
+            border: 3px solid #92400e;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        .nav-btn.prev-btn {
+            left: -80px;
+        }
+        
+        .nav-btn.next-btn {
+            right: -80px;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: translateY(-50%) scale(1);
+        }
+        
+        .nav-btn:disabled:hover {
+            transform: translateY(-50%) scale(1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-arrow {
+            width: 24px;
+            height: 24px;
+            border-top: 4px solid #7c2d12;
+            border-right: 4px solid #7c2d12;
+        }
+        
+        .prev-arrow {
+            transform: rotate(-135deg);
+            margin-right: -4px;
+        }
+        
+        .next-arrow {
+            transform: rotate(45deg);
+            margin-left: -4px;
         }
         
         /* Page title styling */
         .page-title {
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
             color: #92400e;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         
-        /* Responsive text adjustments */
-        @media (max-width: 1280px) {
-            .era-card {
-                height: 200px;
-                gap: 1.75rem;
-            }
-            .era-img-container {
-                width: 140px;
-                height: 140px;
-            }
-            .era-img {
-                border-radius: 18px;
-            }
-            .era-title {
-                font-size: 1.375rem;
-            }
-            .era-period {
-                font-size: 1rem;
-            }
+        /* Slide counter */
+        .slide-counter {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #7c2d12;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            background: rgba(254, 243, 199, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 2px solid #b45309;
         }
         
+        /* Select button */
+        .select-btn {
+            background: linear-gradient(to right, #10b981, #059669);
+            border: 3px solid #047857;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .select-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .select-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .ww2-select-btn {
+            background: linear-gradient(to right, #ef4444, #dc2626);
+            border-color: #b91c1c;
+        }
+        
+        /* Responsive adjustments */
         @media (max-width: 1024px) {
-            .era-card {
-                height: 190px;
-                gap: 1.5rem;
+            .slideshow-container {
+                height: 450px;
             }
+            
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .nav-btn.prev-btn {
+                left: -70px;
+            }
+            
+            .nav-btn.next-btn {
+                right: -70px;
+            }
+            
             .era-img-container {
-                width: 130px;
-                height: 130px;
+                width: 180px;
+                height: 180px;
             }
-            .era-img {
-                border-radius: 16px;
-            }
+            
             .era-title {
-                font-size: 1.25rem;
+                font-size: 1.75rem;
             }
+            
             .era-period {
-                font-size: 0.95rem;
+                font-size: 1.1rem;
             }
+            
             .era-description {
-                font-size: 0.9rem;
-            }
-            .page-title {
-                margin-bottom: 2.5rem;
+                font-size: 1rem;
             }
         }
         
         @media (max-width: 768px) {
+            .content-wrapper {
+                max-width: 90%;
+            }
+            
+            .slideshow-container {
+                height: 400px;
+            }
+            
             .era-card {
-                height: 180px;
-                gap: 1.25rem;
+                padding: 1.5rem;
+                border-width: 4px;
             }
+            
+            .nav-btn {
+                width: 45px;
+                height: 45px;
+                top: auto;
+                bottom: -60px;
+                transform: none;
+            }
+            
+            .nav-btn.prev-btn {
+                left: 25%;
+            }
+            
+            .nav-btn.next-btn {
+                right: 25%;
+            }
+            
             .era-img-container {
-                width: 120px;
-                height: 120px;
+                width: 150px;
+                height: 150px;
             }
-            .era-img {
-                border-radius: 14px;
-            }
+            
             .era-title {
-                font-size: 1.125rem;
+                font-size: 1.5rem;
             }
+            
             .era-period {
-                font-size: 0.875rem;
-                margin-bottom: 0.5rem;
+                font-size: 1rem;
             }
+            
             .era-description {
-                font-size: 0.85rem;
-                line-height: 1.3;
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
             }
-            .page-title {
-                margin-bottom: 2rem;
+            
+            .slide-counter {
+                bottom: -80px;
             }
         }
         
         @media (max-width: 640px) {
-            .era-card {
-                height: 170px;
-                gap: 1rem;
+            .slideshow-container {
+                height: 380px;
             }
+            
             .era-img-container {
-                width: 110px;
-                height: 110px;
+                width: 140px;
+                height: 140px;
+                margin-bottom: 1rem;
             }
-            .era-img {
-                border-radius: 12px;
-                border-width: 3px;
-            }
+            
             .era-title {
-                font-size: 1rem;
+                font-size: 1.3rem;
             }
+            
             .era-period {
-                font-size: 0.85rem;
-                margin-bottom: 0.4rem;
+                font-size: 0.95rem;
+                margin-bottom: 0.75rem;
             }
+            
             .era-description {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
+                margin-bottom: 1.25rem;
+            }
+            
+            .nav-btn.prev-btn {
+                left: 20%;
+            }
+            
+            .nav-btn.next-btn {
+                right: 20%;
             }
         }
         
         @media (max-width: 480px) {
+            .slideshow-container {
+                height: 350px;
+            }
+            
             .era-card {
-                height: 160px;
-                gap: 0.9rem;
+                padding: 1rem;
+                border-radius: 1.5rem;
             }
+            
             .era-img-container {
-                width: 100px;
-                height: 100px;
+                width: 120px;
+                height: 120px;
             }
+            
             .era-img {
-                border-radius: 10px;
+                border-radius: 15px;
             }
+            
             .era-title {
-                font-size: 0.95rem;
+                font-size: 1.2rem;
             }
-            .era-period {
-                font-size: 0.8rem;
-                margin-bottom: 0.35rem;
-            }
+            
             .era-description {
-                font-size: 0.75rem;
-                line-height: 1.25;
+                font-size: 0.8rem;
+                line-height: 1.4;
+            }
+            
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .nav-btn.prev-btn {
+                left: 15%;
+            }
+            
+            .nav-btn.next-btn {
+                right: 15%;
+            }
+            
+            .select-btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
             }
         }
     </style>
@@ -279,168 +477,203 @@
             <span data-translate="Back">← <span class="hidden sm:inline">Back</span></span>
         </button>
 
-        <div class="content-wrapper w-full max-w-6xl px-3 sm:px-5 md:px-8 py-8">
-            <h1 class="page-title text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-8 sm:mb-10 md:mb-14">
+        <div class="content-wrapper">
+            <h1 class="page-title text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-extrabold text-center">
                 <span data-translate="Choose Your Historical Era">Choose Your Historical Era</span>
             </h1>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7 md:gap-10 mb-10 md:mb-12 era-grid">
-                <!-- Early Spanish Era Button -->
-                <button onclick="selectEra('early-spanish')" 
-                        class="era-card border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                    <div class="era-img-container">
-                        <img src="assets/ERA Buttons/Early Spanish Era/Button-Spanish-Early.png" 
-                             alt="Early Spanish Era" 
-                             class="era-img">
+            <!-- Slideshow Container -->
+            <div class="slideshow-container">
+                <!-- Early Spanish Era Slide -->
+                <div class="era-slide active" data-era="early-spanish">
+                    <div class="era-card">
+                        <div class="era-img-container">
+                            <img src="assets/ERA Buttons/Early Spanish Era/Button-Spanish-Early.png" 
+                                 alt="Early Spanish Era" 
+                                 class="era-img">
+                        </div>
+                        <div class="era-content">
+                            <h3 class="era-title font-extrabold" data-translate="Early Spanish Era">Early Spanish Era</h3>
+                            <p class="era-period" data-translate="Battle of Mactan (1521)">Battle of Mactan (1521)</p>
+                            <p class="era-description">
+                                Experience the dawn of Spanish colonization. Witness the epic Battle of Mactan where Lapu-Lapu's forces defeated Magellan's expedition.
+                            </p>
+                            <button onclick="selectEra('early-spanish')" class="select-btn">
+                                <span data-translate="Select This Era">Select This Era</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="era-content">
-                        <h3 class="era-title font-extrabold" data-translate="Early Spanish Era">Early Spanish Era</h3>
-                        <p class="era-period" data-translate="Battle of Mactan (1521)">Battle of Mactan (1521)</p>
-                        <p class="era-description">
-                            Experience the dawn of Spanish colonization. Witness the epic Battle of Mactan where Lapu-Lapu's forces defeated Magellan's expedition.
-                        </p>
+                </div>
+
+                <!-- Late Spanish Era Slide -->
+                <div class="era-slide" data-era="late-spanish">
+                    <div class="era-card">
+                        <div class="era-img-container">
+                            <img src="assets/ERA Buttons/Late Spanish Era/Button-Spanish-Late.png" 
+                                 alt="Late Spanish Era" 
+                                 class="era-img">
+                        </div>
+                        <div class="era-content">
+                            <h3 class="era-title font-extrabold" data-translate="Late Spanish Era">Late Spanish Era</h3>
+                            <p class="era-period" data-translate="Revolution (1896-1898)">Revolution (1896-1898)</p>
+                            <p class="era-description">
+                                Join the Philippine Revolution! Fight alongside heroes like Andres Bonifacio and Jose Rizal in the struggle against 333 years of Spanish rule.
+                            </p>
+                            <button onclick="selectEra('late-spanish')" class="select-btn">
+                                <span data-translate="Select This Era">Select This Era</span>
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <!-- American Colonial Slide -->
+                <div class="era-slide" data-era="american-colonial">
+                    <div class="era-card">
+                        <div class="era-img-container">
+                            <img src="assets/ERA Buttons/American Era/Button-American.png" 
+                                 alt="American Colonial Era" 
+                                 class="era-img">
+                        </div>
+                        <div class="era-content">
+                            <h3 class="era-title font-extrabold" data-translate="American Colonial">American Colonial</h3>
+                            <p class="era-period" data-translate="Philippine-American War">Philippine-American War</p>
+                            <p class="era-description">
+                                Enter the Philippine-American War. Experience the resistance against American colonization and the fight for true independence.
+                            </p>
+                            <button onclick="selectEra('american-colonial')" class="select-btn">
+                                <span data-translate="Select This Era">Select This Era</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WW2 Bonus Stage Slide -->
+                <div class="era-slide" data-era="ww2">
+                    <div class="era-card ww2-card">
+                        <div class="era-img-container">
+                            <img src="assets/ERA Buttons/WWII Era/Button-WWII.png" 
+                                 alt="WWII Era" 
+                                 class="era-img">
+                        </div>
+                        <div class="era-content">
+                            <h3 class="era-title font-extrabold text-red-900" data-translate="WW2 Bonus Stage">WW2 Bonus Stage</h3>
+                            <p class="era-period ww2-period" data-translate="Pacific Theater (1941-1945)">Pacific Theater (1941-1945)</p>
+                            <p class="era-description ww2-description">
+                                Survive World War II in the Pacific! Battle through Japanese occupation, guerrilla warfare, and the fight to liberate the Philippines.
+                            </p>
+                            <button onclick="selectEra('ww2')" class="select-btn ww2-select-btn">
+                                <span data-translate="Select This Era">Select This Era</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <button class="nav-btn prev-btn" onclick="prevSlide()">
+                    <div class="nav-arrow prev-arrow"></div>
+                </button>
+                <button class="nav-btn next-btn" onclick="nextSlide()">
+                    <div class="nav-arrow next-arrow"></div>
                 </button>
 
-                <!-- Late Spanish Era Button -->
-                <button onclick="selectEra('late-spanish')" 
-                        class="era-card border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                    <div class="era-img-container">
-                        <img src="assets/ERA Buttons/Late Spanish Era/Button-Spanish-Late.png" 
-                             alt="Late Spanish Era" 
-                             class="era-img">
-                    </div>
-                    <div class="era-content">
-                        <h3 class="era-title font-extrabold" data-translate="Late Spanish Era">Late Spanish Era</h3>
-                        <p class="era-period" data-translate="Revolution (1896-1898)">Revolution (1896-1898)</p>
-                        <p class="era-description">
-                            Join the Philippine Revolution! Fight alongside heroes like Andres Bonifacio and Jose Rizal in the struggle against 333 years of Spanish rule.
-                        </p>
-                    </div>
-                </button>
-
-                <!-- American Colonial Button -->
-                <button onclick="selectEra('american-colonial')" 
-                        class="era-card border-3 sm:border-4 md:border-6 border-amber-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                    <div class="era-img-container">
-                        <img src="assets/ERA Buttons/American Era/Button-American.png" 
-                             alt="American Colonial Era" 
-                             class="era-img">
-                    </div>
-                    <div class="era-content">
-                        <h3 class="era-title font-extrabold" data-translate="American Colonial">American Colonial</h3>
-                        <p class="era-period" data-translate="Philippine-American War">Philippine-American War</p>
-                        <p class="era-description">
-                            Enter the Philippine-American War. Experience the resistance against American colonization and the fight for true independence.
-                        </p>
-                    </div>
-                </button>
-
-                <!-- WW2 Bonus Stage Button -->
-                <button onclick="selectEra('ww2')" 
-                        class="era-card ww2-card border-3 sm:border-4 md:border-6 border-red-700 rounded-2xl md:rounded-3xl p-6 sm:p-7 md:p-10 hover:-translate-y-2 sm:hover:-translate-y-3 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl">
-                    <div class="era-img-container">
-                        <img src="assets/ERA Buttons/WWII Era/Button-WWII.png" 
-                             alt="WWII Era" 
-                             class="era-img">
-                    </div>
-                    <div class="era-content">
-                        <h3 class="era-title font-extrabold text-red-900" data-translate="WW2 Bonus Stage">WW2 Bonus Stage</h3>
-                        <p class="era-period ww2-period" data-translate="Pacific Theater (1941-1945)">Pacific Theater (1941-1945)</p>
-                        <p class="era-description ww2-description">
-                            Survive World War II in the Pacific! Battle through Japanese occupation, guerrilla warfare, and the fight to liberate the Philippines.
-                        </p>
-                    </div>
-                </button>
+                <!-- Slide Counter -->
+                <div class="slide-counter">
+                    <span id="currentSlide">1</span> / <span id="totalSlides">4</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Character Selection Modal -->
-    <div id="characterSelectModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl md:rounded-3xl border-4 md:border-8 border-amber-800 max-w-4xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="p-4 sm:p-6 md:p-8">
-                <h2 class="text-xl sm:text-2xl md:text-4xl font-extrabold text-amber-900 text-center mb-3 sm:mb-4 md:mb-6">
-                    <span data-translate="Choose Your Hero">Choose Your Hero</span>
-                </h2>
-                <div id="characterSelectGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 md:mb-6">
-                    <!-- Characters will be loaded here -->
-                </div>
-                <div class="text-center">
-                    <button onclick="closeCharacterSelect()" class="bg-gradient-to-r from-gray-300 to-gray-400 border-2 md:border-4 border-gray-600 rounded-xl md:rounded-2xl px-4 sm:px-6 md:px-8 py-2 md:py-3 text-base sm:text-lg md:text-xl font-bold text-gray-800 hover:-translate-y-1 transition-all duration-300">
-                        <span data-translate="Cancel">Cancel</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/eraData.js"></script>
     <script src="js/language.js"></script>
     <script>
-        let selectedEraKey = '';
-
-        function selectEra(era) {
-            selectedEraKey = era;
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.era-slide');
+        const totalSlides = slides.length;
+        
+        // Initialize slide counter
+        document.getElementById('totalSlides').textContent = totalSlides;
+        updateSlideCounter();
+        
+        function updateSlideCounter() {
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
             
-            // If "all" is selected, go directly to battlefield
-            if (era === 'all') {
-                localStorage.setItem('selectedEra', era);
-                localStorage.removeItem('selectedHero');
-                window.location.href = 'battlefield.html';
-                return;
+            // Update navigation buttons
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            
+            // Update slide classes
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev', 'next');
+                
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index === currentSlide - 1) {
+                    slide.classList.add('prev');
+                } else if (index === currentSlide + 1) {
+                    slide.classList.add('next');
+                }
+            });
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlideCounter();
             }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlideCounter();
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+        
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.querySelector('.slideshow-container').addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.querySelector('.slideshow-container').addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
             
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next slide
+                    nextSlide();
+                } else {
+                    // Swipe right - previous slide
+                    prevSlide();
+                }
+            }
+        }
+        
+        function selectEra(era) {
             // Save selected era and go to learning module
             localStorage.setItem('selectedEra', era);
             localStorage.removeItem('selectedHero');
             window.location.href = 'learning-module.html';
-        }
-
-        function showCharacterSelect(era) {
-            const modal = document.getElementById('characterSelectModal');
-            const grid = document.getElementById('characterSelectGrid');
-            const heroes = eraData[era].heroes;
-            
-            grid.innerHTML = '';
-            
-            // Adjust grid layout based on number of heroes
-            if (heroes.length <= 2) {
-                grid.className = 'flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-4 md:mb-6';
-            } else if (heroes.length === 3) {
-                grid.className = 'grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 justify-items-center mb-4 md:mb-6';
-            } else if (heroes.length === 4) {
-                grid.className = 'grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 justify-items-center mb-4 md:mb-6';
-            } else {
-                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 md:mb-6';
-            }
-            
-            heroes.forEach((hero, index) => {
-                const card = document.createElement('div');
-                card.className = 'bg-gradient-to-br from-blue-400 to-cyan-400 border-2 sm:border-3 md:border-4 border-blue-600 rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 cursor-pointer hover:-translate-y-1 sm:hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl w-full';
-                card.onclick = () => selectCharacter(index);
-                
-                card.innerHTML = `
-                    <div class="bg-white rounded-lg md:rounded-xl p-1 sm:p-2 mb-2 md:mb-3 h-20 sm:h-24 md:h-32 flex items-center justify-center shadow-inner" style="box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.1);">
-                        <img src="${hero.folder}/${hero.idle}" alt="${hero.name}" class="max-w-full max-h-full object-contain">
-                    </div>
-                    <h3 class="text-white font-bold text-center text-xs md:text-sm drop-shadow-lg">${hero.name}</h3>
-                `;
-                
-                grid.appendChild(card);
-            });
-            
-            modal.classList.remove('hidden');
-        }
-
-        function selectCharacter(heroIndex) {
-            localStorage.setItem('selectedEra', selectedEraKey);
-            localStorage.setItem('selectedHero', heroIndex);
-            window.location.href = 'learning-module.html';
-        }
-
-        function closeCharacterSelect() {
-            document.getElementById('characterSelectModal').classList.add('hidden');
         }
     </script>
 </body>
