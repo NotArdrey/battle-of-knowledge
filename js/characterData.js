@@ -242,6 +242,10 @@ const characterContributions = {
     },
     'Apolinario Mabini': {
         type: 'hero',
+        story: {
+            en: "Apolinario Mabini was known as the 'Brains of the Revolution,' and for good reason. Despite being paralyzed from the waist down by polio at age 32, he never let his disability stop him from serving his country. A brilliant lawyer and political theorist, Mabini became Aguinaldo's most trusted adviser, drafting the constitution that would govern the first Philippine Republic. He was carried to meetings on a hammock, his mind sharp as ever, formulating strategies and policies. When the Americans offered him collaboration in exchange for comfort, Mabini refused, choosing exile in Guam rather than betray his principles. He returned to die in Manila in 1903, his body broken but his spirit undefeated.",
+            tl: "Si Apolinario Mabini ay kilala bilang 'Utak ng Rebolusyon,' at may mabuting dahilan. Kahit paralizado mula sa baywang pababa dahil sa polio sa edad na 32, hindi niya kailanman hinayaan na hadlangan siya ng kanyang kapansanan sa paglilingkod sa kanyang bansa. Isang mahusay na abogado at teoretiko ng pulitika, naging pinakamapagkakatiwalaang tagapayo ni Mabini si Aguinaldo, na sumulat ng konstitusyon na mamumuno sa unang Republika ng Pilipinas. Dinadala siya sa mga pulong sa duyan, ang kanyang isip ay matalim pa rin, bumubuo ng mga estratehiya at patakaran. Nang alukan siya ng mga Amerikano ng pakikipagtulungan kapalit ng kaginhawahan, tumanggi si Mabini, na pinili ang pagpapatapon sa Guam kaysa sa traydorin ang kanyang mga prinsipyo. Bumalik siya upang mamatay sa Maynila noong 1903, ang kanyang katawan ay wasak ngunit ang kanyang diwa ay di natalo."
+        },
         contributions: {
             en: [
                 'Known as the "Brains of the Revolution"',
@@ -263,6 +267,10 @@ const characterContributions = {
     },
     'Spanish Commander': {
         type: 'villain',
+        story: {
+            en: "The Spanish commanders of the late colonial era were products of military tradition spanning centuries. Dressed in their distinctive uniforms with gold braids and plumed helmets, they commanded regiments that had once conquered empires. But by the 1890s, they faced an enemy unlike any they had known—Filipinos who fought not for gold or glory, but for their homeland. These commanders underestimated the Katipunan, dismissing them as mere bandits. When the revolution erupted in 1896, they found their European tactics useless against guerrilla warfare in tropical terrain. As defeat after defeat mounted, they watched the sun finally set on Spain's Asian empire.",
+            tl: "Ang mga kumander ng Espanya ng huling panahon ng kolonyal ay bunga ng tradisyon militar na tumatagal ng mga siglo. Nakadamit sa kanilang natatanging uniporme na may gintong sintas at helmeng may pluma, nag-utos sila ng mga rehimento na minsan ay sumakop ng mga imperyo. Ngunit noong 1890s, humarap sila sa kaaway na hindi tulad ng anumang nakilala nila—mga Pilipino na lumaban hindi para sa ginto o kaluwalhatian, kundi para sa kanilang lupang tinubuan. Ang mga kumander na ito ay minamaliit ang Katipunan, itinuring silang mga tulisan lamang. Nang sumiklab ang rebolusyon noong 1896, natuklasan nila na ang kanilang mga taktika sa Europa ay walang silbi laban sa digmaang gerilya sa tropikal na lupain. Habang tumataas ang pagkatalo, pinanood nila ang araw na lumubog sa wakas sa imperyo ng Espanya sa Asya."
+        },
         contributions: {
             en: [
                 'Led Spanish military operations during the late colonial period',
@@ -276,6 +284,10 @@ const characterContributions = {
                 'Nagpatupad ng malupit na patakaran kolonyal at batas militar',
                 'Kumakatawan sa awtoridad militar ng Espanya sa panahon ng rebolusyon'
             ]
+        story: {
+            en: "Antonio Luna was a man of contradictions—a brilliant military strategist with a volcanic temper, a scientist turned warrior. Brother of the famous painter Juan Luna, Antonio studied pharmacy and military science in Spain. When war with America came, he brought European military discipline to the ragtag revolutionary forces. His demands for discipline earned him many enemies among the Filipino elite, who resented taking orders from the fierce general. On June 5, 1899, Luna rode into Cabanatuan to meet with President Aguinaldo. Instead, he was ambushed and brutally murdered by Aguinaldo's guards. His death remains one of Philippine history's greatest tragedies—the loss of the military genius who might have changed the war's outcome.",
+            tl: "Si Antonio Luna ay isang tao ng mga kontradiksyon—isang mahusay na estratehista militar na may bulkang ugali, isang siyentipiko na naging mandirigma. Kapatid ng sikat na pintor na si Juan Luna, nag-aral si Antonio ng parmasya at agham militar sa Espanya. Nang dumating ang digmaan sa Amerika, dinala niya ang disiplinang militar ng Europa sa mga hindi organisadong pwersang rebolusyonaryo. Ang kanyang pangangailangan para sa disiplina ay nag-ani ng maraming kaaway sa mga eliteng Pilipino, na nagalit sa pagtanggap ng mga utos mula sa mabangis na heneral. Noong Hunyo 5, 1899, sumakay si Luna patungo sa Cabanatuan upang makipagkita kay Pangulong Aguinaldo. Sa halip, siya ay sinalakay at malupit na pinatay ng mga bantay ni Aguinaldo. Ang kanyang kamatayan ay nananatiling isa sa mga pinakadakilang trahedya ng kasaysayan ng Pilipinas—ang pagkawala ng henyo militar na maaaring nakabago sa kinalabasan ng digmaan."
+        },
         }
     },
     'General Antonio Luna': {
@@ -293,6 +305,10 @@ const characterContributions = {
                 'Kapatid ng pintor na si Juan Luna, isa sa pinakadakilang pinunong militar na Pilipino',
                 'Nanguna sa mga pwersang Pilipino sa panahon ng Digmaang Pilipino-Amerikano bilang Heneral',
                 'Kilala sa kahusayan ng taktika at mahigpit na disiplina',
+        story: {
+            en: "Juan Luna y Novicio was not a general of armies, but a general of art—a master whose brush became a weapon for Filipino identity. Born in Badoc, Ilocos Norte in 1857, Luna's artistic genius bloomed in the academies of Manila, Hong Kong, and ultimately in Europe. His masterpiece 'Spoliarium' shocked the Madrid Exposition of 1884, depicting the brutal treatment of gladiator corpses as a metaphor for Spanish colonial oppression. The painting won the gold medal and announced to the world that Filipinos were equals to any European artist. Luna's turbulent personal life—marked by jealousy that led to tragedy when he killed his wife and mother-in-law in Paris—could not diminish his artistic legacy. He died in Hong Kong in 1899, but his art continues to inspire Filipino pride.",
+            tl: "Si Juan Luna y Novicio ay hindi heneral ng mga hukbo, kundi heneral ng sining—isang maestro na ang kanyang brush ay naging sandata para sa pagkakakilanlan ng Pilipino. Ipinanganak sa Badoc, Ilocos Norte noong 1857, ang henyo ni Luna sa sining ay namukadkad sa mga akademya ng Maynila, Hong Kong, at sa wakas sa Europa. Ang kanyang obra maestra na 'Spoliarium' ay gumising sa Madrid Exposition ng 1884, na naglalarawan ng malupit na pagtrato sa mga bangkay ng gladiator bilang metapora ng pang-aapi ng kolonyal na Espanya. Nanalo ng gintong medalya ang pagpipinta at ipinahayag sa mundo na ang mga Pilipino ay kapantay ng anumang artistang Europeo. Ang magulo niyang personal na buhay—na minarkahan ng panibugho na humantong sa trahedya nang patayin niya ang kanyang asawa at biyenang babae sa Paris—ay hindi makakabawas sa kanyang pamana sa sining. Namatay siya sa Hong Kong noong 1899, ngunit ang kanyang sining ay patuloy na nag-uudyok ng pagmamalaki ng Pilipino."
+        },
                 'Nag-utos ng depensa ng Hilagang Luzon laban sa mga Amerikano',
                 'Pinaslang noong Hunyo 5, 1899 sa Cabanatuan',
                 'Ang kanyang kamatayan ay labis na nagpahina ng paglaban ng Pilipino laban sa mga Amerikano'
@@ -310,6 +326,10 @@ const characterContributions = {
                 'Brother of General Antonio Luna',
                 'Considered one of the greatest Filipino artists in history'
             ],
+        story: {
+            en: "Commodore George Dewey sat aboard the USS Olympia on the morning of May 1, 1898, ready to write history. His fleet had slipped into Manila Bay under cover of darkness, ready to face the Spanish Pacific Squadron. At 5:40 AM, Dewey gave his famous order to Captain Gridley: 'You may fire when ready, Gridley.' The resulting battle was a massacre—in just seven hours, the entire Spanish fleet was destroyed with minimal American casualties. Dewey became an instant hero in America, promoted to Admiral of the Navy. But for Filipinos, his victory was bittersweet—it marked the end of Spanish rule, only to usher in a new colonial master. The bay that witnessed his triumph would soon witness the Philippine-American War.",
+            tl: "Si Commodore George Dewey ay nakaupo sa USS Olympia noong umaga ng Mayo 1, 1898, handa nang sumulat ng kasaysayan. Ang kanyang hukbong-dagat ay pumasok sa Manila Bay sa ilalim ng takip ng kadiliman, handa na harapin ang Spanish Pacific Squadron. Sa 5:40 AM, binigay ni Dewey ang kanyang sikat na utos kay Kapitan Gridley: 'Maaari kang bumaril kapag handa ka na, Gridley.' Ang resultang labanan ay isang patayan—sa loob lamang ng pitong oras, nawasak ang buong hukbong-dagat ng Espanya na may kakaunting biktima sa Amerika. Naging instant na bayani si Dewey sa Amerika, na na-promote bilang Admiral ng Navy. Ngunit para sa mga Pilipino, ang kanyang tagumpay ay mapait—minarkahan nito ang wakas ng pamamahala ng Espanya, upang lamang magpakilala ng bagong kolonyal na panginoon. Ang look na nakasaksi sa kanyang tagumpay ay malapit nang makasaksi sa Digmaang Pilipino-Amerikano."
+        },
             tl: [
                 'Tanyag na pintor na Pilipino, hindi heneral militar',
                 'Nanalo ng gintong medalya sa 1884 Madrid Exposition para sa "Spoliarium"',
@@ -325,6 +345,10 @@ const characterContributions = {
         contributions: {
             en: [
                 'Commander of US Asiatic Squadron',
+        story: {
+            en: "The American soldiers who landed in the Philippines in 1899 came with promises of 'benevolent assimilation' and democracy. Many were young volunteers who had joined after the Spanish-American War, believing they were bringing civilization and progress. But the reality of colonial war quickly shattered such illusions. Fighting in the sweltering tropical heat against an enemy that knew every mountain pass and rice paddy, they learned to fear the Filipino guerrillas. Orders came to implement harsh tactics—burning villages suspected of hiding insurrectos, herding civilians into concentration camps. By the time the war 'officially' ended in 1902, with hundreds of thousands of Filipino civilians dead, these soldiers returned home changed, some haunted by what they had done in the name of empire.",
+            tl: "Ang mga sundalong Amerikano na bumaba sa Pilipinas noong 1899 ay dumating na may mga pangako ng 'benevolent assimilation' at demokrasya. Marami sa kanila ay mga batang boluntaryo na sumali pagkatapos ng Digmaang Espanyol-Amerikano, naniniwala na nagdadala sila ng sibilisasyon at pag-unlad. Ngunit ang katotohanan ng digmaang kolonyal ay mabilis na nawasak ang mga gayong ilusyon. Nakikipaglaban sa napakainit na tropikong init laban sa kaaway na nakakaalam ng bawat daanan sa bundok at palayan, natuto silang matakot sa mga gerilyang Pilipino. Dumating ang mga utos na magpatupad ng mga malupit na taktika—pagsusunog ng mga nayon na pinaghihinalaang nagtatago ng mga insurekto, pagtutulak ng mga sibilyan sa mga concentration camp. Sa oras na ang digmaan ay 'opisyal' na natapos noong 1902, na may daan-daang libong sibilyang Pilipino na namatay, ang mga sundalong ito ay bumalik sa tahanan na nabago, ang iba ay multo ng kanilang ginawa sa ngalan ng imperyo."
+        },
                 'Defeated Spanish fleet in Battle of Manila Bay (May 1, 1898)',
                 'His victory marked the end of Spanish colonial rule',
                 'Enabled American occupation of the Philippines',
@@ -338,7 +362,11 @@ const characterContributions = {
                 'Sikat sa pagsasabi ng "You may fire when ready, Gridley"'
             ]
         }
-    },
+    },story: {
+            en: "Douglas MacArthur had a destiny intertwined with the Philippines. His father had served as military governor during the American occupation, and Douglas himself became Field Marshal of the Philippine Army in the 1930s. When Japanese bombs fell on Pearl Harbor, MacArthur commanded the defense of the Philippines. Despite his best efforts, the overwhelming Japanese forces pushed the defenders to Bataan and Corregidor. On March 11, 1942, under presidential order, MacArthur evacuated to Australia, but not before making his legendary promise: 'I shall return.' For two years, that promise sustained Filipino resistance. On October 20, 1944, MacArthur waded ashore at Leyte, fulfilling his vow. The liberation was costly—Manila became one of the most devastated cities of WWII—but MacArthur kept his word.",
+            tl: "Si Douglas MacArthur ay may kapalaran na magkaugnay sa Pilipinas. Ang kanyang ama ay naglingkod bilang militar na gobernador sa panahon ng okupasyong Amerikano, at si Douglas mismo ay naging Field Marshal ng Hukbong Pilipino noong 1930s. Nang bumagsak ang mga bomba ng mga Hapon sa Pearl Harbor, nag-utos si MacArthur ng pagtatanggol ng Pilipinas. Sa kabila ng kanyang pinakamahusay na pagsisikap, itinulak ng lumalabis na puwersa ng mga Hapon ang mga tagapagtanggol sa Bataan at Corregidor. Noong Marso 11, 1942, sa ilalim ng utos ng pangulo, nag-evacuate si MacArthur sa Australia, ngunit hindi bago gumawa ng kanyang alamat na pangako: 'Babalik ako.' Sa loob ng dalawang taon, ang pangakong iyon ay nagpanatili ng paglaban ng mga Pilipino. Noong Oktubre 20, 1944, lumangoy si MacArthur papunta sa Leyte, natupad ang kanyang panata. Ang pagpapalaya ay mahal—naging isa ang Maynila sa pinaka-wasakang mga lungsod ng WWII—ngunit tinupad ni MacArthur ang kanyang salita."
+        },
+        
     'American Soldier': {
         type: 'villain',
         contributions: {
@@ -355,7 +383,11 @@ const characterContributions = {
                 'Lumahok sa mga kampanya laban sa mga rebolusyonaryong Pilipino'
             ]
         }
-    },
+    },story: {
+            en: "The Japanese soldiers who invaded the Philippines in December 1941 came as part of the Greater East Asia Co-Prosperity Sphere, promising liberation from Western colonialism. But their actions told a different story. After overwhelming American and Filipino forces in Bataan, they forced prisoners on the infamous Death March—a 65-mile trek where thousands died of exhaustion, disease, and execution. During the three-year occupation, the Kempeitai (military police) became feared for their brutal interrogation methods. Filipinos who resisted faced torture and death. As American forces returned in 1944, desperate Japanese soldiers fought a brutal urban battle in Manila, leading to the massacre of over 100,000 Filipino civilians. By war's end, the liberation came at a terrible price—Manila lay in ruins, second only to Warsaw in destruction.",
+            tl: "Ang mga sundalong Hapon na sumalakay sa Pilipinas noong Disyembre 1941 ay dumating bilang bahagi ng Greater East Asia Co-Prosperity Sphere, nangangako ng kalayaan mula sa kolonyalismong Kanluranin. Ngunit ang kanilang mga aksyon ay nagsabi ng ibang kuwento. Matapos lamangan ang mga puwersa ng Amerika at Pilipino sa Bataan, pinilit nila ang mga bilanggo sa kinikilalang Death March—isang 65-milyang paglalakbay kung saan libu-libo ang namatay dahil sa pagkapagod, sakit, at pagbitay. Sa panahon ng tatlong taong okupasyon, ang Kempeitai (pulis militar) ay naging kinatatakutan dahil sa kanilang malupit na paraan ng pagtanong. Ang mga Pilipino na lumaban ay humarap sa pagpapahirap at kamatayan. Habang bumabalik ang mga puwersa ng Amerika noong 1944, ang mga desperadong sundalong Hapon ay nakipaglaban ng malupit na labanan sa lungsod sa Maynila, na humantong sa pagpatay ng mahigit 100,000 sibilyang Pilipino. Sa pagtatapos ng digmaan, ang pagpapalaya ay dumating sa isang kakila-kilabot na presyo—ang Maynila ay gumuho, pangalawa lamang sa Warsaw sa pagkawasak."
+        },
+        
     'Douglas MacArthur': {
         type: 'hero',
         contributions: {
