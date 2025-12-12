@@ -61,16 +61,37 @@ const characterContributions = {
         type: 'villain',
         contributions: {
             en: [
-                'Represented Spanish colonial military forces',
-                'Enforced Spanish rule and colonial policies',
-                'Participated in the conquest and pacification of Philippine territories',
-                'Maintained Spanish military presence for over 300 years'
+                'Represented Spanish colonial military forces during the late colonial period',
+                'Enforced Spanish rule and colonial policies throughout the archipelago',
+                'Participated in suppressing the Philippine Revolution (1896-1898)',
+                'Maintained Spanish military presence for over 300 years',
+                'Faced Filipino revolutionaries in numerous battles across Luzon'
             ],
             tl: [
-                'Kumakatawan sa mga pwersang militar ng kolonyal na Espanya',
-                'Nagpatupad ng pamamahala at patakaran ng Espanya',
-                'Lumahok sa pagsakop at pagpapaamo ng mga teritoryo ng Pilipinas',
-                'Nagpanatili ng presensya militar ng Espanya ng mahigit 300 taon'
+                'Kumakatawan sa mga pwersang militar ng kolonyal na Espanya sa huling panahon ng kolonyal',
+                'Nagpatupad ng pamamahala at patakaran ng Espanya sa buong kapuluan',
+                'Lumahok sa pagsugpo ng Rebolusyong Pilipino (1896-1898)',
+                'Nagpanatili ng presensya militar ng Espanya ng mahigit 300 taon',
+                'Hinarap ang mga rebolusyonaryong Pilipino sa maraming labanan sa Luzon'
+            ]
+        }
+    },
+    'Early Spanish Soldier': {
+        type: 'villain',
+        contributions: {
+            en: [
+                'Part of Ferdinand Magellan\'s expedition in 1521',
+                'Among the first Spanish forces to arrive in the Philippine islands',
+                'Participated in the Battle of Mactan against Lapu-Lapu\'s warriors',
+                'Witnessed the death of Magellan and the defeat of the Spanish expedition',
+                'Represented the beginning of Spanish attempts to colonize the Philippines'
+            ],
+            tl: [
+                'Bahagi ng ekspedisyon ni Ferdinand Magellan noong 1521',
+                'Kabilang sa mga unang pwersang Espanyol na dumating sa kapuluang Pilipinas',
+                'Lumahok sa Labanan ng Mactan laban sa mga mandirigma ni Lapu-Lapu',
+                'Nakasaksi sa kamatayan ni Magellan at pagkatalo ng ekspedisyong Espanyol',
+                'Kumakatawan sa simula ng pagtatangka ng Espanya na sakupin ang Pilipinas'
             ]
         }
     },
