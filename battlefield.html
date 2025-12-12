@@ -485,11 +485,29 @@
     }
     
     .lang-btn {
-        bottom: 47%; /* Positioned just above the question area (55% battle + 45% question) */
+        top: 10px;
         right: 10px;
         background: transparent;
         border: none;
         padding: 0;
+    }
+    
+    @media (max-width: 640px) {
+        .lang-btn {
+            right: 10px;
+        }
+        .lang-btn img {
+            width: 80px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .lang-btn {
+            right: 8px;
+        }
+        .lang-btn img {
+            width: 70px !important;
+        }
     }
     
     /* Modals */
@@ -1057,7 +1075,7 @@
         <img id="langToggleImg" 
              src="assets/Buttons/TAGALOG BUTTON.png" 
              alt="Switch to Tagalog" 
-             class="w-[100px] md:w-[120px] h-auto drop-shadow-lg">
+             class="h-10 md:h-14 w-auto drop-shadow-lg">
     </button>
     
     <!-- Main Battle Screen -->
