@@ -23,7 +23,7 @@ const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Sp
                     'Commodore George Dewey', 'General Juan Luna'];
 
 const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
-                  'Spanish Commander', 'Late Spanish Commander Era', 'Spanish Soldier'];
+                  'Spanish Commander', 'Spanish Soldier'];
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
@@ -37,11 +37,11 @@ const bossDefinitions = {
         enemiesBeforeBoss: 2 // Defeat 2 Spanish Soldiers before Magellan
     },
     'late-spanish': {
-        bossName: 'Late Spanish Commander Era',
+        bossName: 'Spanish Commander',
         isBoss: true,
         isFinalBoss: true,
-        preBossEnemies: ['Spanish Soldier', 'Spanish Commander'],
-        enemiesBeforeBoss: 3 // Defeat 3 enemies before Spanish Commander
+        preBossEnemies: ['Spanish Soldier'],
+        enemiesBeforeBoss: 3 // Defeat 3 Spanish Soldiers before Commander
     },
     'american-colonial': {
         bossName: 'Commodore George Dewey',
