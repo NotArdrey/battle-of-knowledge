@@ -29,7 +29,9 @@ const eraData = {
                 idle: 'Magellan - Idle.png',
                 attack: 'Magellan - Attack.png',
                 hurt: 'Magellan - Hurt.png',
-                victory: 'Magellan - Victory.png'
+                victory: 'Magellan - Victory.png',
+                isBoss: true, // Mark as boss
+                bossOrder: 3 // Appears after 2 regular enemies
             },
             {
                 name: 'Spanish Soldier',
@@ -37,7 +39,8 @@ const eraData = {
                 idle: 'Spanish Soldier - Idle.png',
                 attack: 'Spanish Soldier - Attack.png',
                 hurt: 'Spanish Soldier - Hurt.png',
-                victory: 'Spanish Soldier - Victory.png'
+                victory: 'Spanish Soldier - Victory.png',
+                isBoss: false
             }
         ]
     },
@@ -81,12 +84,14 @@ const eraData = {
         ],
         villains: [
             {
-                name: 'Spanish Commander',
+                name: 'Late Spanish Commander Era',
                 folder: 'assets/Characters/2. Late Spanish Era/Villains/2. Late Spanish Commander Era',
                 idle: 'Spanish Commander - Idle.png',
                 attack: 'Spanish Commander - Attack.png',
                 hurt: 'Spanish Commander - Hurt.png',
-                victory: 'Spanish Commander - Victory.png'
+                victory: 'Spanish Commander - Victory.png',
+                isBoss: true, // Mark as boss
+                bossOrder: 4 // Appears after 3 regular enemies
             },
             {
                 name: 'Spanish Soldier',
@@ -94,7 +99,8 @@ const eraData = {
                 idle: 'Spanish Soldier - Idle.png',
                 attack: 'Spanish Soldier - Attack.png',
                 hurt: 'Spanish Soldier - Hurt.png',
-                victory: 'Spanish Soldier - Victory.png'
+                victory: 'Spanish Soldier - Victory.png',
+                isBoss: false
             }
         ]
     },
@@ -126,7 +132,9 @@ const eraData = {
                 idle: 'Commodore - Idle.png',
                 attack: 'Commodore - Attack.png',
                 hurt: 'Commodore - Hurt.png',
-                victory: 'Commodore - Victory.png'
+                victory: 'Commodore - Victory.png',
+                isBoss: true, // Mark as boss
+                bossOrder: 3 // Appears after 2 regular enemies
             },
             {
                 name: 'American Soldier',
@@ -134,7 +142,8 @@ const eraData = {
                 idle: 'American Soldier - Idle.png',
                 attack: 'American Soldier - Attack.png',
                 hurt: 'American Soldier - Hurt.png',
-                victory: 'American Soldier - Victory.png'
+                victory: 'American Soldier - Victory.png',
+                isBoss: false
             }
         ]
     },
@@ -158,36 +167,99 @@ const eraData = {
                 idle: 'Japanese Soldier - Idle.png',
                 attack: 'Japanese Soldier - Attack.png',
                 hurt: 'Japanese Soldier - Hurt.png',
-                victory: 'Japanese Soldier - Victory.png'
+                victory: 'Japanese Soldier - Victory.png',
+                isBoss: false // No boss for WW2
             }
         ]
     }
 };
 
-// Function to get a random hero from an era
+// Updated Boss Definitions for battle.js
+const bossDefinitions = {
+    'early-spanish': {
+        bossName: 'Ferdinand Magellan',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['Spanish Soldier'],
+        enemiesBeforeBoss: 2 // Defeat 2 Spanish Soldiers before Magellan
+    },
+    'late-spanish': {
+        bossName: 'Late Spanish Commander Era',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['Spanish Soldier'],
+        enemiesBeforeBoss: 3 // Defeat 3 Spanish Soldiers before Spanish Commander
+    },
+    'american-colonial': {
+        bossName: 'Commodore George Dewey',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['American Soldier'],
+        enemiesBeforeBoss: 2 // Defeat 2 American Soldiers before Dewey
+    },
+    'ww2': {
+        bossName: null, // No boss for WW2 era
+        isBoss: false,
+        isFinalBoss: false,
+        preBossEnemies: [],
+        enemiesBeforeBoss: 0
+    }
+};
+
+// Function to get boss for an era
+function getBossForEra(eraKey) {
+    const era = eraData[eraKey];
+    if (!era) return null;
+    
+    return era.villains.find(villain => villain.isBoss) || null;
+}
+
+// Function to get regular (non-boss) villains for an era
+function getRegularVillainsForEra(eraKey) {
+    const era = eraData[eraKey];
+    if (!era) return [];
+    
+    return era.villains.filter(villain => !villain.isBoss);
+}
+
+// Function to get random regular villain (not boss)
+function getRandomRegularVillain(eraKey) {
+    const regularVillains = getRegularVillainsForEra(eraKey);
+    if (regularVillains.length === 0) return null;
+    
+    const randomIndex = Math.floor(Math.random() * regularVillains.length);
+    return regularVillains[randomIndex];
+}
+
+// Function to get villain for current battle state
+function getVillainForBattle(eraKey, enemiesDefeated, totalEnemiesBeforeBoss) {
+    const bossDef = bossDefinitions[eraKey];
+    
+    // Check if it's time for boss battle
+    if (bossDef && bossDef.bossName && enemiesDefeated >= totalEnemiesBeforeBoss) {
+        // Return the boss
+        return getBossForEra(eraKey);
+    } else {
+        // Return regular enemy
+        return getRandomRegularVillain(eraKey) || eraData[eraKey].villains[0];
+    }
+}
+
+// Existing functions remain...
 function getRandomHero(era) {
     const heroes = eraData[era].heroes;
     return heroes[Math.floor(Math.random() * heroes.length)];
 }
 
-// Function to get a random villain from an era
-function getRandomVillain(era) {
-    const villains = eraData[era].villains;
-    return villains[Math.floor(Math.random() * villains.length)];
-}
-
-// Function to get character sprite path
 function getCharacterSprite(character, state) {
     return `${character.folder}/${character[state]}`;
 }
 
-// Function to select random era
 function getRandomEra() {
     const eras = Object.keys(eraData);
     return eras[Math.floor(Math.random() * eras.length)];
 }
 
-// Function to get all eras
 function getAllEras() {
     return Object.keys(eraData);
 }
