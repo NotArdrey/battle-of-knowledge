@@ -1,4 +1,4 @@
-// battle.js - COMPLETE VERSION WITH SOUND EFFECTS
+// battle.js - COMPLETE VERSION WITH BOSS BATTLE MECHANICS
 
 // Battle game logic
 let playerHp = 100;
@@ -8,8 +8,14 @@ let questionIndex = 0;
 let currentEra = '';
 let currentHero = null;
 let currentVillain = null;
-let currentLanguageLoaded = ''; // Track which language questions are loaded
-let currentShuffledAnswers = []; // Store shuffled answers
+let currentLanguageLoaded = '';
+let currentShuffledAnswers = [];
+
+// Boss mechanics tracking
+let isBossBattle = false;
+let bossName = null;
+let enemiesDefeated = 0;
+let totalEnemiesBeforeBoss = 3; // Default: defeat 3 normal enemies before boss
 
 // Character type definitions
 const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier Era', 
@@ -17,9 +23,41 @@ const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Sp
                     'Commodore George Dewey', 'General Juan Luna'];
 
 const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
-                  'Spanish Commander', 'Late Spanish Commander Era', 'Spanish Soldier']; // Added here
+                  'Spanish Commander', 'Late Spanish Commander Era', 'Spanish Soldier'];
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
+
+// Boss definitions for each era
+const bossDefinitions = {
+    'early-spanish': {
+        bossName: 'Ferdinand Magellan',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['Spanish Soldier'],
+        enemiesBeforeBoss: 2 // Defeat 2 Spanish Soldiers before Magellan
+    },
+    'late-spanish': {
+        bossName: 'Late Spanish Commander Era',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['Spanish Soldier', 'Spanish Commander'],
+        enemiesBeforeBoss: 3 // Defeat 3 enemies before Spanish Commander
+    },
+    'american-colonial': {
+        bossName: 'Commodore George Dewey',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['American Soldier'],
+        enemiesBeforeBoss: 2 // Defeat 2 American Soldiers before Dewey
+    },
+    'ww2': {
+        bossName: null, // No boss for WW2 era
+        isBoss: false,
+        isFinalBoss: false,
+        preBossEnemies: [],
+        enemiesBeforeBoss: 0
+    }
+};
 
 // Mobile detection
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -29,14 +67,16 @@ const soundEffects = {
     sword: new Audio('assets/SFX/Attacks/Sword.mp3'),
     gun: new Audio('assets/SFX/Attacks/Gun.mp3'),
     magic: new Audio('assets/SFX/Attacks/Magic.mp3'),
-    hit: new Audio('assets/SFX/Attacks/Hit.mp3'), // Optional: add a hit sound
-    damage: new Audio('assets/SFX/Attacks/Damage.mp3') // Optional: add damage sound
+    hit: new Audio('assets/SFX/Attacks/Hit.mp3'),
+    damage: new Audio('assets/SFX/Attacks/Damage.mp3'),
+    bossIntro: new Audio('assets/SFX/Boss/boss-intro.mp3'), // Optional: add boss intro sound
+    victoryFanfare: new Audio('assets/SFX/Boss/victory-fanfare.mp3') // Optional: victory sound
 };
 
 // Configure sound settings
 Object.values(soundEffects).forEach(sound => {
     sound.preload = 'auto';
-    sound.volume = isMobile ? 0.5 : 0.7; // Lower volume on mobile
+    sound.volume = isMobile ? 0.5 : 0.7;
 });
 
 // Play sound effect with error handling
@@ -44,7 +84,6 @@ function playSound(soundName) {
     try {
         const sound = soundEffects[soundName];
         if (sound) {
-            // Create a new instance to allow overlapping sounds
             const soundClone = new Audio(sound.src);
             soundClone.volume = sound.volume;
             soundClone.play().catch(e => console.log('Sound play failed:', e));
@@ -54,40 +93,23 @@ function playSound(soundName) {
     }
 }
 
-// Enhanced setEraBackground function with error handling
+// Set era background
 function setEraBackground(eraKey) {
     console.log(`setEraBackground called with era: ${eraKey}`);
     
     const era = eraData[eraKey];
     
     if (era && era.background) {
-        console.log(`Setting battle area background for era: ${eraKey}, path: ${era.background}`);
-        
-        // Set ONLY the battle area background - not the page background
         const battleAreaBg = document.getElementById('battleAreaBackground');
         if (battleAreaBg) {
             battleAreaBg.style.backgroundImage = `url('${era.background}')`;
-            battleAreaBg.style.opacity = '1'; // Full opacity
+            battleAreaBg.style.opacity = '1';
             battleAreaBg.style.backgroundSize = 'cover';
             battleAreaBg.style.backgroundPosition = 'center';
             battleAreaBg.style.backgroundRepeat = 'no-repeat';
             battleAreaBg.style.transition = 'background-image 0.5s ease-in-out';
-            
-            // Test if background loads
-            const testImg = new Image();
-            testImg.onload = function() {
-                console.log(`Battle area background loaded successfully: ${era.background}`);
-            };
-            testImg.onerror = function() {
-                console.error(`Failed to load battle area background: ${era.background}`);
-                // Fallback to default
-                setDefaultBackground();
-            };
-            testImg.src = era.background;
         }
-        
     } else {
-        console.warn(`No background found for era: ${eraKey}`);
         setDefaultBackground();
     }
 }
@@ -106,27 +128,39 @@ function setDefaultBackground() {
 // Get unlocked heroes for an era
 function getUnlockedHeroesForEra(eraKey) {
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
-    return unlockedHeroes[eraKey] || [0]; // First hero (index 0) is always unlocked by default
-}
-
-// Get a random era (for "all" battles)
-function getRandomEra() {
-    const eras = Object.keys(eraData);
-    const randomIndex = Math.floor(Math.random() * eras.length);
-    return eras[randomIndex];
+    return unlockedHeroes[eraKey] || [0];
 }
 
 // Get random villain for current era
-function getRandomVillain(eraKey) {
+function getRandomVillain(eraKey, isPreBoss = false) {
+    const bossDef = bossDefinitions[eraKey];
+    
+    if (isBossBattle && bossDef && bossDef.bossName) {
+        // Return the boss
+        const villains = eraData[eraKey].villains;
+        const boss = villains.find(v => v.name === bossDef.bossName);
+        if (boss) return boss;
+    }
+    
+    if (isPreBoss && bossDef && bossDef.preBossEnemies.length > 0) {
+        // Return a pre-boss enemy
+        const villains = eraData[eraKey].villains;
+        const preBossEnemies = villains.filter(v => bossDef.preBossEnemies.includes(v.name));
+        if (preBossEnemies.length > 0) {
+            const randomIndex = Math.floor(Math.random() * preBossEnemies.length);
+            return preBossEnemies[randomIndex];
+        }
+    }
+    
+    // Return any random villain
     const villains = eraData[eraKey].villains;
     const randomIndex = Math.floor(Math.random() * villains.length);
     return villains[randomIndex];
 }
 
-// Get character sprite based on state
+// Get character sprite
 function getCharacterSprite(characterData, state) {
     if (!characterData || !characterData.folder) {
-        // Fallback to default sprites
         if (characterData && characterData.type === 'hero') {
             return state === 'attack' ? 'assets/lapulapu-attack.png' :
                    state === 'hurt' ? 'assets/lapulapu-hurt.png' :
@@ -144,58 +178,70 @@ function getCharacterSprite(characterData, state) {
     return `${characterData.folder}/${spriteFile}`;
 }
 
-// Initialize battle - UPDATED to handle era properly
+// Initialize battle with boss mechanics
 function initBattle() {
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
     
-    // Determine which era to use for this battle
     if (selectedEra === 'all') {
         currentEra = getRandomEra();
-        console.log(`Random era selected: ${currentEra}`);
     } else {
         currentEra = selectedEra;
-        console.log(`Selected era: ${currentEra}`);
     }
     
     // Save the current era for use in this battle
     localStorage.setItem('currentBattleEra', currentEra);
     
-    // Set era-specific backgrounds - THIS IS THE CRITICAL PART
+    // Reset boss battle state
+    isBossBattle = false;
+    enemiesDefeated = 0;
+    
+    // Check if this era has a boss
+    const bossDef = bossDefinitions[currentEra];
+    if (bossDef && bossDef.bossName) {
+        totalEnemiesBeforeBoss = bossDef.enemiesBeforeBoss;
+        bossName = bossDef.bossName;
+        console.log(`Boss detected for ${currentEra}: ${bossName}`);
+        console.log(`Need to defeat ${totalEnemiesBeforeBoss} enemies before boss`);
+    } else {
+        bossName = null;
+        totalEnemiesBeforeBoss = 0;
+        console.log(`No boss for ${currentEra}`);
+    }
+    
+    // Set era-specific backgrounds
     setEraBackground(currentEra);
     
-    // Load questions based on current language and era
+    // Load questions
     const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
     if (questionsData[currentEra] && questionsData[currentEra][currentLanguage]) {
         questions = [...questionsData[currentEra][currentLanguage]];
         shuffleArray(questions);
     } else {
-        console.error('No questions found for era:', currentEra, 'language:', currentLanguage);
-        // Fallback to early-spanish era
         questions = [...questionsData['early-spanish'][currentLanguage]];
         shuffleArray(questions);
     }
-    currentLanguageLoaded = currentLanguage; // Track loaded language
+    currentLanguageLoaded = currentLanguage;
     
-    // Select hero (either player selected or first unlocked)
+    // Select hero
     const selectedHeroIndex = localStorage.getItem('selectedHero');
     const unlockedHeroes = getUnlockedHeroesForEra(currentEra);
     
     if (selectedHeroIndex !== null && eraData[currentEra].heroes[selectedHeroIndex]) {
-        // Check if the selected hero is unlocked
         if (unlockedHeroes.includes(parseInt(selectedHeroIndex))) {
             currentHero = eraData[currentEra].heroes[parseInt(selectedHeroIndex)];
         } else {
-            // Fall back to first unlocked hero
             currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
         }
-        localStorage.removeItem('selectedHero'); // Clear selection for next battle
+        localStorage.removeItem('selectedHero');
     } else {
-        // Use first unlocked hero by default
         currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
     }
     
-    // Select random villain
-    currentVillain = getRandomVillain(currentEra);
+    // Select villain (regular enemy for now)
+    currentVillain = getRandomVillain(currentEra, true); // Start with pre-boss enemies
+    
+    // Update enemy name display
+    updateEnemyDisplay();
     
     // Set character sprites
     updateCharacterSprites();
@@ -206,6 +252,77 @@ function initBattle() {
     
     // Load first question
     loadQuestion();
+}
+
+// Update enemy display with boss indicator
+function updateEnemyDisplay() {
+    const enemyNameElement = document.getElementById('enemyName');
+    const bossDef = bossDefinitions[currentEra];
+    
+    if (isBossBattle && bossDef && bossDef.bossName) {
+        enemyNameElement.textContent = `BOSS: ${currentVillain.name} 👑`;
+        enemyNameElement.classList.add('text-red-700', 'font-extrabold');
+        
+        // Update HP bar color for boss
+        const enemyHpBar = document.getElementById('enemyHpBar');
+        enemyHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626, #7f1d1d)';
+        
+        // Show boss warning if this is the first boss appearance
+        if (enemiesDefeated === totalEnemiesBeforeBoss) {
+            showBossWarning();
+        }
+    } else {
+        enemyNameElement.textContent = currentVillain.name;
+        enemyNameElement.classList.remove('text-red-700', 'font-extrabold');
+        
+        // Show enemy count if not boss
+        const bossDef = bossDefinitions[currentEra];
+        if (bossDef && bossDef.bossName) {
+            const remaining = totalEnemiesBeforeBoss - enemiesDefeated;
+            if (remaining > 0) {
+                enemyNameElement.textContent = `${currentVillain.name} (${remaining} to boss)`;
+            }
+        }
+    }
+}
+
+// Show boss warning
+function showBossWarning() {
+    const warningDiv = document.createElement('div');
+    warningDiv.id = 'bossWarning';
+    warningDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #ef4444, #dc2626, #7f1d1d);
+        color: white;
+        padding: 20px 30px;
+        border-radius: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 10000;
+        box-shadow: 0 0 50px rgba(239, 68, 68, 0.7);
+        animation: boss-warning 2s ease-out;
+    `;
+    
+    warningDiv.innerHTML = `
+        <div class="text-3xl mb-2">⚠️ BOSS BATTLE ⚠️</div>
+        <div class="text-xl">${bossName} has appeared!</div>
+    `;
+    
+    document.body.appendChild(warningDiv);
+    
+    // Play boss intro sound if available
+    if (soundEffects.bossIntro) {
+        playSound('bossIntro');
+    }
+    
+    // Remove warning after animation
+    setTimeout(() => {
+        warningDiv.remove();
+    }, 2000);
 }
 
 // Update character sprites to idle state
@@ -220,14 +337,13 @@ function updateCharacterSprites() {
     enemySprite.alt = currentVillain.name;
 }
 
-// Change character animation state
+// Set character state
 function setCharacterState(character, state) {
     const sprite = character === 'player' ? document.getElementById('playerSprite') : document.getElementById('enemySprite');
     const characterData = character === 'player' ? currentHero : currentVillain;
     
     sprite.src = getCharacterSprite(characterData, state);
     
-    // Return to idle after animation duration
     if (state !== 'idle') {
         setTimeout(() => {
             sprite.src = getCharacterSprite(characterData, 'idle');
@@ -246,33 +362,25 @@ function shuffleArray(array) {
 
 // Load question
 function loadQuestion() {
-    // Check if language changed - if so, just translate the current question
     const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
     const languageChanged = currentLanguageLoaded !== currentLanguage;
     
     if (languageChanged) {
-        // Language changed - get the same question index from new language for current era
         if (questionsData[currentEra] && questionsData[currentEra][currentLanguage]) {
             questions = [...questionsData[currentEra][currentLanguage]];
         } else {
-            console.error('No questions found for era:', currentEra, 'language:', currentLanguage);
             questions = [...questionsData['early-spanish'][currentLanguage]];
         }
         currentLanguageLoaded = currentLanguage;
         
-        // When language changes, map the old shuffled answers to new language answers
-        // Find the positions of the current answers and get the translated versions
         if (currentShuffledAnswers.length > 0 && currentQuestion) {
             const newQuestion = questions[questionIndex];
             const oldQuestion = currentQuestion;
             const newShuffledAnswers = [];
             
-            // For each position in the shuffled array, find which answer it was and get the translation
             currentShuffledAnswers.forEach(oldAnswer => {
-                // Find the index of this answer in the old question's answers
                 const indexInOldAnswers = oldQuestion.answers.indexOf(oldAnswer);
                 if (indexInOldAnswers !== -1) {
-                    // Get the corresponding answer from the new language
                     newShuffledAnswers.push(newQuestion.answers[indexInOldAnswers]);
                 }
             });
@@ -289,13 +397,11 @@ function loadQuestion() {
     currentQuestion = questions[questionIndex];
     document.getElementById('questionText').textContent = currentQuestion.question;
     
-    // Only shuffle answers if this is a new question (not a language change)
     if (!languageChanged || currentShuffledAnswers.length === 0) {
         currentShuffledAnswers = [...currentQuestion.answers];
         shuffleArray(currentShuffledAnswers);
     }
     
-    // Update answer buttons
     const answerElements = ['answerA', 'answerB', 'answerC', 'answerD'];
     answerElements.forEach((elementId, index) => {
         const button = document.getElementById(elementId);
@@ -325,7 +431,6 @@ function selectAnswer(index) {
         attackEnemy();
     } else {
         selectedButton.classList.add('incorrect');
-        // Show correct answer
         buttons.forEach((btnId, i) => {
             if (currentQuestion.shuffledAnswers[i] === currentQuestion.correct) {
                 document.getElementById(btnId).classList.add('correct');
@@ -342,20 +447,15 @@ function selectAnswer(index) {
         
         if (enemyHp > 0 && playerHp > 0) {
             questionIndex++;
-            currentShuffledAnswers = []; // Clear shuffled answers for next question
+            currentShuffledAnswers = [];
             loadQuestion();
         }
     }, 2500);
 }
 
-// ============================================
-// IMPACTFUL ATTACK EFFECT FUNCTIONS WITH SOUND
-// ============================================
-
 // Mobile-optimized screen shake
 function mobileShake() {
     if (isMobile) {
-        // For mobile: Simple translate animation
         document.body.style.transform = 'translateX(-5px)';
         
         setTimeout(() => {
@@ -374,7 +474,6 @@ function mobileShake() {
             }, 40);
         }, 40);
     } else {
-        // For desktop: CSS animation
         document.body.style.animation = 'mobile-shake 0.4s ease-out';
         setTimeout(() => {
             document.body.style.animation = '';
@@ -382,9 +481,8 @@ function mobileShake() {
     }
 }
 
-// Create GIANT sword effect WITH SOUND
+// Enhanced attack functions with boss adjustments
 function createGiantSwordEffect(isAttacker) {
-    // Play sword sound
     playSound('sword');
     
     const characterElement = isAttacker ? 
@@ -395,7 +493,6 @@ function createGiantSwordEffect(isAttacker) {
     const rect = characterElement.getBoundingClientRect();
     const battleRect = battleArea.getBoundingClientRect();
     
-    // GIANT sword slash that covers most of the screen
     const swordSlash = document.createElement('div');
     swordSlash.style.cssText = `
         position: fixed;
@@ -425,8 +522,10 @@ function createGiantSwordEffect(isAttacker) {
     
     document.body.appendChild(swordSlash);
     
-    // Create multiple sword trails for impact
-    for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+    // Enhanced effect for boss battles
+    const effectCount = isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6);
+    
+    for (let i = 0; i < effectCount; i++) {
         setTimeout(() => {
             const trail = document.createElement('div');
             trail.style.cssText = `
@@ -462,7 +561,6 @@ function createGiantSwordEffect(isAttacker) {
         }, i * 50);
     }
     
-    // Main sword animation
     swordSlash.animate([
         { 
             transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, 
@@ -489,7 +587,6 @@ function createGiantSwordEffect(isAttacker) {
         fill: 'forwards'
     });
     
-    // ENERGY WAVES from sword impact
     setTimeout(() => {
         for (let i = 0; i < (isMobile ? 2 : 4); i++) {
             const wave = document.createElement('div');
@@ -503,15 +600,15 @@ function createGiantSwordEffect(isAttacker) {
                 pointer-events: none;
                 left: ${endX}px;
                 top: ${startY + (isMobile ? 40 : 80)}px;
-                transform: translate(-50%, -50%) scale(0);
+                transform: scale(0);
             `;
             
             document.body.appendChild(wave);
             
             wave.animate([
-                { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.7 },
-                { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 0 }
+                { transform: 'scale(0)', opacity: 0 },
+                { transform: 'scale(1)', opacity: 0.7 },
+                { transform: 'scale(2.5)', opacity: 0 }
             ], {
                 duration: isMobile ? 600 : 800,
                 easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -527,13 +624,11 @@ function createGiantSwordEffect(isAttacker) {
     return swordSlash;
 }
 
-// Create GIANT gun effect WITH SOUND
 function createGiantGunEffect(isAttacker) {
-    // Play gun sound with slight variation for multiple shots
     setTimeout(() => playSound('gun'), 0);
     if (!isMobile) {
-        setTimeout(() => playSound('gun'), 50); // Second shot for desktop
-        setTimeout(() => playSound('gun'), 100); // Third shot for desktop
+        setTimeout(() => playSound('gun'), 50);
+        setTimeout(() => playSound('gun'), 100);
     }
     
     const characterElement = isAttacker ? 
@@ -544,7 +639,6 @@ function createGiantGunEffect(isAttacker) {
     const rect = characterElement.getBoundingClientRect();
     const battleRect = battleArea.getBoundingClientRect();
     
-    // HUGE muzzle flash
     const muzzleFlash = document.createElement('div');
     const flashSize = isMobile ? 100 : 180;
     muzzleFlash.style.cssText = `
@@ -569,7 +663,6 @@ function createGiantGunEffect(isAttacker) {
     
     document.body.appendChild(muzzleFlash);
     
-    // EXPLOSIVE flash animation
     muzzleFlash.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
         { transform: 'translate(-50%, -50%) scale(2.5)', opacity: 1 },
@@ -581,7 +674,6 @@ function createGiantGunEffect(isAttacker) {
         fill: 'forwards'
     });
     
-    // GIANT bullet trail - LASER BEAM
     setTimeout(() => {
         const bulletTrail = document.createElement('div');
         const trailLength = Math.abs(battleRect.right - rect.right);
@@ -609,7 +701,6 @@ function createGiantGunEffect(isAttacker) {
         
         document.body.appendChild(bulletTrail);
         
-        // LASER beam animation
         bulletTrail.animate([
             { transform: `${isAttacker ? 'scaleX(0.1)' : 'scaleX(-0.1)'}`, opacity: 0 },
             { transform: `${isAttacker ? 'scaleX(2)' : 'scaleX(-2)'}`, opacity: 1 },
@@ -621,7 +712,6 @@ function createGiantGunEffect(isAttacker) {
             fill: 'forwards'
         });
         
-        // SHELL CASINGS flying everywhere
         for (let i = 0; i < (isMobile ? 5 : 10); i++) {
             setTimeout(() => {
                 const casing = document.createElement('div');
@@ -678,9 +768,7 @@ function createGiantGunEffect(isAttacker) {
     return muzzleFlash;
 }
 
-// Create GIANT magic effect WITH SOUND
 function createGiantMagicEffect(isAttacker) {
-    // Play magic sound
     playSound('magic');
     
     const characterElement = isAttacker ? 
@@ -693,7 +781,6 @@ function createGiantMagicEffect(isAttacker) {
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    // HUGE magic sphere
     const magicSphere = document.createElement('div');
     const sphereSize = isMobile ? 120 : 240;
     magicSphere.style.cssText = `
@@ -720,7 +807,6 @@ function createGiantMagicEffect(isAttacker) {
     
     document.body.appendChild(magicSphere);
     
-    // ENERGY SPHERE animation
     magicSphere.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
         { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 0.9 },
@@ -732,7 +818,6 @@ function createGiantMagicEffect(isAttacker) {
         fill: 'forwards'
     });
     
-    // ENERGY WAVES expanding outward
     for (let i = 0; i < (isMobile ? 3 : 6); i++) {
         setTimeout(() => {
             const wave = document.createElement('div');
@@ -767,7 +852,6 @@ function createGiantMagicEffect(isAttacker) {
         }, i * (isMobile ? 150 : 200));
     }
     
-    // MAGIC PARTICLES STORM
     for (let i = 0; i < (isMobile ? 15 : 30); i++) {
         setTimeout(() => {
             const particle = document.createElement('div');
@@ -820,7 +904,6 @@ function createGiantMagicEffect(isAttacker) {
         }, i * (isMobile ? 30 : 50));
     }
     
-    // ARCANE RUNES floating around
     for (let i = 0; i < (isMobile ? 6 : 12); i++) {
         setTimeout(() => {
             const rune = document.createElement('div');
@@ -864,13 +947,10 @@ function createGiantMagicEffect(isAttacker) {
     return magicSphere;
 }
 
-// Create GIANT impact effect WITH SOUND
 function createGiantImpactEffect(isAttacker, damage) {
-    // Play hit sound (if available)
     if (soundEffects.hit) {
         playSound('hit');
     }
-    // Play damage sound for critical hits
     if (damage > 25 && soundEffects.damage) {
         setTimeout(() => playSound('damage'), 100);
     }
@@ -883,7 +963,6 @@ function createGiantImpactEffect(isAttacker, damage) {
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    // MASSIVE impact explosion
     const impactExplosion = document.createElement('div');
     const explosionSize = (isMobile ? 80 : 160) + damage * (isMobile ? 3 : 6);
     impactExplosion.style.cssText = `
@@ -909,7 +988,6 @@ function createGiantImpactEffect(isAttacker, damage) {
     
     document.body.appendChild(impactExplosion);
     
-    // EXPLOSION animation
     impactExplosion.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
         { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
@@ -921,7 +999,6 @@ function createGiantImpactEffect(isAttacker, damage) {
         fill: 'forwards'
     });
     
-    // SHOCKWAVE RINGS
     for (let i = 0; i < (isMobile ? 3 : 6); i++) {
         setTimeout(() => {
             const shockwave = document.createElement('div');
@@ -955,7 +1032,6 @@ function createGiantImpactEffect(isAttacker, damage) {
         }, i * (isMobile ? 80 : 120));
     }
     
-    // CRACK EFFECT for critical hits
     if (damage > 25) {
         const crack = document.createElement('div');
         crack.style.cssText = `
@@ -990,7 +1066,6 @@ function createGiantImpactEffect(isAttacker, damage) {
         setTimeout(() => crack.remove(), isMobile ? 400 : 600);
     }
     
-    // IMPACT PARTICLES flying out
     for (let i = 0; i < (isMobile ? 20 : 40); i++) {
         setTimeout(() => {
             const particle = document.createElement('div');
@@ -1064,17 +1139,16 @@ function createAttackEffectForHurtCharacter(characterName, isHurtOnPlayer, damag
     return createGiantImpactEffect(!isHurtOnPlayer, damage);
 }
 
-// Show damage number - MASSIVE and impactful
+// Show damage number
 function showDamage(damage, target) {
     const character = target === 'player' ? 
         document.getElementById('playerCharacter') : 
-        document.getElementById('enemyCharacter');
+        document.getElementById('playerCharacter');
     
     const damageEl = document.createElement('div');
     damageEl.className = 'damage-number';
     damageEl.textContent = `-${damage}`;
     
-    // GIANT damage numbers
     if (isMobile) {
         damageEl.style.cssText = `
             position: fixed;
@@ -1113,12 +1187,11 @@ function showDamage(damage, target) {
     
     const rect = character.getBoundingClientRect();
     damageEl.style.left = `${rect.left + rect.width / 2}px`;
-    damageEl.style.top = `${rect.top + rect.height * 0.15}px`; // Higher for more visibility
+    damageEl.style.top = `${rect.top + rect.height * 0.15}px`;
     damageEl.style.transform = 'translateX(-50%)';
     
     document.body.appendChild(damageEl);
     
-    // For critical hits, add a second damage number for emphasis
     if (damage > 25) {
         setTimeout(() => {
             const critEl = document.createElement('div');
@@ -1165,23 +1238,31 @@ function showDamage(damage, target) {
 }
 
 // ============================================
-// ATTACK FUNCTIONS WITH GIANT EFFECTS & SOUND
+// ATTACK FUNCTIONS WITH BOSS MECHANICS
 // ============================================
 
 // Attack enemy
 function attackEnemy() {
-    const damage = Math.floor(Math.random() * 15) + 15; // 15-30 damage
+    // Calculate damage - bosses take less damage
+    let damage = Math.floor(Math.random() * 15) + 15; // 15-30 damage
+    if (isBossBattle) {
+        damage = Math.floor(damage * 0.7); // Bosses take 30% less damage
+    }
+    
     enemyHp = Math.max(0, enemyHp - damage);
     
     // Player attacks
     setCharacterState('player', 'attack');
     document.getElementById('playerCharacter').classList.add('attacking');
     
-    // Create GIANT attack effect (includes sound)
+    // Create attack effect
     createAttackEffectForAttacker(currentHero.name, true);
     
-    // Screen shake
+    // Screen shake (stronger for boss battles)
     mobileShake();
+    if (isBossBattle) {
+        setTimeout(() => mobileShake(), 200);
+    }
     
     setTimeout(() => {
         document.getElementById('playerCharacter').classList.remove('attacking');
@@ -1192,14 +1273,53 @@ function attackEnemy() {
         showDamage(damage, 'enemy');
         updateHP();
         
-        // Create GIANT impact effect (includes hit sound)
+        // Create impact effect
         createAttackEffectForHurtCharacter(currentHero.name, false, damage);
         
         setTimeout(() => {
             document.getElementById('enemyCharacter').classList.remove('hurt');
             
             if (enemyHp <= 0) {
-                victory();
+                // Enemy defeated
+                enemiesDefeated++;
+                
+                // Check if it's time for boss battle
+                const bossDef = bossDefinitions[currentEra];
+                if (bossDef && bossDef.bossName && !isBossBattle && enemiesDefeated >= totalEnemiesBeforeBoss) {
+                    // Start boss battle
+                    isBossBattle = true;
+                    currentVillain = getRandomVillain(currentEra, false); // Get the boss
+                    enemyHp = 150; // Boss has more HP
+                    updateEnemyDisplay();
+                    updateHP();
+                    setCharacterState('enemy', 'idle');
+                    
+                    // Show boss warning
+                    showBossWarning();
+                    
+                    // Load next question
+                    questionIndex++;
+                    currentShuffledAnswers = [];
+                    loadQuestion();
+                } else if (isBossBattle) {
+                    // Boss defeated
+                    victory();
+                } else {
+                    // Regular enemy defeated - continue with next enemy
+                    setTimeout(() => {
+                        // Reset enemy HP and get new enemy
+                        enemyHp = 100;
+                        currentVillain = getRandomVillain(currentEra, true);
+                        updateEnemyDisplay();
+                        updateHP();
+                        setCharacterState('enemy', 'idle');
+                        
+                        // Load next question
+                        questionIndex++;
+                        currentShuffledAnswers = [];
+                        loadQuestion();
+                    }, 1000);
+                }
             }
         }, isMobile ? 1000 : 1200);
     }, isMobile ? 400 : 600);
@@ -1207,14 +1327,19 @@ function attackEnemy() {
 
 // Attack player
 function attackPlayer() {
-    const damage = Math.floor(Math.random() * 15) + 15; // 15-30 damage
+    // Calculate damage - bosses deal more damage
+    let damage = Math.floor(Math.random() * 15) + 15; // 15-30 damage
+    if (isBossBattle) {
+        damage = Math.floor(damage * 1.5); // Bosses deal 50% more damage
+    }
+    
     playerHp = Math.max(0, playerHp - damage);
     
     // Enemy attacks
     setCharacterState('enemy', 'attack');
     document.getElementById('enemyCharacter').classList.add('attacking');
     
-    // Create GIANT attack effect (includes sound)
+    // Create attack effect
     createAttackEffectForAttacker(currentVillain.name, false);
     
     // Screen shake
@@ -1229,7 +1354,7 @@ function attackPlayer() {
         showDamage(damage, 'player');
         updateHP();
         
-        // Create GIANT impact effect (includes hit sound)
+        // Create impact effect
         createAttackEffectForHurtCharacter(currentVillain.name, true, damage);
         
         setTimeout(() => {
@@ -1247,12 +1372,17 @@ function updateHP() {
     const playerHpBar = document.getElementById('playerHpBar');
     const enemyHpBar = document.getElementById('enemyHpBar');
     
-    playerHpBar.style.width = `${playerHp}%`;
-    enemyHpBar.style.width = `${enemyHp}%`;
+    // Calculate percentages (boss has 150 HP max)
+    const playerHpPercent = playerHp;
+    const enemyHpPercent = isBossBattle ? (enemyHp / 150) * 100 : enemyHp;
+    
+    playerHpBar.style.width = `${playerHpPercent}%`;
+    enemyHpBar.style.width = `${enemyHpPercent}%`;
     
     // Update HP text
+    const enemyMaxHp = isBossBattle ? 150 : 100;
     document.getElementById('playerHpText').textContent = `${playerHp}/100`;
-    document.getElementById('enemyHpText').textContent = `${enemyHp}/100`;
+    document.getElementById('enemyHpText').textContent = `${enemyHp}/${enemyMaxHp}`;
     
     // Change HP bar color based on health
     if (playerHp < 30) {
@@ -1263,9 +1393,9 @@ function updateHP() {
         playerHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a, #15803d)';
     }
     
-    if (enemyHp < 30) {
+    if (enemyHp < (isBossBattle ? 45 : 30)) {
         enemyHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626, #b91c1c)';
-    } else if (enemyHp < 60) {
+    } else if (enemyHp < (isBossBattle ? 90 : 60)) {
         enemyHpBar.style.background = 'linear-gradient(to right, #f59e0b, #f97316, #ea580c)';
     } else {
         enemyHpBar.style.background = 'linear-gradient(to right, #22c55e, #16a34a, #15803d)';
@@ -1278,11 +1408,14 @@ function victory() {
     setCharacterState('enemy', 'hurt');
     document.getElementById('playerCharacter').classList.add('victory');
     
-    setTimeout(() => {
-        document.getElementById('victoryModal').classList.remove('hidden');
-    }, 1000);
+    // Play victory fanfare for boss battles
+    if (isBossBattle && soundEffects.victoryFanfare) {
+        playSound('victoryFanfare');
+    }
     
-    checkBattleEnd();
+    setTimeout(() => {
+        checkBattleEnd();
+    }, 1000);
 }
 
 // Defeat
@@ -1311,7 +1444,7 @@ function checkBattleEnd() {
     }
 }
 
-// Get era order for progression
+// Era order for progression
 const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
 // Save unlocked heroes for an era
@@ -1326,17 +1459,15 @@ function unlockNextHero(eraKey) {
     const heroes = eraData[eraKey].heroes;
     const unlockedIndices = getUnlockedHeroesForEra(eraKey);
     
-    // Find the next hero to unlock
     const nextHeroIndex = unlockedIndices.length;
     
     if (nextHeroIndex < heroes.length) {
-        // There's a hero to unlock
         unlockedIndices.push(nextHeroIndex);
         saveUnlockedHeroesForEra(eraKey, unlockedIndices);
-        return heroes[nextHeroIndex]; // Return the newly unlocked hero
+        return heroes[nextHeroIndex];
     }
     
-    return null; // All heroes already unlocked
+    return null;
 }
 
 // Unlock hero and show victory
@@ -1350,18 +1481,26 @@ function unlockHeroAndShowVictory() {
         localStorage.setItem('completedEras', JSON.stringify(completedEras));
     }
     
+    // Show special victory message for boss battles
+    const victoryModal = document.getElementById('victoryModal');
+    const victoryTitle = victoryModal.querySelector('h1');
+    
+    if (isBossBattle) {
+        victoryTitle.textContent = '🎖️ BOSS DEFEATED! 🎖️';
+        victoryTitle.classList.add('text-red-700');
+        victoryTitle.classList.remove('text-amber-800');
+    }
+    
     // Try to unlock the next hero
     const unlockedHero = unlockNextHero(currentEra);
     const heroAchievementDiv = document.querySelector('#victoryModal .bg-gradient-to-br.from-amber-50');
     const heroUnlockedTitle = document.querySelector('#victoryModal [data-lang-key="heroUnlocked"]');
     
     if (unlockedHero) {
-        // Show hero achievement
         if (heroAchievementDiv) {
             heroAchievementDiv.style.display = 'block';
         }
         
-        // Update hero unlocked title
         if (heroUnlockedTitle) {
             const newHeroText = translations && translations[currentLanguage] 
                 ? translations[currentLanguage]['newHeroUnlocked'] || '🏆 New Hero Unlocked! 🏆'
@@ -1369,14 +1508,12 @@ function unlockHeroAndShowVictory() {
             heroUnlockedTitle.textContent = newHeroText;
         }
         
-        // Display hero achievement with correct image path
         const heroImageEl = document.getElementById('unlockedHeroImage');
-        heroImageEl.style.display = 'block'; // Make sure image is visible
+        heroImageEl.style.display = 'block';
         heroImageEl.src = `${unlockedHero.folder}/${unlockedHero.idle}`;
         document.getElementById('unlockedHeroName').textContent = unlockedHero.name;
         document.getElementById('unlockedHeroDescription').textContent = unlockedHero.description || `${unlockedHero.name} - Hero of ${eraData[currentEra].name}`;
     } else {
-        // All heroes already unlocked - show different message or hide the section
         if (heroAchievementDiv) {
             const allHeroesUnlockedText = translations && translations[currentLanguage]
                 ? translations[currentLanguage]['allHeroesUnlocked'] || '🎉 All Heroes Unlocked! 🎉'
@@ -1389,7 +1526,6 @@ function unlockHeroAndShowVictory() {
                 heroUnlockedTitle.textContent = allHeroesUnlockedText;
             }
             
-            // Hide the hero image and show congrats message
             document.getElementById('unlockedHeroImage').style.display = 'none';
             document.getElementById('unlockedHeroName').textContent = '';
             document.getElementById('unlockedHeroDescription').textContent = congratsText;
@@ -1415,11 +1551,9 @@ function proceedToNextEra() {
     if (currentEraIndex < eraOrder.length - 1) {
         const nextEra = eraOrder[currentEraIndex + 1];
         localStorage.setItem('selectedEra', nextEra);
-        localStorage.removeItem('selectedHero'); // Clear hero selection
-        // Go to learning module for the next era
+        localStorage.removeItem('selectedHero');
         window.location.href = 'learning-module.html';
     } else {
-        // All eras completed
         window.location.href = 'collection.html';
     }
 }
@@ -1447,7 +1581,7 @@ function disableAnswers() {
 
 // Initialize battle when page loads
 window.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded - Initializing battle...');
+    console.log('DOMContentLoaded - Initializing battle with boss mechanics...');
     
     // Initialize the battle
     initBattle();
@@ -1463,3 +1597,10 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
 });
+
+// Helper function to get random era (for "all" battles)
+function getRandomEra() {
+    const eras = Object.keys(eraData);
+    const randomIndex = Math.floor(Math.random() * eras.length);
+    return eras[randomIndex];
+}
