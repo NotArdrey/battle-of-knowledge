@@ -449,7 +449,7 @@
                     <div class="progress-container">
                         <div class="flex justify-between items-center mb-2">
                             <p class="text-amber-900 font-bold text-lg">
-                                <span data-translate="Your Progress">Your Progress</span>
+                                <span data-translate="yourProgress">Your Progress</span>
                             </p>
                             <p class="text-amber-900 font-semibold text-base">
                                 <span id="lessonProgress">0 / 5</span> <span data-translate="lessonsCompleted">lessons completed</span>
@@ -633,8 +633,8 @@
             
             // Update complete button
             const completeBtn = document.getElementById('completeLessonBtn');
-            const completeText = '✓ Mark as Complete';
-            const completedText = '✓ Completed';
+            const completeText = translations[currentLanguage]['markComplete'] || '✓ Mark as Complete';
+            const completedText = translations[currentLanguage]['Completed'] || '✓ Completed';
             
             if (isCompleted) {
                 completeBtn.disabled = true;
@@ -827,12 +827,12 @@
             if (completed >= totalLessons) {
                 startButton.disabled = false;
                 startButton.onclick = startBattle;
-                hint.textContent = 'Ready for battle! Click to start!';
+                hint.textContent = translations[currentLanguage]['readyForBattle'] || 'Ready for battle! Click to start!';
                 hint.classList.add('text-green-600');
                 hint.classList.remove('text-amber-700');
             } else {
                 startButton.disabled = true;
-                hint.textContent = 'Complete all lessons to unlock the battle!';
+                hint.textContent = translations[currentLanguage]['completeAllLessons'] || 'Complete all lessons to unlock the battle!';
                 hint.classList.remove('text-green-600');
                 hint.classList.add('text-amber-700');
             }

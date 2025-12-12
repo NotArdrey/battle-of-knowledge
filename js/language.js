@@ -72,7 +72,14 @@ const translations = {
         'noStay': 'No, Stay',
         'newHeroUnlocked': '🏆 New Hero Unlocked! 🏆',
         'allHeroesUnlocked': '🎉 All Heroes Unlocked! 🎉',
-        'congratulations': 'Congratulations! You have unlocked all heroes in this era!'
+        'congratulations': 'Congratulations! You have unlocked all heroes in this era!',
+        'completeInOrder': 'Complete lessons in order to unlock battle!',
+        'yourProgress': 'Your Progress',
+        'readyForBattle': 'Ready for battle! Click to start!',
+        'resetProgress': '🔄 Reset Progress',
+        'completeAllLessons': 'Complete all lessons to unlock the battle!',
+        'Next': 'Next ▶',
+        'Previous': '◀ Previous'
     },
     tl: {
         // Index page
@@ -147,7 +154,14 @@ const translations = {
         'noStay': 'Hindi, Manatili',
         'newHeroUnlocked': '🏆 Bagong Bayani Na-unlock! 🏆',
         'allHeroesUnlocked': '🎉 Lahat ng Bayani Na-unlock! 🎉',
-        'congratulations': 'Binabati kita! Na-unlock mo na ang lahat ng bayani sa panahong ito!'
+        'congratulations': 'Binabati kita! Na-unlock mo na ang lahat ng bayani sa panahong ito!',
+        'completeInOrder': 'Kumpletuhin ang mga aral upang ma-unlock ang labanan!',
+        'yourProgress': 'Iyong Progreso',
+        'readyForBattle': 'Handa na para sa labanan! I-click para magsimula!',
+        'resetProgress': '🔄 I-reset ang Progreso',
+        'completeAllLessons': 'Kumpletuhin lahat ng aral upang ma-unlock ang labanan!',
+        'Next': 'Susunod ▶',
+        'Previous': '◀ Nakaraan'
     }
 };
 
