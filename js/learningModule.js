@@ -362,6 +362,8 @@ function startBattle() {
         // Show character selection modal
         showCharacterSelect();
     } else {
+        // Clear any previous battle progress to start a fresh session
+        localStorage.removeItem('battleProgress');
         // Go directly to battlefield
         window.location.href = 'battlefield.html';
     }
@@ -429,6 +431,8 @@ function showCharacterSelect() {
 
 // Select character
 function selectCharacter(heroIndex) {
+    // Clear any previous battle progress to start a fresh session
+    localStorage.removeItem('battleProgress');
     localStorage.setItem('selectedHero', heroIndex);
     window.location.href = 'battlefield.html';
 }

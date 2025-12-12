@@ -23,7 +23,7 @@ const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Sp
                     'Commodore George Dewey', 'General Juan Luna'];
 
 const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
-                  'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era'];
+                  'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era', 'Spanish Soldier'];
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
@@ -51,7 +51,7 @@ const bossDefinitions = {
         bossName: 'Spanish Commander',
         isBoss: true,
         isFinalBoss: true,
-        preBossEnemies: ['Spanish Soldier'],
+        preBossEnemies: ['Spanish Soldier', 'Late Spanish Soldier Era'],
         enemiesBeforeBoss: 3 // Defeat 3 Spanish Soldiers before Commander
     },
     'american-colonial': {
@@ -371,9 +371,6 @@ function initBattle() {
             currentVillain = getRandomVillain(currentEra, !isBossBattle);
         }
         
-        // Clear the selected hero from storage
-        localStorage.removeItem('selectedHero');
-        
     } else {
         // Start fresh battle
         if (selectedEra === 'all') {
@@ -429,7 +426,6 @@ function initBattle() {
             } else {
                 currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
             }
-            localStorage.removeItem('selectedHero');
         } else {
             currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
         }
