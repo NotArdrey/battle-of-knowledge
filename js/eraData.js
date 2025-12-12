@@ -1,4 +1,4 @@
-// eraData.js - Complete with proper boss structure
+// Era configuration with backgrounds and characters
 const eraData = {
     'early-spanish': {
         name: 'Early Spanish Era',
@@ -81,7 +81,7 @@ const eraData = {
         ],
         villains: [
             {
-                name: 'Late Spanish Commander Era',
+                name: 'Spanish Commander',
                 folder: 'assets/Characters/2. Late Spanish Era/Villains/2. Late Spanish Commander Era',
                 idle: 'Spanish Commander - Idle.png',
                 attack: 'Spanish Commander - Attack.png',
@@ -163,3 +163,31 @@ const eraData = {
         ]
     }
 };
+
+// Function to get a random hero from an era
+function getRandomHero(era) {
+    const heroes = eraData[era].heroes;
+    return heroes[Math.floor(Math.random() * heroes.length)];
+}
+
+// Function to get a random villain from an era
+function getRandomVillain(era) {
+    const villains = eraData[era].villains;
+    return villains[Math.floor(Math.random() * villains.length)];
+}
+
+// Function to get character sprite path
+function getCharacterSprite(character, state) {
+    return `${character.folder}/${character[state]}`;
+}
+
+// Function to select random era
+function getRandomEra() {
+    const eras = Object.keys(eraData);
+    return eras[Math.floor(Math.random() * eras.length)];
+}
+
+// Function to get all eras
+function getAllEras() {
+    return Object.keys(eraData);
+}
