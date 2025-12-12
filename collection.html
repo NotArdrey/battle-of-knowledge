@@ -254,44 +254,70 @@
         .modal-container {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
             backdrop-filter: blur(10px);
-            border: 6px solid rgba(120, 53, 15, 0.6);
+            border: 6px solid rgba(120, 53, 14, 0.8);
             border-radius: 24px;
+            overflow: hidden;
         }
         
         .modal-title {
-            color: #7c2d12;
+            color: #451a03;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
-            font-size: 2rem;
             font-weight: 800;
+            line-height: 1.2;
         }
         
         .modal-subtitle {
             color: #92400e;
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
         .modal-content {
             color: #7c2d12;
-            line-height: 1.6;
-            font-size: 1.1rem;
+            line-height: 1.7;
+            font-size: 1rem;
         }
         
         .section-title {
-            color: #92400e;
+            color: #78350f;
             font-weight: 800;
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
             border-bottom: 3px solid rgba(120, 53, 15, 0.3);
             padding-bottom: 0.5rem;
         }
         
         .contribution-item {
-            background: rgba(254, 243, 199, 0.5);
-            border-left: 4px solid rgba(120, 53, 15, 0.5);
+            background: rgba(255, 255, 255, 0.6);
+            border-left: 4px solid rgba(180, 83, 9, 0.7);
             padding: 0.75rem 1rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
             border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .contribution-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(4px);
+        }
+        
+        /* Scrollbar for modal content */
+        .modal-container ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .modal-container ::-webkit-scrollbar-track {
+            background: rgba(254, 243, 199, 0.5);
+            border-radius: 3px;
+        }
+        
+        .modal-container ::-webkit-scrollbar-thumb {
+            background: rgba(180, 83, 9, 0.4);
+            border-radius: 3px;
+        }
+        
+        .modal-container ::-webkit-scrollbar-thumb:hover {
+            background: rgba(180, 83, 9, 0.6);
         }
         
         /* Custom scrollbar for content backdrop */
@@ -494,27 +520,53 @@
     </div>
 
     <!-- Character Details Modal -->
-    <div id="characterModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div class="modal-container rounded-2xl md:rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="p-4 sm:p-6 md:p-8">
-                <button onclick="closeModal()" class="float-right text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900 hover:text-red-600 transition-colors p-2">×</button>
+    <div id="characterModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+        <div class="modal-container rounded-2xl md:rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="flex flex-col md:flex-row h-full">
+                <!-- Left Side - Character Image -->
+                <div class="md:w-2/5 relative flex items-center justify-center p-4 md:p-8 overflow-hidden">
+                    <!-- Era Background -->
+                    <div id="modalEraBg" class="absolute inset-0 bg-cover bg-center" style="filter: brightness(0.6);"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30"></div>
+                    
+                    <button onclick="closeModal()" class="absolute top-2 right-2 md:hidden text-2xl font-bold text-white hover:text-red-400 transition-colors p-2 z-10">×</button>
+                    <div class="relative z-10 w-full max-w-[250px] md:max-w-[300px] aspect-square flex items-center justify-center">
+                        <img id="modalCharacterImg" src="" alt="" class="max-w-full max-h-full object-contain drop-shadow-2xl">
+                    </div>
+                    <div class="absolute bottom-4 left-4 right-4 z-10">
+                        <span id="modalCharacterType" class="character-type w-full text-center block"></span>
+                    </div>
+                </div>
                 
-                <div class="clear-both">
-                    <div class="flex flex-col sm:flex-row gap-4 md:gap-6 items-center mb-4 md:mb-6">
-                        <div class="character-image-container w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 flex-shrink-0">
-                            <img id="modalCharacterImg" src="" alt="" class="character-image">
-                        </div>
-                        <div class="flex-1 text-center sm:text-left">
-                            <h2 id="modalCharacterName" class="modal-title text-xl sm:text-2xl md:text-4xl mb-2"></h2>
-                            <p id="modalCharacterEra" class="modal-subtitle mb-2 md:mb-4"></p>
-                            <span id="modalCharacterType" class="character-type"></span>
-                        </div>
+                <!-- Right Side - Character Info -->
+                <div class="md:w-3/5 flex flex-col max-h-[60vh] md:max-h-[90vh] overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-gradient-to-r from-amber-100 to-amber-200 p-4 md:p-6 border-b-4 border-amber-600 flex-shrink-0">
+                        <button onclick="closeModal()" class="hidden md:block float-right text-2xl md:text-3xl font-bold text-amber-900 hover:text-red-600 transition-colors p-1">×</button>
+                        <h2 id="modalCharacterName" class="modal-title text-2xl md:text-3xl lg:text-4xl mb-1"></h2>
+                        <p id="modalCharacterEra" class="modal-subtitle text-base md:text-lg"></p>
                     </div>
                     
-                    <div class="border-t-4 border-amber-600 pt-4 md:pt-6">
-                        <h3 class="section-title" data-translate="Historical Contributions">Historical Contributions</h3>
-                        <div id="modalCharacterContributions" class="modal-content">
-                            <!-- Contributions will be loaded here -->
+                    <!-- Scrollable Content -->
+                    <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gradient-to-b from-amber-50 to-amber-100">
+                        <!-- Story Section -->
+                        <div class="mb-6">
+                            <h3 class="section-title flex items-center gap-2" data-translate="Story">
+                                <span>📖</span> Story
+                            </h3>
+                            <div id="modalCharacterStory" class="modal-content bg-white/50 rounded-xl p-4 border-2 border-amber-200">
+                                <!-- Story will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Contributions Section -->
+                        <div>
+                            <h3 class="section-title flex items-center gap-2" data-translate="Historical Contributions">
+                                <span>🏆</span> Historical Contributions
+                            </h3>
+                            <div id="modalCharacterContributions" class="modal-content">
+                                <!-- Contributions will be loaded here -->
+                            </div>
                         </div>
                     </div>
                 </div>

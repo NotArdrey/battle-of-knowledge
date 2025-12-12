@@ -2,6 +2,10 @@
 const characterContributions = {
     'Lapu-Lapu': {
         type: 'hero',
+        story: {
+            en: "Born as a fierce warrior and leader of Mactan, Lapu-Lapu rose to become the legendary chieftain who would change Philippine history forever. When foreign ships appeared on the horizon in 1521, he stood resolute while others wavered. Unlike Raja Humabon of Cebu who welcomed the strangers, Lapu-Lapu saw through their intentions. On that fateful morning of April 27, 1521, with only 1,500 warriors armed with bamboo spears and kampilans, he faced the armored conquistadors on the shores of Mactan. His courage and tactical brilliance led to the death of Ferdinand Magellan himself, proving that Filipinos would never bow to foreign invaders without a fight.",
+            tl: "Ipinanganak bilang isang matapang na mandirigma at pinuno ng Mactan, si Lapu-Lapu ay naging alamat na datu na magbabago ng kasaysayan ng Pilipinas magpakailanman. Nang lumitaw ang mga dayuhang barko sa abot-tanaw noong 1521, siya ay nanatiling matatag habang ang iba ay nag-alinlangan. Hindi tulad ni Raja Humabon ng Cebu na tinanggap ang mga dayuhan, nakita ni Lapu-Lapu ang kanilang tunay na hangarin. Sa umaga ng Abril 27, 1521, kasama lamang ang 1,500 mandirigma na armado ng sibat na kawayan at kampilan, hinarap niya ang mga armadong conquistador sa dalampasigan ng Mactan. Ang kanyang tapang at kahusayan sa taktika ay nagdulot ng kamatayan ni Ferdinand Magellan mismo, na nagpapatunay na ang mga Pilipino ay hindi susuko sa mga mananakop nang walang laban."
+        },
         contributions: {
             en: [
                 'First Filipino hero to resist Spanish colonization',
@@ -21,6 +25,10 @@ const characterContributions = {
     },
     'Raja Humabon': {
         type: 'hero',
+        story: {
+            en: "Raja Humabon, the powerful ruler of Cebu, stood at a crossroads of history when Magellan's fleet arrived in 1521. A pragmatic leader, he saw opportunity in the foreign visitors and their advanced weapons. He was the first Filipino ruler to embrace Christianity, taking the name Carlos in honor of the Spanish King. His wife, now known as Queen Juana, received the image of the Santo Niño. Though history has judged his alliance with Spain harshly, Humabon's decision shaped the cultural and religious identity of the Philippines for centuries to come.",
+            tl: "Si Raja Humabon, ang makapangyarihang pinuno ng Cebu, ay nakatayo sa isang mahalagang sandali ng kasaysayan nang dumating ang mga barko ni Magellan noong 1521. Bilang isang praktikal na pinuno, nakita niya ang oportunidad sa mga dayuhang bisita at kanilang mga makabagong sandata. Siya ang unang pinunong Pilipino na yumakap sa Kristiyanismo, na kinuha ang pangalang Carlos bilang parangal sa Hari ng Espanya. Ang kanyang asawa, na ngayon ay kilala bilang Reyna Juana, ay tumanggap ng imahen ng Santo Niño. Bagaman hinatulan ng kasaysayan ang kanyang alyansa sa Espanya, ang desisyon ni Humabon ay humubog ng kulturang at relihiyosong pagkakakilanlan ng Pilipinas sa loob ng maraming siglo."
+        },
         contributions: {
             en: [
                 'Rajah of Cebu who initially allied with Magellan',
@@ -40,6 +48,10 @@ const characterContributions = {
     },
     'Ferdinand Magellan': {
         type: 'villain',
+        story: {
+            en: "Ferdinand Magellan, a Portuguese explorer sailing under the Spanish crown, embarked on the most ambitious voyage of his era—to circumnavigate the globe. After months of treacherous sailing through the strait that now bears his name, he reached the Philippine archipelago on March 16, 1521. His mission was not merely exploration but conquest and conversion. He planted the cross of Christianity in Cebu and demanded submission from local chieftains. His arrogance would be his undoing when he underestimated Lapu-Lapu of Mactan, meeting his death on the island's shores on April 27, 1521.",
+            tl: "Si Ferdinand Magellan, isang manlalakbay na Portuges na naglalayag sa ilalim ng korona ng Espanya, ay nagsimula ng pinaka-ambisyosong paglalakbay ng kanyang panahon—ang libutin ang mundo. Matapos ang mga buwan ng mapanganib na paglalayag sa kipot na ngayon ay may pangalan niya, nakarating siya sa kapuluang Pilipinas noong Marso 16, 1521. Ang kanyang misyon ay hindi lamang paggalugad kundi pananakop at pagpapalit ng relihiyon. Itinayo niya ang krus ng Kristiyanismo sa Cebu at hinihingi ang pagsuko mula sa mga lokal na datu. Ang kanyang kahambugan ang magiging dahilan ng kanyang kapahamakan nang minamaliit niya si Lapu-Lapu ng Mactan, at natagpuan ang kanyang kamatayan sa dalampasigan ng isla noong Abril 27, 1521."
+        },
         contributions: {
             en: [
                 'Portuguese explorer who led the first circumnavigation expedition',
@@ -59,6 +71,10 @@ const characterContributions = {
     },
     'Spanish Soldier': {
         type: 'villain',
+        story: {
+            en: "The Spanish soldier of the late colonial period was a product of centuries of imperial tradition. Armed with rifles and discipline, these soldiers were tasked with maintaining Spain's grip on the Philippine islands. They faced a new enemy in the Katipuneros—Filipino revolutionaries who fought with nothing but bolos, bamboo lances, and an unbreakable spirit. As the revolution of 1896 spread like wildfire across Luzon, these soldiers found themselves fighting not just rebels, but an entire nation awakening to the dream of freedom.",
+            tl: "Ang sundalong Espanyol ng huling panahon ng kolonyal ay bunga ng daan-daang taon ng tradisyon ng imperyo. Armado ng mga riple at disiplina, ang mga sundalong ito ay itinalaga upang panatilihin ang kontrol ng Espanya sa kapuluang Pilipinas. Humarap sila sa bagong kaaway sa mga Katipunero—mga rebolusyonaryong Pilipino na lumaban gamit lamang ang mga bolo, sibat na kawayan, at isang di-mabubuong diwa. Habang kumakalat ang rebolusyon ng 1896 sa buong Luzon, natagpuan ng mga sundalong ito na hindi lamang mga rebelde ang kanilang kinakaharap, kundi isang buong bansa na gumigising sa pangarap ng kalayaan."
+        },
         contributions: {
             en: [
                 'Represented Spanish colonial military forces during the late colonial period',
@@ -78,6 +94,10 @@ const characterContributions = {
     },
     'Early Spanish Soldier': {
         type: 'villain',
+        story: {
+            en: "The early Spanish soldiers who arrived with Magellan's expedition in 1521 were hardened veterans of European wars, clad in armor and wielding crossbows and harquebuses. They had conquered the Aztecs and Incas and believed no native force could stand against them. But on the shores of Mactan, they faced warriors who knew their terrain intimately. Wading through waist-deep water under a hail of poisoned arrows and bamboo spears, they watched in horror as their invincible commander fell. Those who survived fled to their ships, forever remembering the day the unconquerable were conquered.",
+            tl: "Ang mga unang sundalong Espanyol na dumating kasama ng ekspedisyon ni Magellan noong 1521 ay mga beteranong nagpakahirap sa mga digmaan sa Europa, nakabihis ng kalasag at may hawak na mga krosbow at harquebus. Sinakop nila ang mga Aztec at Inca at naniniwala na walang pwersang katutubo ang kayang tumayo laban sa kanila. Ngunit sa dalampasigan ng Mactan, humarap sila sa mga mandirigma na lubos na kilala ang kanilang lupain. Habang lumalakad sa tubig na hanggang baywang sa ilalim ng pag-ulan ng mga palasong may lason at sibat na kawayan, nakita nila sa takot na bumagsak ang kanilang hindi matatalo na kumander. Ang mga nakaligtas ay tumakas patungo sa kanilang mga barko, magpakailanmang matatandaan ang araw na ang mga hindi matatalo ay natalo."
+        },
         contributions: {
             en: [
                 'Part of Ferdinand Magellan\'s expedition in 1521',
@@ -97,6 +117,10 @@ const characterContributions = {
     },
     'Jose Rizal': {
         type: 'hero',
+        story: {
+            en: "José Rizal was not born a hero—he became one through the power of his pen. A polymath who excelled in medicine, literature, and multiple languages, Rizal chose to fight not with weapons but with words. His novels, Noli Me Tangere and El Filibusterismo, tore away the veil of colonial oppression, exposing the abuses of the Spanish friars to the world. Exiled, imprisoned, and finally executed at Bagumbayan on December 30, 1896, Rizal's death ignited the flames of revolution. His final poem, Mi Último Adiós, remains one of the most moving tributes to love of country ever written.",
+            tl: "Hindi ipinanganak si José Rizal bilang bayani—naging bayani siya sa pamamagitan ng kapangyarihan ng kanyang panulat. Isang polymath na mahusay sa medisina, literatura, at maraming wika, pinili ni Rizal na lumaban hindi gamit ang mga armas kundi gamit ang mga salita. Ang kanyang mga nobela, Noli Me Tangere at El Filibusterismo, ay nagbukas ng belo ng pang-aapi ng kolonyal, inilalantad ang mga pang-aabuso ng mga prayleng Espanyol sa mundo. Ipinatapon, ikinulong, at sa wakas ay pinatay sa Bagumbayan noong Disyembre 30, 1896, ang kamatayan ni Rizal ay nagpasiklab ng apoy ng rebolusyon. Ang kanyang huling tula, Mi Último Adiós, ay nananatiling isa sa pinaka-makabuluhang parangal sa pagmamahal sa bayan na naisulat kailanman."
+        },
         contributions: {
             en: [
                 'National hero of the Philippines',
@@ -118,6 +142,10 @@ const characterContributions = {
     },
     'Andres Bonifacio': {
         type: 'hero',
+        story: {
+            en: "Andrés Bonifacio was a man of the masses—a warehouse worker who taught himself to read and became the voice of the Filipino people. While the ilustrados debated reform, Bonifacio knew that freedom would only come through revolution. In 1892, he founded the Katipunan in secret, recruiting members through blood compacts and whispered oaths. When the secret society was discovered in 1896, Bonifacio made the fateful decision at Pugad Lawin, tearing their cedulas and crying 'Long live the Philippines!' His was a revolution of the common tao, and though he was betrayed and executed, his legacy of courage lives on.",
+            tl: "Si Andrés Bonifacio ay isang tao ng masa—isang manggagawa sa bodega na nagturo sa sarili niyang magbasa at naging boses ng mga Pilipino. Habang ang mga ilustrado ay nakikipagdebate tungkol sa reporma, alam ni Bonifacio na ang kalayaan ay darating lamang sa pamamagitan ng rebolusyon. Noong 1892, itinatag niya ang Katipunan nang palihim, nagre-recruit ng mga miyembro sa pamamagitan ng mga sanduguan at bulong na mga panata. Nang matuklasan ang lihim na samahan noong 1896, ginawa ni Bonifacio ang mahalagang desisyon sa Pugad Lawin, pinunit ang kanilang mga sedula at sumigaw ng 'Mabuhay ang Pilipinas!' Ang kanyang rebolusyon ay para sa karaniwang tao, at kahit siya ay pinagtaksilan at pinatay, ang kanyang pamana ng katapangan ay nananatiling buhay."
+        },
         contributions: {
             en: [
                 'Founded the Katipunan (KKK) on July 7, 1892',
@@ -137,6 +165,62 @@ const characterContributions = {
     },
     'Emilio Aguinaldo': {
         type: 'hero',
+        // Era-specific story and contributions
+        eraSpecific: {
+            'late-spanish': {
+                story: {
+                    en: "Emilio Aguinaldo emerged from the chaos of revolution as the youngest general in the revolutionary army at just 28 years old. Born to a wealthy family in Kawit, Cavite, he rose through the ranks of the Katipunan through military brilliance and political cunning. His victories in Cavite proved decisive, and when internal conflicts threatened to tear the revolution apart, Aguinaldo emerged as the leader who could unite the factions. On June 12, 1898, from the balcony of his ancestral home, he proclaimed Philippine independence, unfurling the flag and hearing the national anthem for the first time. It was the birth of a nation.",
+                    tl: "Si Emilio Aguinaldo ay lumitaw mula sa kaguluhan ng rebolusyon bilang pinakabatang heneral sa hukbong rebolusyonaryo sa edad lamang na 28. Ipinanganak sa isang mayamang pamilya sa Kawit, Cavite, siya ay umangat sa mga ranggo ng Katipunan sa pamamagitan ng kahusayan sa militar at katalinuhan sa pulitika. Ang kanyang mga tagumpay sa Cavite ay naging mapagpasya, at nang ang mga panloob na alitan ay nagbanta na wasakin ang rebolusyon, lumitaw si Aguinaldo bilang pinuno na kayang pagsamahin ang mga pangkat. Noong Hunyo 12, 1898, mula sa balkonahe ng kanyang ninunong tahanan, ipinahayag niya ang kalayaan ng Pilipinas, itinayo ang bandila at narinig ang pambansang awit sa unang pagkakataon. Ito ang kapanganakan ng isang bansa."
+                },
+                contributions: {
+                    en: [
+                        'Led Filipino forces to victory in Cavite during the Philippine Revolution',
+                        'Declared Philippine Independence on June 12, 1898 from Kawit, Cavite',
+                        'First and youngest President of the Revolutionary Government at age 28',
+                        'Established the first democratic republic in Asia through the Malolos Congress',
+                        'Commander-in-chief of revolutionary forces against Spain',
+                        'Unified various revolutionary factions under one government'
+                    ],
+                    tl: [
+                        'Pinangunahan ang mga pwersang Pilipino sa tagumpay sa Cavite sa panahon ng Rebolusyong Pilipino',
+                        'Idineklara ang Kalayaan ng Pilipinas noong Hunyo 12, 1898 mula sa Kawit, Cavite',
+                        'Una at pinakabatang Pangulo ng Rebolusyonaryong Pamahalaan sa edad na 28',
+                        'Itinatag ang unang demokratikong republika sa Asya sa pamamagitan ng Kongreso ng Malolos',
+                        'Kumander-heneral ng mga pwersang rebolusyonaryo laban sa Espanya',
+                        'Pinagkaisa ang iba\'t ibang pangkat na rebolusyonaryo sa ilalim ng isang pamahalaan'
+                    ]
+                }
+            },
+            'american-colonial': {
+                story: {
+                    en: "When the Americans arrived as supposed allies against Spain, Aguinaldo initially welcomed them. But the Treaty of Paris shattered that illusion—the Philippines had merely been sold from one colonial master to another for $20 million. Refusing to submit, Aguinaldo led his forces against the new invaders in what would become the Philippine-American War. For three years, Filipino guerrillas fought against the superior American forces. When Aguinaldo was captured in 1901 through a daring ruse in Palanan, Isabela, the organized resistance effectively ended. He lived to see true independence in 1946 and died in 1964, the last living link to the revolution.",
+                    tl: "Nang dumating ang mga Amerikano bilang mga dapat na kakampi laban sa Espanya, tinanggap muna sila ni Aguinaldo. Ngunit winasak ng Kasunduan sa Paris ang ilusyong iyon—ang Pilipinas ay ipinagbili lamang mula sa isang kolonyal na panginoon tungo sa isa pa sa halagang $20 milyon. Tumangging sumuko, pinangunahan ni Aguinaldo ang kanyang mga puwersa laban sa mga bagong mananakop sa magiging Digmaang Pilipino-Amerikano. Sa loob ng tatlong taon, lumaban ang mga gerilyang Pilipino laban sa mas malakas na pwersang Amerikano. Nang mahuli si Aguinaldo noong 1901 sa pamamagitan ng isang mapangahas na pakana sa Palanan, Isabela, ang organisadong paglaban ay epektibong natapos. Nabuhay siya upang makita ang tunay na kalayaan noong 1946 at namatay noong 1964, ang huling buhay na ugnay sa rebolusyon."
+                },
+                contributions: {
+                    en: [
+                        'Led Filipino resistance during the Philippine-American War (1899-1902)',
+                        'First President of the First Philippine Republic during American occupation',
+                        'Organized guerrilla warfare against American forces across Luzon',
+                        'Continued to fight for independence even after American takeover',
+                        'Captured in Palanan, Isabela in 1901, ending organized resistance',
+                        'Witnessed and attended Philippine independence on July 4, 1946'
+                    ],
+                    tl: [
+                        'Pinangunahan ang paglaban ng mga Pilipino sa Digmaang Pilipino-Amerikano (1899-1902)',
+                        'Unang Pangulo ng Unang Republika ng Pilipinas sa panahon ng okupasyong Amerikano',
+                        'Nag-organisa ng digmaang gerilya laban sa mga pwersang Amerikano sa buong Luzon',
+                        'Patuloy na nakipaglaban para sa kalayaan kahit matapos ang pananakop ng Amerika',
+                        'Nahuli sa Palanan, Isabela noong 1901, na nagtapos ng organisadong paglaban',
+                        'Nakasaksi at dumalo sa kalayaan ng Pilipinas noong Hulyo 4, 1946'
+                    ]
+                }
+            }
+        },
+        // Default fallback (used if no era-specific data)
+        story: {
+            en: "Emilio Aguinaldo emerged from the chaos of revolution as the youngest general in the revolutionary army at just 28 years old. Born to a wealthy family in Kawit, Cavite, he rose through the ranks of the Katipunan through military brilliance and political cunning. He led the fight for independence against both Spain and the United States, becoming the first President of the Philippines.",
+            tl: "Si Emilio Aguinaldo ay lumitaw mula sa kaguluhan ng rebolusyon bilang pinakabatang heneral sa hukbong rebolusyonaryo sa edad lamang na 28. Ipinanganak sa isang mayamang pamilya sa Kawit, Cavite, siya ay umangat sa mga ranggo ng Katipunan sa pamamagitan ng kahusayan sa militar at katalinuhan sa pulitika. Pinangunahan niya ang laban para sa kalayaan laban sa Espanya at Estados Unidos, na naging unang Pangulo ng Pilipinas."
+        },
         contributions: {
             en: [
                 'First President of the Philippines',

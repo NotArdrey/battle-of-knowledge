@@ -1,14 +1,15 @@
-// Learning module content for each era
+﻿// Learning module content for each era
 const learningData = {
     'early-spanish': {
         en: {
-            title: 'Early Spanish Era (1521)',
-            subtitle: 'The Battle of Mactan and First Contact',
+            title: 'Early Spanish Era',
+            subtitle: 'The First Contact (1521)',
+
             lessons: [
                 {
                     id: 1,
-                    title: '🏝️ Pre-Colonial Philippines',
-                    icon: '🏝️',
+                    title: 'Pre-Colonial Philippines',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Life Before the Spanish</h3>
@@ -17,7 +18,7 @@ const learningData = {
                             <p class="mb-3">Society was organized into distinct classes including nobles (maharlika), freemen, and slaves. Traditional religious practices centered around animism, while some communities in the south had already embraced Islamic influences brought by traders from neighboring regions.</p>
                             
                             <div class="bg-blue-100 border-l-4 border-blue-500 p-4 mt-4">
-                                <p class="font-semibold">💡 Did you know?</p>
+                                <p class="font-semibold">Did you know?</p>
                                 <p>Ancient Filipinos were skilled navigators and boat builders, trading across Southeast Asia! Their advanced maritime technology allowed them to establish trade networks throughout the region long before European contact.</p>
                             </div>
                         </div>
@@ -25,8 +26,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '⛵ Magellan\'s Arrival (1521)',
-                    icon: '⛵',
+                    title: "Magellan's Arrival (1521)",
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Ferdinand Magellan Arrives</h3>
@@ -35,7 +36,7 @@ const learningData = {
                             <p class="mb-3">The journey unfolded through several key events: Magellan first landed in Homonhon Island on March 16, then proceeded to Cebu by March 28. On April 14, 1521, Raja Humabon and approximately 800 of his followers converted to Christianity in what would become the first Catholic mass in the Philippines. This religious conversion set the stage for the historic Battle of Mactan that followed on April 27.</p>
                             
                             <div class="bg-amber-100 border-l-4 border-amber-500 p-4 mt-4">
-                                <p class="font-semibold">⚠️ Important Context:</p>
+                                <p class="font-semibold">Important Context:</p>
                                 <p>Magellan immediately claimed the islands for Spain and began efforts to convert native populations to Christianity. This aggressive approach created tensions with local leaders who valued their independence and traditional ways of life, leading to inevitable conflicts over sovereignty and cultural autonomy.</p>
                             </div>
                         </div>
@@ -43,8 +44,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '⚔️ Lapu-Lapu: The First Hero',
-                    icon: '⚔️',
+                    title: 'Lapu-Lapu: The Hero',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Lapu-Lapu: Defender of Mactan</h3>
@@ -55,7 +56,7 @@ const learningData = {
                             <p class="mb-3">Lapu-Lapu is traditionally depicted wielding a <strong>kampilan</strong>, a distinctive Filipino sword known for its effectiveness in close combat. This weapon symbolizes both his martial prowess and his commitment to defending his people's way of life against foreign imposition.</p>
                             
                             <div class="bg-green-100 border-l-4 border-green-500 p-4 mt-4">
-                                <p class="font-semibold">🏆 Lasting Legacy:</p>
+                                <p class="font-semibold">Lasting Legacy:</p>
                                 <p>Lapu-Lapu is honored as the first Filipino to successfully resist European colonization, setting a powerful precedent for future generations. His statue stands proudly in Mactan, Cebu, serving as an enduring symbol of Filipino courage, independence, and national pride that continues to inspire Filipinos today.</p>
                             </div>
                         </div>
@@ -63,8 +64,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '🗡️ The Battle of Mactan',
-                    icon: '🗡️',
+                    title: 'Battle of Mactan',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">The Battle of Mactan (April 27, 1521)</h3>
@@ -75,7 +76,7 @@ const learningData = {
                             <p class="mb-3">Several factors contributed to the Filipino victory. The home advantage proved crucial as local warriors knew every detail of the terrain and tidal patterns. Their superior numbers allowed for envelopment tactics that neutralized Spanish firepower. Most importantly, Lapu-Lapu's forces fought with extraordinary determination, defending their homeland and traditional way of life against foreign domination.</p>
                             
                             <div class="bg-red-100 border-l-4 border-red-500 p-4 mt-4">
-                                <p class="font-semibold">⚡ Historical Significance:</p>
+                                <p class="font-semibold">Historical Significance:</p>
                                 <p>This decisive victory demonstrated that Western colonial powers could be successfully resisted, even with their technological advantages. The death of Magellan marked a temporary setback for Spanish expansion in the region. However, Spain would return in 1565 under Miguel López de Legazpi to establish permanent colonial rule, beginning 333 years of Spanish administration in the Philippines.</p>
                             </div>
                         </div>
@@ -83,8 +84,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🏛️ After the Battle',
-                    icon: '🏛️',
+                    title: 'Aftermath & Legacy',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">The Aftermath and Spanish Return</h3>
@@ -95,7 +96,7 @@ const learningData = {
                             <p class="mb-3">Spanish colonization brought profound changes including the replacement of the indigenous Baybayin script with the Latin alphabet, establishment of formal educational institutions and universities, creation of a centralized governmental system, and unfortunately, systematic exploitation of Filipino labor and natural resources. The encomienda system in particular created conditions of forced labor and tribute collection that heavily burdened the native population.</p>
                             
                             <div class="bg-purple-100 border-l-4 border-purple-500 p-4 mt-4">
-                                <p class="font-semibold">📚 Historical Perspective:</p>
+                                <p class="font-semibold">Historical Perspective:</p>
                                 <p>While the Battle of Mactan represented an important victory for Filipino sovereignty, it marked only the beginning of a long struggle for independence that would span centuries. The complete independence of the Philippines would not be achieved until 1898 from Spain and 1946 from the United States, making the journey from Lapu-Lapu's resistance to full nationhood a story of persistent struggle and gradual self-determination.</p>
                             </div>
                         </div>
@@ -104,13 +105,13 @@ const learningData = {
             ]
         },
         tl: {
-            title: 'Unang Panahon ng Espanyol (1521)',
-            subtitle: 'Ang Labanan sa Mactan at Unang Pagdating',
+            title: 'Maagang Panahon ng Espanya',
+            subtitle: 'Ang Unang Pakikipag-ugnayan (1521)',
             lessons: [
                 {
                     id: 1,
-                    title: '🏝️ Pilipinas Bago ang Pananakop',
-                    icon: '🏝️',
+                    title: 'Pre-Colonial na Pilipinas',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Buhay Bago Dumating ang Espanyol</h3>
@@ -119,7 +120,7 @@ const learningData = {
                             <p class="mb-3">Ang lipunan ay nahahati sa mga magkakaibang uri kabilang ang mga maharlika (noble), malalayang tao, at alipin. Ang mga tradisyonal na paniniwala ay nakasentro sa animismo, habang ang ilang pamayanan sa timog ay naimpluwensyahan na ng Islam na dala ng mga mangangalakal mula sa kalapit na rehiyon.</p>
                             
                             <div class="bg-blue-100 border-l-4 border-blue-500 p-4 mt-4">
-                                <p class="font-semibold">💡 Alam mo ba?</p>
+                                <p class="font-semibold">Alam mo ba?</p>
                                 <p>Ang mga sinaunang Pilipino ay bihasang mandaragat at tagagawa ng bangka, nakikipagkalakalan sa buong Timog-Silangang Asya! Ang kanilang advanced na teknolohiya sa paglalayag ay nagbigay-daan sa pagtatatag ng mga network ng kalakalan sa rehiyon bago pa man dumating ang mga Europeo.</p>
                             </div>
                         </div>
@@ -127,8 +128,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '⛵ Pagdating ni Magellan (1521)',
-                    icon: '⛵',
+                    title: 'Pagdating ni Magellan (1521)',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Dumating si Ferdinand Magellan</h3>
@@ -137,7 +138,7 @@ const learningData = {
                             <p class="mb-3">Ang paglalakbay ay nagpatuloy sa pamamagitan ng ilang mahahalagang pangyayari: Unang dumating si Magellan sa Isla ng Homonhon noong Marso 16, pagkatapos ay nagtungo sa Cebu noong Marso 28. Noong Abril 14, 1521, si Raja Humabon at humigit-kumulang 800 ng kanyang mga tagasunod ay naging Kristiyano sa unang misa Katoliko sa Pilipinas. Ang pagbabagong ito ng relihiyon ang naghanda sa makasaysayang Labanan sa Mactan na sumunod noong Abril 27.</p>
                             
                             <div class="bg-amber-100 border-l-4 border-amber-500 p-4 mt-4">
-                                <p class="font-semibold">⚠️ Mahalagang Konteksto:</p>
+                                <p class="font-semibold">Mahalagang Konteksto:</p>
                                 <p>Agad na inangkin ni Magellan ang mga isla para sa Espanya at nagsimulang i-convert ang mga katutubo sa Kristiyanismo. Ang agresibong paraang ito ay lumikha ng mga pag-igting sa mga lokal na pinuno na pinahahalagahan ang kanilang kalayaan at tradisyonal na pamumuhay, na humantong sa hindi maiiwasang mga salungatan tungkol sa soberanya at kultural na awtonomiya.</p>
                             </div>
                         </div>
@@ -145,8 +146,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '⚔️ Lapu-Lapu: Ang Unang Bayani',
-                    icon: '⚔️',
+                    title: 'Lapu-Lapu: Ang Bayani',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Lapu-Lapu: Tagapagtanggol ng Mactan</h3>
@@ -157,7 +158,7 @@ const learningData = {
                             <p class="mb-3">Si Lapu-Lapu ay tradisyonal na inilalarawan na may hawak na <strong>kampilan</strong>, isang natatanging espada ng Pilipino na kilala sa bisa nito sa malapit na labanan. Ang sandatang ito ay sumisimbolo sa kanyang kasanayan sa pakikidigma at kanyang pangako na ipagtanggol ang pamumuhay ng kanyang mga tao laban sa dayuhang pagpataw.</p>
                             
                             <div class="bg-green-100 border-l-4 border-green-500 p-4 mt-4">
-                                <p class="font-semibold">🏆 Pangmatagalang Pamana:</p>
+                                <p class="font-semibold">Pangmatagalang Pamana:</p>
                                 <p>Si Lapu-Lapu ay iginagalang bilang unang Pilipinong matagumpay na lumaban sa pananakop ng Europeo, na nagtakda ng isang makapangyarihang precedent para sa susunod na mga henerasyon. Ang kanyang estatwa ay nakatayo nang may karangalan sa Mactan, Cebu, na nagsisilbing pangmatagalang simbolo ng katapangan, kalayaan, at pambansang pagmamataas ng Pilipino na patuloy na nagbibigay-inspirasyon sa mga Pilipino hanggang ngayon.</p>
                             </div>
                         </div>
@@ -165,8 +166,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '🗡️ Ang Labanan sa Mactan',
-                    icon: '🗡️',
+                    title: 'Labanan sa Mactan',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Ang Labanan sa Mactan (Abril 27, 1521)</h3>
@@ -177,7 +178,7 @@ const learningData = {
                             <p class="mb-3">Ilang mga kadahilanan ang nag-ambag sa tagumpay ng mga Pilipino. Ang bentahe sa tahanan ay naging mahalaga dahil alam ng mga lokal na mandirigma ang bawat detalye ng lupain at mga pattern ng alon. Ang kanilang superior na numero ay nagpapahintulot ng mga taktika ng pagpapalibot na neutralisado ang apoy ng mga Espanyol. Higit sa lahat, ang mga puwersa ni Lapu-Lapu ay lumaban nang may pambihirang determinasyon, na ipinagtatanggol ang kanilang lupain at tradisyonal na paraan ng pamumuhay laban sa dayuhang dominasyon.</p>
                             
                             <div class="bg-red-100 border-l-4 border-red-500 p-4 mt-4">
-                                <p class="font-semibold">⚡ Makasaysayang Kahalagahan:</p>
+                                <p class="font-semibold">Makasaysayang Kahalagahan:</p>
                                 <p>Ang mapagpasyang tagumpay na ito ay nagpakita na ang mga Kanluraning kolonyal na kapangyarihan ay maaaring matagumpay na labanan, kahit na may kanilang mga teknolohikal na kalamangan. Ang pagkamatay ni Magellan ay nagmarka ng pansamantalang pagkaantala para sa pagpapalawak ng Espanya sa rehiyon. Gayunpaman, babalik ang Espanya noong 1565 sa ilalim ni Miguel López de Legazpi upang magtatag ng permanenteng kolonyal na pamamahala, na nagsisimula ng 333 taon ng pamamahala ng Espanya sa Pilipinas.</p>
                             </div>
                         </div>
@@ -185,8 +186,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🏛️ Pagkatapos ng Labanan',
-                    icon: '🏛️',
+                    title: 'Bunga at Pamana',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Ang Sumunod at Pagbabalik ng mga Espanyol</h3>
@@ -197,7 +198,7 @@ const learningData = {
                             <p class="mb-3">Ang kolonisasyon ng Espanya ay nagdala ng malalim na mga pagbabago kabilang ang pagpapalit ng katutubong Baybayin script sa alpabetong Latin, pagtatatag ng pormal na mga institusyong pang-edukasyon at mga unibersidad, paglikha ng isang sentralisadong sistema ng pamahalaan, at sa kasamaang-palad, sistematikong pagsasamantala sa paggawa at likas na yaman ng Pilipino. Ang sistema ng encomienda sa partikular ay lumikha ng mga kondisyon ng sapilitang paggawa at koleksyon ng tributo na mabigat na pabigat sa katutubong populasyon.</p>
                             
                             <div class="bg-purple-100 border-l-4 border-purple-500 p-4 mt-4">
-                                <p class="font-semibold">📚 Makasaysayang Pananaw:</p>
+                                <p class="font-semibold">Makasaysayang Pananaw:</p>
                                 <p>Habang ang Labanan sa Mactan ay kumakatawan sa isang mahalagang tagumpay para sa soberanya ng Pilipino, ito ay nagmarka lamang ng simula ng isang mahabang pakikibaka para sa kalayaan na tatagal ng mga siglo. Ang kumpletong kalayaan ng Pilipinas ay hindi makakamit hanggang 1898 mula sa Espanya at 1946 mula sa Estados Unidos, na ginagawa ang paglalakbay mula sa paglaban ni Lapu-Lapu tungo sa ganap na pagka-bansa bilang isang kwento ng patuloy na pakikibaka at unti-unting pagpapasya sa sarili.</p>
                             </div>
                         </div>
@@ -208,13 +209,13 @@ const learningData = {
     },
     'late-spanish': {
         en: {
-            title: 'Late Spanish Era (1896-1898)',
-            subtitle: 'The Philippine Revolution',
+            title: 'Late Spanish Era',
+            subtitle: 'The Philippine Revolution (1896-1898)',
             lessons: [
                 {
                     id: 1,
-                    title: '📖 Jose Rizal: The Reformist',
-                    icon: '📖',
+                    title: 'Jose Rizal',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Dr. Jose Rizal - National Hero</h3>
@@ -228,8 +229,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '✊ The Katipunan Revolution',
-                    icon: '✊',
+                    title: 'Andres Bonifacio',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Andres Bonifacio and the KKK</h3>
@@ -243,8 +244,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '🇵🇭 Philippine Independence',
-                    icon: '🇵🇭',
+                    title: 'Emilio Aguinaldo',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Emilio Aguinaldo's Leadership</h3>
@@ -258,8 +259,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '⚖️ The Brains of the Revolution',
-                    icon: '⚖️',
+                    title: 'Apolinario Mabini',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Apolinario Mabini</h3>
@@ -273,8 +274,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🌅 End of Spanish Rule',
-                    icon: '🌅',
+                    title: 'Treaty of Paris',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Treaty of Paris (1898)</h3>
@@ -289,13 +290,13 @@ const learningData = {
             ]
         },
         tl: {
-            title: 'Huling Panahon ng Espanyol (1896-1898)',
-            subtitle: 'Ang Rebolusyong Pilipino',
+            title: 'Huling Panahon ng Espanya',
+            subtitle: 'Ang Rebolusyong Pilipino (1896-1898)',
             lessons: [
                 {
                     id: 1,
-                    title: '📖 Jose Rizal: Ang Repormista',
-                    icon: '📖',
+                    title: 'Jose Rizal',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Dr. Jose Rizal - Pambansang Bayani</h3>
@@ -309,8 +310,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '✊ Ang Rebolusyong Katipunan',
-                    icon: '✊',
+                    title: 'Andres Bonifacio',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Andres Bonifacio at ang KKK</h3>
@@ -324,8 +325,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '🇵🇭 Kalayaan ng Pilipinas',
-                    icon: '🇵🇭',
+                    title: 'Emilio Aguinaldo',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Pamumuno ni Emilio Aguinaldo</h3>
@@ -339,8 +340,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '⚖️ Ang Utak ng Rebolusyon',
-                    icon: '⚖️',
+                    title: 'Apolinario Mabini',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Apolinario Mabini</h3>
@@ -354,8 +355,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🌅 Wakas ng Pamamahala ng Espanyol',
-                    icon: '🌅',
+                    title: 'Kasunduan sa Paris',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Kasunduan sa Paris (1898)</h3>
@@ -372,13 +373,13 @@ const learningData = {
     },
     'american-colonial': {
         en: {
-            title: 'American Colonial Era (1899-1946)',
-            subtitle: 'Philippine-American War and Colonial Period',
+            title: 'American Colonial Era',
+            subtitle: 'A New Colonial Power (1898-1946)',
             lessons: [
                 {
                     id: 1,
-                    title: '🦅 American Arrival',
-                    icon: '🦅',
+                    title: 'The Transition',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">From Spanish to American Rule</h3>
@@ -390,8 +391,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '⚔️ Philippine-American War',
-                    icon: '⚔️',
+                    title: 'Philippine-American War',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">The War for Independence (1899-1902)</h3>
@@ -405,8 +406,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '🏫 American Colonial Policy',
-                    icon: '🏫',
+                    title: 'Benevolent Assimilation',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Benevolent Assimilation</h3>
@@ -420,8 +421,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '📜 Steps to Independence',
-                    icon: '📜',
+                    title: 'Path to Self-Government',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Path to Self-Government</h3>
@@ -435,8 +436,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🌟 Legacy of American Period',
-                    icon: '🌟',
+                    title: 'American Legacy',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Impact on Philippine Society</h3>
@@ -451,13 +452,13 @@ const learningData = {
             ]
         },
         tl: {
-            title: 'Panahon ng Kolonyal na Amerika (1899-1946)',
-            subtitle: 'Digmaang Pilipino-Amerikano at Panahong Kolonyal',
+            title: 'Panahon ng Pananakop ng Amerika',
+            subtitle: 'Bagong Kolonyal na Kapangyarihan (1898-1946)',
             lessons: [
                 {
                     id: 1,
-                    title: '🦅 Pagdating ng Amerika',
-                    icon: '🦅',
+                    title: 'Ang Paglipat',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Mula sa Espanyol tungo sa Pamamahala ng Amerika</h3>
@@ -469,8 +470,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '⚔️ Digmaang Pilipino-Amerikano',
-                    icon: '⚔️',
+                    title: 'Digmaang Pilipino-Amerikano',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Digmaan para sa Kalayaan (1899-1902)</h3>
@@ -484,8 +485,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '🏫 Patakaran ng Kolonyal na Amerika',
-                    icon: '🏫',
+                    title: 'Benevolent Assimilation',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Benevolent Assimilation</h3>
@@ -499,8 +500,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '📜 Hakbang tungo sa Kalayaan',
-                    icon: '📜',
+                    title: 'Landas sa Sariling Pamahalaan',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Landas tungo sa Sariling Pamahalaan</h3>
@@ -514,8 +515,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🌟 Pamana ng Panahong Amerikano',
-                    icon: '🌟',
+                    title: 'Pamana ng Amerika',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Epekto sa Lipunang Pilipino</h3>
@@ -532,13 +533,13 @@ const learningData = {
     },
     'ww2': {
         en: {
-            title: 'World War 2 Era (1941-1945)',
-            subtitle: 'Japanese Occupation and Liberation',
+            title: 'World War II Era',
+            subtitle: 'The Japanese Occupation (1941-1945)',
             lessons: [
                 {
                     id: 1,
-                    title: '💣 Japanese Invasion',
-                    icon: '💣',
+                    title: 'Japanese Invasion',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">December 8, 1941</h3>
@@ -550,8 +551,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '🏴 Bataan Death March',
-                    icon: '🏴',
+                    title: 'Bataan Death March',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">The Infamous March (April 1942)</h3>
@@ -563,8 +564,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '🗡️ Filipino Resistance',
-                    icon: '🗡️',
+                    title: 'Filipino Resistance',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Guerrilla Warfare and Underground Movements</h3>
@@ -576,8 +577,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '🇺🇸 MacArthur Returns',
-                    icon: '🇺🇸',
+                    title: 'Liberation',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">"I Shall Return" - October 1944</h3>
@@ -589,8 +590,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🕊️ Path to Independence',
-                    icon: '🕊️',
+                    title: 'Independence',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">July 4, 1946: Realization of Independence</h3>
@@ -605,13 +606,13 @@ const learningData = {
             ]
         },
         tl: {
-            title: 'Panahon ng Ikalawang Digmaang Pandaigdig (1941-1945)',
-            subtitle: 'Okupasyon ng Hapon at Paglaya',
+            title: 'Panahon ng Ikalawang Digmaang Pandaigdig',
+            subtitle: 'Ang Pananakop ng Hapon (1941-1945)',
             lessons: [
                 {
                     id: 1,
-                    title: '💣 Pagsalakay ng Hapon',
-                    icon: '💣',
+                    title: 'Pagsalakay ng Hapon',
+                    icon: '1',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Disyembre 8, 1941</h3>
@@ -623,8 +624,8 @@ const learningData = {
                 },
                 {
                     id: 2,
-                    title: '🏴 Martsa ng Kamatayan sa Bataan',
-                    icon: '🏴',
+                    title: 'Bataan Death March',
+                    icon: '2',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Ang Bantog na Martsa (Abril 1942)</h3>
@@ -636,8 +637,8 @@ const learningData = {
                 },
                 {
                     id: 3,
-                    title: '🗡️ Paglaban ng mga Pilipino',
-                    icon: '🗡️',
+                    title: 'Paglaban ng Pilipino',
+                    icon: '3',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Digmaang Gerilya at Mga Kilusang Underground</h3>
@@ -649,8 +650,8 @@ const learningData = {
                 },
                 {
                     id: 4,
-                    title: '🇺🇸 Pagbabalik ni MacArthur',
-                    icon: '🇺🇸',
+                    title: 'Pagpapalaya',
+                    icon: '4',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">"I Shall Return" - Oktubre 1944</h3>
@@ -662,8 +663,8 @@ const learningData = {
                 },
                 {
                     id: 5,
-                    title: '🕊️ Landas tungo sa Kalayaan',
-                    icon: '🕊️',
+                    title: 'Kalayaan',
+                    icon: '5',
                     content: `
                         <div class="space-y-4">
                             <h3 class="text-xl font-bold mb-3">Hulyo 4, 1946: Pagkamit ng Kalayaan</h3>

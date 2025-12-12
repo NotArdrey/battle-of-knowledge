@@ -160,6 +160,16 @@ function showCharacterDetails(character) {
     const contributions = characterContributions[character.name];
     const lang = localStorage.getItem('selectedLanguage') || 'en';
     
+    // Check for era-specific data
+    const eraKey = character.eraKey;
+    const hasEraSpecific = contributions && contributions.eraSpecific && contributions.eraSpecific[eraKey];
+    
+    // Set era background
+    const eraBg = document.getElementById('modalEraBg');
+    if (eraBg && eraData[character.eraKey]) {
+        eraBg.style.backgroundImage = `url('${eraData[character.eraKey].background}')`;
+    }
+    
     // Set character image
     document.getElementById('modalCharacterImg').src = getCharacterSprite(character, 'idle');
     document.getElementById('modalCharacterImg').alt = character.name;
@@ -184,17 +194,49 @@ function showCharacterDetails(character) {
     
     // Set contributions
     const contributionsDiv = document.getElementById('modalCharacterContributions');
-    if (contributions && contributions.contributions) {
-        const contributionsList = contributions.contributions[lang] || contributions.contributions['en'] || [];
+    const storyDiv = document.getElementById('modalCharacterStory');
+    
+    // Set story - check era-specific first
+    let storyData = null;
+    if (hasEraSpecific && contributions.eraSpecific[eraKey].story) {
+        storyData = contributions.eraSpecific[eraKey].story;
+    } else if (contributions && contributions.story) {
+        storyData = contributions.story;
+    }
+    
+    if (storyData) {
+        const storyText = storyData[lang] || storyData['en'] || '';
+        storyDiv.innerHTML = `<p class="text-amber-800 leading-relaxed">${storyText}</p>`;
+    } else {
+        const noStoryText = lang === 'tl' ? 'Ang kwento ay paparating...' : 'Story coming soon...';
+        storyDiv.innerHTML = `<p class="text-amber-700 italic">${noStoryText}</p>`;
+    }
+    
+    // Set contributions - check era-specific first
+    let contributionsData = null;
+    if (hasEraSpecific && contributions.eraSpecific[eraKey].contributions) {
+        contributionsData = contributions.eraSpecific[eraKey].contributions;
+    } else if (contributions && contributions.contributions) {
+        contributionsData = contributions.contributions;
+    }
+    
+    if (contributionsData) {
+        const contributionsList = contributionsData[lang] || contributionsData['en'] || [];
         contributionsDiv.innerHTML = contributionsList.map(contribution => 
-            `<div class="flex gap-3">
-                <span class="text-amber-600 font-bold flex-shrink-0">•</span>
-                <p>${contribution}</p>
+            `<div class="contribution-item flex gap-3">
+                <span class="text-amber-600 font-bold flex-shrink-0 text-lg">•</span>
+                <p class="text-amber-900">${contribution}</p>
             </div>`
         ).join('');
     } else {
         const noInfoText = lang === 'tl' ? 'Impormasyon sa kasaysayan ay paparating...' : 'Historical information coming soon...';
         contributionsDiv.innerHTML = `<p class="text-amber-700 italic">${noInfoText}</p>`;
+    }
+    
+    // Update "Story" heading translation
+    const storyHeading = document.querySelector('[data-translate="Story"]');
+    if (storyHeading && translations[lang]['Story']) {
+        storyHeading.textContent = translations[lang]['Story'];
     }
     
     // Update "Historical Contributions" heading translation

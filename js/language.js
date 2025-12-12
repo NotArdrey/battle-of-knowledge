@@ -79,7 +79,8 @@ const translations = {
         'resetProgress': '🔄 Reset Progress',
         'completeAllLessons': 'Complete all lessons to unlock the battle!',
         'Next': 'Next ▶',
-        'Previous': '◀ Previous'
+        'Previous': '◀ Previous',
+        'Story': 'Story'
     },
     tl: {
         // Index page
@@ -161,7 +162,8 @@ const translations = {
         'resetProgress': '🔄 I-reset ang Progreso',
         'completeAllLessons': 'Kumpletuhin lahat ng aral upang ma-unlock ang labanan!',
         'Next': 'Susunod ▶',
-        'Previous': '◀ Nakaraan'
+        'Previous': '◀ Nakaraan',
+        'Story': 'Kwento'
     }
 };
 
