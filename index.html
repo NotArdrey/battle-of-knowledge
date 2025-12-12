@@ -324,7 +324,7 @@
     <script src="js/language.js"></script>
     
     <script>
-        // Language toggle functionality
+        // Language toggle functionality with localStorage
         document.addEventListener('DOMContentLoaded', function() {
             const langToggle = document.getElementById('langToggle');
             const langToggleImg = document.getElementById('langToggleImg');
@@ -333,12 +333,25 @@
             const startButtonImg = document.getElementById('startButtonImg');
             const collectionButtonImg = document.getElementById('collectionButtonImg');
             
-            // Set initial state
-            let isTagalog = false;
+            // Check localStorage for saved language preference
+            let isTagalog = localStorage.getItem('language') === 'tagalog';
+            
+            // Set initial state based on saved preference
+            setLanguage(isTagalog);
             
             langToggle.addEventListener('click', function() {
                 isTagalog = !isTagalog;
+                setLanguage(isTagalog);
                 
+                // Save language preference to localStorage
+                localStorage.setItem('language', isTagalog ? 'tagalog' : 'english');
+                
+                // Optional: Preload images to prevent flickering on toggle
+                preloadImages(isTagalog);
+            });
+            
+            // Function to set language
+            function setLanguage(isTagalog) {
                 if (isTagalog) {
                     // Switch to Tagalog
                     englishTitle.style.display = 'none';
@@ -360,13 +373,7 @@
                     collectionButtonImg.src = 'assets/Buttons/COLLECTION Button.png';
                     collectionButtonImg.alt = 'COLLECTION';
                 }
-                
-                // Optional: Preload images to prevent flickering on toggle
-                preloadImages(isTagalog);
-                
-                // You might also want to integrate this with your existing language.js
-                // to change other text elements on the page
-            });
+            }
             
             // Function to preload images for smooth transition
             function preloadImages(isTagalog) {
