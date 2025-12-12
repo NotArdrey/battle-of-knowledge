@@ -355,10 +355,9 @@ function setupLessonNavigation() {
 // Start battle
 function startBattle() {
     const selectedEra = localStorage.getItem('selectedEra');
-    const selectedHero = localStorage.getItem('selectedHero');
     
-    // Check if era has multiple heroes and no hero was selected yet
-    if (eraData[selectedEra] && eraData[selectedEra].heroes.length > 1 && selectedHero === null) {
+    // Always show character selection for eras with multiple heroes
+    if (eraData[selectedEra] && eraData[selectedEra].heroes.length > 1) {
         // Show character selection modal
         showCharacterSelect();
     } else {
