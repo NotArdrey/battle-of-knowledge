@@ -1,4 +1,4 @@
-// battle.js - COMPLETE VERSION WITH FIXED BOSS BATTLE MECHANICS
+// battle.js - COMPLETE VERSION WITH BOSS BATTLE MECHANICS
 
 // Battle game logic
 let playerHp = 100;
@@ -27,7 +27,7 @@ const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier',
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
-// Boss definitions for each era - UPDATED WITH CORRECT NAMES
+// Boss definitions for each era
 const bossDefinitions = {
     'early-spanish': {
         bossName: 'Ferdinand Magellan',
@@ -40,8 +40,8 @@ const bossDefinitions = {
         bossName: 'Late Spanish Commander Era',
         isBoss: true,
         isFinalBoss: true,
-        preBossEnemies: ['Spanish Soldier'],
-        enemiesBeforeBoss: 3 // Defeat 3 Spanish Soldiers before Spanish Commander
+        preBossEnemies: ['Spanish Soldier', 'Spanish Commander'],
+        enemiesBeforeBoss: 3 // Defeat 3 enemies before Spanish Commander
     },
     'american-colonial': {
         bossName: 'Commodore George Dewey',
@@ -69,8 +69,8 @@ const soundEffects = {
     magic: new Audio('assets/SFX/Attacks/Magic.mp3'),
     hit: new Audio('assets/SFX/Attacks/Hit.mp3'),
     damage: new Audio('assets/SFX/Attacks/Damage.mp3'),
-    bossIntro: new Audio('assets/SFX/Boss/boss-intro.mp3'),
-    victoryFanfare: new Audio('assets/SFX/Boss/victory-fanfare.mp3')
+    bossIntro: new Audio('assets/SFX/Boss/boss-intro.mp3'), // Optional: add boss intro sound
+    victoryFanfare: new Audio('assets/SFX/Boss/victory-fanfare.mp3') // Optional: victory sound
 };
 
 // Configure sound settings
@@ -131,53 +131,31 @@ function getUnlockedHeroesForEra(eraKey) {
     return unlockedHeroes[eraKey] || [0];
 }
 
-// FIXED: Get villain for current battle state - CORRECT VERSION
-function getVillainForBattle(isPreBoss = true) {
-    const bossDef = bossDefinitions[currentEra];
+// Get random villain for current era
+function getRandomVillain(eraKey, isPreBoss = false) {
+    const bossDef = bossDefinitions[eraKey];
     
-    // If it's boss battle time, return the boss
     if (isBossBattle && bossDef && bossDef.bossName) {
-        // Find and return the boss
-        const villains = eraData[currentEra].villains;
+        // Return the boss
+        const villains = eraData[eraKey].villains;
         const boss = villains.find(v => v.name === bossDef.bossName);
         if (boss) return boss;
     }
     
-    // If we need pre-boss enemies and this era has them
     if (isPreBoss && bossDef && bossDef.preBossEnemies.length > 0) {
-        // Return a pre-boss enemy (non-boss villain)
-        const villains = eraData[currentEra].villains;
-        const preBossEnemies = villains.filter(v => {
-            // Check if this villain is in preBossEnemies AND is not a boss
-            const isPreBossEnemy = bossDef.preBossEnemies.includes(v.name);
-            const isBoss = v.isBoss || v.name === bossDef.bossName;
-            return isPreBossEnemy && !isBoss;
-        });
-        
+        // Return a pre-boss enemy
+        const villains = eraData[eraKey].villains;
+        const preBossEnemies = villains.filter(v => bossDef.preBossEnemies.includes(v.name));
         if (preBossEnemies.length > 0) {
             const randomIndex = Math.floor(Math.random() * preBossEnemies.length);
             return preBossEnemies[randomIndex];
         }
     }
     
-    // Return any non-boss villain
-    const villains = eraData[currentEra].villains;
-    const bossDefCurrent = bossDefinitions[currentEra];
-    const nonBossVillains = villains.filter(v => {
-        // Filter out bosses
-        if (bossDefCurrent && bossDefCurrent.bossName) {
-            return v.name !== bossDefCurrent.bossName && !v.isBoss;
-        }
-        return true; // No boss defined for this era
-    });
-    
-    if (nonBossVillains.length > 0) {
-        const randomIndex = Math.floor(Math.random() * nonBossVillains.length);
-        return nonBossVillains[randomIndex];
-    }
-    
-    // Fallback: return first villain
-    return villains[0];
+    // Return any random villain
+    const villains = eraData[eraKey].villains;
+    const randomIndex = Math.floor(Math.random() * villains.length);
+    return villains[randomIndex];
 }
 
 // Get character sprite
@@ -200,7 +178,7 @@ function getCharacterSprite(characterData, state) {
     return `${characterData.folder}/${spriteFile}`;
 }
 
-// Initialize battle with boss mechanics - UPDATED
+// Initialize battle with boss mechanics
 function initBattle() {
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
     
@@ -224,19 +202,10 @@ function initBattle() {
         bossName = bossDef.bossName;
         console.log(`Boss detected for ${currentEra}: ${bossName}`);
         console.log(`Need to defeat ${totalEnemiesBeforeBoss} enemies before boss`);
-        
-        // Update enemy counter display
-        updateEnemyCounter(enemiesDefeated, totalEnemiesBeforeBoss);
     } else {
         bossName = null;
         totalEnemiesBeforeBoss = 0;
         console.log(`No boss for ${currentEra}`);
-        
-        // Hide enemy counter for eras without bosses
-        const enemyCounter = document.getElementById('enemyCounter');
-        if (enemyCounter) {
-            enemyCounter.classList.add('hidden');
-        }
     }
     
     // Set era-specific backgrounds
@@ -268,10 +237,10 @@ function initBattle() {
         currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
     }
     
-    // Select villain (regular enemy for now) - USING CORRECT FUNCTION
-    currentVillain = getVillainForBattle(true); // Start with pre-boss enemies
+    // Select villain (regular enemy for now)
+    currentVillain = getRandomVillain(currentEra, true); // Start with pre-boss enemies
     
-    // Update enemy display
+    // Update enemy name display
     updateEnemyDisplay();
     
     // Set character sprites
@@ -281,80 +250,38 @@ function initBattle() {
     document.getElementById('playerName').textContent = currentHero.name;
     document.getElementById('enemyName').textContent = currentVillain.name;
     
-    // Reset HP
-    playerHp = 100;
-    enemyHp = 100;
-    
-    // Update HP bars initially
-    updateHP();
-    
     // Load first question
     loadQuestion();
-}
-
-// Update enemy counter display
-function updateEnemyCounter(count, total) {
-    const counter = document.getElementById('enemyCounter');
-    const countSpan = document.getElementById('enemiesDefeatedCount');
-    const totalSpan = document.getElementById('totalEnemiesBeforeBoss');
-    
-    if (counter && countSpan && totalSpan) {
-        countSpan.textContent = count;
-        totalSpan.textContent = total;
-        
-        if (total > 0 && count < total) {
-            counter.classList.remove('hidden');
-            counter.style.display = 'block';
-        } else {
-            counter.classList.add('hidden');
-        }
-    }
 }
 
 // Update enemy display with boss indicator
 function updateEnemyDisplay() {
     const enemyNameElement = document.getElementById('enemyName');
-    const enemyHpBar = document.getElementById('enemyHpBar');
     const bossDef = bossDefinitions[currentEra];
     
     if (isBossBattle && bossDef && bossDef.bossName) {
-        // BOSS DISPLAY
         enemyNameElement.textContent = `BOSS: ${currentVillain.name} 👑`;
-        enemyNameElement.className = 'character-name boss-name';
+        enemyNameElement.classList.add('text-red-700', 'font-extrabold');
         
-        // Add boss styling to HP bar
-        enemyHpBar.classList.add('boss-hp-bar-animation');
-        enemyHpBar.parentElement.classList.add('boss-hp-bar');
-        
-        // Update enemy counter to show boss battle
-        const enemyCounter = document.getElementById('enemyCounter');
-        if (enemyCounter) {
-            enemyCounter.innerHTML = '<span class="text-red-400">⚔️ BOSS BATTLE ⚔️</span>';
-            enemyCounter.classList.remove('hidden');
-        }
+        // Update HP bar color for boss
+        const enemyHpBar = document.getElementById('enemyHpBar');
+        enemyHpBar.style.background = 'linear-gradient(to right, #ef4444, #dc2626, #7f1d1d)';
         
         // Show boss warning if this is the first boss appearance
         if (enemiesDefeated === totalEnemiesBeforeBoss) {
             showBossWarning();
         }
     } else {
-        // REGULAR ENEMY DISPLAY
         enemyNameElement.textContent = currentVillain.name;
-        enemyNameElement.className = 'character-name';
-        
-        // Remove boss styling
-        enemyHpBar.classList.remove('boss-hp-bar-animation');
-        enemyHpBar.parentElement.classList.remove('boss-hp-bar');
+        enemyNameElement.classList.remove('text-red-700', 'font-extrabold');
         
         // Show enemy count if not boss
         const bossDef = bossDefinitions[currentEra];
-        if (bossDef && bossDef.bossName && totalEnemiesBeforeBoss > 0) {
+        if (bossDef && bossDef.bossName) {
             const remaining = totalEnemiesBeforeBoss - enemiesDefeated;
             if (remaining > 0) {
                 enemyNameElement.textContent = `${currentVillain.name} (${remaining} to boss)`;
             }
-            // Update enemy counter
-            updateEnemyCounter(enemiesDefeated, totalEnemiesBeforeBoss);
         }
     }
 }
@@ -394,9 +321,7 @@ function showBossWarning() {
     
     // Remove warning after animation
     setTimeout(() => {
-        if (warningDiv.parentNode) {
-            warningDiv.remove();
-        }
+        warningDiv.remove();
     }, 2000);
 }
 
@@ -556,10 +481,7 @@ function mobileShake() {
     }
 }
 
-// ============================================
-// ATTACK EFFECT FUNCTIONS (Keeping existing effects)
-// ============================================
-
+// Enhanced attack functions with boss adjustments
 function createGiantSwordEffect(isAttacker) {
     playSound('sword');
     
@@ -982,6 +904,44 @@ function createGiantMagicEffect(isAttacker) {
         }, i * (isMobile ? 30 : 50));
     }
     
+    for (let i = 0; i < (isMobile ? 6 : 12); i++) {
+        setTimeout(() => {
+            const rune = document.createElement('div');
+            rune.style.cssText = `
+                position: fixed;
+                width: ${isMobile ? '40px' : '80px'};
+                height: ${isMobile ? '40px' : '80px'};
+                background: radial-gradient(circle, 
+                    rgba(139, 92, 246, 0.7) 0%,
+                    rgba(79, 70, 229, 0.5) 100%);
+                clip-path: polygon(${Array.from({length: 6}, (_, j) => 
+                    `${50 + 30 * Math.cos((j * 60 + Math.random() * 30) * Math.PI/180)}% ` +
+                    `${50 + 30 * Math.sin((j * 60 + Math.random() * 30) * Math.PI/180)}%`
+                ).join(', ')});
+                z-index: 9996;
+                pointer-events: none;
+                filter: drop-shadow(0 0 ${isMobile ? '10px' : '20px'} #8b5cf6);
+                left: ${centerX + Math.random() * (isMobile ? 100 : 200) - (isMobile ? 50 : 100)}px;
+                top: ${centerY + Math.random() * (isMobile ? 100 : 200) - (isMobile ? 50 : 100)}px;
+                transform: scale(0) rotate(0deg);
+            `;
+            
+            document.body.appendChild(rune);
+            
+            rune.animate([
+                { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+                { transform: 'scale(1.5) rotate(180deg)', opacity: 0.6 },
+                { transform: 'scale(2) rotate(360deg)', opacity: 0 }
+            ], {
+                duration: isMobile ? 400 : 700,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                fill: 'forwards'
+            });
+            
+            setTimeout(() => rune.remove(), isMobile ? 400 : 700);
+        }, i * (isMobile ? 80 : 100));
+    }
+    
     setTimeout(() => magicSphere.remove(), isMobile ? 600 : 900);
     
     return magicSphere;
@@ -1328,7 +1288,7 @@ function attackEnemy() {
                 if (bossDef && bossDef.bossName && !isBossBattle && enemiesDefeated >= totalEnemiesBeforeBoss) {
                     // Start boss battle
                     isBossBattle = true;
-                    currentVillain = getVillainForBattle(false); // Get the boss
+                    currentVillain = getRandomVillain(currentEra, false); // Get the boss
                     enemyHp = 150; // Boss has more HP
                     updateEnemyDisplay();
                     updateHP();
@@ -1349,7 +1309,7 @@ function attackEnemy() {
                     setTimeout(() => {
                         // Reset enemy HP and get new enemy
                         enemyHp = 100;
-                        currentVillain = getVillainForBattle(true);
+                        currentVillain = getRandomVillain(currentEra, true);
                         updateEnemyDisplay();
                         updateHP();
                         setCharacterState('enemy', 'idle');
@@ -1523,18 +1483,18 @@ function unlockHeroAndShowVictory() {
     
     // Show special victory message for boss battles
     const victoryModal = document.getElementById('victoryModal');
-    const victoryTitle = document.getElementById('victoryTitle');
+    const victoryTitle = victoryModal.querySelector('h1');
     
     if (isBossBattle) {
         victoryTitle.textContent = '🎖️ BOSS DEFEATED! 🎖️';
-        victoryTitle.classList.add('text-red-700', 'animate-bounce');
+        victoryTitle.classList.add('text-red-700');
         victoryTitle.classList.remove('text-amber-800');
     }
     
     // Try to unlock the next hero
     const unlockedHero = unlockNextHero(currentEra);
     const heroAchievementDiv = document.querySelector('#victoryModal .bg-gradient-to-br.from-amber-50');
-    const heroUnlockedTitle = document.getElementById('heroUnlockedTitle');
+    const heroUnlockedTitle = document.querySelector('#victoryModal [data-lang-key="heroUnlocked"]');
     
     if (unlockedHero) {
         if (heroAchievementDiv) {
@@ -1626,6 +1586,9 @@ window.addEventListener('DOMContentLoaded', function() {
     // Initialize the battle
     initBattle();
     
+    // Update HP bars initially
+    updateHP();
+    
     // Hide loading overlay
     setTimeout(() => {
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1641,8 +1604,3 @@ function getRandomEra() {
     const randomIndex = Math.floor(Math.random() * eras.length);
     return eras[randomIndex];
 }
-
-// Global function for battlefield.html
-window.restartBattle = function() {
-    location.reload();
-};
