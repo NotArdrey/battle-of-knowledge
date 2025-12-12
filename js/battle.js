@@ -1,4 +1,4 @@
-// battle.js - COMPLETE VERSION WITH BOSS BATTLE MECHANICS
+// battle.js - COMPLETE VERSION WITH BOSS BATTLE MECHANICS AND AUTOMATIC BACKGROUND MUSIC
 
 // Battle game logic
 let playerHp = 100;
@@ -154,10 +154,25 @@ const soundEffects = {
     victoryFanfare: new Audio('assets/SFX/Boss/victory-fanfare.mp3') // Optional: victory sound
 };
 
+// Background music objects
+const backgroundMusic = {
+    'early-spanish': new Audio('assets/Game-BGM/Battlefield BGMs/Early Spanish Era Theme.mp3'),
+    'late-spanish': new Audio('assets/Game-BGM/Battlefield BGMs/Late Spanish Era Theme.mp3'),
+    'american-colonial': new Audio('assets/Game-BGM/Battlefield BGMs/American Colonial Theme.mp3'),
+    'ww2': new Audio('assets/Game-BGM/Battlefield BGMs/WW2 Theme.mp3')
+};
+
 // Configure sound settings
 Object.values(soundEffects).forEach(sound => {
     sound.preload = 'auto';
     sound.volume = isMobile ? 0.5 : 0.7;
+});
+
+// Configure background music settings
+Object.values(backgroundMusic).forEach(bgm => {
+    bgm.preload = 'auto';
+    bgm.loop = true;
+    bgm.volume = isMobile ? 0.4 : 0.6;
 });
 
 // Play sound effect with error handling
@@ -171,6 +186,45 @@ function playSound(soundName) {
         }
     } catch (error) {
         console.log('Sound error:', error);
+    }
+}
+
+// Play background music for current era - AUTOMATICALLY
+function playBackgroundMusic() {
+    if (!currentEra || !backgroundMusic[currentEra]) return;
+    
+    try {
+        // Stop any currently playing music
+        stopAllBackgroundMusic();
+        
+        // Play the current era's music
+        const bgm = backgroundMusic[currentEra];
+        bgm.currentTime = 0;
+        bgm.volume = isMobile ? 0.4 : 0.6;
+        
+        // Try to play automatically
+        bgm.play().catch(e => {
+            console.log('Background music autoplay blocked:', e);
+            // Music will play after user interaction
+        });
+    } catch (error) {
+        console.log('Background music error:', error);
+    }
+}
+
+// Stop all background music
+function stopAllBackgroundMusic() {
+    Object.values(backgroundMusic).forEach(bgm => {
+        bgm.pause();
+        bgm.currentTime = 0;
+    });
+}
+
+// Stop current background music
+function stopBackgroundMusic() {
+    if (currentEra && backgroundMusic[currentEra]) {
+        backgroundMusic[currentEra].pause();
+        backgroundMusic[currentEra].currentTime = 0;
     }
 }
 
@@ -399,6 +453,11 @@ function initBattle() {
     
     // Load question
     loadQuestion();
+    
+    // Play background music AUTOMATICALLY (after a short delay to ensure everything is loaded)
+    setTimeout(() => {
+        playBackgroundMusic();
+    }, 300);
     
     // Save initial progress
     saveBattleProgress();
@@ -1590,6 +1649,9 @@ function victory() {
     // Clear saved battle progress on victory
     clearBattleProgress();
     
+    // Stop background music on victory
+    stopBackgroundMusic();
+    
     setCharacterState('player', 'victory');
     setCharacterState('enemy', 'hurt');
     document.getElementById('playerCharacter').classList.add('victory');
@@ -1608,6 +1670,9 @@ function victory() {
 function defeat() {
     // Clear saved battle progress on defeat
     clearBattleProgress();
+    
+    // Stop background music on defeat
+    stopBackgroundMusic();
     
     setCharacterState('player', 'hurt');
     setCharacterState('enemy', 'victory');
@@ -1773,7 +1838,7 @@ function disableAnswers() {
 
 // Initialize battle when page loads
 window.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded - Initializing battle with boss mechanics...');
+    console.log('DOMContentLoaded - Initializing battle with boss mechanics and automatic background music...');
     
     // Initialize the battle
     initBattle();
@@ -1788,6 +1853,17 @@ window.addEventListener('DOMContentLoaded', function() {
             loadingOverlay.classList.add('hidden');
         }
     }, 500);
+    
+    // Add click event listeners to buttons to start music (for autoplay restrictions)
+    const buttons = document.querySelectorAll('.answer-btn, .control-btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Try to play music on first user interaction if autoplay was blocked
+            if (currentEra && backgroundMusic[currentEra] && backgroundMusic[currentEra].paused) {
+                backgroundMusic[currentEra].play().catch(e => console.log('Music play on interaction failed:', e));
+            }
+        });
+    });
 });
 
 // Helper function to get random era (for "all" battles)
@@ -1796,3 +1872,10 @@ function getRandomEra() {
     const randomIndex = Math.floor(Math.random() * eras.length);
     return eras[randomIndex];
 }
+
+// Export functions for global use
+window.selectAnswer = selectAnswer;
+window.proceedToNextEra = proceedToNextEra;
+window.restartBattle = function() {
+    location.reload();
+};
