@@ -16,8 +16,7 @@ let isBossBattle = false;
 let bossName = null;
 let enemiesDefeated = 0;
 let totalEnemiesBeforeBoss = 3; // Default: defeat 3 normal enemies before boss
-
-// Character type definitions
+// Character type definitions - UPDATED FOR SPANISH SOLDIER DIFFERENTIATION
 const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier Era', 
                     'Andres Bonifacio', 'Emilio Aguinaldo', 
                     'Commodore George Dewey', 'General Juan Luna'];
@@ -27,6 +26,7 @@ const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier',
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
+// Add this new function to detect if it's an early Spanish soldier
 function isEarlySpanishSoldier(characterName, currentEra) {
     return characterName === 'Spanish Soldier' && currentEra === 'early-spanish';
 }
