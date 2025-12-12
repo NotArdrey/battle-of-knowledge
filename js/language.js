@@ -201,6 +201,13 @@ function updateLanguage() {
             element.textContent = translations[currentLanguage][key];
         }
     });
+
+    // Swap language-specific images when data attributes are provided
+    document.querySelectorAll('[data-lang-img-en][data-lang-img-tl]').forEach(img => {
+        const enSrc = img.getAttribute('data-lang-img-en');
+        const tlSrc = img.getAttribute('data-lang-img-tl');
+        img.src = currentLanguage === 'tl' ? tlSrc : enSrc;
+    });
     
     // Update Victory modal text if it exists
     const victoryTitle = document.querySelector('#victoryModal h1');
