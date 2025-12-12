@@ -214,9 +214,22 @@ function updateLanguage() {
 }
 
 function updateToggleButton() {
+    // Update text label if exists (legacy support)
     const langLabel = document.getElementById('langLabel');
     if (langLabel) {
         langLabel.textContent = currentLanguage === 'en' ? 'TAGALOG' : 'ENGLISH';
+    }
+    
+    // Update image button if exists
+    const langToggleImg = document.getElementById('langToggleImg');
+    if (langToggleImg) {
+        if (currentLanguage === 'en') {
+            langToggleImg.src = 'assets/Buttons/TAGALOG BUTTON.png';
+            langToggleImg.alt = 'Switch to Tagalog';
+        } else {
+            langToggleImg.src = 'assets/Buttons/ENGLISH BUTTON.png';
+            langToggleImg.alt = 'Switch to English';
+        }
     }
 }
 

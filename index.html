@@ -37,7 +37,7 @@
         inset: 0;
         background-image: 
             linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-            url('assets/MAIN BG/Menu-BG.png');
+            url('assets/Background/Menu-BG.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -276,7 +276,7 @@
         <!-- Language Toggle Button as Image -->
         <button id="langToggle" class="language-toggle">
             <img id="langToggleImg" 
-                 src="assets/MAIN BG/TAGALOG BUTTON.png" 
+                 src="assets/Buttons/TAGALOG BUTTON.png" 
                  alt="Switch to Tagalog" 
                  class="language-toggle-img">
         </button>
@@ -287,13 +287,13 @@
             <div class="title-container">
                 <!-- English Title (default) -->
                 <img id="englishTitle" 
-                    src="assets/MAIN BG/Title/Game-English-Title.png" 
+                    src="assets/Background/Title/Game-English-Title.png" 
                     alt="Battle of Knowledge" 
                     class="title-image english-title title-glow">
                 
                 <!-- Tagalog Title (hidden by default) -->
                 <img id="tagalogTitle" 
-                    src="assets/MAIN BG/Title/Game-Tagalog-Title.png" 
+                    src="assets/Background/Title/Game-Tagalog-Title.png" 
                     alt="Labanan ng Kaalaman" 
                     class="title-image tagalog-title title-glow">
             </div>
@@ -303,7 +303,7 @@
                 <button onclick="window.location.href='era-selection.html'" 
                         class="image-button">
                     <img id="startButtonImg" 
-                        src="assets/MAIN BG/START Button.png" 
+                        src="assets/Buttons/START Button.png" 
                         alt="START" 
                         class="button-img start-button-img">
                 </button>
@@ -312,7 +312,7 @@
                 <button onclick="window.location.href='collection.html'" 
                         class="image-button">
                     <img id="collectionButtonImg"
-                        src="assets/MAIN BG/COLLECTION Button.png" 
+                        src="assets/Buttons/COLLECTION Button.png" 
                         alt="COLLECTION" 
                         class="button-img collection-button-img">
                 </button>
@@ -343,21 +343,21 @@
                     // Switch to Tagalog
                     englishTitle.style.display = 'none';
                     tagalogTitle.style.display = 'block';
-                    langToggleImg.src = 'assets/MAIN BG/ENGLISH BUTTON.png';
+                    langToggleImg.src = 'assets/Buttons/ENGLISH BUTTON.png';
                     langToggleImg.alt = 'Switch to English';
-                    startButtonImg.src = 'assets/MAIN BG/SIMULA Button.png';
+                    startButtonImg.src = 'assets/Buttons/SIMULA Button.png';
                     startButtonImg.alt = 'SIMULA';
-                    collectionButtonImg.src = 'assets/MAIN BG/KOLEKSYON Button.png';
+                    collectionButtonImg.src = 'assets/Buttons/KOLEKSYON Button.png';
                     collectionButtonImg.alt = 'KOLEKSYON';
                 } else {
                     // Switch to English
                     englishTitle.style.display = 'block';
                     tagalogTitle.style.display = 'none';
-                    langToggleImg.src = 'assets/MAIN BG/TAGALOG BUTTON.png';
+                    langToggleImg.src = 'assets/Buttons/TAGALOG BUTTON.png';
                     langToggleImg.alt = 'Switch to Tagalog';
-                    startButtonImg.src = 'assets/MAIN BG/START Button.png';
+                    startButtonImg.src = 'assets/Buttons/START Button.png';
                     startButtonImg.alt = 'START';
-                    collectionButtonImg.src = 'assets/MAIN BG/COLLECTION Button.png';
+                    collectionButtonImg.src = 'assets/Buttons/COLLECTION Button.png';
                     collectionButtonImg.alt = 'COLLECTION';
                 }
                 
