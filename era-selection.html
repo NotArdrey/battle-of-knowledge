@@ -108,6 +108,8 @@
             padding: 2rem;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
         .era-card:hover {
@@ -118,6 +120,137 @@
         .ww2-card {
             background: linear-gradient(to bottom right, rgba(254, 226, 226, 0.95), rgba(254, 215, 170, 0.95));
             border-color: #dc2626;
+        }
+
+        .era-card.locked {
+            filter: grayscale(0.5) brightness(0.85);
+            cursor: not-allowed;
+        }
+        
+        .era-card.locked:hover {
+            transform: translateY(0);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .lock-overlay {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(0, 0, 0, 0.4), transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(0, 0, 0, 0.3), transparent 50%),
+                linear-gradient(135deg, rgba(0, 0, 0, 0.75), rgba(41, 37, 36, 0.65));
+            backdrop-filter: blur(3px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: #fef3c7;
+            text-align: center;
+            padding: 1.5rem;
+            pointer-events: none;
+            animation: lock-fade-in 0.4s ease-out;
+        }
+        
+        @keyframes lock-fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes lock-pulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.9));
+            }
+        }
+        
+        @keyframes lock-shine {
+            0% {
+                background-position: -100% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .lock-badge {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(41, 37, 36, 0.9));
+            border: 3px solid #fbbf24;
+            border-radius: 999px;
+            padding: 0.75rem 1.75rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(251, 191, 36, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: lock-pulse 2s ease-in-out infinite;
+        }
+        
+        .lock-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: lock-shine 3s infinite;
+        }
+        
+        .lock-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+            margin-bottom: 0.5rem;
+            animation: lock-pulse 2s ease-in-out infinite;
+        }
+
+        .lock-requirement {
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 420px;
+            font-weight: 600;
+            text-shadow: 
+                2px 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border: 2px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .lock-hint {
+            font-size: 0.85rem;
+            color: #fcd34d;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
         }
         
         .era-img-container {
@@ -275,8 +408,32 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
+
+        .select-btn.locked {
+            background: linear-gradient(to right, #6b7280, #4b5563);
+            border-color: #374151;
+            cursor: not-allowed;
+            opacity: 0.6;
+            position: relative;
+            overflow: hidden;
+        }
         
-        .select-btn:hover {
+        .select-btn.locked::before {
+            content: '🔒';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            opacity: 0.3;
+        }
+        
+        .select-btn.locked:hover {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .select-btn:not(.locked):hover {
             transform: translateY(-2px) scale(1.05);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
@@ -322,7 +479,20 @@
                 font-size: 1.1rem;
             }
             
-            .era-description {
+   
+            .lock-icon {
+                font-size: 2.5rem;
+            }
+            
+            .lock-badge {
+                font-size: 1.1rem;
+                padding: 0.6rem 1.5rem;
+            }
+            
+            .lock-requirement {
+                font-size: 0.9rem;
+                padding: 0.85rem 1rem;
+            }era-description {
                 font-size: 1rem;
             }
         }
@@ -427,6 +597,25 @@
             .era-img-container {
                 width: 120px;
                 height: 120px;
+            }
+            
+            .lock-icon {
+                font-size: 2rem;
+            }
+            
+            .lock-badge {
+                font-size: 1rem;
+                padding: 0.5rem 1.25rem;
+            }
+            
+            .lock-requirement {
+                font-size: 0.8rem;
+                padding: 0.75rem 0.85rem;
+                max-width: 280px;
+            }
+            
+            .lock-hint {
+                font-size: 0.75rem;
             }
             
             .era-img {
@@ -589,10 +778,80 @@
         let currentSlide = 0;
         const slides = document.querySelectorAll('.era-slide');
         const totalSlides = slides.length;
+        const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
+        const eraNames = {
+            'early-spanish': 'Early Spanish Era',
+            'late-spanish': 'Late Spanish Era',
+            'american-colonial': 'American Colonial',
+            'ww2': 'WW2 Bonus Stage'
+        };
+
+        function getEraProgressMap() {
+            try {
+                return JSON.parse(localStorage.getItem('eraProgress')) || {};
+            } catch (error) {
+                console.warn('Unable to parse eraProgress, resetting', error);
+                return {};
+            }
+        }
+
+        function isEraUnlocked(eraKey) {
+            const eraIndex = eraOrder.indexOf(eraKey);
+            if (eraIndex <= 0) return true; // First era always unlocked
+
+            const prevEra = eraOrder[eraIndex - 1];
+            const progress = getEraProgressMap();
+            const prevStatus = progress[prevEra] || {};
+            return !!(prevStatus.lessonsComplete && prevStatus.bossDefeated);
+        }
+
+        function getEraRequirementText(eraKey) {
+            const eraIndex = eraOrder.indexOf(eraKey);
+            if (eraIndex <= 0) return '';
+
+            const prevEra = eraOrder[eraIndex - 1];
+            return `Unlocks after completing all learning modules and defeating the boss in ${eraNames[prevEra] || 'the previous era'}.`;
+        }
+
+        function ensureLockOverlay(cardElement) {
+            let overlay = cardElement.querySelector('.lock-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'lock-overlay hidden';
+                overlay.innerHTML = `
+                    <div class="lock-icon">🔒</div>
+                    <div class="lock-badge">ERA LOCKED</div>
+                    <p class="lock-requirement"></p>
+                    <p class="lock-hint">✨ Complete previous era to unlock</p>
+                `;
+                cardElement.appendChild(overlay);
+            }
+            return overlay;
+        }
+
+        function refreshEraLocks() {
+            slides.forEach((slide) => {
+                const eraKey = slide.dataset.era;
+                const card = slide.querySelector('.era-card');
+                const selectBtn = slide.querySelector('.select-btn');
+                const overlay = ensureLockOverlay(card);
+                const locked = !isEraUnlocked(eraKey);
+
+                card.classList.toggle('locked', locked);
+                overlay.classList.toggle('hidden', !locked);
+                overlay.querySelector('.lock-requirement').textContent = getEraRequirementText(eraKey);
+
+                if (selectBtn) {
+                    selectBtn.disabled = locked;
+                    selectBtn.classList.toggle('locked', locked);
+                }
+            });
+        }
         
         // Initialize slide counter
         document.getElementById('totalSlides').textContent = totalSlides;
         updateSlideCounter();
+        refreshEraLocks();
         
         function updateSlideCounter() {
             document.getElementById('currentSlide').textContent = currentSlide + 1;
@@ -670,6 +929,11 @@
         }
         
         function selectEra(era) {
+            if (!isEraUnlocked(era)) {
+                alert(getEraRequirementText(era) || 'Complete the previous era first.');
+                return;
+            }
+
             // Save selected era and go to learning module
             localStorage.setItem('selectedEra', era);
             localStorage.removeItem('selectedHero');

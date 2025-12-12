@@ -4,11 +4,32 @@ let currentLang = localStorage.getItem('selectedLanguage') || 'en';
 let completedLessons = new Set();
 let currentLessonIndex = 0;
 let currentEraLessons = [];
+const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
+
+// Persisted progression helpers
+function getEraProgressMap() {
+    try {
+        return JSON.parse(localStorage.getItem('eraProgress')) || {};
+    } catch (error) {
+        console.warn('Unable to parse eraProgress, resetting', error);
+        return {};
+    }
+}
+
+function updateEraProgress(eraKey, updates) {
+    const progress = getEraProgressMap();
+    const existing = progress[eraKey] || { lessonsComplete: false, bossDefeated: false };
+    progress[eraKey] = { ...existing, ...updates };
+    localStorage.setItem('eraProgress', JSON.stringify(progress));
+}
 
 // Initialize learning module
 function initLearningModule() {
     currentEraKey = localStorage.getItem('selectedEra') || 'early-spanish';
     currentLang = localStorage.getItem('selectedLanguage') || 'en';
+
+    // Ensure progress record exists for the current era
+    updateEraProgress(currentEraKey, {});
     
     // Load completed lessons for this era from localStorage
     const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
@@ -168,6 +189,7 @@ function completeCurrentLesson() {
     
     // If all lessons completed, show celebration
     if (completedLessons.size === currentEraLessons.length) {
+        updateEraProgress(currentEraKey, { lessonsComplete: true });
         setTimeout(showAllLessonsCompleted, 500);
     }
     

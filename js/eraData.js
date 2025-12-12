@@ -32,7 +32,7 @@ const eraData = {
                 victory: 'Magellan - Victory.png'
             },
             {
-                name: 'Spanish Soldier',
+                name: 'Early Spanish Soldier',
                 folder: 'assets/Characters/1. Early Spanish Era/Villains/1. Early Spanish Soldier Era',
                 idle: 'Spanish Soldier - Idle.png',
                 attack: 'Spanish Soldier - Attack.png',

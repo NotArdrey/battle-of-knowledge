@@ -18,7 +18,7 @@ let enemiesDefeated = 0;
 let totalEnemiesBeforeBoss = 3; // Default: defeat 3 normal enemies before boss
 
 // Character type definitions
-const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier Era', 
+const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier', 
                     'Andres Bonifacio', 'Emilio Aguinaldo', 
                     'Commodore George Dewey', 'General Juan Luna'];
 
@@ -33,7 +33,7 @@ const bossDefinitions = {
         bossName: 'Ferdinand Magellan',
         isBoss: true,
         isFinalBoss: true,
-        preBossEnemies: ['Spanish Soldier'],
+        preBossEnemies: ['Early Spanish Soldier'],
         enemiesBeforeBoss: 2 // Defeat 2 Spanish Soldiers before Magellan
     },
     'late-spanish': {
@@ -59,8 +59,78 @@ const bossDefinitions = {
     }
 };
 
+// Persisted progression helpers
+function getEraProgressMap() {
+    try {
+        return JSON.parse(localStorage.getItem('eraProgress')) || {};
+    } catch (error) {
+        console.warn('Unable to parse eraProgress, resetting', error);
+        return {};
+    }
+}
+
+function updateEraProgress(eraKey, updates) {
+    const progress = getEraProgressMap();
+    const existing = progress[eraKey] || { lessonsComplete: false, bossDefeated: false };
+    progress[eraKey] = { ...existing, ...updates };
+    localStorage.setItem('eraProgress', JSON.stringify(progress));
+}
+
 // Mobile detection
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+// Save battle progress to localStorage
+function saveBattleProgress() {
+    const battleState = {
+        playerHp: playerHp,
+        enemyHp: enemyHp,
+        questionIndex: questionIndex,
+        currentEra: currentEra,
+        enemiesDefeated: enemiesDefeated,
+        isBossBattle: isBossBattle,
+        currentHeroName: currentHero ? currentHero.name : null,
+        currentVillainName: currentVillain ? currentVillain.name : null,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('battleProgress', JSON.stringify(battleState));
+    console.log('Battle progress saved:', battleState);
+}
+
+// Load battle progress from localStorage
+function loadBattleProgress() {
+    const saved = localStorage.getItem('battleProgress');
+    if (!saved) return null;
+    
+    try {
+        const battleState = JSON.parse(saved);
+        
+        // Check if save is older than 1 hour (3600000 ms) - expire old saves
+        const oneHour = 3600000;
+        if (Date.now() - battleState.timestamp > oneHour) {
+            clearBattleProgress();
+            return null;
+        }
+        
+        // Check if it's for the same era
+        const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
+        if (battleState.currentEra !== selectedEra && selectedEra !== 'all') {
+            clearBattleProgress();
+            return null;
+        }
+        
+        return battleState;
+    } catch (e) {
+        console.error('Error loading battle progress:', e);
+        clearBattleProgress();
+        return null;
+    }
+}
+
+// Clear battle progress
+function clearBattleProgress() {
+    localStorage.removeItem('battleProgress');
+    console.log('Battle progress cleared');
+}
 
 // Sound effects - preload them
 const soundEffects = {
@@ -182,63 +252,129 @@ function getCharacterSprite(characterData, state) {
 function initBattle() {
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
     
-    if (selectedEra === 'all') {
-        currentEra = getRandomEra();
+    // Check for saved battle progress
+    const savedProgress = loadBattleProgress();
+    
+    if (savedProgress) {
+        // Restore saved battle state
+        console.log('Restoring saved battle progress...');
+        currentEra = savedProgress.currentEra;
+        playerHp = savedProgress.playerHp;
+        enemyHp = savedProgress.enemyHp;
+        questionIndex = savedProgress.questionIndex;
+        enemiesDefeated = savedProgress.enemiesDefeated;
+        isBossBattle = savedProgress.isBossBattle;
+        
+        // Set up boss mechanics
+        const bossDef = bossDefinitions[currentEra];
+        if (bossDef && bossDef.bossName) {
+            totalEnemiesBeforeBoss = bossDef.enemiesBeforeBoss;
+            bossName = bossDef.bossName;
+        } else {
+            bossName = null;
+            totalEnemiesBeforeBoss = 0;
+        }
+        
+        // Set era-specific backgrounds
+        setEraBackground(currentEra);
+        
+        // Load questions
+        const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+        if (questionsData[currentEra] && questionsData[currentEra][currentLanguage]) {
+            questions = [...questionsData[currentEra][currentLanguage]];
+            shuffleArray(questions);
+        } else {
+            questions = [...questionsData['early-spanish'][currentLanguage]];
+            shuffleArray(questions);
+        }
+        currentLanguageLoaded = currentLanguage;
+        
+        // Restore hero
+        const unlockedHeroes = getUnlockedHeroesForEra(currentEra);
+        if (savedProgress.currentHeroName) {
+            currentHero = eraData[currentEra].heroes.find(h => h.name === savedProgress.currentHeroName);
+        }
+        if (!currentHero) {
+            currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
+        }
+        
+        // Restore villain
+        if (savedProgress.currentVillainName) {
+            currentVillain = eraData[currentEra].villains.find(v => v.name === savedProgress.currentVillainName);
+        }
+        if (!currentVillain) {
+            currentVillain = getRandomVillain(currentEra, !isBossBattle);
+        }
+        
+        // Clear the selected hero from storage
+        localStorage.removeItem('selectedHero');
+        
     } else {
-        currentEra = selectedEra;
-    }
-    
-    // Save the current era for use in this battle
-    localStorage.setItem('currentBattleEra', currentEra);
-    
-    // Reset boss battle state
-    isBossBattle = false;
-    enemiesDefeated = 0;
-    
-    // Check if this era has a boss
-    const bossDef = bossDefinitions[currentEra];
-    if (bossDef && bossDef.bossName) {
-        totalEnemiesBeforeBoss = bossDef.enemiesBeforeBoss;
-        bossName = bossDef.bossName;
-        console.log(`Boss detected for ${currentEra}: ${bossName}`);
-        console.log(`Need to defeat ${totalEnemiesBeforeBoss} enemies before boss`);
-    } else {
-        bossName = null;
-        totalEnemiesBeforeBoss = 0;
-        console.log(`No boss for ${currentEra}`);
-    }
-    
-    // Set era-specific backgrounds
-    setEraBackground(currentEra);
-    
-    // Load questions
-    const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
-    if (questionsData[currentEra] && questionsData[currentEra][currentLanguage]) {
-        questions = [...questionsData[currentEra][currentLanguage]];
-        shuffleArray(questions);
-    } else {
-        questions = [...questionsData['early-spanish'][currentLanguage]];
-        shuffleArray(questions);
-    }
-    currentLanguageLoaded = currentLanguage;
-    
-    // Select hero
-    const selectedHeroIndex = localStorage.getItem('selectedHero');
-    const unlockedHeroes = getUnlockedHeroesForEra(currentEra);
-    
-    if (selectedHeroIndex !== null && eraData[currentEra].heroes[selectedHeroIndex]) {
-        if (unlockedHeroes.includes(parseInt(selectedHeroIndex))) {
-            currentHero = eraData[currentEra].heroes[parseInt(selectedHeroIndex)];
+        // Start fresh battle
+        if (selectedEra === 'all') {
+            currentEra = getRandomEra();
+        } else {
+            currentEra = selectedEra;
+        }
+        
+        // Save the current era for use in this battle
+        localStorage.setItem('currentBattleEra', currentEra);
+        
+        // Reset battle state
+        playerHp = 100;
+        enemyHp = 100;
+        questionIndex = 0;
+        isBossBattle = false;
+        enemiesDefeated = 0;
+        
+        // Check if this era has a boss
+        const bossDef = bossDefinitions[currentEra];
+        if (bossDef && bossDef.bossName) {
+            totalEnemiesBeforeBoss = bossDef.enemiesBeforeBoss;
+            bossName = bossDef.bossName;
+            console.log(`Boss detected for ${currentEra}: ${bossName}`);
+            console.log(`Need to defeat ${totalEnemiesBeforeBoss} enemies before boss`);
+        } else {
+            bossName = null;
+            totalEnemiesBeforeBoss = 0;
+            console.log(`No boss for ${currentEra}`);
+        }
+        
+        // Set era-specific backgrounds
+        setEraBackground(currentEra);
+        
+        // Load questions
+        const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+        if (questionsData[currentEra] && questionsData[currentEra][currentLanguage]) {
+            questions = [...questionsData[currentEra][currentLanguage]];
+            shuffleArray(questions);
+        } else {
+            questions = [...questionsData['early-spanish'][currentLanguage]];
+            shuffleArray(questions);
+        }
+        currentLanguageLoaded = currentLanguage;
+        
+        // Select hero
+        const selectedHeroIndex = localStorage.getItem('selectedHero');
+        const unlockedHeroes = getUnlockedHeroesForEra(currentEra);
+        
+        if (selectedHeroIndex !== null && eraData[currentEra].heroes[selectedHeroIndex]) {
+            if (unlockedHeroes.includes(parseInt(selectedHeroIndex))) {
+                currentHero = eraData[currentEra].heroes[parseInt(selectedHeroIndex)];
+            } else {
+                currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
+            }
+            localStorage.removeItem('selectedHero');
         } else {
             currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
         }
-        localStorage.removeItem('selectedHero');
-    } else {
-        currentHero = eraData[currentEra].heroes[unlockedHeroes[0]];
+        
+        // Select villain (regular enemy for now)
+        currentVillain = getRandomVillain(currentEra, true); // Start with pre-boss enemies
     }
-    
-    // Select villain (regular enemy for now)
-    currentVillain = getRandomVillain(currentEra, true); // Start with pre-boss enemies
+
+    // Ensure progress record exists for the current era
+    updateEraProgress(currentEra, {});
     
     // Update enemy name display
     updateEnemyDisplay();
@@ -250,8 +386,11 @@ function initBattle() {
     document.getElementById('playerName').textContent = currentHero.name;
     document.getElementById('enemyName').textContent = currentVillain.name;
     
-    // Load first question
+    // Load question
     loadQuestion();
+    
+    // Save initial progress
+    saveBattleProgress();
 }
 
 // Update enemy display with boss indicator
@@ -341,12 +480,27 @@ function updateCharacterSprites() {
 function setCharacterState(character, state) {
     const sprite = character === 'player' ? document.getElementById('playerSprite') : document.getElementById('enemySprite');
     const characterData = character === 'player' ? currentHero : currentVillain;
+    const enemyContainer = character === 'enemy' ? document.getElementById('enemyCharacter') : null;
+    const isEarlySpanishSoldier = enemyContainer && characterData && characterData.name === 'Early Spanish Soldier';
+
+    // Early Spanish Soldier attack sprite already faces left, so temporarily remove the default flip
+    if (isEarlySpanishSoldier) {
+        if (state === 'attack') {
+            enemyContainer.classList.add('no-flip');
+        } else {
+            enemyContainer.classList.remove('no-flip');
+        }
+    }
     
     sprite.src = getCharacterSprite(characterData, state);
     
     if (state !== 'idle') {
         setTimeout(() => {
             sprite.src = getCharacterSprite(characterData, 'idle');
+            
+            if (isEarlySpanishSoldier && enemyContainer) {
+                enemyContainer.classList.remove('no-flip');
+            }
         }, 1200);
     }
 }
@@ -414,6 +568,9 @@ function loadQuestion() {
     currentQuestion.shuffledAnswers = currentShuffledAnswers;
     
     enableAnswers();
+    
+    // Save progress after loading new question
+    saveBattleProgress();
 }
 
 // Select answer
@@ -489,16 +646,26 @@ function createGiantSwordEffect(isAttacker) {
         document.getElementById('playerCharacter') : 
         document.getElementById('enemyCharacter');
     
+    const targetElement = isAttacker ? 
+        document.getElementById('enemyCharacter') : 
+        document.getElementById('playerCharacter');
+    
     const battleArea = document.querySelector('.battle-area');
     const rect = characterElement.getBoundingClientRect();
+    const targetRect = targetElement.getBoundingClientRect();
     const battleRect = battleArea.getBoundingClientRect();
+    
+    // Different clip-path for attacker vs defender - flipped for enemy attacks
+    const clipPath = isAttacker 
+        ? 'polygon(0% 40%, 20% 30%, 40% 20%, 60% 30%, 80% 40%, 100% 60%, 80% 70%, 60% 80%, 40% 70%, 20% 60%)'
+        : 'polygon(100% 40%, 80% 30%, 60% 20%, 40% 30%, 20% 40%, 0% 60%, 20% 70%, 40% 80%, 60% 70%, 80% 60%)';
     
     const swordSlash = document.createElement('div');
     swordSlash.style.cssText = `
         position: fixed;
         width: ${isMobile ? '200px' : '350px'};
         height: ${isMobile ? '100px' : '180px'};
-        background: linear-gradient(45deg, 
+        background: linear-gradient(${isAttacker ? '45deg' : '135deg'}, 
             transparent 0%,
             rgba(251, 191, 36, 0.95) 25%,
             rgba(245, 158, 11, 1) 50%,
@@ -508,17 +675,19 @@ function createGiantSwordEffect(isAttacker) {
         pointer-events: none;
         filter: drop-shadow(0 0 ${isMobile ? '20px' : '40px'} #fbbf24) 
                 drop-shadow(0 0 ${isMobile ? '40px' : '80px'} #dc2626);
-        clip-path: polygon(0% 40%, 20% 30%, 40% 20%, 60% 30%, 80% 40%, 100% 60%, 80% 70%, 60% 80%, 40% 70%, 20% 60%);
+        clip-path: ${clipPath};
         mix-blend-mode: screen;
     `;
     
-    const startX = isAttacker ? rect.right - (isMobile ? 80 : 150) : rect.left + (isMobile ? 80 : 150);
+    // For player (left side) attacking: start from player's right, move toward enemy
+    // For enemy (right side) attacking: start from enemy's left, move toward player
+    const startX = isAttacker ? rect.right - (isMobile ? 80 : 150) : rect.left - (isMobile ? 100 : 200);
     const startY = rect.top + rect.height * 0.3;
-    const endX = isAttacker ? battleRect.right - (isMobile ? 80 : 150) : battleRect.left + (isMobile ? 80 : 150);
+    const endX = isAttacker ? targetRect.left : targetRect.right;
     
     swordSlash.style.left = `${startX}px`;
     swordSlash.style.top = `${startY}px`;
-    swordSlash.style.transform = `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`;
+    swordSlash.style.transform = `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`;
     
     document.body.appendChild(swordSlash);
     
@@ -532,7 +701,7 @@ function createGiantSwordEffect(isAttacker) {
                 position: fixed;
                 width: ${isMobile ? '100px' : '200px'};
                 height: ${isMobile ? '30px' : '60px'};
-                background: linear-gradient(45deg, 
+                background: linear-gradient(${isAttacker ? '45deg' : '135deg'}, 
                     rgba(251, 191, 36, 0.8) 0%,
                     rgba(220, 38, 38, 0.6) 100%);
                 z-index: 9998;
@@ -541,16 +710,16 @@ function createGiantSwordEffect(isAttacker) {
                 opacity: 0.8;
                 left: ${startX + (isAttacker ? i * 20 : -i * 20)}px;
                 top: ${startY + (i * 10)}px;
-                transform: rotate(${isAttacker ? '15' : '165'}deg) scale(0);
+                transform: rotate(${isAttacker ? '15' : '-15'}deg) scale(0);
                 border-radius: ${isMobile ? '5px' : '10px'};
             `;
             
             document.body.appendChild(trail);
             
             trail.animate([
-                { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, opacity: 0 },
-                { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${1.5 + i * 0.2})`, opacity: 0.7 },
-                { transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, opacity: 0 }
+                { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 },
+                { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(${1.5 + i * 0.2})`, opacity: 0.7 },
+                { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 }
             ], {
                 duration: isMobile ? 400 : 600,
                 easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -563,20 +732,20 @@ function createGiantSwordEffect(isAttacker) {
     
     swordSlash.animate([
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(0)`, 
+            transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, 
             opacity: 0
         },
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${isMobile ? '1.8' : '2.5'})`, 
+            transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(${isMobile ? '1.8' : '2.5'})`, 
             opacity: 1
         },
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${isMobile ? '2.2' : '3'})`, 
+            transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(${isMobile ? '2.2' : '3'})`, 
             opacity: 0.8,
             left: `${endX}px`
         },
         { 
-            transform: `rotate(${isAttacker ? '15' : '165'}deg) scale(${isMobile ? '2.5' : '3.5'})`, 
+            transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(${isMobile ? '2.5' : '3.5'})`, 
             opacity: 0,
             left: `${endX}px`,
             top: `${startY + (isMobile ? 80 : 150)}px`
@@ -1379,6 +1548,9 @@ function updateHP() {
     playerHpBar.style.width = `${playerHpPercent}%`;
     enemyHpBar.style.width = `${enemyHpPercent}%`;
     
+    // Save battle progress after HP changes
+    saveBattleProgress();
+    
     // Update HP text
     const enemyMaxHp = isBossBattle ? 150 : 100;
     document.getElementById('playerHpText').textContent = `${playerHp}/100`;
@@ -1404,6 +1576,9 @@ function updateHP() {
 
 // Victory
 function victory() {
+    // Clear saved battle progress on victory
+    clearBattleProgress();
+    
     setCharacterState('player', 'victory');
     setCharacterState('enemy', 'hurt');
     document.getElementById('playerCharacter').classList.add('victory');
@@ -1420,6 +1595,9 @@ function victory() {
 
 // Defeat
 function defeat() {
+    // Clear saved battle progress on defeat
+    clearBattleProgress();
+    
     setCharacterState('player', 'hurt');
     setCharacterState('enemy', 'victory');
     document.getElementById('enemyCharacter').classList.add('victory');
@@ -1480,6 +1658,9 @@ function unlockHeroAndShowVictory() {
         completedEras.push(currentEra);
         localStorage.setItem('completedEras', JSON.stringify(completedEras));
     }
+
+    // Persist local unlock state so later eras can be gated
+    updateEraProgress(currentEra, { bossDefeated: true, lessonsComplete: true });
     
     // Show special victory message for boss battles
     const victoryModal = document.getElementById('victoryModal');
