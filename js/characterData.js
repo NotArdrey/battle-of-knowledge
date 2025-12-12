@@ -173,24 +173,45 @@ const characterContributions = {
             ]
         }
     },
-    'General Juan Luna': {
+    'General Antonio Luna': {
         type: 'hero',
         contributions: {
             en: [
                 'Brother of painter Juan Luna, one of the greatest Filipino military leaders',
-                'Led Filipino forces during the Philippine-American War',
-                'Known for brilliant military tactics and strategies',
-                'Commanded the defense of Northern Luzon',
-                'Assassinated in 1899, reportedly on orders from Aguinaldo',
-                'His death weakened Filipino resistance against Americans'
+                'Led Filipino forces during the Philippine-American War as Commanding General',
+                'Known for brilliant military tactics and fierce discipline',
+                'Commanded the defense of Northern Luzon against American forces',
+                'Assassinated on June 5, 1899 in Cabanatuan',
+                'His death significantly weakened Filipino resistance against Americans'
             ],
             tl: [
                 'Kapatid ng pintor na si Juan Luna, isa sa pinakadakilang pinunong militar na Pilipino',
-                'Nanguna sa mga pwersang Pilipino sa panahon ng Digmaang Pilipino-Amerikano',
-                'Kilala sa kahusayan ng taktika at estratehiya militar',
-                'Nag-utos ng depensa ng Hilagang Luzon',
-                'Pinaslang noong 1899, ulat ay sa utos ni Aguinaldo',
-                'Ang kanyang kamatayan ay nagpahina ng paglaban ng Pilipino laban sa mga Amerikano'
+                'Nanguna sa mga pwersang Pilipino sa panahon ng Digmaang Pilipino-Amerikano bilang Heneral',
+                'Kilala sa kahusayan ng taktika at mahigpit na disiplina',
+                'Nag-utos ng depensa ng Hilagang Luzon laban sa mga Amerikano',
+                'Pinaslang noong Hunyo 5, 1899 sa Cabanatuan',
+                'Ang kanyang kamatayan ay labis na nagpahina ng paglaban ng Pilipino laban sa mga Amerikano'
+            ]
+        }
+    },
+    'General Juan Luna': {
+        type: 'hero',
+        contributions: {
+            en: [
+                'Renowned Filipino painter, not a military general',
+                'Won gold medal at the 1884 Madrid Exposition for "Spoliarium"',
+                'His masterpiece depicted the suffering of the Filipino people under Spanish rule',
+                'Inspired Filipino nationalism through his art',
+                'Brother of General Antonio Luna',
+                'Considered one of the greatest Filipino artists in history'
+            ],
+            tl: [
+                'Tanyag na pintor na Pilipino, hindi heneral militar',
+                'Nanalo ng gintong medalya sa 1884 Madrid Exposition para sa "Spoliarium"',
+                'Ang kanyang obra maestra ay naglalarawan ng paghihirap ng mga Pilipino sa ilalim ng Espanya',
+                'Nag-udyok ng nasyonalismong Pilipino sa pamamagitan ng kanyang sining',
+                'Kapatid ni Heneral Antonio Luna',
+                'Itinuturing na isa sa pinakadakilang artistang Pilipino sa kasaysayan'
             ]
         }
     },
