@@ -324,7 +324,7 @@
     <script src="js/language.js"></script>
     
     <script>
-        // Language toggle functionality with localStorage
+        // Language toggle functionality with localStorage (synced with language.js)
         document.addEventListener('DOMContentLoaded', function() {
             const langToggle = document.getElementById('langToggle');
             const langToggleImg = document.getElementById('langToggleImg');
@@ -333,21 +333,21 @@
             const startButtonImg = document.getElementById('startButtonImg');
             const collectionButtonImg = document.getElementById('collectionButtonImg');
             
-            // Check localStorage for saved language preference
-            let isTagalog = localStorage.getItem('language') === 'tagalog';
+            // Check localStorage for saved language preference (using same key as language.js)
+            let currentLang = localStorage.getItem('selectedLanguage') || 'en';
             
             // Set initial state based on saved preference
-            setLanguage(isTagalog);
+            setLanguage(currentLang === 'tl');
             
             langToggle.addEventListener('click', function() {
-                isTagalog = !isTagalog;
-                setLanguage(isTagalog);
+                currentLang = currentLang === 'en' ? 'tl' : 'en';
+                setLanguage(currentLang === 'tl');
                 
-                // Save language preference to localStorage
-                localStorage.setItem('language', isTagalog ? 'tagalog' : 'english');
+                // Save language preference to localStorage (same key as language.js)
+                localStorage.setItem('selectedLanguage', currentLang);
                 
                 // Optional: Preload images to prevent flickering on toggle
-                preloadImages(isTagalog);
+                preloadImages(currentLang === 'tl');
             });
             
             // Function to set language
