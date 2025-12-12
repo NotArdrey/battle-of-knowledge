@@ -125,7 +125,7 @@
     /* Question Area - BOTTOM (45%) with background */
     .question-area {
         flex: 0 0 45%;
-        background-image: url('assets/Background/QuestionAndAnswerBG.png');
+        background-image: url('assets/QNA-BG/QuestionAndAnswerBG.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -492,15 +492,6 @@
         color: #78350f;
     }
     
-    /* Music Control Button */
-    .music-btn {
-        top: 10px;
-        right: 80px;
-        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        border-color: #6d28d9;
-        color: white;
-    }
-    
     /* Modals */
     .modal-overlay {
         position: fixed;
@@ -600,12 +591,6 @@
             font-size: 12px;
             padding: 6px 12px;
             top: 5px;
-        }
-        
-        .music-btn {
-            right: 70px;
-            padding: 8px 12px;
-            font-size: 12px;
         }
     }
     
@@ -1037,33 +1022,23 @@
             }
         }
     }
-    
-    /* Music button animations */
-    @keyframes music-pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-    
-    .music-playing {
-        animation: music-pulse 2s infinite;
-    }
 </style>
 </head>
 <body>
-    <!-- Audio Elements for Background Music -->
-    <audio id="bgmEarlySpanish" preload="auto">
+    <!-- Audio Elements for Background Music (hidden) -->
+    <audio id="bgmEarlySpanish" preload="auto" loop>
         <source src="assets/Game-BGM/Battlefield BGMs/Early Spanish Era Theme.mp3" type="audio/mpeg">
     </audio>
     
-    <audio id="bgmLateSpanish" preload="auto">
+    <audio id="bgmLateSpanish" preload="auto" loop>
         <source src="assets/Game-BGM/Battlefield BGMs/Late Spanish Era Theme.mp3" type="audio/mpeg">
     </audio>
     
-    <audio id="bgmAmericanColonial" preload="auto">
+    <audio id="bgmAmericanColonial" preload="auto" loop>
         <source src="assets/Game-BGM/Battlefield BGMs/American Colonial Theme.mp3" type="audio/mpeg">
     </audio>
     
-    <audio id="bgmWW2" preload="auto">
+    <audio id="bgmWW2" preload="auto" loop>
         <source src="assets/Game-BGM/Battlefield BGMs/WW2 Theme.mp3" type="audio/mpeg">
     </audio>
     
@@ -1071,12 +1046,6 @@
     <button onclick="window.location.href='era-selection.html'" 
             class="control-btn back-btn">
         ← Back
-    </button>
-    
-    <!-- Music Toggle Button -->
-    <button id="musicToggle" 
-            class="control-btn music-btn">
-        🎵 <span id="musicLabel">ON</span>
     </button>
     
     <!-- Language Toggle -->
@@ -1261,9 +1230,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Battlefield page loaded with boss mechanics');
             
-            // Initialize music control
-            initMusicControl();
-            
             // Hide loading overlay
             setTimeout(() => {
                 document.getElementById('loadingOverlay')?.classList.add('hidden');
@@ -1283,114 +1249,9 @@
             location.reload();
         }
         
-        // Music control functions
-        function initMusicControl() {
-            const musicToggle = document.getElementById('musicToggle');
-            const musicLabel = document.getElementById('musicLabel');
-            
-            if (musicToggle && musicLabel) {
-                // Check saved preference
-                const musicEnabled = localStorage.getItem('battleMusicEnabled') !== 'false';
-                
-                // Update button state
-                updateMusicButton(musicEnabled);
-                
-                // Add click handler
-                musicToggle.addEventListener('click', function() {
-                    const currentEnabled = localStorage.getItem('battleMusicEnabled') !== 'false';
-                    const newEnabled = !currentEnabled;
-                    
-                    localStorage.setItem('battleMusicEnabled', newEnabled);
-                    updateMusicButton(newEnabled);
-                    
-                    // Play or stop music based on new state
-                    if (newEnabled) {
-                        playEraBackgroundMusic(currentEra);
-                    } else {
-                        stopAllBackgroundMusic();
-                    }
-                });
-            }
-        }
-        
-        function updateMusicButton(enabled) {
-            const musicToggle = document.getElementById('musicToggle');
-            const musicLabel = document.getElementById('musicLabel');
-            
-            if (musicToggle && musicLabel) {
-                if (enabled) {
-                    musicLabel.textContent = 'ON';
-                    musicToggle.classList.add('music-playing');
-                    musicToggle.style.background = 'linear-gradient(135deg, #8b5cf6, #7c3aed)';
-                } else {
-                    musicLabel.textContent = 'OFF';
-                    musicToggle.classList.remove('music-playing');
-                    musicToggle.style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
-                }
-            }
-        }
-        
-        function playEraBackgroundMusic(eraKey) {
-            // Check if music is enabled
-            const musicEnabled = localStorage.getItem('battleMusicEnabled') !== 'false';
-            if (!musicEnabled) return;
-            
-            // Stop any currently playing music
-            stopAllBackgroundMusic();
-            
-            // Play the appropriate era music
-            const bgmElement = getBgmElementForEra(eraKey);
-            if (bgmElement) {
-                bgmElement.volume = 0.7; // Set volume
-                bgmElement.loop = true; // Loop the music
-                
-                // Play with promise handling
-                const playPromise = bgmElement.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log('Auto-play prevented:', error);
-                        // User interaction required - we'll wait for a button click
-                    });
-                }
-            }
-        }
-        
-        function stopAllBackgroundMusic() {
-            const bgmElements = [
-                document.getElementById('bgmEarlySpanish'),
-                document.getElementById('bgmLateSpanish'),
-                document.getElementById('bgmAmericanColonial'),
-                document.getElementById('bgmWW2')
-            ];
-            
-            bgmElements.forEach(bgm => {
-                if (bgm) {
-                    bgm.pause();
-                    bgm.currentTime = 0;
-                }
-            });
-        }
-        
-        function getBgmElementForEra(eraKey) {
-            switch(eraKey) {
-                case 'early-spanish':
-                    return document.getElementById('bgmEarlySpanish');
-                case 'late-spanish':
-                    return document.getElementById('bgmLateSpanish');
-                case 'american-colonial':
-                    return document.getElementById('bgmAmericanColonial');
-                case 'ww2':
-                    return document.getElementById('bgmWW2');
-                default:
-                    return document.getElementById('bgmEarlySpanish');
-            }
-        }
-        
         // Ensure battle.js functions are available globally
         window.selectAnswer = selectAnswer;
         window.proceedToNextEra = proceedToNextEra;
-        window.playEraBackgroundMusic = playEraBackgroundMusic;
-        window.stopAllBackgroundMusic = stopAllBackgroundMusic;
         
         // Update enemy counter display
         function updateEnemyCounter(count, total) {
