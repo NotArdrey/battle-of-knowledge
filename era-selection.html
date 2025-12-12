@@ -419,7 +419,7 @@
         }
         
         .select-btn.locked::before {
-            content: '🔒';
+            content: '';
             position: absolute;
             left: 50%;
             top: 50%;
@@ -844,10 +844,10 @@
                 overlay = document.createElement('div');
                 overlay.className = 'lock-overlay hidden';
                 overlay.innerHTML = `
-                    <div class="lock-icon">🔒</div>
+                    <div class="lock-icon"></div>
                     <div class="lock-badge">ERA LOCKED</div>
                     <p class="lock-requirement"></p>
-                    <p class="lock-hint">✨ Complete previous era to unlock</p>
+                    <p class="lock-hint">Complete previous era to unlock</p>
                 `;
                 cardElement.appendChild(overlay);
             }

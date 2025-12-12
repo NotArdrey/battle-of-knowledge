@@ -129,8 +129,8 @@ function loadCurrentLesson() {
     
     // Update complete button
     const completeBtn = document.getElementById('completeLessonBtn');
-    const completeText = translations && translations[currentLang] ? translations[currentLang]['markComplete'] : '✓ Mark as Complete';
-    const completedText = translations && translations[currentLang] ? translations[currentLang]['Completed'] : '✓ Completed';
+    const completeText = translations && translations[currentLang] ? translations[currentLang]['markComplete'] : 'Mark as Complete';
+    const completedText = translations && translations[currentLang] ? translations[currentLang]['Completed'] : 'Completed';
     
     if (isCompleted) {
         completeBtn.disabled = true;
@@ -209,7 +209,7 @@ function showLessonCompletion() {
     const originalText = completeBtn.querySelector('span').textContent;
     
     // Change button text briefly
-    completeBtn.querySelector('span').textContent = '✓ Done!';
+    completeBtn.querySelector('span').textContent = 'Done!';
     completeBtn.style.background = 'linear-gradient(to right, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9))';
     completeBtn.style.borderColor = 'rgba(21, 128, 61, 0.6)';
     completeBtn.style.color = 'white';
@@ -226,7 +226,7 @@ function showLessonCompletion() {
             completeBtn.disabled = true;
             completeBtn.classList.remove('complete-button');
             completeBtn.classList.add('next-button');
-            completeBtn.querySelector('span').textContent = translations && translations[currentLang] ? translations[currentLang]['Completed'] : '✓ Completed';
+            completeBtn.querySelector('span').textContent = translations && translations[currentLang] ? translations[currentLang]['Completed'] : 'Completed';
         }
     }, 1000);
 }
@@ -269,7 +269,7 @@ function showAllLessonsCompleted() {
     celebration.className = 'fixed inset-0 flex items-center justify-center z-50 pointer-events-none';
     celebration.innerHTML = `
         <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white px-8 py-6 rounded-2xl shadow-2xl transform -translate-y-10 animate-bounce text-center max-w-md">
-            <p class="text-2xl md:text-3xl font-bold mb-2">🎉 Congratulations!</p>
+            <p class="text-2xl md:text-3xl font-bold mb-2">Congratulations!</p>
             <p class="text-lg md:text-xl">You've completed all lessons!</p>
             <p class="text-base md:text-lg mt-2">You can now start the battle!</p>
         </div>
@@ -395,7 +395,7 @@ function showCharacterSelect() {
             heroesHTML += `
                 <div class="bg-gradient-to-br from-gray-400 to-gray-500 border-3 md:border-4 border-gray-600 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-not-allowed opacity-70 shadow-xl relative">
                     <div class="absolute inset-0 flex items-center justify-center z-10">
-                        <span class="text-4xl">🔒</span>
+                        <span class="text-4xl"></span>
                     </div>
                     <div class="bg-gray-300 rounded-lg md:rounded-xl p-2 mb-3 h-24 md:h-32 flex items-center justify-center shadow-inner filter grayscale" style="box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.1);">
                         <img src="${hero.folder}/${hero.idle}" alt="${hero.name}" class="max-w-full max-h-full object-contain opacity-50">

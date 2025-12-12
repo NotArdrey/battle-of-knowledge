@@ -92,12 +92,12 @@ function renderCharacterGrid() {
             <p class="text-white text-xs text-center font-semibold">${eraName}</p>
             <div class="text-center mt-2">
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-bold ${character.characterType === 'hero' ? 'bg-yellow-400 text-blue-900' : 'bg-gray-800 text-red-400'}">
-                    ${character.characterType === 'hero' ? '⭐ ' + heroLabel : '⚔️ ' + villainLabel}
+                    ${character.characterType === 'hero' ? heroLabel : villainLabel}
                 </span>
             </div>
             ${isUnlocked ? '' : `
                 <div class="lock-overlay">
-                    <div class="lock-icon">🔒</div>
+                    <div class="lock-icon"></div>
                     <div class="lock-text">${unlockHint}</div>
                 </div>
             `}
@@ -185,10 +185,10 @@ function showCharacterDetails(character) {
     const villainLabel = translations[lang]['VILLAIN'] || 'VILLAIN';
     
     if (character.characterType === 'hero') {
-        typeBadge.textContent = '⭐ ' + heroLabel;
+        typeBadge.textContent = heroLabel;
         typeBadge.className = 'inline-block px-6 py-2 rounded-full text-white font-bold text-lg bg-gradient-to-r from-blue-600 to-cyan-600';
     } else {
-        typeBadge.textContent = '⚔️ ' + villainLabel;
+        typeBadge.textContent = villainLabel;
         typeBadge.className = 'inline-block px-6 py-2 rounded-full text-white font-bold text-lg bg-gradient-to-r from-red-600 to-orange-600';
     }
     
@@ -224,7 +224,6 @@ function showCharacterDetails(character) {
         const contributionsList = contributionsData[lang] || contributionsData['en'] || [];
         contributionsDiv.innerHTML = contributionsList.map(contribution => 
             `<div class="contribution-item flex gap-3">
-                <span class="text-amber-600 font-bold flex-shrink-0 text-lg">•</span>
                 <p class="text-amber-900">${contribution}</p>
             </div>`
         ).join('');

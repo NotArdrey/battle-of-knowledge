@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = `p-4 rounded-xl border-2 ${achievement.unlocked ? 'bg-yellow-100 border-yellow-500' : 'bg-gray-300 border-gray-500 opacity-50'}`;
             card.innerHTML = `
                 <p class="font-bold text-sm">${achievement.name}</p>
-                <p class="text-xs">${achievement.unlocked ? '✓ Unlocked' : '🔒 Locked'}</p>
+                <p class="text-xs">${achievement.unlocked ? 'Unlocked' : 'Locked'}</p>
             `;
             achievementCards.appendChild(card);
         });
