@@ -90,6 +90,11 @@ function updateEraProgress(eraKey, updates) {
 // Mobile detection
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+// Prefer lighter effects on mobile or when the user requests reduced motion
+const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
+const reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion;
+
 // Save battle progress to localStorage
 function saveBattleProgress() {
     const battleState = {
@@ -678,30 +683,14 @@ function selectAnswer(index) {
 
 // Mobile-optimized screen shake
 function mobileShake() {
-    if (isMobile) {
-        document.body.style.transform = 'translateX(-5px)';
-        
-        setTimeout(() => {
-            document.body.style.transform = 'translateX(5px)';
-            
-            setTimeout(() => {
-                document.body.style.transform = 'translateX(-3px)';
-                
-                setTimeout(() => {
-                    document.body.style.transform = 'translateX(3px)';
-                    
-                    setTimeout(() => {
-                        document.body.style.transform = 'translateX(0)';
-                    }, 40);
-                }, 40);
-            }, 40);
-        }, 40);
-    } else {
-        document.body.style.animation = 'mobile-shake 0.4s ease-out';
-        setTimeout(() => {
-            document.body.style.animation = '';
-        }, 400);
-    }
+    const target = document.querySelector('.battle-area') || document.body;
+    if (!target) return;
+    const duration = reducedFxMode ? 180 : 280;
+    target.classList.remove('shake-hit');
+    // Force reflow so the animation can restart
+    void target.offsetWidth;
+    target.classList.add('shake-hit');
+    setTimeout(() => target.classList.remove('shake-hit'), duration);
 }
 
 // Enhanced attack functions with boss adjustments
@@ -744,6 +733,11 @@ function createGiantSwordEffect(isAttacker) {
         clip-path: ${clipPath};
         mix-blend-mode: screen;
     `;
+
+    if (reducedFxMode) {
+        swordSlash.style.filter = 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.7))';
+        swordSlash.style.mixBlendMode = 'normal';
+    }
     
     // For player (left side) attacking: start from player's right, move toward enemy
     // For enemy (right side) attacking: start from enemy's left, move toward player
@@ -758,7 +752,8 @@ function createGiantSwordEffect(isAttacker) {
     document.body.appendChild(swordSlash);
     
     // Enhanced effect for boss battles
-    const effectCount = isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6);
+    const baseCount = isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6);
+    const effectCount = reducedFxMode ? 1 : Math.max(1, Math.round(baseCount));
     
     for (let i = 0; i < effectCount; i++) {
         setTimeout(() => {
@@ -781,6 +776,11 @@ function createGiantSwordEffect(isAttacker) {
             `;
             
             document.body.appendChild(trail);
+
+            if (reducedFxMode) {
+                trail.style.filter = 'blur(2px)';
+                trail.style.opacity = 0.6;
+            }
             
             trail.animate([
                 { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 },
@@ -823,7 +823,8 @@ function createGiantSwordEffect(isAttacker) {
     });
     
     setTimeout(() => {
-        for (let i = 0; i < (isMobile ? 2 : 4); i++) {
+        const waveCount = reducedFxMode ? 1 : (isMobile ? 2 : 4);
+        for (let i = 0; i < waveCount; i++) {
             const wave = document.createElement('div');
             wave.style.cssText = `
                 position: fixed;
@@ -895,6 +896,10 @@ function createGiantGunEffect(isAttacker) {
         top: ${rect.top + rect.height * 0.4}px;
         transform: translate(-50%, -50%) scale(0);
     `;
+
+    if (reducedFxMode) {
+        muzzleFlash.style.filter = 'none';
+    }
     
     document.body.appendChild(muzzleFlash);
     
@@ -947,7 +952,8 @@ function createGiantGunEffect(isAttacker) {
             fill: 'forwards'
         });
         
-        for (let i = 0; i < (isMobile ? 5 : 10); i++) {
+        const casingCount = reducedFxMode ? 0 : (isMobile ? 5 : 10);
+        for (let i = 0; i < casingCount; i++) {
             setTimeout(() => {
                 const casing = document.createElement('div');
                 casing.style.cssText = `
@@ -1039,6 +1045,11 @@ function createGiantMagicEffect(isAttacker) {
         top: ${centerY}px;
         transform: translate(-50%, -50%) scale(0);
     `;
+
+    if (reducedFxMode) {
+        magicSphere.style.filter = 'drop-shadow(0 0 24px rgba(139, 92, 246, 0.7))';
+        magicSphere.style.mixBlendMode = 'normal';
+    }
     
     document.body.appendChild(magicSphere);
     
@@ -1053,7 +1064,8 @@ function createGiantMagicEffect(isAttacker) {
         fill: 'forwards'
     });
     
-    for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+    const magicWaveCount = reducedFxMode ? 1 : (isMobile ? 3 : 6);
+    for (let i = 0; i < magicWaveCount; i++) {
         setTimeout(() => {
             const wave = document.createElement('div');
             const waveSize = (isMobile ? 100 : 200) + i * (isMobile ? 40 : 80);
@@ -1087,7 +1099,8 @@ function createGiantMagicEffect(isAttacker) {
         }, i * (isMobile ? 150 : 200));
     }
     
-    for (let i = 0; i < (isMobile ? 15 : 30); i++) {
+    const magicParticleCount = reducedFxMode ? 4 : (isMobile ? 15 : 30);
+    for (let i = 0; i < magicParticleCount; i++) {
         setTimeout(() => {
             const particle = document.createElement('div');
             const size = (isMobile ? 8 : 15) + Math.random() * (isMobile ? 12 : 25);
@@ -1301,7 +1314,8 @@ function createGiantImpactEffect(isAttacker, damage) {
         setTimeout(() => crack.remove(), isMobile ? 400 : 600);
     }
     
-    for (let i = 0; i < (isMobile ? 20 : 40); i++) {
+    const impactParticleCount = reducedFxMode ? 4 : (isMobile ? 20 : 40);
+    for (let i = 0; i < impactParticleCount; i++) {
         setTimeout(() => {
             const particle = document.createElement('div');
             const size = (isMobile ? 6 : 12) + Math.random() * (isMobile ? 9 : 18);
@@ -1384,41 +1398,23 @@ function showDamage(damage, target) {
     damageEl.className = 'damage-number';
     damageEl.textContent = `-${damage}`;
     
-    if (isMobile) {
-        damageEl.style.cssText = `
-            position: fixed;
-            font-size: ${damage > 25 ? '52px' : '42px'};
-            font-weight: 900;
-            color: ${damage > 25 ? '#fbbf24' : '#ef4444'};
-            text-shadow: 
-                3px 3px 6px rgba(0, 0, 0, 0.9), 
-                0 0 25px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 
-                0 0 50px ${damage > 25 ? '#fb923c' : '#dc2626'},
-                0 0 75px ${damage > 25 ? '#f59e0b' : '#b91c1c'};
-            z-index: 9999;
-            pointer-events: none;
-            animation: damage-popup 1.2s ease-out forwards;
-            font-family: 'Baloo 2', cursive;
-            letter-spacing: 1px;
-        `;
-    } else {
-        damageEl.style.cssText = `
-            position: fixed;
-            font-size: ${damage > 25 ? '72px' : '58px'};
-            font-weight: 900;
-            color: ${damage > 25 ? '#fbbf24' : '#ef4444'};
-            text-shadow: 
-                5px 5px 10px rgba(0, 0, 0, 0.9), 
-                0 0 35px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 
-                0 0 70px ${damage > 25 ? '#fb923c' : '#dc2626'},
-                0 0 105px ${damage > 25 ? '#f59e0b' : '#b91c1c'};
-            z-index: 9999;
-            pointer-events: none;
-            animation: damage-popup 1.5s ease-out forwards;
-            font-family: 'Baloo 2', cursive;
-            letter-spacing: 2px;
-        `;
-    }
+    const baseShadow = reducedFxMode ? '1px 1px 2px rgba(0, 0, 0, 0.6)' : isMobile ?
+        `3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 25px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 50px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 75px ${damage > 25 ? '#f59e0b' : '#b91c1c'}` :
+        `5px 5px 10px rgba(0, 0, 0, 0.9), 0 0 35px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 70px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 105px ${damage > 25 ? '#f59e0b' : '#b91c1c'}`;
+    const baseSize = reducedFxMode ? (isMobile ? '32px' : '40px') : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
+    const baseDuration = reducedFxMode ? 900 : (isMobile ? 1200 : 1500);
+    damageEl.style.cssText = `
+        position: fixed;
+        font-size: ${baseSize};
+        font-weight: 900;
+        color: ${damage > 25 ? '#fbbf24' : '#ef4444'};
+        text-shadow: ${baseShadow};
+        z-index: 9999;
+        pointer-events: none;
+        animation: damage-popup ${baseDuration}ms ease-out forwards;
+        font-family: 'Baloo 2', cursive;
+        letter-spacing: ${reducedFxMode ? '0.5px' : isMobile ? '1px' : '2px'};
+    `;
     
     const rect = character.getBoundingClientRect();
     damageEl.style.left = `${rect.left + rect.width / 2}px`;
@@ -1427,7 +1423,7 @@ function showDamage(damage, target) {
     
     document.body.appendChild(damageEl);
     
-    if (damage > 25) {
+    if (!reducedFxMode && damage > 25) {
         setTimeout(() => {
             const critEl = document.createElement('div');
             critEl.textContent = 'CRITICAL!';
@@ -1495,7 +1491,7 @@ function attackEnemy() {
     
     // Screen shake (stronger for boss battles)
     mobileShake();
-    if (isBossBattle) {
+    if (isBossBattle && !reducedFxMode) {
         setTimeout(() => mobileShake(), 200);
     }
     

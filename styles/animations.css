@@ -31,6 +31,13 @@
     100% { transform: scaleX(-1) translateX(0) scaleY(1); }
 }
 
+@keyframes shake-hit {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    25% { transform: translate3d(-6px, 2px, 0); }
+    50% { transform: translate3d(6px, -2px, 0); }
+    75% { transform: translate3d(-4px, 1px, 0); }
+}
+
 @keyframes hurt-animation-flipped {
     0% { transform: scaleX(-1) translateX(0) scaleY(1); filter: brightness(1); }
     15% { transform: scaleX(-1) translateX(-25px) scaleY(0.93); filter: brightness(1.5); }
@@ -68,11 +75,11 @@
 }
 
 .character.attacking {
-    animation: attack-animation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: attack-animation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .character.hurt {
-    animation: hurt-animation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: hurt-animation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .character.victory {
@@ -116,9 +123,15 @@
     color: white !important;
 }
 
+.shake-hit {
+    animation: shake-hit 0.22s ease;
+    will-change: transform;
+}
+
 /* Smooth sprite transitions */
 .sprite-image {
-    transition: opacity 0.15s ease-in-out;
+    transition: opacity 0.18s ease-in-out, transform 0.2s ease, filter 0.2s ease;
+    will-change: transform, opacity, filter;
 }
 
 /* Background transition */
@@ -133,11 +146,11 @@
 
 /* Maintain flip during animations */
 #enemyCharacter.attacking {
-    animation: attack-animation-flipped 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: attack-animation-flipped 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 #enemyCharacter.hurt {
-    animation: hurt-animation-flipped 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: hurt-animation-flipped 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 #enemyCharacter.victory {
