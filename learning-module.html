@@ -1507,7 +1507,7 @@
         }
         
         // Confirm and execute reset
-        function confirmResetProgress() {
+        async function confirmResetProgress() {
             // Clear completed lessons for current era
             completedLessons.clear();
             localStorage.removeItem(`learning_${currentEraKey}`);
@@ -1515,8 +1515,24 @@
             // Reset to first lesson
             currentLessonIndex = 0;
             
+            // Reset progress in database
+            if (window.ProgressSync) {
+                await window.ProgressSync.updateEraProgress(currentEraKey, {
+                    lessonsComplete: false,
+                    bossDefeated: false,
+                    currentLessonIndex: 0,
+                    battleScore: 0,
+                    enemiesDefeated: 0,
+                    highestStreak: 0
+                });
+                // Clear completed lessons array in cache
+                window.ProgressSync.progress.completedLessons[currentEraKey] = [];
+                // Re-save to server with empty lessons
+                await window.ProgressSync.saveToServer(currentEraKey, window.ProgressSync.getEraProgress(currentEraKey));
+            }
+            
             // Update UI
-            loadCurrentLesson();
+            await loadCurrentLesson();
             createLessonIndicators();
             updateProgress();
             checkBattleUnlock();
