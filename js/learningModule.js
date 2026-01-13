@@ -99,10 +99,18 @@ async function initLearningModule() {
         : [];
     completedLessons = new Set(lessonList);
     
+    // Restore current lesson index from database
+    if (window.ProgressSync) {
+        const eraProgress = window.ProgressSync.getEraProgress(currentEraKey);
+        if (eraProgress && typeof eraProgress.currentLessonIndex === 'number') {
+            currentLessonIndex = eraProgress.currentLessonIndex;
+        }
+    }
+    
     loadEraContent();
     setupLessonNavigation();
     updateProgress();
-    loadCurrentLesson();
+    await loadCurrentLesson();
 }
 
 // Load era content
@@ -174,11 +182,16 @@ function getNextUncompletedIndex() {
 }
 
 // Load current lesson
-function loadCurrentLesson() {
+async function loadCurrentLesson() {
     if (currentEraLessons.length === 0) return;
     
     const lesson = currentEraLessons[currentLessonIndex];
     const isCompleted = completedLessons.has(lesson.id);
+    
+    // Save current lesson index to database
+    if (window.ProgressSync) {
+        await window.ProgressSync.updateEraProgress(currentEraKey, { currentLessonIndex: currentLessonIndex });
+    }
     
     // Update lesson display
     document.getElementById('currentLessonIcon').textContent = lesson.icon;

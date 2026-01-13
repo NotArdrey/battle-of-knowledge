@@ -1017,7 +1017,7 @@
                         class_id,
                         created_at,
                         classes!profiles_class_id_fkey(class_name),
-                        progress(era_key, lessons_complete, boss_defeated, battle_score, last_played_at)
+                        progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
                     `)
                     .eq('teacher_id', currentProfile.id)
                     .eq('role', 'student');
@@ -1057,7 +1057,10 @@
                     const p = eraProgress[era];
                     if (!p) return '<span class="era-badge era-notstarted">Not Started</span>';
                     if (p.boss_defeated) return '<span class="era-badge era-complete">✓ Complete</span>';
-                    if (p.lessons_complete) return '<span class="era-badge era-incomplete">Learning</span>';
+                    if (p.lessons_complete) return '<span class="era-badge era-incomplete">Battle Ready</span>';
+                    // Show lesson progress count
+                    const lessonsCount = Array.isArray(p.lessons_completed) ? p.lessons_completed.length : 0;
+                    if (lessonsCount > 0) return `<span class="era-badge era-incomplete">${lessonsCount} Lessons</span>`;
                     return '<span class="era-badge era-incomplete">In Progress</span>';
                 };
                 
@@ -1131,6 +1134,8 @@
                 <div class="era-progress-grid">
                     ${Object.entries(eraNames).map(([key, name]) => {
                         const p = eraProgress[key];
+                        const lessonsCompleted = Array.isArray(p?.lessons_completed) ? p.lessons_completed : [];
+                        const currentLesson = (p?.current_lesson_index || 0) + 1;
                         return `
                             <div class="era-progress-card">
                                 <div class="era-progress-title">${name}</div>
@@ -1139,17 +1144,21 @@
                                         <span class="status-icon ${p?.lessons_complete ? 'status-complete' : 'status-notstarted'}">
                                             ${p?.lessons_complete ? '✓' : '○'}
                                         </span>
-                                        Lessons: ${p?.lessons_complete ? 'Complete' : 'Incomplete'}
+                                        Lessons: ${p?.lessons_complete ? 'All Complete' : `${lessonsCompleted.length} completed`}
+                                    </p>
+                                    <p class="text-xs text-amber-600">
+                                        Current: Lesson ${currentLesson}
                                     </p>
                                     <p>
                                         <span class="status-icon ${p?.boss_defeated ? 'status-complete' : 'status-notstarted'}">
                                             ${p?.boss_defeated ? '✓' : '○'}
                                         </span>
-                                        Boss: ${p?.boss_defeated ? 'Defeated' : 'Not Defeated'}
+                                        Boss: ${p?.boss_defeated ? 'Defeated ✓' : 'Not Defeated'}
                                     </p>
                                     <p class="mt-1 text-sm text-amber-700">
                                         Battle Score: ${p?.battle_score || 0}
                                     </p>
+                                    ${p?.last_played_at ? `<p class="text-xs text-gray-500">Last: ${formatDate(p.last_played_at)}</p>` : ''}
                                 </div>
                             </div>
                         `;
