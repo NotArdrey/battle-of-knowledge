@@ -353,7 +353,17 @@ function getCharacterSprite(characterData, state) {
 }
 
 // Initialize battle with boss mechanics
-function initBattle() {
+async function initBattle() {
+    // Wait for ProgressSync to be initialized if available
+    if (window.ProgressSync && !window.ProgressSync.userId) {
+        try {
+            await window.ProgressSync.init();
+            console.log('ProgressSync initialized in initBattle');
+        } catch (e) {
+            console.warn('ProgressSync init failed:', e);
+        }
+    }
+    
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
     
     // Check for saved battle progress
@@ -567,6 +577,26 @@ function showBossWarning() {
     setTimeout(() => {
         warningDiv.remove();
     }, 2000);
+}
+
+// Preload a character sprite and return a promise
+function preloadCharacterSprite(characterData, state) {
+    return new Promise((resolve) => {
+        const src = getCharacterSprite(characterData, state);
+        const img = new Image();
+        img.onload = () => resolve(src);
+        img.onerror = () => resolve(src); // Still resolve on error to avoid blocking
+        img.src = src;
+        // Timeout fallback in case image takes too long
+        setTimeout(() => resolve(src), 2000);
+    });
+}
+
+// Preload all sprites for a character (idle, attack, hurt, victory)
+async function preloadAllSprites(characterData) {
+    const states = ['idle', 'attack', 'hurt', 'victory'];
+    const promises = states.map(state => preloadCharacterSprite(characterData, state));
+    await Promise.all(promises);
 }
 
 // Update character sprites to idle state
@@ -1551,38 +1581,48 @@ function attackEnemy() {
                 // Check if it's time for boss battle
                 const bossDef = bossDefinitions[currentEra];
                 if (bossDef && bossDef.bossName && !isBossBattle && enemiesDefeated >= totalEnemiesBeforeBoss) {
-                    // Start boss battle
+                    // Start boss battle - preload boss sprites first
                     isBossBattle = true;
-                    currentVillain = getRandomVillain(currentEra, false); // Get the boss
-                    console.log(`Boss battle started! Fighting: ${currentVillain.name}`);
-                    enemyHp = 150; // Boss has more HP
+                    const bossVillain = getRandomVillain(currentEra, false); // Get the boss
+                    console.log(`Boss battle started! Fighting: ${bossVillain.name}`);
                     
-                    // Update enemy name display
-                    document.getElementById('enemyName').textContent = currentVillain.name;
-                    updateEnemyDisplay();
-                    updateHP();
-                    
-                    // Update enemy sprite to boss sprite
-                    updateCharacterSprites();
-                    setCharacterState('enemy', 'idle');
-                    
-                    // Show boss warning
-                    showBossWarning();
-                    
-                    // Load next question
-                    questionIndex++;
-                    currentShuffledAnswers = [];
-                    loadQuestion();
+                    // Preload boss sprites before displaying
+                    preloadAllSprites(bossVillain).then(() => {
+                        currentVillain = bossVillain;
+                        enemyHp = 150; // Boss has more HP
+                        
+                        // Update enemy name display
+                        document.getElementById('enemyName').textContent = currentVillain.name;
+                        updateEnemyDisplay();
+                        updateHP();
+                        
+                        // Update enemy sprite to boss sprite
+                        updateCharacterSprites();
+                        setCharacterState('enemy', 'idle');
+                        
+                        // Show boss warning
+                        showBossWarning();
+                        
+                        // Load next question
+                        questionIndex++;
+                        currentShuffledAnswers = [];
+                        loadQuestion();
+                    });
+                    return; // Exit early - the promise will handle the rest
                 } else if (isBossBattle) {
                     // Boss defeated
                     victory();
                 } else {
                     // Regular enemy defeated - continue with next enemy
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         // Reset enemy HP and get new enemy
                         enemyHp = 100;
-                        currentVillain = getRandomVillain(currentEra, true);
-                        console.log(`Next enemy: ${currentVillain.name}`);
+                        const nextVillain = getRandomVillain(currentEra, true);
+                        console.log(`Next enemy: ${nextVillain.name}`);
+                        
+                        // Preload next enemy sprites before displaying
+                        await preloadCharacterSprite(nextVillain, 'idle');
+                        currentVillain = nextVillain;
                         
                         // Update enemy name display
                         document.getElementById('enemyName').textContent = currentVillain.name;
@@ -1887,11 +1927,11 @@ function disableAnswers() {
 }
 
 // Initialize battle when page loads
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', async function() {
     console.log('DOMContentLoaded - Initializing battle with boss mechanics and automatic background music...');
     
-    // Initialize the battle
-    initBattle();
+    // Initialize the battle (now async to wait for ProgressSync)
+    await initBattle();
     
     // Update HP bars initially
     updateHP();

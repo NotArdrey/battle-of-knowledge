@@ -1555,21 +1555,21 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOMContentLoaded fired');
             
-            // Initialize learning module immediately - don't wait for ProgressSync
-            try {
-                initLearningModule();
-            } catch (error) {
-                console.error('Error in initLearningModule:', error);
+            // Initialize ProgressSync FIRST to ensure progress is loaded
+            if (window.ProgressSync) {
+                try {
+                    await window.ProgressSync.init();
+                    console.log('ProgressSync initialized');
+                } catch (e) {
+                    console.warn('ProgressSync init failed:', e);
+                }
             }
             
-            // Initialize ProgressSync in the background (non-blocking)
-            if (window.ProgressSync) {
-                window.ProgressSync.init().then(() => {
-                    console.log('ProgressSync initialized');
-                    // Reload progress data if needed
-                }).catch(e => {
-                    console.warn('ProgressSync init failed:', e);
-                });
+            // Initialize learning module after ProgressSync is ready
+            try {
+                await initLearningModule();
+            } catch (error) {
+                console.error('Error in initLearningModule:', error);
             }
             
             // Setup language toggle
