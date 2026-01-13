@@ -443,35 +443,45 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/shared-auth.js"></script>
     <script>
-        // Supabase config
-        const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
-        
-        let supabase = null;
+        // Use Supabase client from supabase-config.js
+        let supabaseClient = null;
         let studentIdValid = false;
         let studentIdCheckTimeout = null;
         
-        // Get Supabase client
-        function getClient() {
-            if (supabase) return supabase;
-            if (window.SupabaseConfig?.supabase) return window.SupabaseConfig.supabase;
-            if (window.supabaseClient) return window.supabaseClient;
-            if (window.supabase?.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                return supabase;
+        // Toggle password visibility - defined early for onclick handlers
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(inputId + 'ToggleBtn');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (btn) btn.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                if (btn) btn.textContent = 'Show';
             }
-            return null;
+        }
+        
+        // Get Supabase client (use shared-auth helper to avoid double init)
+        function getClient() {
+            if (supabaseClient) return supabaseClient;
+            try {
+                supabaseClient = getSupabaseClient();
+                return supabaseClient;
+            } catch (e) {
+                console.error('Supabase client unavailable:', e);
+                return null;
+            }
         }
         
         // Check if already logged in
         document.addEventListener('DOMContentLoaded', async () => {
-            supabase = getClient();
-            if (!supabase) {
+            supabaseClient = getClient();
+            if (!supabaseClient) {
                 console.error('Supabase not available');
                 return;
             }
             
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 window.location.href = 'index.html';
             }
@@ -488,6 +498,17 @@
                 return;
             }
             
+            // Check if supabase is available
+            if (!supabaseClient) {
+                supabaseClient = getClient();
+                if (!supabaseClient) {
+                    statusDiv.innerHTML = '<span>⚠️ Unable to connect to server. Please refresh the page.</span>';
+                    statusDiv.className = 'validation-status invalid';
+                    studentIdValid = false;
+                    return;
+                }
+            }
+            
             // Debounce the validation
             clearTimeout(studentIdCheckTimeout);
             studentIdCheckTimeout = setTimeout(async () => {
@@ -495,12 +516,16 @@
                 statusDiv.className = 'validation-status checking';
                 
                 try {
-                    const { data, error } = await supabase
+                    console.log('Validating student ID:', studentId);
+                    
+                    const { data, error } = await supabaseClient
                         .from('registered_students')
                         .select('*')
                         .eq('student_id_number', studentId)
                         .eq('is_claimed', false)
                         .single();
+                    
+                    console.log('Validation response:', { data, error });
                     
                     if (data && !error) {
                         statusDiv.innerHTML = `<span>✓ Valid: ${data.full_name}</span>`;
@@ -512,13 +537,19 @@
                         if (!nameField.value) {
                             nameField.value = data.full_name;
                         }
-                    } else {
+                    } else if (error && error.code === 'PGRST116') {
+                        // No rows returned - ID not found or already claimed
                         statusDiv.innerHTML = '<span>✗ Student ID not found or already registered</span>';
+                        statusDiv.className = 'validation-status invalid';
+                        studentIdValid = false;
+                    } else {
+                        statusDiv.innerHTML = `<span>✗ ${error?.message || 'Student ID not found or already registered'}</span>`;
                         statusDiv.className = 'validation-status invalid';
                         studentIdValid = false;
                     }
                 } catch (e) {
-                    statusDiv.innerHTML = '<span>✗ Error checking student ID</span>';
+                    console.error('Student ID validation error:', e);
+                    statusDiv.innerHTML = '<span>✗ Error checking student ID. Please try again.</span>';
                     statusDiv.className = 'validation-status invalid';
                     studentIdValid = false;
                 }
@@ -584,19 +615,6 @@
             }
         }
         
-        // Toggle password visibility
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const btn = document.getElementById(inputId + 'ToggleBtn');
-            if (input.type === 'password') {
-                input.type = 'text';
-                if (btn) btn.textContent = 'Hide';
-            } else {
-                input.type = 'password';
-                if (btn) btn.textContent = 'Show';
-            }
-        }
-        
         // Show error message
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
@@ -638,8 +656,16 @@
                 return;
             }
             
-            if (!studentIdValid) {
-                showError('Please enter a valid student ID. If you don\'t have one, contact your administrator.');
+            // Student ID validation - only require if field is visible and has a value
+            const studentIdField = document.getElementById('studentId');
+            if (studentIdField && studentId) {
+                if (!studentIdValid) {
+                    showError('The student ID you entered is not valid or has already been claimed. Please check your ID or contact your administrator.');
+                    return;
+                }
+            } else if (studentIdField && !studentId) {
+                // If student ID field exists but is empty, show a warning
+                showError('Please enter your student ID to register. If you don\'t have one, contact your school administrator.');
                 return;
             }
             
@@ -666,7 +692,7 @@
             
             try {
                 // Create the user account
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -685,7 +711,7 @@
                 
                 // Update profile with student ID
                 if (studentId && data.user) {
-                    await supabase
+                    await supabaseClient
                         .from('profiles')
                         .update({ student_id_number: studentId })
                         .eq('id', data.user.id);
@@ -693,7 +719,7 @@
                 
                 // Mark student ID as claimed
                 if (studentId) {
-                    await supabase
+                    await supabaseClient
                         .from('registered_students')
                         .update({ 
                             is_claimed: true, 
@@ -704,7 +730,7 @@
                 
                 // Enroll in class if code provided
                 if (classCode && data.user) {
-                    const { data: classData } = await supabase
+                    const { data: classData } = await supabaseClient
                         .from('classes')
                         .select('id, teacher_id')
                         .eq('class_code', classCode)
@@ -713,13 +739,13 @@
                     
                     if (classData) {
                         // Insert enrollment
-                        await supabase.from('class_enrollments').insert({
+                        await supabaseClient.from('class_enrollments').insert({
                             class_id: classData.id,
                             student_id: data.user.id
                         });
                         
                         // Update profile with teacher and class
-                        await supabase
+                        await supabaseClient
                             .from('profiles')
                             .update({ 
                                 teacher_id: classData.teacher_id,
