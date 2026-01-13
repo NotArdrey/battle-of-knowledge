@@ -67,30 +67,19 @@ window.addEventListener('beforeunload', stopModuleBackgroundMusic);
 
 // Persisted progression helpers
 function getEraProgressMap() {
-    // Use ProgressSync if available for cloud sync
-    if (window.ProgressSync && window.ProgressSync.progress) {
-        return window.ProgressSync.progress.eras || {};
+    if (window.ProgressSync) {
+        return window.ProgressSync.getAllProgress() || {};
     }
-    // Fallback to localStorage
-    try {
-        return JSON.parse(localStorage.getItem('eraProgress')) || {};
-    } catch (error) {
-        console.warn('Unable to parse eraProgress, resetting', error);
-        return {};
-    }
+    console.warn('ProgressSync unavailable; returning empty era progress map');
+    return {};
 }
 
 async function updateEraProgress(eraKey, updates) {
-    // Use ProgressSync if available for cloud sync
     if (window.ProgressSync) {
         await window.ProgressSync.updateEraProgress(eraKey, updates);
         return;
     }
-    // Fallback to localStorage
-    const progress = getEraProgressMap();
-    const existing = progress[eraKey] || { lessonsComplete: false, bossDefeated: false };
-    progress[eraKey] = { ...existing, ...updates };
-    localStorage.setItem('eraProgress', JSON.stringify(progress));
+    console.warn('ProgressSync unavailable; progress update skipped');
 }
 
 // Initialize learning module
@@ -104,17 +93,11 @@ async function initLearningModule() {
     // Ensure progress record exists for the current era
     await updateEraProgress(currentEraKey, {});
     
-    // Load completed lessons - try ProgressSync first, fallback to localStorage
-    if (window.ProgressSync && window.ProgressSync.progress) {
-        const cloudLessons = window.ProgressSync.progress.completedLessons || {};
-        const eraLessons = cloudLessons[currentEraKey] || [];
-        completedLessons = new Set(eraLessons);
-    } else {
-        const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
-        if (savedProgress) {
-            completedLessons = new Set(JSON.parse(savedProgress));
-        }
-    }
+    // Load completed lessons from ProgressSync (DB-backed)
+    const lessonList = window.ProgressSync
+        ? window.ProgressSync.getCompletedLessons(currentEraKey)
+        : [];
+    completedLessons = new Set(lessonList);
     
     loadEraContent();
     setupLessonNavigation();
@@ -255,12 +238,6 @@ async function completeCurrentLesson() {
     // Save progress - use ProgressSync if available
     if (window.ProgressSync) {
         await window.ProgressSync.markLessonComplete(currentEraKey, lesson.id);
-    } else {
-        // Fallback to localStorage
-        localStorage.setItem(
-            `learning_${currentEraKey}`, 
-            JSON.stringify([...completedLessons])
-        );
     }
     
     // Show completion animation

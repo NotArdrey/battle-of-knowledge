@@ -142,12 +142,11 @@ function getUnlockedHeroes() {
 
 // Retrieve era progress map from localStorage
 function getEraProgressMap() {
-    try {
-        return JSON.parse(localStorage.getItem('eraProgress')) || {};
-    } catch (error) {
-        console.warn('Unable to parse eraProgress, resetting', error);
-        return {};
+    if (window.ProgressSync) {
+        return window.ProgressSync.getAllProgress() || {};
     }
+    console.warn('ProgressSync unavailable; returning empty era progress map');
+    return {};
 }
 
 // Store current character for re-rendering modal on language change

@@ -176,7 +176,7 @@ async function signOut() {
         localStorage.removeItem('userProfile');
         localStorage.removeItem('redirectAfterLogin');
         
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     } catch (error) {
         console.error('Error signing out:', error);
         alert('Error signing out. Please try again.');

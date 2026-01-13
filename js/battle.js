@@ -75,28 +75,19 @@ const bossDefinitions = {
 
 // Persisted progression helpers
 function getEraProgressMap() {
-    // Use ProgressSync if available (Supabase integration)
     if (window.ProgressSync) {
-        return window.ProgressSync.getAllProgress();
+        return window.ProgressSync.getAllProgress() || {};
     }
-    try {
-        return JSON.parse(localStorage.getItem('eraProgress')) || {};
-    } catch (error) {
-        console.warn('Unable to parse eraProgress, resetting', error);
-        return {};
-    }
+    console.warn('ProgressSync unavailable; returning empty progress map');
+    return {};
 }
 
 async function updateEraProgress(eraKey, updates) {
-    // Use ProgressSync if available (Supabase integration)
     if (window.ProgressSync) {
         await window.ProgressSync.updateEraProgress(eraKey, updates);
         return;
     }
-    const progress = getEraProgressMap();
-    const existing = progress[eraKey] || { lessonsComplete: false, bossDefeated: false };
-    progress[eraKey] = { ...existing, ...updates };
-    localStorage.setItem('eraProgress', JSON.stringify(progress));
+    console.warn('ProgressSync unavailable; progress update skipped');
 }
 
 // Mobile detection
