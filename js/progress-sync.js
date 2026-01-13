@@ -145,6 +145,7 @@ const ProgressSync = {
     async markBossDefeated(eraKey, score = 0) {
         await this.updateEraProgress(eraKey, {
             bossDefeated: true,
+            lessonsComplete: true,
             battleScore: score
         });
     },
