@@ -1514,6 +1514,12 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Battlefield page loaded with boss mechanics');
             
+            // Block access when not signed in so progress will persist
+            if (window.SupabaseConfig) {
+                const authed = await window.SupabaseConfig.requireAuth('login.html');
+                if (!authed) return;
+            }
+            
             // Initialize ProgressSync if available
             if (window.ProgressSync) {
                 await window.ProgressSync.init();

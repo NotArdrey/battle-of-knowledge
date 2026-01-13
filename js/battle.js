@@ -1929,6 +1929,12 @@ function disableAnswers() {
 // Initialize battle when page loads
 window.addEventListener('DOMContentLoaded', async function() {
     console.log('DOMContentLoaded - Initializing battle with boss mechanics and automatic background music...');
+
+    // Require auth so progress can be saved; redirect to login if missing
+    if (window.SupabaseConfig) {
+        const authed = await window.SupabaseConfig.requireAuth('login.html');
+        if (!authed) return;
+    }
     
     // Initialize the battle (now async to wait for ProgressSync)
     await initBattle();

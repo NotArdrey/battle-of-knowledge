@@ -1555,6 +1555,12 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOMContentLoaded fired');
             
+            // Require login so lesson progress is stored to the user account
+            if (window.SupabaseConfig) {
+                const authed = await window.SupabaseConfig.requireAuth('login.html');
+                if (!authed) return;
+            }
+
             // Initialize ProgressSync FIRST to ensure progress is loaded
             if (window.ProgressSync) {
                 try {
