@@ -161,9 +161,20 @@ const ProgressSync = {
     },
 
     async saveToServer(eraKey, data) {
-        if (!this.userId) return;
+        const toast = window.SupabaseConfig?.showToast;
+
+        if (!this.userId) {
+            console.warn('ProgressSync: No userId; progress not saved');
+            toast?.('Progress not saved: please sign in');
+            return;
+        }
+
         const client = this.getClient();
-        if (!client) return;
+        if (!client) {
+            console.warn('ProgressSync: Supabase client unavailable; progress not saved');
+            toast?.('Progress not saved: connection unavailable');
+            return;
+        }
 
         try {
             const lessonsCompleted = this.getCompletedLessons(eraKey);
@@ -187,6 +198,7 @@ const ProgressSync = {
             if (error) throw error;
         } catch (error) {
             console.error('Error saving progress to server:', error);
+            toast?.('Progress not saved: ' + (error?.message || 'server error'));
         }
     },
 
