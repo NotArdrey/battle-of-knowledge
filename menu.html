@@ -372,7 +372,7 @@
         
         async function handleLogout() {
             await SupabaseConfig.signOut();
-            window.location.reload();
+            window.location.href = 'index.html';
         }
         
         // Language toggle functionality with localStorage (synced with language.js)
