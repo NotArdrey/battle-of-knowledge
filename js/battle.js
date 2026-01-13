@@ -18,12 +18,15 @@ let enemiesDefeated = 0;
 let totalEnemiesBeforeBoss = 3; // Default: defeat 3 normal enemies before boss
 
 // Character type definitions
+// All characters now use sword effects for historical accuracy and consistency
 const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier', 
                     'Andres Bonifacio', 'Emilio Aguinaldo', 
-                    'Commodore George Dewey', 'General Juan Luna'];
+                    'Commodore George Dewey', 'General Juan Luna',
+                    'American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
+                    'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era', 'Spanish Soldier'];
 
-const gunUsers = ['American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
-                  'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era', 'Spanish Soldier'];
+// gunUsers removed - all characters now use sword sounds
+const gunUsers = [];
 
 const magicUsers = ['Jose Rizal', 'Apolinario Mabini'];
 
@@ -62,16 +65,20 @@ const bossDefinitions = {
         enemiesBeforeBoss: 2 // Defeat 2 American Soldiers before Dewey
     },
     'ww2': {
-        bossName: null, // No boss for WW2 era
-        isBoss: false,
-        isFinalBoss: false,
-        preBossEnemies: [],
-        enemiesBeforeBoss: 0
+        bossName: 'Japanese Commander',
+        isBoss: true,
+        isFinalBoss: true,
+        preBossEnemies: ['Japanese Soldier'],
+        enemiesBeforeBoss: 2 // Defeat 2 Japanese Soldiers before Commander
     }
 };
 
 // Persisted progression helpers
 function getEraProgressMap() {
+    // Use ProgressSync if available (Supabase integration)
+    if (window.ProgressSync) {
+        return window.ProgressSync.getAllProgress();
+    }
     try {
         return JSON.parse(localStorage.getItem('eraProgress')) || {};
     } catch (error) {
@@ -80,7 +87,12 @@ function getEraProgressMap() {
     }
 }
 
-function updateEraProgress(eraKey, updates) {
+async function updateEraProgress(eraKey, updates) {
+    // Use ProgressSync if available (Supabase integration)
+    if (window.ProgressSync) {
+        await window.ProgressSync.updateEraProgress(eraKey, updates);
+        return;
+    }
     const progress = getEraProgressMap();
     const existing = progress[eraKey] || { lessonsComplete: false, bossDefeated: false };
     progress[eraKey] = { ...existing, ...updates };
@@ -149,9 +161,10 @@ function clearBattleProgress() {
 }
 
 // Sound effects - preload them
+// Note: All characters now use sword sound effects instead of gun sounds
 const soundEffects = {
     sword: new Audio('assets/SFX/Attacks/Sword.mp3'),
-    gun: new Audio('assets/SFX/Attacks/Gun.mp3'),
+    gun: new Audio('assets/SFX/Attacks/Sword.mp3'), // Replaced gun with sword sound
     magic: new Audio('assets/SFX/Attacks/Magic.mp3'),
     hit: new Audio('assets/SFX/Attacks/Hit.mp3'),
     damage: new Audio('assets/SFX/Attacks/Damage.mp3'),
@@ -1717,7 +1730,7 @@ function unlockNextHero(eraKey) {
 }
 
 // Unlock hero and show victory
-function unlockHeroAndShowVictory() {
+async function unlockHeroAndShowVictory() {
     const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
     
     // Mark era as completed
@@ -1728,7 +1741,17 @@ function unlockHeroAndShowVictory() {
     }
 
     // Persist local unlock state so later eras can be gated
-    updateEraProgress(currentEra, { bossDefeated: true, lessonsComplete: true });
+    // Use ProgressSync for Supabase integration
+    if (window.ProgressSync) {
+        await window.ProgressSync.markBossDefeated(currentEra, questionIndex * 10);
+        await window.ProgressSync.logGameSession(currentEra, 'battle', {
+            questionsAnswered: questionIndex,
+            correctAnswers: questionIndex,
+            score: questionIndex * 10
+        });
+    } else {
+        updateEraProgress(currentEra, { bossDefeated: true, lessonsComplete: true });
+    }
     
     // Show special victory message for boss battles
     const victoryModal = document.getElementById('victoryModal');

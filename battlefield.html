@@ -1267,6 +1267,11 @@
     <!-- Floating Damage Indicators -->
     <div id="damageIndicators" class="fixed inset-0 pointer-events-none z-40"></div>
     
+    <!-- Supabase SDK and Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/progress-sync.js"></script>
+    
     <script src="js/eraData.js"></script>
     <script src="js/questions.js"></script>
     <script src="js/battle.js"></script>
@@ -1274,8 +1279,13 @@
     
     <script>
         // Simple initialization
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('Battlefield page loaded with boss mechanics');
+            
+            // Initialize ProgressSync if available
+            if (window.ProgressSync) {
+                await window.ProgressSync.init();
+            }
             
             // Hide loading overlay
             setTimeout(() => {

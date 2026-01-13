@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Admin Dashboard - Battle of Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Baloo 2', cursive; 
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 4px solid rgba(120, 53, 15, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .dashboard-title {
+            color: #7c2d12;
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-badge {
+            background: linear-gradient(to right, #dc2626, #b91c1c);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+            border: 2px solid #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout:hover {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #7c2d12;
+        }
+        
+        .stat-label {
+            color: #92400e;
+            font-weight: 600;
+        }
+        
+        .content-card {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .card-title {
+            color: #7c2d12;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #7c2d12;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            border-color: #b45309;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            border-color: #b45309;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background: rgba(180, 83, 9, 0.2);
+            color: #7c2d12;
+            font-weight: 700;
+            padding: 1rem;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid rgba(120, 53, 15, 0.1);
+            color: #7c2d12;
+        }
+        
+        .data-table tr:hover {
+            background: rgba(251, 191, 36, 0.1);
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .role-admin { background: #fecaca; color: #991b1b; }
+        .role-teacher { background: #dbeafe; color: #1e40af; }
+        .role-student { background: #d1fae5; color: #065f46; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-verified { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            margin-right: 0.25rem;
+        }
+        
+        .btn-verify {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-verify:hover { background: #059669; }
+        
+        .btn-promote {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-promote:hover { background: #2563eb; }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-delete:hover { background: #dc2626; }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(120, 53, 15, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #b45309;
+            background: rgba(251, 191, 36, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            color: #7c2d12;
+            min-width: 250px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #b45309;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
+            border: 4px solid rgba(120, 53, 15, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            color: #7c2d12;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            color: #7c2d12;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Baloo 2', cursive;
+            color: #7c2d12;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #92400e;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            color: #b45309;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(180, 83, 9, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .btn-action {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1 class="dashboard-title">🛡️ Admin Dashboard</h1>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">← Home</a>
+                    <a href="era-selection.html" class="nav-link">🎮 Play Game</a>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="userName" class="text-amber-800 font-semibold"></span>
+                <span class="user-badge">ADMIN</span>
+                <button onclick="handleLogout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalTeachers">0</div>
+                <div class="stat-label">Teachers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingVerification">0</div>
+                <div class="stat-label">Pending Verification</div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('users')">👥 User Management</button>
+            <button class="tab-btn" onclick="switchTab('students')">📚 Student Registry</button>
+        </div>
+        
+        <!-- User Management Tab -->
+        <div id="usersTab" class="tab-content active">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">All Users</h2>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                        <button class="btn-primary" onclick="showTeacherModal()">➕ Add Teacher</button>
+                        <input type="text" class="search-input" placeholder="🔍 Search users..." oninput="filterUsers(this.value)">
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="usersEmpty" class="empty-state hidden">
+                    <div class="empty-icon">👥</div>
+                    <p>No users found</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Student Registry Tab -->
+        <div id="studentsTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Registered Students Database</h2>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn-primary" onclick="showStudentModal()">➕ Add Student</button>
+                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);" onclick="document.getElementById('excelFile').click()">📤 Upload Excel</button>
+                    </div>
+                </div>
+                
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('excelFile').click()">
+                    <div class="upload-icon">📊</div>
+                    <p class="text-amber-800 font-semibold mb-2">Upload Student List (Excel)</p>
+                    <p class="text-amber-600 text-sm">Click or drag & drop an Excel file (.xlsx, .xls)</p>
+                    <p class="text-amber-500 text-xs mt-2">Required columns: student_id_number, full_name, email (optional), grade_level, section</p>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden" onchange="handleExcelUpload(event)">
+                </div>
+                
+                <div class="card-header mt-6">
+                    <h3 class="card-title">Student List</h3>
+                    <input type="text" class="search-input" placeholder="🔍 Search students..." oninput="filterStudents(this.value)">
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Grade/Section</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Students will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="studentsEmpty" class="empty-state hidden">
+                    <div class="empty-icon">📚</div>
+                    <p>No registered students yet</p>
+                    <p class="text-sm">Click "Add Student" or upload an Excel file to add students</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Add Student Modal -->
+    <div id="studentModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Add Student</h2>
+            <form id="studentForm" onsubmit="handleAddStudent(event)">
+                <div class="form-group">
+                    <label class="form-label">Student ID Number</label>
+                    <input type="text" id="newStudentId" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="newStudentName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email (Optional)</label>
+                    <input type="email" id="newStudentEmail" class="form-input">
+                </div>
+                
+                <div class="flex gap-3">
+                    <div class="form-group flex-1">
+                        <label class="form-label">Grade Level</label>
+                        <input type="text" id="newStudentGrade" class="form-input" placeholder="e.g., Grade 7">
+                    </div>
+                    
+                    <div class="form-group flex-1">
+                        <label class="form-label">Section</label>
+                        <input type="text" id="newStudentSection" class="form-input" placeholder="e.g., Section A">
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeStudentModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Add Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Teacher Modal -->
+    <div id="teacherModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Add Teacher Account</h2>
+            <form id="teacherForm" onsubmit="handleAddTeacher(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="newTeacherName" class="form-input" required placeholder="Enter teacher's full name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="newTeacherEmail" class="form-input" required placeholder="teacher@school.edu">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="newTeacherPassword" class="form-input" required minlength="6" placeholder="Minimum 6 characters">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="newTeacherPasswordConfirm" class="form-input" required minlength="6" placeholder="Confirm password">
+                </div>
+                
+                <div id="teacherFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mb-4"></div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeTeacherModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" id="addTeacherBtn" class="flex-1 btn-primary">
+                        Create Teacher Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Supabase config - standalone, no external dependencies
+        const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
+        
+        let sb = null;
+        let allUsers = [];
+        let allStudents = [];
+        let currentProfile = null;
+        
+        // Get Supabase client
+        function getClient() {
+            if (sb) return sb;
+            if (window.supabaseClient) return window.supabaseClient;
+            if (window.supabase?.createClient) {
+                sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return sb;
+            }
+            return null;
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            sb = getClient();
+            if (!sb) {
+                alert('Failed to initialize Supabase client');
+                return;
+            }
+            
+            // Check if logged in
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Get profile
+            const { data: profile } = await sb
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            
+            // Allow access even without profile (for new admins)
+            currentProfile = profile || { id: session.user.id, full_name: session.user.email, role: 'admin' };
+            document.getElementById('userName').textContent = currentProfile.full_name;
+            
+            // Load data
+            await Promise.all([
+                loadUsers(),
+                loadRegisteredStudents(),
+                loadStats()
+            ]);
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+        });
+        
+        // Load statistics
+        async function loadStats() {
+            try {
+                const { data: users, error } = await sb
+                    .from('profiles')
+                    .select('role, is_verified');
+                
+                if (error) throw error;
+                
+                const total = users.length;
+                const teachers = users.filter(u => u.role === 'teacher').length;
+                const students = users.filter(u => u.role === 'student').length;
+                const pending = users.filter(u => !u.is_verified && u.role === 'teacher').length;
+                
+                document.getElementById('totalUsers').textContent = total;
+                document.getElementById('totalTeachers').textContent = teachers;
+                document.getElementById('totalStudents').textContent = students;
+                document.getElementById('pendingVerification').textContent = pending;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Load all users
+        async function loadUsers() {
+            try {
+                const { data, error } = await sb
+                    .from('profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allUsers = data || [];
+                renderUsers(allUsers);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        // Render users table
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            const emptyState = document.getElementById('usersEmpty');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.full_name}</td>
+                    <td>${user.email}</td>
+                    <td><span class="role-badge role-${user.role}">${user.role.toUpperCase()}</span></td>
+                    <td><span class="status-badge ${user.is_verified ? 'status-verified' : 'status-pending'}">${user.is_verified ? 'Verified' : 'Pending'}</span></td>
+                    <td>${formatDate(user.created_at)}</td>
+                    <td>
+                        ${!user.is_verified && user.role === 'teacher' ? 
+                            `<button class="btn-action btn-verify" onclick="verifyUser('${user.id}')">Verify</button>` : ''
+                        }
+                        ${user.role === 'student' ? 
+                            `<button class="btn-action btn-promote" onclick="promoteUser('${user.id}')">→ Teacher</button>` : ''
+                        }
+                        ${user.role !== 'admin' ? 
+                            `<button class="btn-action btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Format date helper
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString();
+        }
+        
+        // Filter users
+        function filterUsers(query) {
+            const filtered = allUsers.filter(u => 
+                u.full_name.toLowerCase().includes(query.toLowerCase()) ||
+                u.email.toLowerCase().includes(query.toLowerCase()) ||
+                u.role.toLowerCase().includes(query.toLowerCase())
+            );
+            renderUsers(filtered);
+        }
+        
+        // Verify user
+        async function verifyUser(userId) {
+            try {
+                const { error } = await sb
+                    .from('profiles')
+                    .update({ is_verified: true })
+                    .eq('id', userId);
+                
+                if (error) throw error;
+                
+                showToast('User verified successfully!', 'success');
+                loadUsers();
+                loadStats();
+            } catch (error) {
+                console.error('Error verifying user:', error);
+                showToast('Failed to verify user', 'error');
+            }
+        }
+        
+        // Promote user to teacher
+        async function promoteUser(userId) {
+            if (!confirm('Are you sure you want to promote this user to Teacher?')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('profiles')
+                    .update({ role: 'teacher', is_verified: true })
+                    .eq('id', userId);
+                
+                if (error) throw error;
+                
+                showToast('User promoted to Teacher!', 'success');
+                loadUsers();
+                loadStats();
+            } catch (error) {
+                console.error('Error promoting user:', error);
+                showToast('Failed to promote user', 'error');
+            }
+        }
+        
+        // Delete user
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('profiles')
+                    .delete()
+                    .eq('id', userId);
+                
+                if (error) throw error;
+                
+                showToast('User deleted successfully!', 'success');
+                loadUsers();
+                loadStats();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showToast('Failed to delete user', 'error');
+            }
+        }
+        
+        // Load registered students
+        async function loadRegisteredStudents() {
+            try {
+                const { data, error } = await sb
+                    .from('registered_students')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allStudents = data || [];
+                renderStudents(allStudents);
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+        
+        // Render students table
+        function renderStudents(students) {
+            const tbody = document.getElementById('studentsTableBody');
+            const emptyState = document.getElementById('studentsEmpty');
+            
+            if (students.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = students.map(student => `
+                <tr>
+                    <td>${student.student_id_number}</td>
+                    <td>${student.full_name}</td>
+                    <td>${student.email || '-'}</td>
+                    <td>${student.grade_level || '-'} / ${student.section || '-'}</td>
+                    <td><span class="status-badge ${student.is_claimed ? 'status-verified' : 'status-pending'}">${student.is_claimed ? 'Registered' : 'Available'}</span></td>
+                    <td>
+                        <button class="btn-action btn-delete" onclick="deleteStudent('${student.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Filter students
+        function filterStudents(query) {
+            const filtered = allStudents.filter(s => 
+                s.full_name.toLowerCase().includes(query.toLowerCase()) ||
+                s.student_id_number.toLowerCase().includes(query.toLowerCase()) ||
+                (s.email && s.email.toLowerCase().includes(query.toLowerCase()))
+            );
+            renderStudents(filtered);
+        }
+        
+        // Handle Excel upload
+        async function handleExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoading(true);
+            
+            try {
+                const data = await readExcelFile(file);
+                
+                if (data.length === 0) {
+                    throw new Error('No data found in Excel file');
+                }
+                
+                // Validate required columns exist
+                const requiredColumns = ['student_id_number', 'full_name'];
+                const headers = Object.keys(data[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'));
+                
+                const missingColumns = [];
+                for (const col of requiredColumns) {
+                    const variations = {
+                        'student_id_number': ['student_id_number', 'studentid', 'student_id', 'id', 'studentidnumber'],
+                        'full_name': ['full_name', 'fullname', 'name', 'student_name', 'studentname']
+                    };
+                    const found = variations[col].some(v => headers.includes(v));
+                    if (!found) {
+                        missingColumns.push(col);
+                    }
+                }
+                
+                if (missingColumns.length > 0) {
+                    throw new Error(`Missing required columns: ${missingColumns.join(', ')}\n\nRequired: student_id_number, full_name`);
+                }
+                
+                // Normalize and validate each row
+                const validStudents = [];
+                const invalidRows = [];
+                
+                data.forEach((row, index) => {
+                    const rowNumber = index + 2; // Excel rows start at 1, plus header row
+                    
+                    // Normalize column names
+                    const normalized = {};
+                    for (const [key, value] of Object.entries(row)) {
+                        const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
+                        normalized[normalizedKey] = value;
+                    }
+                    
+                    // Extract values with fallbacks
+                    const studentId = String(
+                        normalized.student_id_number || 
+                        normalized.studentid || 
+                        normalized.student_id || 
+                        normalized.id || 
+                        normalized.studentidnumber || 
+                        ''
+                    ).trim();
+                    
+                    const fullName = String(
+                        normalized.full_name || 
+                        normalized.fullname || 
+                        normalized.name || 
+                        normalized.student_name || 
+                        normalized.studentname || 
+                        ''
+                    ).trim();
+                    
+                    const email = normalized.email ? String(normalized.email).trim() : null;
+                    const gradeLevel = normalized.grade_level || normalized.grade || normalized.gradelevel || null;
+                    const section = normalized.section || null;
+                    
+                    // Validate required fields
+                    const errors = [];
+                    if (!studentId) errors.push('missing student_id_number');
+                    if (!fullName) errors.push('missing full_name');
+                    if (studentId && studentId.length < 3) errors.push('student_id_number too short');
+                    if (fullName && fullName.length < 2) errors.push('full_name too short');
+                    if (email && !email.includes('@')) errors.push('invalid email format');
+                    
+                    if (errors.length > 0) {
+                        invalidRows.push({ row: rowNumber, errors: errors.join(', ') });
+                    } else {
+                        validStudents.push({
+                            student_id_number: studentId,
+                            full_name: fullName,
+                            email: email,
+                            grade_level: gradeLevel ? String(gradeLevel) : null,
+                            section: section ? String(section) : null,
+                            uploaded_by: currentProfile.id
+                        });
+                    }
+                });
+                
+                // Check for duplicates within the file
+                const idCounts = {};
+                validStudents.forEach(s => {
+                    idCounts[s.student_id_number] = (idCounts[s.student_id_number] || 0) + 1;
+                });
+                const duplicateIds = Object.entries(idCounts).filter(([id, count]) => count > 1).map(([id]) => id);
+                
+                if (duplicateIds.length > 0) {
+                    throw new Error(`Duplicate student IDs found in file: ${duplicateIds.join(', ')}`);
+                }
+                
+                if (validStudents.length === 0) {
+                    let errorMsg = 'No valid student records found.\n\n';
+                    if (invalidRows.length > 0) {
+                        errorMsg += 'Errors found:\n';
+                        invalidRows.slice(0, 5).forEach(r => {
+                            errorMsg += `• Row ${r.row}: ${r.errors}\n`;
+                        });
+                        if (invalidRows.length > 5) {
+                            errorMsg += `... and ${invalidRows.length - 5} more errors`;
+                        }
+                    }
+                    throw new Error(errorMsg);
+                }
+                
+                // Upsert to database
+                const { error } = await sb
+                    .from('registered_students')
+                    .upsert(validStudents, { 
+                        onConflict: 'student_id_number',
+                        ignoreDuplicates: false 
+                    });
+                
+                if (error) throw error;
+                
+                // Build success message
+                let successMsg = `Successfully uploaded ${validStudents.length} students!`;
+                if (invalidRows.length > 0) {
+                    successMsg += ` (${invalidRows.length} rows skipped due to errors)`;
+                }
+                
+                showToast(successMsg, 'success');
+                
+                // Show warning for skipped rows
+                if (invalidRows.length > 0) {
+                    console.warn('Skipped rows:', invalidRows);
+                    setTimeout(() => {
+                        let warningMsg = `${invalidRows.length} rows were skipped:\n`;
+                        invalidRows.slice(0, 3).forEach(r => {
+                            warningMsg += `• Row ${r.row}: ${r.errors}\n`;
+                        });
+                        if (invalidRows.length > 3) {
+                            warningMsg += `Check console for full list.`;
+                        }
+                        alert(warningMsg);
+                    }, 500);
+                }
+                
+                loadRegisteredStudents();
+                
+            } catch (error) {
+                console.error('Excel upload error:', error);
+                showToast(error.message || 'Failed to upload file', 'error');
+            } finally {
+                showLoading(false);
+                event.target.value = ''; // Reset file input
+            }
+        }
+        
+        // Read Excel file
+        function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+                        const json = XLSX.utils.sheet_to_json(sheet);
+                        resolve(json);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const file = e.dataTransfer.files[0];
+                if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+                    handleExcelUpload({ target: { files: [file] } });
+                } else {
+                    showToast('Please upload an Excel file (.xlsx or .xls)', 'error');
+                }
+            });
+        }
+        
+        // Delete student from registry
+        async function deleteStudent(studentId) {
+            if (!confirm('Are you sure you want to delete this student from the registry?')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('registered_students')
+                    .delete()
+                    .eq('id', studentId);
+                
+                if (error) throw error;
+                
+                showToast('Student deleted successfully!', 'success');
+                loadRegisteredStudents();
+            } catch (error) {
+                console.error('Error deleting student:', error);
+                showToast('Failed to delete student', 'error');
+            }
+        }
+        
+        // Show student modal
+        function showStudentModal() {
+            document.getElementById('studentModal').classList.remove('hidden');
+        }
+        
+        // Close student modal
+        function closeStudentModal() {
+            document.getElementById('studentModal').classList.add('hidden');
+            document.getElementById('studentForm').reset();
+        }
+        
+        // Handle add student
+        async function handleAddStudent(event) {
+            event.preventDefault();
+            
+            const studentId = document.getElementById('newStudentId').value.trim();
+            const name = document.getElementById('newStudentName').value.trim();
+            const email = document.getElementById('newStudentEmail').value.trim();
+            const grade = document.getElementById('newStudentGrade').value.trim();
+            const section = document.getElementById('newStudentSection').value.trim();
+            
+            try {
+                const { error } = await sb
+                    .from('registered_students')
+                    .insert({
+                        student_id_number: studentId,
+                        full_name: name,
+                        email: email || null,
+                        grade_level: grade || null,
+                        section: section || null,
+                        uploaded_by: currentProfile.id
+                    });
+                
+                if (error) throw error;
+                
+                showToast('Student added successfully!', 'success');
+                closeStudentModal();
+                loadRegisteredStudents();
+            } catch (error) {
+                console.error('Error adding student:', error);
+                if (error.code === '23505') {
+                    showToast('Student ID already exists', 'error');
+                } else {
+                    showToast('Failed to add student', 'error');
+                }
+            }
+        }
+        
+        // Show teacher modal
+        function showTeacherModal() {
+            document.getElementById('teacherModal').classList.remove('hidden');
+            document.getElementById('teacherFormError').classList.add('hidden');
+        }
+        
+        // Close teacher modal
+        function closeTeacherModal() {
+            document.getElementById('teacherModal').classList.add('hidden');
+            document.getElementById('teacherForm').reset();
+            document.getElementById('teacherFormError').classList.add('hidden');
+        }
+        
+        // Handle add teacher
+        async function handleAddTeacher(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('newTeacherName').value.trim();
+            const email = document.getElementById('newTeacherEmail').value.trim();
+            const password = document.getElementById('newTeacherPassword').value;
+            const passwordConfirm = document.getElementById('newTeacherPasswordConfirm').value;
+            const errorDiv = document.getElementById('teacherFormError');
+            const submitBtn = document.getElementById('addTeacherBtn');
+            
+            // Reset error
+            errorDiv.classList.add('hidden');
+            
+            // Validate passwords match
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Validate password length
+            if (password.length < 6) {
+                errorDiv.textContent = 'Password must be at least 6 characters';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            try {
+                // Create user with Supabase Auth
+                const { data: authData, error: authError } = await sb.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            role: 'teacher'
+                        }
+                    }
+                });
+                
+                if (authError) throw authError;
+                
+                // The trigger should create the profile, but let's update it to ensure teacher role
+                if (authData.user) {
+                    // Wait a moment for the trigger to run
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Update the profile to ensure it has teacher role and is verified
+                    const { error: updateError } = await sb
+                        .from('profiles')
+                        .update({ 
+                            role: 'teacher', 
+                            is_verified: true,
+                            full_name: name
+                        })
+                        .eq('id', authData.user.id);
+                    
+                    if (updateError) {
+                        console.warn('Could not update profile, may need manual verification:', updateError);
+                    }
+                }
+                
+                showToast(`Teacher account created for ${email}!`, 'success');
+                closeTeacherModal();
+                loadUsers();
+                loadStats();
+                
+            } catch (error) {
+                console.error('Error creating teacher:', error);
+                if (error.message.includes('already registered')) {
+                    errorDiv.textContent = 'This email is already registered';
+                } else {
+                    errorDiv.textContent = error.message || 'Failed to create teacher account';
+                }
+                errorDiv.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Teacher Account';
+            }
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tabs > .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Toast notification helper
+        function showToast(message, type = 'info') {
+            const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                background: ${colors[type] || colors.info}; color: white;
+                padding: 1rem 1.5rem; border-radius: 0.5rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
+                font-weight: 600; animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Show loading indicator
+        function showLoading(show) {
+            // Simple implementation
+            document.body.style.cursor = show ? 'wait' : 'default';
+        }
+        
+        // Handle logout
+        async function handleLogout() {
+            await sb.auth.signOut();
+            window.location.href = 'login.html';
+        }
+        
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

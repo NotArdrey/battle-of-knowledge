@@ -423,5 +423,28 @@ const characterContributions = {
                 "Kumakatawan sa presensya militar ng Imperyong Hapon"
             ]
         }
+    },
+    "Japanese Commander": {
+        type: "villain",
+        story: {
+            en: "The Japanese Commander represented the iron will of Imperial Japan's military leadership during the occupation of the Philippines. These officers, trained in the traditions of Bushido and absolute loyalty to the Emperor, commanded forces that swept across Southeast Asia with terrifying efficiency. In the Philippines, Japanese commanders orchestrated the defense against MacArthur's return, ordering their troops to fight to the last man. During the Battle of Manila in 1945, commanders gave orders that led to the systematic destruction of the city and the massacre of Filipino civilians. Their fanatical dedication to their cause resulted in some of the war's worst atrocities, leaving scars on the Filipino psyche that would take generations to heal.",
+            tl: "Ang Kumander ng Hapon ay kumakatawan sa bakal na kalooban ng pamumuno ng militar ng Imperyong Hapon sa panahon ng pananakop sa Pilipinas. Ang mga opisyal na ito, sinanay sa mga tradisyon ng Bushido at ganap na katapatan sa Emperador, ay nag-utos ng mga puwersang gumugpo sa buong Timog-Silangang Asya na may nakakatakot na kahusayan. Sa Pilipinas, ang mga kumander ng Hapon ay nag-organisa ng depensa laban sa pagbabalik ni MacArthur, na nag-utos sa kanilang mga tropa na lumaban hanggang sa huling tao. Sa panahon ng Labanan sa Maynila noong 1945, nagbigay ang mga kumander ng mga utos na humantong sa sistematikong pagkawasak ng lungsod at pagpatay sa mga sibilyang Pilipino. Ang kanilang panatikong dedikasyon sa kanilang layunin ay nagresulta sa ilan sa pinakamasamang mga krimen sa digmaan, na nag-iwan ng mga sugat sa kaluluwa ng mga Pilipino na tatagal ng mga henerasyon upang maghilom."
+        },
+        contributions: {
+            en: [
+                "Led Japanese military operations during the occupation (1942-1945)",
+                "Commanded forces in the defense against American liberation",
+                "Directed the brutal Battle of Manila in 1945",
+                "Ordered systematic resistance that resulted in massive civilian casualties",
+                "Represented Imperial Japanese military authority in the Philippines"
+            ],
+            tl: [
+                "Nanguna sa mga operasyong militar ng Hapon sa panahon ng pananakop (1942-1945)",
+                "Nag-utos ng mga puwersa sa depensa laban sa pagpapalaya ng Amerika",
+                "Nagdirekta ng malupit na Labanan sa Maynila noong 1945",
+                "Nag-utos ng sistematikong paglaban na nagresulta sa napakalaking biktimang sibilyan",
+                "Kumakatawan sa awtoridad militar ng Imperyong Hapon sa Pilipinas"
+            ]
+        }
     }
 };

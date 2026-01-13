@@ -418,36 +418,6 @@ const learningData = {
                             <p class="mb-3">Infrastructure development received substantial American investment, with improvements in transportation networks, communication systems, and public health facilities that modernized Philippine society. However, these developments often served American economic interests and facilitated resource extraction, creating patterns of dependency that would shape Philippine economic development for decades.</p>
                         </div>
                     `
-                },
-                {
-                    id: 4,
-                    title: 'Path to Self-Government',
-                    icon: '4',
-                    content: `
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-bold mb-3">Path to Self-Government</h3>
-                            <p class="mb-3">The United States gradually granted increased autonomy to the Philippines through a series of legislative acts that created a pathway toward eventual independence. The Jones Act of 1916 established the principle of Philippine independence while creating a bicameral Philippine legislature with greater Filipino participation, marking an important step toward self-governance within the colonial framework.</p>
-                            
-                            <p class="mb-3">The Tydings-McDuffie Act of 1934 proved particularly significant, establishing the Philippine Commonwealth with a ten-year transition period leading to full independence in 1946. This legislation created a semi-autonomous government under Filipino leadership, with Manuel L. Quezon elected as the first Commonwealth President in 1935, representing the highest level of self-government achieved under American colonial administration.</p>
-                            
-                            <p class="mb-3">Filipino leaders used this transitional period to develop governmental institutions, draft a new constitution, and prepare for complete sovereignty. This decade of Commonwealth government allowed Filipinos to gain administrative experience and establish governance patterns that would continue after independence, though the outbreak of World War II would dramatically interrupt this transition process.</p>
-                        </div>
-                    `
-                },
-                {
-                    id: 5,
-                    title: 'American Legacy',
-                    icon: '5',
-                    content: `
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-bold mb-3">Impact on Philippine Society</h3>
-                            <p class="mb-3">American colonization left enduring impacts on Philippine culture, education, government, and international relations that continue to shape contemporary Philippine society. The establishment of English as the second official language created linguistic patterns that facilitated international communication and educational access while simultaneously marginalizing indigenous languages and creating complex questions of national identity.</p>
-                            
-                            <p class="mb-3">The American-style education system introduced Western pedagogical methods, curricular content, and institutional structures that transformed Philippine education while also inculcating American cultural values and historical perspectives. This educational legacy created a bilingual, Western-oriented elite while also providing broader literacy and educational opportunities that empowered social mobility and national development.</p>
-                            
-                            <p class="mb-3">Democratic government structures introduced during the American period, including the presidential system, separation of powers, and constitutional governance, established patterns that would endure after independence. The strong United States-Philippines relationship initiated during this colonial period continues to influence Philippine foreign policy, security arrangements, and economic relations, creating a complex post-colonial relationship that balances historical connections with contemporary national interests.</p>
-                        </div>
-                    `
                 }
             ]
         },
@@ -495,36 +465,6 @@ const learningData = {
                             <p class="mb-3">Ang mga makabuluhang pagbabago ay kinabibilangan ng pagtatatag ng isang komprehensibong sistema ng pampublikong edukasyon na gumagamit ng Ingles bilang midyum ng pagtuturo, na dramatikong nagpataas ng mga rate ng literacy habang sabay na lumilikha ng mga pagbabago sa lingguwistika at kultura. Ang mga awtoridad ng Amerika ay nagpakilala rin ng mga demokratikong institusyon, kabilang ang mga halalan para sa mga lokal na opisina at kalaunan mga pambansang katawang lehislatibo, bagaman ang mga ito ay nagpapatakbo sa loob ng mga hadlang ng pangangasiwa ng kolonyal at limitadong awtonomiya ng Pilipino.</p>
                             
                             <p class="mb-3">Ang pagpapaunlad ng imprastraktura ay tumanggap ng makabuluhang pamumuhunan ng Amerika, na may mga pagpapabuti sa mga network ng transportasyon, sistema ng komunikasyon, at mga pasilidad ng pampublikong kalusugan na nag-modernize sa lipunan ng Pilipinas. Gayunpaman, ang mga pag-unlad na ito ay madalas na nagsilbi sa mga interes ng ekonomiya ng Amerika at nagpadali sa pagkuha ng mga mapagkukunan, na lumilikha ng mga pattern ng pagdepende na maghuhugis sa pag-unlad ng ekonomiya ng Pilipinas sa loob ng mga dekada.</p>
-                        </div>
-                    `
-                },
-                {
-                    id: 4,
-                    title: 'Landas sa Sariling Pamahalaan',
-                    icon: '4',
-                    content: `
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-bold mb-3">Landas tungo sa Sariling Pamahalaan</h3>
-                            <p class="mb-3">Ang Estados Unidos ay unti-unting nagbigay ng mas mataas na awtonomiya sa Pilipinas sa pamamagitan ng isang serye ng mga batas na lehislatibo na lumikha ng isang landas patungo sa kalaunang kalayaan. Ang Batas Jones ng 1916 ay nagtatag ng prinsipyo ng kalayaan ng Pilipinas habang lumilikha ng isang bicameral na lehislatura ng Pilipinas na may mas malaking partisipasyon ng Pilipino, na nagmamarka ng isang mahalagang hakbang tungo sa sariling pamamahala sa loob ng balangkas ng kolonyal.</p>
-                            
-                            <p class="mb-3">Ang Batas Tydings-McDuffie ng 1934 ay napatunayang partikular na makabuluhan, na nagtatag ng Commonwealth ng Pilipinas na may sampung taong panahon ng paglipat na humahantong sa ganap na kalayaan noong 1946. Ang batas na ito ay lumikha ng isang semi-autonomous na pamahalaan sa ilalim ng pamumuno ng Pilipino, na si Manuel L. Quezon ay nahalal bilang unang Pangulo ng Commonwealth noong 1935, na kumakatawan sa pinakamataas na antas ng sariling pamahalaan na nakamit sa ilalim ng administrasyon ng kolonyal ng Amerika.</p>
-                            
-                            <p class="mb-3">Ang mga pinuno ng Pilipino ay gumamit ng panahon ng paglipat na ito upang bumuo ng mga institusyong pampamahalaan, mag-draft ng isang bagong konstitusyon, at maghanda para sa kumpletong soberanya. Ang dekadang ito ng pamahalaan ng Commonwealth ay nagpapahintulot sa mga Pilipino na makakuha ng karanasan sa administratibo at magtatag ng mga pattern ng pamamahala na magpapatuloy pagkatapos ng kalayaan, bagaman ang pagsiklab ng Ikalawang Digmaang Pandaigdig ay dramatikong makakaabala sa prosesong ito ng paglipat.</p>
-                        </div>
-                    `
-                },
-                {
-                    id: 5,
-                    title: 'Pamana ng Amerika',
-                    icon: '5',
-                    content: `
-                        <div class="space-y-4">
-                            <h3 class="text-xl font-bold mb-3">Epekto sa Lipunang Pilipino</h3>
-                            <p class="mb-3">Ang pananakop ng Amerika ay nag-iwan ng pangmatagalang mga epekto sa kultura, edukasyon, pamahalaan, at ugnayang internasyonal ng Pilipinas na patuloy na humuhubog sa kontemporaryong lipunan ng Pilipinas. Ang pagtatatag ng Ingles bilang ikalawang opisyal na wika ay lumikha ng mga pattern ng lingguwistika na nagpadali sa komunikasyong internasyonal at pag-access sa edukasyon habang sabay na nagmamarginalisa sa mga katutubong wika at lumilikha ng mga kumplikadong tanong ng pambansang pagkakakilanlan.</p>
-                            
-                            <p class="mb-3">Ang sistema ng edukasyon na estilo ng Amerika ay nagpakilala ng mga Kanluraning pamamaraan ng pedagogical, nilalaman ng kurikulum, at mga istrukturang institusyonal na nagbago sa edukasyon ng Pilipinas habang dinidikta rin ang mga halaga at pananaw sa kasaysayan ng kultura ng Amerika. Ang pamana ng edukasyong ito ay lumikha ng isang bilingual, Kanluraning-oriented na elite habang nagbibigay din ng mas malawak na literacy at mga oportunidad sa edukasyon na nagbigay-kapangyarihan sa sosyal na paggalaw at pambansang pag-unlad.</p>
-                            
-                            <p class="mb-3">Ang mga istruktura ng demokratikong pamahalaan na ipinakilala sa panahon ng Amerika, kabilang ang sistemang pampanguluhan, paghihiwalay ng mga kapangyarihan, at konstitusyonal na pamamahala, ay nagtatag ng mga pattern na mananatili pagkatapos ng kalayaan. Ang malakas na relasyon ng Estados Unidos-Pilipinas na sinimulan sa panahong kolonyal na ito ay patuloy na nakakaimpluwensya sa patakarang panlabas ng Pilipinas, mga pagsasaayos ng seguridad, at ugnayang pang-ekonomiya, na lumilikha ng isang kumplikadong post-kolonyal na relasyon na nagbabalanse ng mga makasaysayang koneksyon sa kontemporaryong mga interes ng bansa.</p>
                         </div>
                     `
                 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Battle of Knowledge: Philippine History</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +38,7 @@
         inset: 0;
         background-image: 
             linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-            url('assets/Background/Menu-BG.png');
+            url('assets/Background/Start Menu/Start Menu.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -266,6 +267,9 @@
 </style>
 </head>
 <body>
+    <meta http-equiv="refresh" content="0;url=login.html">
+    <script>window.location.href = 'login.html';</script>
+    <p style="text-align:center; padding:2rem;">Redirecting to login...</p>
     <div class="main-container">
         <!-- Menu Background -->
         <div class="menu-bg-overlay"></div>
@@ -320,12 +324,64 @@
         </div>
     </div>
 
+    <script src="js/supabase-config.js"></script>
+    <script src="js/shared-auth.js"></script>
+    <script src="js/progress-sync.js"></script>
     <script src="js/achievements.js"></script>
     <script src="js/language.js"></script>
     
+    <!-- User Auth Status Bar -->
+    <div id="authStatusBar" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
+        <span id="userNameDisplay" class="font-semibold text-amber-900"></span>
+        <span id="userRoleBadge" class="text-xs px-2 py-1 rounded-full bg-amber-500 text-white font-bold"></span>
+        <button onclick="handleLogout()" class="text-red-600 hover:text-red-800 font-semibold text-sm">Logout</button>
+    </div>
+    
+    <!-- Login Prompt for non-authenticated users -->
+    <div id="loginPrompt" class="hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full px-6 py-3 shadow-lg flex items-center gap-4">
+        <span class="font-semibold">Sign in to save your progress!</span>
+        <a href="login.html" class="bg-white text-blue-600 px-4 py-1 rounded-full font-bold hover:bg-blue-100 transition-colors">Login</a>
+    </div>
+    
     <script>
+        // Session check and user status
+        async function checkAuthStatus() {
+            try {
+                const session = await SupabaseConfig.getSession();
+                const authBar = document.getElementById('authStatusBar');
+                const loginPrompt = document.getElementById('loginPrompt');
+                
+                if (session) {
+                    // User is logged in
+                    const profile = await SupabaseConfig.getCurrentProfile();
+                    if (profile) {
+                        document.getElementById('userNameDisplay').textContent = profile.full_name;
+                        document.getElementById('userRoleBadge').textContent = profile.role.toUpperCase();
+                        authBar.classList.remove('hidden');
+                        loginPrompt.classList.add('hidden');
+                        
+                        // Initialize progress sync
+                        await ProgressSync.init();
+                    }
+                } else {
+                    // User not logged in - show login prompt
+                    authBar.classList.add('hidden');
+                    loginPrompt.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+        
+        async function handleLogout() {
+            await SupabaseConfig.signOut();
+            window.location.reload();
+        }
+        
         // Language toggle functionality with localStorage (synced with language.js)
         document.addEventListener('DOMContentLoaded', function() {
+            // Check auth status
+            checkAuthStatus();
             const langToggle = document.getElementById('langToggle');
             const langToggleImg = document.getElementById('langToggleImg');
             const englishTitle = document.getElementById('englishTitle');

@@ -33,8 +33,8 @@
         .era-bg-overlay {
             position: absolute;
             inset: 0;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-                            url('assets/Background/ERA Selection BG.png');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), 
+                            url('assets/Background/Start Menu/Start Menu.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -798,6 +798,11 @@
         </div>
     </div>
 
+    <!-- Supabase SDK and Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/progress-sync.js"></script>
+    
     <script src="js/language.js"></script>
     <script>
         let currentSlide = 0;
@@ -811,7 +816,21 @@
             'ww2': 'WW2 Bonus Stage'
         };
 
+        // Initialize ProgressSync on page load
+        (async function() {
+            if (window.ProgressSync) {
+                await window.ProgressSync.init();
+            }
+            // Refresh UI after progress loaded
+            refreshEraLocks();
+        })();
+
         function getEraProgressMap() {
+            // Use ProgressSync if available for cloud sync
+            if (window.ProgressSync && window.ProgressSync.progress) {
+                return window.ProgressSync.progress.eras || {};
+            }
+            // Fallback to localStorage
             try {
                 return JSON.parse(localStorage.getItem('eraProgress')) || {};
             } catch (error) {

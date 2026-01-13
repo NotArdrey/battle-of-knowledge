@@ -6,8 +6,72 @@ let currentLessonIndex = 0;
 let currentEraLessons = [];
 const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
+// Era-specific Background Music for Learning Module
+const moduleBackgroundMusic = {
+    'early-spanish': new Audio('assets/Game-BGM/modulePartBGM/Early Spanish Whole Menu BGM.mp3'),
+    'late-spanish': new Audio('assets/Game-BGM/modulePartBGM/Late Spanish Era Whole Menu BGM.mp3'),
+    'american-colonial': new Audio('assets/Game-BGM/modulePartBGM/American Colonial Whole Menu BGM.mp3'),
+    'ww2': new Audio('assets/Game-BGM/modulePartBGM/WW2 Whole Menu BGM.mp3')
+};
+
+// Configure background music settings
+Object.values(moduleBackgroundMusic).forEach(bgm => {
+    bgm.preload = 'auto';
+    bgm.loop = true;
+    bgm.volume = 0.4; // Lower volume for learning module
+});
+
+// Current playing BGM reference
+let currentModuleBGM = null;
+
+// Play era-specific background music
+function playModuleBackgroundMusic(eraKey) {
+    if (!eraKey || !moduleBackgroundMusic[eraKey]) return;
+    
+    try {
+        // Stop any currently playing music
+        stopModuleBackgroundMusic();
+        
+        // Play the current era's music
+        currentModuleBGM = moduleBackgroundMusic[eraKey];
+        currentModuleBGM.currentTime = 0;
+        currentModuleBGM.volume = 0.4;
+        
+        // Try to play automatically
+        currentModuleBGM.play().catch(e => {
+            console.log('Module BGM autoplay blocked:', e);
+            // Add click handler to start music on user interaction
+            document.addEventListener('click', function startBGM() {
+                if (currentModuleBGM) {
+                    currentModuleBGM.play().catch(() => {});
+                }
+                document.removeEventListener('click', startBGM);
+            }, { once: true });
+        });
+    } catch (error) {
+        console.log('Module BGM error:', error);
+    }
+}
+
+// Stop background music
+function stopModuleBackgroundMusic() {
+    Object.values(moduleBackgroundMusic).forEach(bgm => {
+        bgm.pause();
+        bgm.currentTime = 0;
+    });
+    currentModuleBGM = null;
+}
+
+// Stop music when leaving the page
+window.addEventListener('beforeunload', stopModuleBackgroundMusic);
+
 // Persisted progression helpers
 function getEraProgressMap() {
+    // Use ProgressSync if available for cloud sync
+    if (window.ProgressSync && window.ProgressSync.progress) {
+        return window.ProgressSync.progress.eras || {};
+    }
+    // Fallback to localStorage
     try {
         return JSON.parse(localStorage.getItem('eraProgress')) || {};
     } catch (error) {
@@ -16,7 +80,13 @@ function getEraProgressMap() {
     }
 }
 
-function updateEraProgress(eraKey, updates) {
+async function updateEraProgress(eraKey, updates) {
+    // Use ProgressSync if available for cloud sync
+    if (window.ProgressSync) {
+        await window.ProgressSync.updateEraProgress(eraKey, updates);
+        return;
+    }
+    // Fallback to localStorage
     const progress = getEraProgressMap();
     const existing = progress[eraKey] || { lessonsComplete: false, bossDefeated: false };
     progress[eraKey] = { ...existing, ...updates };
@@ -24,17 +94,26 @@ function updateEraProgress(eraKey, updates) {
 }
 
 // Initialize learning module
-function initLearningModule() {
+async function initLearningModule() {
     currentEraKey = localStorage.getItem('selectedEra') || 'early-spanish';
     currentLang = localStorage.getItem('selectedLanguage') || 'en';
 
+    // Start era-specific background music
+    playModuleBackgroundMusic(currentEraKey);
+
     // Ensure progress record exists for the current era
-    updateEraProgress(currentEraKey, {});
+    await updateEraProgress(currentEraKey, {});
     
-    // Load completed lessons for this era from localStorage
-    const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
-    if (savedProgress) {
-        completedLessons = new Set(JSON.parse(savedProgress));
+    // Load completed lessons - try ProgressSync first, fallback to localStorage
+    if (window.ProgressSync && window.ProgressSync.progress) {
+        const cloudLessons = window.ProgressSync.progress.completedLessons || {};
+        const eraLessons = cloudLessons[currentEraKey] || [];
+        completedLessons = new Set(eraLessons);
+    } else {
+        const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
+        if (savedProgress) {
+            completedLessons = new Set(JSON.parse(savedProgress));
+        }
     }
     
     loadEraContent();
@@ -165,7 +244,7 @@ function updateNavigationButtons() {
 }
 
 // Complete current lesson
-function completeCurrentLesson() {
+async function completeCurrentLesson() {
     if (currentEraLessons.length === 0) return;
     
     const lesson = currentEraLessons[currentLessonIndex];
@@ -173,11 +252,16 @@ function completeCurrentLesson() {
     // Mark as complete
     completedLessons.add(lesson.id);
     
-    // Save progress to localStorage
-    localStorage.setItem(
-        `learning_${currentEraKey}`, 
-        JSON.stringify([...completedLessons])
-    );
+    // Save progress - use ProgressSync if available
+    if (window.ProgressSync) {
+        await window.ProgressSync.markLessonComplete(currentEraKey, lesson.id);
+    } else {
+        // Fallback to localStorage
+        localStorage.setItem(
+            `learning_${currentEraKey}`, 
+            JSON.stringify([...completedLessons])
+        );
+    }
     
     // Show completion animation
     showLessonCompletion();
@@ -189,7 +273,7 @@ function completeCurrentLesson() {
     
     // If all lessons completed, show celebration
     if (completedLessons.size === currentEraLessons.length) {
-        updateEraProgress(currentEraKey, { lessonsComplete: true });
+        await updateEraProgress(currentEraKey, { lessonsComplete: true });
         setTimeout(showAllLessonsCompleted, 500);
     }
     

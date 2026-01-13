@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Teacher Dashboard - Battle of Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Baloo 2', cursive; 
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 4px solid rgba(120, 53, 15, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .dashboard-title {
+            color: #7c2d12;
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-badge {
+            background: linear-gradient(to right, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+            border: 2px solid #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout:hover {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #7c2d12;
+        }
+        
+        .stat-label {
+            color: #92400e;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .content-card {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .card-title {
+            color: #7c2d12;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #7c2d12;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            border-color: #b45309;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            border-color: #b45309;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background: rgba(180, 83, 9, 0.2);
+            color: #7c2d12;
+            font-weight: 700;
+            padding: 1rem;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid rgba(120, 53, 15, 0.1);
+            color: #7c2d12;
+        }
+        
+        .data-table tr:hover {
+            background: rgba(251, 191, 36, 0.1);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(120, 53, 15, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #10b981, #059669);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .era-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .era-complete { background: #d1fae5; color: #065f46; }
+        .era-incomplete { background: #fef3c7; color: #92400e; }
+        .era-notstarted { background: #f3f4f6; color: #6b7280; }
+        
+        .class-code-box {
+            background: linear-gradient(to right, #1e40af, #3b82f6);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .class-code {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 0.3em;
+            font-family: monospace;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #7c2d12;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #b45309;
+        }
+        
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            margin-right: 0.25rem;
+        }
+        
+        .btn-view {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-view:hover { background: #2563eb; }
+        
+        .btn-remove {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-remove:hover { background: #dc2626; }
+        
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            color: #7c2d12;
+            min-width: 250px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #b45309;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
+            border: 4px solid rgba(120, 53, 15, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            color: #7c2d12;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            color: #7c2d12;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(120, 53, 15, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Baloo 2', cursive;
+            color: #7c2d12;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #b45309;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #92400e;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            color: #b45309;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(180, 83, 9, 0.1);
+        }
+        
+        .student-detail-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .era-progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .era-progress-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 2px solid rgba(120, 53, 15, 0.2);
+        }
+        
+        .era-progress-title {
+            font-weight: 700;
+            color: #7c2d12;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.7rem;
+        }
+        
+        .status-complete { background: #10b981; color: white; }
+        .status-incomplete { background: #f59e0b; color: white; }
+        .status-notstarted { background: #9ca3af; color: white; }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .class-code {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1 class="dashboard-title">👩‍🏫 Teacher Dashboard</h1>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">← Home</a>
+                    <a href="era-selection.html" class="nav-link">🎮 Play Game</a>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="userName" class="text-amber-800 font-semibold"></span>
+                <span class="user-badge">TEACHER</span>
+                <button onclick="handleLogout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Verification Warning -->
+        <div id="verificationWarning" class="hidden content-card" style="background: rgba(251, 191, 36, 0.3); border-color: #f59e0b;">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⚠️</span>
+                <div>
+                    <h3 class="font-bold text-amber-900">Account Pending Verification</h3>
+                    <p class="text-amber-800">Your account is awaiting admin verification. Some features may be limited.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalStudents">0</div>
+                <div class="stat-label">My Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalClasses">0</div>
+                <div class="stat-label">Classes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgProgress">0%</div>
+                <div class="stat-label">Avg. Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalQuestions">0</div>
+                <div class="stat-label">My Questions</div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('classes')">🏫 My Classes</button>
+            <button class="tab-btn" onclick="switchTab('students')">👥 Student Progress</button>
+            <button class="tab-btn" onclick="switchTab('questions')">❓ Questions</button>
+        </div>
+        
+        <!-- Classes Tab -->
+        <div id="classesTab" class="tab-content active">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">My Classes</h2>
+                    <button class="btn-primary" onclick="showCreateClassModal()">➕ Create Class</button>
+                </div>
+                
+                <div id="classesList">
+                    <!-- Classes will be loaded here -->
+                </div>
+                
+                <div id="classesEmpty" class="empty-state hidden">
+                    <div class="empty-icon">🏫</div>
+                    <p>No classes yet</p>
+                    <p class="text-sm">Create a class to start adding students</p>
+                    <button class="btn-primary mt-4" onclick="showCreateClassModal()">Create Your First Class</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Students Tab -->
+        <div id="studentsTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Student Progress Tracking</h2>
+                    <input type="text" class="search-input" placeholder="🔍 Search students..." oninput="filterStudents(this.value)">
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Class</th>
+                                <th>Era 1</th>
+                                <th>Era 2</th>
+                                <th>Era 3</th>
+                                <th>Era 4</th>
+                                <th>Overall</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Students will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="studentsEmpty" class="empty-state hidden">
+                    <div class="empty-icon">👥</div>
+                    <p>No students enrolled yet</p>
+                    <p class="text-sm">Share your class code with students to get started</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Questions Tab -->
+        <div id="questionsTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Question Bank</h2>
+                    <button class="btn-primary" onclick="showQuestionModal()">➕ Add Custom Question</button>
+                </div>
+                
+                <!-- Question Type Tabs -->
+                <div id="questionTypeTabs" class="tabs" style="margin-bottom: 0.5rem;">
+                    <button class="tab-btn active" onclick="renderQuestions('system')">📚 System Questions</button>
+                    <button class="tab-btn" onclick="renderQuestions('custom')">✏️ Custom Questions</button>
+                </div>
+                
+                <!-- Era Filter Tabs -->
+                <div id="questionEraTabs" class="tabs">
+                    <button class="tab-btn active" onclick="filterQuestionsByEra('all')">All Eras</button>
+                    <button class="tab-btn" onclick="filterQuestionsByEra('early-spanish')">Early Spanish</button>
+                    <button class="tab-btn" onclick="filterQuestionsByEra('late-spanish')">Late Spanish</button>
+                    <button class="tab-btn" onclick="filterQuestionsByEra('american-colonial')">American Era</button>
+                    <button class="tab-btn" onclick="filterQuestionsByEra('ww2')">WW2 Era</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="questionsTable">
+                        <thead>
+                            <tr>
+                                <th>Era</th>
+                                <th>Question</th>
+                                <th>Correct Answer</th>
+                                <th>Difficulty</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionsTableBody">
+                            <!-- Questions will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="questionsEmpty" class="empty-state hidden">
+                    <div class="empty-icon">❓</div>
+                    <p>No custom questions yet</p>
+                    <p class="text-sm">Add questions for your students</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Class Modal -->
+    <div id="createClassModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Create New Class</h2>
+            <form id="createClassForm" onsubmit="handleCreateClass(event)">
+                <div class="form-group">
+                    <label class="form-label">Class Name</label>
+                    <input type="text" id="className" class="form-input" placeholder="e.g., Philippine History - Grade 7" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea id="classDescription" class="form-input" rows="2" placeholder="Brief description of the class"></textarea>
+                </div>
+                
+                <div class="flex gap-3">
+                    <div class="form-group flex-1">
+                        <label class="form-label">Grade Level</label>
+                        <input type="text" id="classGrade" class="form-input" placeholder="e.g., Grade 7">
+                    </div>
+                    
+                    <div class="form-group flex-1">
+                        <label class="form-label">Section</label>
+                        <input type="text" id="classSection" class="form-input" placeholder="e.g., Section A">
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeCreateClassModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Create Class
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Question Modal -->
+    <div id="questionModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="modal-title" id="questionModalTitle">Add New Question</h2>
+            <form id="questionForm" onsubmit="handleSaveQuestion(event)">
+                <input type="hidden" id="editQuestionId">
+                
+                <div class="form-group">
+                    <label class="form-label">Era</label>
+                    <select id="questionEra" class="form-input" required>
+                        <option value="">Select Era</option>
+                        <option value="early-spanish">Early Spanish Era</option>
+                        <option value="late-spanish">Late Spanish Era</option>
+                        <option value="american-colonial">American Colonial Era</option>
+                        <option value="ww2">WW2 Era</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Question (English)</label>
+                    <textarea id="questionTextEn" class="form-input" rows="2" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Question (Tagalog) - Optional</label>
+                    <textarea id="questionTextTl" class="form-input" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Correct Answer (English)</label>
+                    <input type="text" id="correctAnswerEn" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Wrong Answers (English) - One per line</label>
+                    <textarea id="wrongAnswersEn" class="form-input" rows="3" placeholder="Wrong answer 1&#10;Wrong answer 2&#10;Wrong answer 3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Difficulty</label>
+                    <select id="questionDifficulty" class="form-input" required>
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeQuestionModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Save Question
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Student Detail Modal -->
+    <div id="studentDetailModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="modal-title" id="studentDetailName">Student Details</h2>
+                <button onclick="closeStudentDetailModal()" class="text-2xl text-amber-900 hover:text-red-600">&times;</button>
+            </div>
+            
+            <div id="studentDetailContent">
+                <!-- Student details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/questions.js"></script>
+    <script>
+        // Supabase config - standalone
+        const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
+        
+        let sb = null;
+        function getClient() {
+            if (sb) return sb;
+            if (window.supabaseClient) return window.supabaseClient;
+            if (window.supabase?.createClient) {
+                sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return sb;
+            }
+            return null;
+        }
+        
+        // Helper functions
+        function showToast(message, type = 'info') {
+            const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                background: ${colors[type] || colors.info}; color: white;
+                padding: 1rem 1.5rem; border-radius: 12px; font-weight: 600;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString();
+        }
+        
+        let allClasses = [];
+        let allStudents = [];
+        let allQuestions = [];
+        let allSystemQuestions = [];
+        let currentProfile = null;
+        let currentQuestionType = 'system'; // 'system' or 'custom'
+        
+        const eraNames = {
+            'early-spanish': 'Early Spanish Era',
+            'late-spanish': 'Late Spanish Era',
+            'american-colonial': 'American Colonial Era',
+            'ww2': 'WW2 Era'
+        };
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            sb = getClient();
+            if (!sb) {
+                alert('Failed to initialize Supabase client');
+                return;
+            }
+            
+            // Check if logged in
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Get profile
+            const { data: profile } = await sb
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            
+            if (!profile || (profile.role !== 'teacher' && profile.role !== 'admin')) {
+                alert('Access denied. Teacher or Admin role required.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentProfile = profile;
+            document.getElementById('userName').textContent = currentProfile.full_name;
+            
+            // Show verification warning if not verified
+            if (!currentProfile.is_verified) {
+                document.getElementById('verificationWarning').classList.remove('hidden');
+            }
+            
+            // Load system questions from questions.js
+            loadSystemQuestions();
+            
+            // Load data
+            await Promise.all([
+                loadClasses(),
+                loadStudents(),
+                loadCustomQuestions(),
+                loadStats()
+            ]);
+        });
+        
+        // Load statistics
+        async function loadStats() {
+            document.getElementById('totalStudents').textContent = allStudents.length;
+            document.getElementById('totalClasses').textContent = allClasses.length;
+            document.getElementById('totalQuestions').textContent = allSystemQuestions.length + allQuestions.length;
+            
+            // Calculate average progress
+            if (allStudents.length > 0) {
+                let totalProgress = 0;
+                allStudents.forEach(student => {
+                    const progress = student.progress || [];
+                    const completed = progress.filter(p => p.boss_defeated).length;
+                    totalProgress += (completed / 4) * 100;
+                });
+                document.getElementById('avgProgress').textContent = 
+                    Math.round(totalProgress / allStudents.length) + '%';
+            }
+        }
+        
+        // Load classes
+        async function loadClasses() {
+            try {
+                const { data, error } = await sb
+                    .from('classes')
+                    .select(`
+                        *,
+                        enrollments:class_enrollments(count)
+                    `)
+                    .eq('teacher_id', currentProfile.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allClasses = data || [];
+                renderClasses(allClasses);
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+        
+        // Render classes
+        function renderClasses(classes) {
+            const container = document.getElementById('classesList');
+            const emptyState = document.getElementById('classesEmpty');
+            
+            if (classes.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            container.innerHTML = classes.map(cls => `
+                <div class="class-code-box mb-4">
+                    <div class="flex justify-between items-start flex-wrap gap-4">
+                        <div class="text-left">
+                            <h3 class="text-xl font-bold">${cls.class_name}</h3>
+                            <p class="opacity-80">${cls.grade_level || ''} ${cls.section || ''}</p>
+                            ${cls.description ? `<p class="text-sm opacity-70 mt-1">${cls.description}</p>` : ''}
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm opacity-80">Class Code</p>
+                            <p class="class-code">${cls.class_code}</p>
+                            <button onclick="copyClassCode('${cls.class_code}')" class="mt-2 px-4 py-1 bg-white/20 rounded-lg text-sm hover:bg-white/30 transition-colors">
+                                📋 Copy Code
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20 flex justify-between items-center flex-wrap gap-2">
+                        <span>👥 ${cls.enrollments?.[0]?.count || 0} students enrolled</span>
+                        <div class="flex gap-2">
+                            <button onclick="toggleClassStatus('${cls.id}', ${!cls.is_active})" class="px-3 py-1 bg-white/20 rounded-lg text-sm hover:bg-white/30">
+                                ${cls.is_active ? '🔒 Deactivate' : '🔓 Activate'}
+                            </button>
+                            <button onclick="deleteClass('${cls.id}')" class="px-3 py-1 bg-red-500/50 rounded-lg text-sm hover:bg-red-500/70">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Copy class code
+        function copyClassCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Class code copied!', 'success');
+            });
+        }
+        
+        // Toggle class status
+        async function toggleClassStatus(classId, isActive) {
+            try {
+                const { error } = await sb
+                    .from('classes')
+                    .update({ is_active: isActive })
+                    .eq('id', classId);
+                
+                if (error) throw error;
+                
+                showToast(`Class ${isActive ? 'activated' : 'deactivated'}!`, 'success');
+                loadClasses();
+            } catch (error) {
+                console.error('Error updating class:', error);
+                showToast('Failed to update class', 'error');
+            }
+        }
+        
+        // Delete class
+        async function deleteClass(classId) {
+            if (!confirm('Are you sure you want to delete this class? Students will be unenrolled.')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('classes')
+                    .delete()
+                    .eq('id', classId);
+                
+                if (error) throw error;
+                
+                showToast('Class deleted!', 'success');
+                loadClasses();
+                loadStudents();
+            } catch (error) {
+                console.error('Error deleting class:', error);
+                showToast('Failed to delete class', 'error');
+            }
+        }
+        
+        // Show create class modal
+        function showCreateClassModal() {
+            document.getElementById('createClassModal').classList.remove('hidden');
+        }
+        
+        // Close create class modal
+        function closeCreateClassModal() {
+            document.getElementById('createClassModal').classList.add('hidden');
+            document.getElementById('createClassForm').reset();
+        }
+        
+        // Handle create class
+        async function handleCreateClass(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('className').value.trim();
+            const description = document.getElementById('classDescription').value.trim();
+            const grade = document.getElementById('classGrade').value.trim();
+            const section = document.getElementById('classSection').value.trim();
+            
+            try {
+                // Generate class code
+                const { data: codeData, error: codeError } = await sb
+                    .rpc('generate_class_code');
+                
+                if (codeError) throw codeError;
+                
+                const { error } = await sb
+                    .from('classes')
+                    .insert({
+                        teacher_id: currentProfile.id,
+                        class_name: name,
+                        class_code: codeData,
+                        description: description || null,
+                        grade_level: grade || null,
+                        section: section || null
+                    });
+                
+                if (error) throw error;
+                
+                showToast('Class created successfully!', 'success');
+                closeCreateClassModal();
+                loadClasses();
+                loadStats();
+            } catch (error) {
+                console.error('Error creating class:', error);
+                showToast('Failed to create class', 'error');
+            }
+        }
+        
+        // Load students
+        async function loadStudents() {
+            try {
+                const { data, error } = await sb
+                    .from('profiles')
+                    .select(`
+                        id,
+                        full_name,
+                        email,
+                        class_id,
+                        created_at,
+                        classes!profiles_class_id_fkey(class_name),
+                        progress(era_key, lessons_complete, boss_defeated, battle_score, last_played_at)
+                    `)
+                    .eq('teacher_id', currentProfile.id)
+                    .eq('role', 'student');
+                
+                if (error) throw error;
+                
+                allStudents = data || [];
+                renderStudents(allStudents);
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+        
+        // Render students table
+        function renderStudents(students) {
+            const tbody = document.getElementById('studentsTableBody');
+            const emptyState = document.getElementById('studentsEmpty');
+            
+            if (students.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            tbody.innerHTML = students.map(student => {
+                const progress = student.progress || [];
+                const eraProgress = {
+                    'early-spanish': progress.find(p => p.era_key === 'early-spanish'),
+                    'late-spanish': progress.find(p => p.era_key === 'late-spanish'),
+                    'american-colonial': progress.find(p => p.era_key === 'american-colonial'),
+                    'ww2': progress.find(p => p.era_key === 'ww2')
+                };
+                
+                const getEraStatus = (era) => {
+                    const p = eraProgress[era];
+                    if (!p) return '<span class="era-badge era-notstarted">Not Started</span>';
+                    if (p.boss_defeated) return '<span class="era-badge era-complete">✓ Complete</span>';
+                    if (p.lessons_complete) return '<span class="era-badge era-incomplete">Learning</span>';
+                    return '<span class="era-badge era-incomplete">In Progress</span>';
+                };
+                
+                const completedEras = progress.filter(p => p.boss_defeated).length;
+                const overallProgress = Math.round((completedEras / 4) * 100);
+                
+                const lastPlayed = progress.reduce((latest, p) => {
+                    if (!latest) return p.last_played_at;
+                    return new Date(p.last_played_at) > new Date(latest) ? p.last_played_at : latest;
+                }, null);
+                
+                return `
+                    <tr>
+                        <td><strong>${student.full_name}</strong></td>
+                        <td>${student.classes?.class_name || '-'}</td>
+                        <td>${getEraStatus('early-spanish')}</td>
+                        <td>${getEraStatus('late-spanish')}</td>
+                        <td>${getEraStatus('american-colonial')}</td>
+                        <td>${getEraStatus('ww2')}</td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <div class="progress-bar" style="width: 60px;">
+                                    <div class="progress-fill" style="width: ${overallProgress}%;"></div>
+                                </div>
+                                <span>${overallProgress}%</span>
+                            </div>
+                        </td>
+                        <td>${lastPlayed ? formatDate(lastPlayed) : 'Never'}</td>
+                        <td>
+                            <button class="btn-action btn-view" onclick="viewStudentDetails('${student.id}')">View</button>
+                            <button class="btn-action btn-remove" onclick="removeStudent('${student.id}')">Remove</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Filter students
+        function filterStudents(query) {
+            const filtered = allStudents.filter(s => 
+                s.full_name.toLowerCase().includes(query.toLowerCase()) ||
+                s.email?.toLowerCase().includes(query.toLowerCase())
+            );
+            renderStudents(filtered);
+        }
+        
+        // View student details
+        function viewStudentDetails(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+            
+            document.getElementById('studentDetailName').textContent = student.full_name;
+            
+            const progress = student.progress || [];
+            const eraProgress = {
+                'early-spanish': progress.find(p => p.era_key === 'early-spanish'),
+                'late-spanish': progress.find(p => p.era_key === 'late-spanish'),
+                'american-colonial': progress.find(p => p.era_key === 'american-colonial'),
+                'ww2': progress.find(p => p.era_key === 'ww2')
+            };
+            
+            const content = document.getElementById('studentDetailContent');
+            content.innerHTML = `
+                <div class="student-detail-card">
+                    <p><strong>Email:</strong> ${student.email}</p>
+                    <p><strong>Class:</strong> ${student.classes?.class_name || 'No class'}</p>
+                    <p><strong>Joined:</strong> ${formatDate(student.created_at)}</p>
+                </div>
+                
+                <h3 class="card-title mt-6 mb-2">Era Progress</h3>
+                <div class="era-progress-grid">
+                    ${Object.entries(eraNames).map(([key, name]) => {
+                        const p = eraProgress[key];
+                        return `
+                            <div class="era-progress-card">
+                                <div class="era-progress-title">${name}</div>
+                                <div class="mt-2">
+                                    <p>
+                                        <span class="status-icon ${p?.lessons_complete ? 'status-complete' : 'status-notstarted'}">
+                                            ${p?.lessons_complete ? '✓' : '○'}
+                                        </span>
+                                        Lessons: ${p?.lessons_complete ? 'Complete' : 'Incomplete'}
+                                    </p>
+                                    <p>
+                                        <span class="status-icon ${p?.boss_defeated ? 'status-complete' : 'status-notstarted'}">
+                                            ${p?.boss_defeated ? '✓' : '○'}
+                                        </span>
+                                        Boss: ${p?.boss_defeated ? 'Defeated' : 'Not Defeated'}
+                                    </p>
+                                    <p class="mt-1 text-sm text-amber-700">
+                                        Battle Score: ${p?.battle_score || 0}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            document.getElementById('studentDetailModal').classList.remove('hidden');
+        }
+        
+        // Close student detail modal
+        function closeStudentDetailModal() {
+            document.getElementById('studentDetailModal').classList.add('hidden');
+        }
+        
+        // Remove student from class
+        async function removeStudent(studentId) {
+            if (!confirm('Remove this student from your class?')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('profiles')
+                    .update({ teacher_id: null, class_id: null })
+                    .eq('id', studentId);
+                
+                if (error) throw error;
+                
+                showToast('Student removed from class', 'success');
+                loadStudents();
+                loadStats();
+            } catch (error) {
+                console.error('Error removing student:', error);
+                showToast('Failed to remove student', 'error');
+            }
+        }
+        
+        // Load system questions from questions.js
+        function loadSystemQuestions() {
+            allSystemQuestions = [];
+            
+            // questionsData is loaded from questions.js
+            if (typeof questionsData !== 'undefined') {
+                for (const [eraKey, eraData] of Object.entries(questionsData)) {
+                    const questions = eraData.en || [];
+                    questions.forEach((q, index) => {
+                        allSystemQuestions.push({
+                            id: `system-${eraKey}-${index}`,
+                            era_key: eraKey,
+                            question_text_en: q.question,
+                            correct_answer_en: q.correct,
+                            wrong_answers_en: q.answers.filter(a => a !== q.correct),
+                            difficulty: 'medium',
+                            is_system: true,
+                            is_approved: true
+                        });
+                    });
+                }
+            }
+        }
+        
+        // Load custom questions from database
+        async function loadCustomQuestions() {
+            try {
+                const { data, error } = await sb
+                    .from('custom_questions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allQuestions = data || [];
+                renderQuestions('system'); // Default to system questions view
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+        
+        // Render questions
+        function renderQuestions(type = 'system') {
+            currentQuestionType = type;
+            const tbody = document.getElementById('questionsTableBody');
+            const emptyState = document.getElementById('questionsEmpty');
+            
+            // Update type tab styling
+            document.querySelectorAll('#questionTypeTabs .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((type === 'system' && btn.textContent.includes('System')) ||
+                    (type === 'custom' && btn.textContent.includes('Custom'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Reset era filter to "All" when switching types
+            document.querySelectorAll('#questionEraTabs .tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === 0);
+            });
+            
+            const questions = type === 'system' ? allSystemQuestions : allQuestions;
+            
+            // Update era counts
+            updateEraCounts(questions);
+            
+            if (questions.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('p').textContent = type === 'system' 
+                    ? 'No system questions loaded' 
+                    : 'No custom questions yet';
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            renderQuestionRows(questions);
+        }
+        
+        // Update era filter counts
+        function updateEraCounts(questions) {
+            const counts = {
+                'all': questions.length,
+                'early-spanish': questions.filter(q => q.era_key === 'early-spanish').length,
+                'late-spanish': questions.filter(q => q.era_key === 'late-spanish').length,
+                'american-colonial': questions.filter(q => q.era_key === 'american-colonial').length,
+                'ww2': questions.filter(q => q.era_key === 'ww2').length
+            };
+            
+            document.querySelectorAll('#questionEraTabs .tab-btn').forEach(btn => {
+                const text = btn.textContent.split('(')[0].trim();
+                let eraKey = 'all';
+                if (text.includes('Early')) eraKey = 'early-spanish';
+                else if (text.includes('Late')) eraKey = 'late-spanish';
+                else if (text.includes('American')) eraKey = 'american-colonial';
+                else if (text.includes('WW2')) eraKey = 'ww2';
+                
+                btn.textContent = `${text} (${counts[eraKey]})`;
+            });
+        }
+        
+        // Render question table rows
+        function renderQuestionRows(questions) {
+            const tbody = document.getElementById('questionsTableBody');
+            tbody.innerHTML = questions.map(q => {
+                const isSystem = q.is_system || q.id.toString().startsWith('system-');
+                return `
+                <tr>
+                    <td><span class="era-badge era-${q.era_key === 'early-spanish' ? 'complete' : q.era_key === 'late-spanish' ? 'incomplete' : 'notstarted'}">${eraNames[q.era_key] || q.era_key}</span></td>
+                    <td>${(q.question_text_en || '').substring(0, 50)}...</td>
+                    <td>${q.correct_answer_en}</td>
+                    <td>${(q.difficulty || 'medium').toUpperCase()}</td>
+                    <td>
+                        <span class="era-badge ${q.is_approved ? 'era-complete' : 'era-incomplete'}">
+                            ${isSystem ? 'System' : (q.is_approved ? 'Approved' : 'Pending')}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-action btn-view" onclick="${isSystem ? `viewSystemQuestion('${q.id}')` : `editQuestion('${q.id}')`}">${isSystem ? 'View' : 'Edit'}</button>
+                        ${!isSystem ? `<button class="btn-action btn-remove" onclick="deleteQuestion('${q.id}')">Delete</button>` : ''}
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+        
+        // Filter questions by era or type
+        function filterQuestionsByEra(filter) {
+            // Update era tab styling
+            document.querySelectorAll('#questionEraTabs .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                const text = btn.textContent.split('(')[0].trim().toLowerCase();
+                if ((filter === 'all' && text.includes('all')) ||
+                    (filter === 'early-spanish' && text.includes('early')) ||
+                    (filter === 'late-spanish' && text.includes('late')) ||
+                    (filter === 'american-colonial' && text.includes('american')) ||
+                    (filter === 'ww2' && text.includes('ww2'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Get current question set
+            const questions = currentQuestionType === 'system' ? allSystemQuestions : allQuestions;
+            
+            // Filter by era
+            const filtered = filter === 'all' ? questions : questions.filter(q => q.era_key === filter);
+            
+            const tbody = document.getElementById('questionsTableBody');
+            const emptyState = document.getElementById('questionsEmpty');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('p').textContent = `No ${currentQuestionType} questions for this era`;
+            } else {
+                emptyState.classList.add('hidden');
+                renderQuestionRows(filtered);
+            }
+        }
+        
+        // View system question (read-only)
+        function viewSystemQuestion(questionId) {
+            const question = allSystemQuestions.find(q => q.id === questionId);
+            if (!question) return;
+            
+            document.getElementById('questionModalTitle').textContent = 'View System Question';
+            document.getElementById('editQuestionId').value = '';
+            document.getElementById('questionEra').value = question.era_key;
+            document.getElementById('questionTextEn').value = question.question_text_en;
+            document.getElementById('questionTextTl').value = '';
+            document.getElementById('correctAnswerEn').value = question.correct_answer_en;
+            document.getElementById('wrongAnswersEn').value = question.wrong_answers_en.join('\n');
+            document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
+            
+            // Make fields read-only for system questions
+            document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                el.setAttribute('readonly', true);
+                el.setAttribute('disabled', true);
+            });
+            
+            document.getElementById('questionModal').classList.remove('hidden');
+        }
+        
+        // Show question modal
+        function showQuestionModal() {
+            document.getElementById('questionModalTitle').textContent = 'Add New Question';
+            document.getElementById('editQuestionId').value = '';
+            document.getElementById('questionForm').reset();
+            
+            // Remove read-only
+            document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                el.removeAttribute('readonly');
+                el.removeAttribute('disabled');
+            });
+            
+            document.getElementById('questionModal').classList.remove('hidden');
+        }
+        
+        // Close question modal
+        function closeQuestionModal() {
+            document.getElementById('questionModal').classList.add('hidden');
+        }
+        
+        // Edit question
+        function editQuestion(questionId) {
+            const question = allQuestions.find(q => q.id === questionId);
+            if (!question) return;
+            
+            document.getElementById('questionModalTitle').textContent = 'Edit Question';
+            document.getElementById('editQuestionId').value = questionId;
+            document.getElementById('questionEra').value = question.era_key;
+            document.getElementById('questionTextEn').value = question.question_text_en;
+            document.getElementById('questionTextTl').value = question.question_text_tl || '';
+            document.getElementById('correctAnswerEn').value = question.correct_answer_en;
+            document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
+            document.getElementById('questionDifficulty').value = question.difficulty;
+            
+            // Remove read-only
+            document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                el.removeAttribute('readonly');
+                el.removeAttribute('disabled');
+            });
+            
+            document.getElementById('questionModal').classList.remove('hidden');
+        }
+        
+        // Handle save question
+        async function handleSaveQuestion(event) {
+            event.preventDefault();
+            
+            const questionId = document.getElementById('editQuestionId').value;
+            const era = document.getElementById('questionEra').value;
+            const questionEn = document.getElementById('questionTextEn').value.trim();
+            const questionTl = document.getElementById('questionTextTl').value.trim();
+            const correctEn = document.getElementById('correctAnswerEn').value.trim();
+            const wrongEn = document.getElementById('wrongAnswersEn').value.trim().split('\n').filter(a => a.trim());
+            const difficulty = document.getElementById('questionDifficulty').value;
+            
+            if (wrongEn.length < 2) {
+                showToast('Please provide at least 2 wrong answers', 'error');
+                return;
+            }
+            
+            try {
+                const questionData = {
+                    era_key: era,
+                    question_text_en: questionEn,
+                    question_text_tl: questionTl || null,
+                    correct_answer_en: correctEn,
+                    wrong_answers_en: wrongEn,
+                    difficulty: difficulty
+                };
+                
+                if (questionId) {
+                    // Update existing
+                    const { error } = await sb
+                        .from('custom_questions')
+                        .update(questionData)
+                        .eq('id', questionId);
+                    
+                    if (error) throw error;
+                    showToast('Question updated!', 'success');
+                } else {
+                    // Create new
+                    questionData.created_by = currentProfile.id;
+                    questionData.is_approved = currentProfile.role === 'admin'; // Auto-approve for admins
+                    
+                    const { error } = await sb
+                        .from('custom_questions')
+                        .insert(questionData);
+                    
+                    if (error) throw error;
+                    showToast(currentProfile.role === 'admin' ? 'Question added!' : 'Question added! Awaiting admin approval.', 'success');
+                }
+                
+                closeQuestionModal();
+                loadCustomQuestions();
+                loadStats();
+            } catch (error) {
+                console.error('Error saving question:', error);
+                showToast('Failed to save question', 'error');
+            }
+        }
+        
+        // Delete question
+        async function deleteQuestion(questionId) {
+            if (!confirm('Delete this question?')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('custom_questions')
+                    .delete()
+                    .eq('id', questionId);
+                
+                if (error) throw error;
+                
+                showToast('Question deleted!', 'success');
+                loadCustomQuestions();
+                loadStats();
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                showToast('Failed to delete question', 'error');
+            }
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tabs > .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Handle logout
+        async function handleLogout() {
+            await sb.auth.signOut();
+            window.location.href = 'login.html';
+        }
+        
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

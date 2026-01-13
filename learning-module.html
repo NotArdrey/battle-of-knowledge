@@ -406,6 +406,111 @@
                 font-size: 0.9rem;
             }
         }
+        
+        /* Video Container Styles */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto 1.5rem auto;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .video-container video {
+            width: 100%;
+            display: block;
+            border-radius: 16px;
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            border-radius: 16px;
+        }
+        
+        .video-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .video-placeholder-text {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .caption-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 0.75rem 1rem;
+            text-align: center;
+        }
+        
+        .caption-text {
+            color: white;
+            font-size: 1rem;
+            line-height: 1.4;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .video-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .caption-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .caption-toggle {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .caption-toggle:hover {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .caption-text {
+            transition: opacity 0.3s ease;
+        }
+        
+        @media (max-width: 480px) {
+            .caption-text {
+                font-size: 0.85rem;
+            }
+            
+            .video-placeholder-icon {
+                font-size: 2rem;
+            }
+            
+            .video-placeholder-text {
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -468,6 +573,25 @@
                         <h3 id="currentLessonTitle" class="current-lesson-title">Loading Lesson...</h3>
                         <div id="currentLessonNumber" class="lesson-number-badge">1/5</div>
                     </div>
+
+                    <div class="video-toolbar">
+                        <button id="bgmToggleBtn" class="caption-toggle" onclick="toggleModuleBGM()">🔊 BGM</button>
+                        <div class="caption-controls">
+                            <button id="captionVisibilityToggle" class="caption-toggle" onclick="toggleCaptionsVisibility()">Hide CC</button>
+                            <button id="captionLangToggle" class="caption-toggle" onclick="toggleCaptionLanguage()">EN/TL</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Container - Shows video with captions for each lesson -->
+                    <div id="lessonVideoContainer" class="video-container">
+                        <div class="video-placeholder">
+                            <div class="video-placeholder-icon">🎬</div>
+                            <div class="video-placeholder-text">Video Coming Soon</div>
+                        </div>
+                        <div id="captionContainer" class="caption-container" style="display: none;">
+                            <p id="captionText" class="caption-text"></p>
+                        </div>
+                    </div>
                     
                     <div id="currentLessonContent" class="current-lesson-content">
                         <!-- Lesson content will be loaded here -->
@@ -519,10 +643,356 @@
         </div>
     </div>
 
+    <!-- Supabase SDK and Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/progress-sync.js"></script>
+    
     <script src="js/eraData.js"></script>
     <script src="js/learningData.js"></script>
+    <script src="js/moduleVideos.js"></script>
     <script src="js/language.js"></script>
     <script>
+        // Era-specific Background Music for Learning Module
+        const moduleBackgroundMusic = {
+            'early-spanish': new Audio('assets/Game-BGM/modulePartBGM/Early Spanish Whole Menu BGM.mp3'),
+            'late-spanish': new Audio('assets/Game-BGM/modulePartBGM/Late Spanish Era Whole Menu BGM.mp3'),
+            'american-colonial': new Audio('assets/Game-BGM/modulePartBGM/American Colonial Whole Menu BGM.mp3'),
+            'ww2': new Audio('assets/Game-BGM/modulePartBGM/WW2 Whole Menu BGM.mp3')
+        };
+
+        // Configure background music settings
+        Object.values(moduleBackgroundMusic).forEach(bgm => {
+            bgm.preload = 'auto';
+            bgm.loop = true;
+            bgm.volume = 0.4; // Lower volume for learning module
+        });
+
+        // Current playing BGM reference
+        let currentModuleBGM = null;
+        let resumeModuleBGMOnPause = false;
+
+        // Play era-specific background music
+        function playModuleBackgroundMusic(eraKey) {
+            if (!eraKey || !moduleBackgroundMusic[eraKey]) return;
+            
+            try {
+                // Stop any currently playing music
+                stopModuleBackgroundMusic();
+                
+                // Play the current era's music
+                currentModuleBGM = moduleBackgroundMusic[eraKey];
+                currentModuleBGM.currentTime = 0;
+                currentModuleBGM.volume = 0.4;
+                
+                // Try to play automatically
+                currentModuleBGM.play().catch(e => {
+                    console.log('Module BGM autoplay blocked:', e);
+                    // Add click handler to start music on user interaction
+                    document.addEventListener('click', function startBGM() {
+                        if (currentModuleBGM) {
+                            currentModuleBGM.play().catch(() => {});
+                        }
+                        document.removeEventListener('click', startBGM);
+                    }, { once: true });
+                });
+            } catch (error) {
+                console.log('Module BGM error:', error);
+            }
+        }
+
+        // Stop background music
+        function stopModuleBackgroundMusic() {
+            Object.values(moduleBackgroundMusic).forEach(bgm => {
+                bgm.pause();
+                bgm.currentTime = 0;
+            });
+            currentModuleBGM = null;
+            resumeModuleBGMOnPause = false;
+        }
+
+        // Pause BGM while video audio plays
+        function muteModuleBGMForVideo() {
+            if (currentModuleBGM && !currentModuleBGM.paused) {
+                currentModuleBGM.pause();
+                resumeModuleBGMOnPause = true;
+            } else {
+                resumeModuleBGMOnPause = false;
+            }
+        }
+
+        // Resume BGM after video pauses or ends
+        let moduleBGMMuted = false; // User toggle state
+
+        function resumeModuleBGMAfterVideo() {
+            if (moduleBGMMuted) return; // User has BGM muted, don't resume
+            if (resumeModuleBGMOnPause && currentModuleBGM) {
+                currentModuleBGM.play().catch(() => {});
+                resumeModuleBGMOnPause = false;
+            }
+        }
+
+        // Toggle BGM on/off
+        function toggleModuleBGM() {
+            const btn = document.getElementById('bgmToggleBtn');
+            if (currentModuleBGM) {
+                if (currentModuleBGM.paused) {
+                    currentModuleBGM.play().catch(() => {});
+                    moduleBGMMuted = false;
+                    if (btn) btn.textContent = '🔊 BGM';
+                } else {
+                    currentModuleBGM.pause();
+                    moduleBGMMuted = true;
+                    if (btn) btn.textContent = '🔇 BGM';
+                }
+            }
+        }
+
+        // Stop music when leaving the page
+        window.addEventListener('beforeunload', stopModuleBackgroundMusic);
+
+        // Video and Caption Management
+        let currentCaptions = [];
+        let captionLanguage = localStorage.getItem('selectedLanguage') || 'en';
+        let currentCaptionIndex = 0;
+        let captionInterval = null;
+        let captionsVisible = true;
+
+        function refreshCaptionControls() {
+            const captionToggleBtn = document.getElementById('captionVisibilityToggle');
+            const captionLangBtn = document.getElementById('captionLangToggle');
+            if (captionToggleBtn) {
+                captionToggleBtn.textContent = captionsVisible ? 'Hide CC' : 'Show CC';
+            }
+            if (captionLangBtn) {
+                captionLangBtn.textContent = captionLanguage === 'en' ? 'EN' : 'TL';
+            }
+        }
+
+        // Load video and captions for a specific lesson
+        function loadLessonVideo(lessonId) {
+            const videoContainer = document.getElementById('lessonVideoContainer');
+            const captionContainer = document.getElementById('captionContainer');
+            const captionText = document.getElementById('captionText');
+            
+            // Get video data from moduleVideos.js
+            if (typeof moduleVideos !== 'undefined' && moduleVideos[currentEraKey]) {
+                const lessonData = moduleVideos[currentEraKey].lessons.find(l => l.lessonId === lessonId);
+                
+                if (lessonData) {
+                    // Load captions
+                    currentCaptions = lessonData.captions[captionLanguage] || lessonData.captions['en'] || [];
+                    
+                    // Check if video file exists
+                    if (lessonData.videoFile) {
+                        // Show actual video
+                        videoContainer.innerHTML = `
+                            <video id="lessonVideo" controls>
+                                <source src="${lessonData.videoFile}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div id="captionContainer" class="caption-container">
+                                <p id="captionText" class="caption-text"></p>
+                            </div>
+                        `;
+                        
+                        // Set up video caption sync
+                        const video = document.getElementById('lessonVideo');
+                        video.addEventListener('timeupdate', syncCaptions);
+                        video.addEventListener('pause', handleVideoPauseCaptions);
+                        video.addEventListener('play', handleVideoPlayCaptions);
+                        video.addEventListener('play', muteModuleBGMForVideo);
+                        video.addEventListener('playing', muteModuleBGMForVideo);
+                        video.addEventListener('pause', resumeModuleBGMAfterVideo);
+                        video.addEventListener('ended', resumeModuleBGMAfterVideo);
+                        const liveCaptionContainer = document.getElementById('captionContainer');
+                        if (liveCaptionContainer) {
+                            liveCaptionContainer.style.display = captionsVisible ? 'block' : 'none';
+                        }
+                    } else {
+                        // Show placeholder with captions slideshow
+                        videoContainer.innerHTML = `
+                            <div class="video-placeholder">
+                                <div class="video-placeholder-icon">📜</div>
+                                <div class="video-placeholder-text">Chapter ${lessonId}: ${lessonData.title}</div>
+                            </div>
+                            <div id="captionContainer" class="caption-container" style="display: block;">
+                                <p id="captionText" class="caption-text"></p>
+                            </div>
+                        `;
+                        
+                        // Start caption slideshow
+                        const placeholderCaptionContainer = document.getElementById('captionContainer');
+                        if (placeholderCaptionContainer) {
+                            placeholderCaptionContainer.style.display = captionsVisible ? 'block' : 'none';
+                        }
+
+                        if (captionsVisible) {
+                            startCaptionSlideshow();
+                        }
+                    }
+                    refreshCaptionControls();
+                } else {
+                    // No video data for this lesson
+                    showVideoPlaceholder();
+                }
+            } else {
+                // moduleVideos not loaded
+                showVideoPlaceholder();
+            }
+        }
+        
+        // Show video placeholder
+        function showVideoPlaceholder() {
+            const videoContainer = document.getElementById('lessonVideoContainer');
+            videoContainer.innerHTML = `
+                <div class="video-placeholder">
+                    <div class="video-placeholder-icon">🎬</div>
+                    <div class="video-placeholder-text">Video Coming Soon</div>
+                </div>
+            `;
+        }
+        
+        // Sync captions with video time
+        function syncCaptions() {
+            const video = document.getElementById('lessonVideo');
+            const captionText = document.getElementById('captionText');
+            const captionContainer = document.getElementById('captionContainer');
+            
+            if (!captionsVisible) {
+                if (captionContainer) {
+                    captionContainer.style.display = 'none';
+                }
+                return;
+            }
+
+            if (!video || !captionText || currentCaptions.length === 0) return;
+            
+            const currentTime = video.currentTime;
+            let activeCaption = null;
+            
+            // Find the appropriate caption for the current time
+            for (let i = currentCaptions.length - 1; i >= 0; i--) {
+                if (currentTime >= currentCaptions[i].time) {
+                    activeCaption = currentCaptions[i];
+                    break;
+                }
+            }
+            
+            if (activeCaption) {
+                captionText.textContent = activeCaption.text;
+                captionContainer.style.display = 'block';
+            } else {
+                captionContainer.style.display = 'none';
+            }
+        }
+        
+        // Start caption slideshow for placeholder
+        function startCaptionSlideshow() {
+            // Clear any existing interval
+            if (captionInterval) {
+                clearInterval(captionInterval);
+            }
+            
+            const captionText = document.getElementById('captionText');
+            const captionContainer = document.getElementById('captionContainer');
+            if (!captionsVisible || !captionText || currentCaptions.length === 0) return;
+            
+            currentCaptionIndex = 0;
+            captionText.textContent = currentCaptions[0].text;
+            if (captionContainer) {
+                captionContainer.style.display = 'block';
+            }
+            
+            // Auto-advance captions every 5 seconds
+            captionInterval = setInterval(() => {
+                currentCaptionIndex = (currentCaptionIndex + 1) % currentCaptions.length;
+                captionText.textContent = currentCaptions[currentCaptionIndex].text;
+                
+                // Add fade animation
+                captionText.style.opacity = '0';
+                setTimeout(() => {
+                    captionText.style.opacity = '1';
+                }, 100);
+            }, 5000);
+        }
+        
+        // Toggle caption language
+        function toggleCaptionLanguage() {
+            captionLanguage = captionLanguage === 'en' ? 'tl' : 'en';
+            
+            // Reload the current lesson video with new language
+            const lesson = currentEraLessons[currentLessonIndex];
+            if (lesson) {
+                loadLessonVideo(lesson.id);
+            }
+            refreshCaptionControls();
+        }
+
+        // Toggle captions visibility
+        function toggleCaptionsVisibility() {
+            captionsVisible = !captionsVisible;
+
+            const captionContainer = document.getElementById('captionContainer');
+            const toggleButton = document.getElementById('captionVisibilityToggle');
+            const video = document.getElementById('lessonVideo');
+
+            if (toggleButton) {
+                toggleButton.textContent = captionsVisible ? 'Hide CC' : 'Show CC';
+            }
+
+            // Hide captions and stop any slideshow if turning off
+            if (!captionsVisible) {
+                if (captionContainer) {
+                    captionContainer.style.display = 'none';
+                }
+                if (captionInterval) {
+                    clearInterval(captionInterval);
+                    captionInterval = null;
+                }
+                return;
+            }
+
+            // Show captions again
+            if (captionContainer) {
+                captionContainer.style.display = 'block';
+            }
+
+            // Resume syncing or slideshow based on available media
+            if (video) {
+                syncCaptions();
+            } else if (currentCaptions.length > 0) {
+                startCaptionSlideshow();
+            }
+
+            refreshCaptionControls();
+        }
+        
+        // Stop caption slideshow when leaving page
+        window.addEventListener('beforeunload', () => {
+            if (captionInterval) {
+                clearInterval(captionInterval);
+            }
+        });
+
+        // Hide captions when video is paused
+        function handleVideoPauseCaptions() {
+            const captionContainer = document.getElementById('captionContainer');
+            if (captionContainer) {
+                captionContainer.style.display = 'none';
+            }
+        }
+
+        // Show captions when video plays if toggled on
+        function handleVideoPlayCaptions() {
+            if (!captionsVisible) return;
+            const captionContainer = document.getElementById('captionContainer');
+            if (captionContainer) {
+                captionContainer.style.display = 'block';
+            }
+            syncCaptions();
+        }
+
         // Learning Module Logic
         let currentEraKey = '';
         let currentLang = localStorage.getItem('selectedLanguage') || 'en';
@@ -532,38 +1002,59 @@
 
         // Initialize learning module
         function initLearningModule() {
-            currentEraKey = localStorage.getItem('selectedEra') || 'early-spanish';
-            currentLang = localStorage.getItem('selectedLanguage') || 'en';
-            
-            // Load completed lessons for this era from localStorage
-            const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
-            if (savedProgress) {
-                completedLessons = new Set(JSON.parse(savedProgress));
+            try {
+                currentEraKey = localStorage.getItem('selectedEra') || 'early-spanish';
+                currentLang = localStorage.getItem('selectedLanguage') || 'en';
+                
+                // Start era-specific background music
+                playModuleBackgroundMusic(currentEraKey);
+                
+                // Load completed lessons for this era from localStorage
+                const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
+                if (savedProgress) {
+                    completedLessons = new Set(JSON.parse(savedProgress));
+                }
+                
+                loadEraContent();
+                setupLessonNavigation();
+                updateProgress();
+                loadCurrentLesson();
+            } catch (error) {
+                console.error('Error in initLearningModule:', error);
             }
-            
-            loadEraContent();
-            setupLessonNavigation();
-            updateProgress();
-            loadCurrentLesson();
         }
 
         // Load era content
         function loadEraContent() {
-            const eraContent = learningData[currentEraKey][currentLang];
-            
-            if (!eraContent) {
-                console.error('No content found for era:', currentEraKey, 'language:', currentLang);
-                return;
+            try {
+                if (typeof learningData === 'undefined') {
+                    console.error('learningData is not defined!');
+                    return;
+                }
+                
+                if (!learningData[currentEraKey]) {
+                    console.error('No data for era:', currentEraKey);
+                    return;
+                }
+                
+                const eraContent = learningData[currentEraKey][currentLang];
+                
+                if (!eraContent) {
+                    console.error('No content found for era:', currentEraKey, 'language:', currentLang);
+                    return;
+                }
+                
+                // Update title
+                document.getElementById('eraTitle').textContent = eraContent.title;
+                
+                // Store lessons
+                currentEraLessons = eraContent.lessons;
+                
+                // Create lesson indicators
+                createLessonIndicators();
+            } catch (error) {
+                console.error('Error in loadEraContent:', error);
             }
-            
-            // Update title
-            document.getElementById('eraTitle').textContent = eraContent.title;
-            
-            // Store lessons
-            currentEraLessons = eraContent.lessons;
-            
-            // Create lesson indicators
-            createLessonIndicators();
         }
 
         // Create lesson indicators
@@ -617,39 +1108,55 @@
 
         // Load current lesson
         function loadCurrentLesson() {
-            if (currentEraLessons.length === 0) return;
-            
-            const lesson = currentEraLessons[currentLessonIndex];
-            const isCompleted = completedLessons.has(lesson.id);
-            
-            // Update lesson display
-            document.getElementById('currentLessonIcon').textContent = lesson.icon;
-            document.getElementById('currentLessonTitle').textContent = lesson.title;
-            document.getElementById('currentLessonContent').innerHTML = lesson.content;
-            document.getElementById('currentLessonNumber').textContent = `${currentLessonIndex + 1} / ${currentEraLessons.length}`;
-            
-            // Update navigation buttons
-            updateNavigationButtons();
-            
-            // Update complete button
-            const completeBtn = document.getElementById('completeLessonBtn');
-            const completeText = translations[currentLanguage]['markComplete'] || 'Mark as Complete';
-            const completedText = translations[currentLanguage]['Completed'] || 'Completed';
-            
-            if (isCompleted) {
-                completeBtn.disabled = true;
-                completeBtn.classList.remove('complete-button');
-                completeBtn.classList.add('next-button');
-                completeBtn.querySelector('span').textContent = completedText;
-            } else {
-                completeBtn.disabled = false;
-                completeBtn.classList.remove('next-button');
-                completeBtn.classList.add('complete-button');
-                completeBtn.querySelector('span').textContent = completeText;
+            try {
+                if (currentEraLessons.length === 0) {
+                    console.error('No lessons found in currentEraLessons array');
+                    return;
+                }
+                
+                const lesson = currentEraLessons[currentLessonIndex];
+                
+                if (!lesson) {
+                    console.error('Lesson not found at index:', currentLessonIndex);
+                    return;
+                }
+                
+                const isCompleted = completedLessons.has(lesson.id);
+                
+                // Update lesson display
+                document.getElementById('currentLessonIcon').textContent = lesson.icon;
+                document.getElementById('currentLessonTitle').textContent = lesson.title;
+                document.getElementById('currentLessonContent').innerHTML = lesson.content;
+                document.getElementById('currentLessonNumber').textContent = `${currentLessonIndex + 1} / ${currentEraLessons.length}`;
+                
+                // Load video and captions for this lesson
+                loadLessonVideo(lesson.id);
+                
+                // Update navigation buttons
+                updateNavigationButtons();
+                
+                // Update complete button
+                const completeBtn = document.getElementById('completeLessonBtn');
+                const completeText = translations[currentLanguage]['markComplete'] || 'Mark as Complete';
+                const completedText = translations[currentLanguage]['Completed'] || 'Completed';
+                
+                if (isCompleted) {
+                    completeBtn.disabled = true;
+                    completeBtn.classList.remove('complete-button');
+                    completeBtn.classList.add('next-button');
+                    completeBtn.querySelector('span').textContent = completedText;
+                } else {
+                    completeBtn.disabled = false;
+                    completeBtn.classList.remove('next-button');
+                    completeBtn.classList.add('complete-button');
+                    completeBtn.querySelector('span').textContent = completeText;
+                }
+                
+                // Auto-scroll to top of lesson content
+                document.getElementById('currentLessonContent').scrollTop = 0;
+            } catch (error) {
+                console.error('Error in loadCurrentLesson:', error);
             }
-            
-            // Auto-scroll to top of lesson content
-            document.getElementById('currentLessonContent').scrollTop = 0;
         }
 
         // Update navigation buttons
@@ -1045,8 +1552,25 @@
         }
 
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            initLearningModule();
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOMContentLoaded fired');
+            
+            // Initialize learning module immediately - don't wait for ProgressSync
+            try {
+                initLearningModule();
+            } catch (error) {
+                console.error('Error in initLearningModule:', error);
+            }
+            
+            // Initialize ProgressSync in the background (non-blocking)
+            if (window.ProgressSync) {
+                window.ProgressSync.init().then(() => {
+                    console.log('ProgressSync initialized');
+                    // Reload progress data if needed
+                }).catch(e => {
+                    console.warn('ProgressSync init failed:', e);
+                });
+            }
             
             // Setup language toggle
             const langToggle = document.getElementById('langToggle');
