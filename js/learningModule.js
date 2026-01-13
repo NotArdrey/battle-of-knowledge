@@ -18,7 +18,7 @@ const moduleBackgroundMusic = {
 Object.values(moduleBackgroundMusic).forEach(bgm => {
     bgm.preload = 'auto';
     bgm.loop = true;
-    bgm.volume = 0.4; // Lower volume for learning module
+    bgm.volume = 0.2; // Set to 20% volume
 });
 
 // Current playing BGM reference
@@ -35,7 +35,7 @@ function playModuleBackgroundMusic(eraKey) {
         // Play the current era's music
         currentModuleBGM = moduleBackgroundMusic[eraKey];
         currentModuleBGM.currentTime = 0;
-        currentModuleBGM.volume = 0.4;
+        currentModuleBGM.volume = 0.2;
         
         // Try to play automatically
         currentModuleBGM.play().catch(e => {

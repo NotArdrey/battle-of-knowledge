@@ -54,7 +54,7 @@ const bossDefinitions = {
         bossName: 'Spanish Commander',
         isBoss: true,
         isFinalBoss: true,
-        preBossEnemies: ['Spanish Soldier', 'Late Spanish Soldier Era'],
+        preBossEnemies: ['Spanish Soldier'],
         enemiesBeforeBoss: 3 // Defeat 3 Spanish Soldiers before Commander
     },
     'american-colonial': {
@@ -95,8 +95,18 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 
 // Prefer lighter effects on mobile or when the user requests reduced motion
 const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
-const reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion;
+let fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
+let reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion;
+
+// Function to dynamically update graphics mode
+function updateReducedFxMode(isLowQuality) {
+    reducedFxMode = isLowQuality || isMobile || prefersReducedMotion;
+    fxQuality = isLowQuality ? 'low' : 'high';
+    console.log('Graphics quality updated:', reducedFxMode ? 'Low' : 'High');
+}
+
+// Expose to window for settings panel
+window.updateReducedFxMode = updateReducedFxMode;
 
 // Save battle progress to localStorage
 function saveBattleProgress() {
@@ -174,14 +184,14 @@ const backgroundMusic = {
 // Configure sound settings
 Object.values(soundEffects).forEach(sound => {
     sound.preload = 'auto';
-    sound.volume = isMobile ? 0.5 : 0.7;
+    sound.volume = 0.2;
 });
 
 // Configure background music settings
 Object.values(backgroundMusic).forEach(bgm => {
     bgm.preload = 'auto';
     bgm.loop = true;
-    bgm.volume = isMobile ? 0.4 : 0.6;
+    bgm.volume = 0.2;
 });
 
 // Play sound effect with error handling
@@ -209,7 +219,7 @@ function playBackgroundMusic() {
         // Play the current era's music
         const bgm = backgroundMusic[currentEra];
         bgm.currentTime = 0;
-        bgm.volume = isMobile ? 0.4 : 0.6;
+        bgm.volume = 0.2;
         
         // Try to play automatically
         bgm.play().catch(e => {
@@ -278,26 +288,46 @@ function getUnlockedHeroesForEra(eraKey) {
 // Get random villain for current era
 function getRandomVillain(eraKey, isPreBoss = false) {
     const bossDef = bossDefinitions[eraKey];
+    const villains = eraData[eraKey].villains;
     
+    // If it's a boss battle, ALWAYS return the boss
     if (isBossBattle && bossDef && bossDef.bossName) {
-        // Return the boss
-        const villains = eraData[eraKey].villains;
         const boss = villains.find(v => v.name === bossDef.bossName);
-        if (boss) return boss;
+        if (boss) {
+            console.log(`Boss battle: Returning boss ${boss.name}`);
+            return boss;
+        }
     }
     
+    // If explicitly requesting the boss (isPreBoss = false and boss exists)
+    if (!isPreBoss && bossDef && bossDef.bossName) {
+        const boss = villains.find(v => v.name === bossDef.bossName);
+        if (boss) {
+            console.log(`Requesting boss: Returning ${boss.name}`);
+            return boss;
+        }
+    }
+    
+    // Return a pre-boss enemy (regular soldier)
     if (isPreBoss && bossDef && bossDef.preBossEnemies.length > 0) {
-        // Return a pre-boss enemy
-        const villains = eraData[eraKey].villains;
         const preBossEnemies = villains.filter(v => bossDef.preBossEnemies.includes(v.name));
         if (preBossEnemies.length > 0) {
             const randomIndex = Math.floor(Math.random() * preBossEnemies.length);
+            console.log(`Pre-boss battle: Returning soldier ${preBossEnemies[randomIndex].name}`);
             return preBossEnemies[randomIndex];
         }
     }
     
-    // Return any random villain
-    const villains = eraData[eraKey].villains;
+    // Fallback: Return any random villain (excluding boss during pre-boss phase)
+    if (isPreBoss && bossDef && bossDef.bossName) {
+        const nonBossVillains = villains.filter(v => v.name !== bossDef.bossName);
+        if (nonBossVillains.length > 0) {
+            const randomIndex = Math.floor(Math.random() * nonBossVillains.length);
+            return nonBossVillains[randomIndex];
+        }
+    }
+    
+    // Final fallback
     const randomIndex = Math.floor(Math.random() * villains.length);
     return villains[randomIndex];
 }
@@ -1524,9 +1554,16 @@ function attackEnemy() {
                     // Start boss battle
                     isBossBattle = true;
                     currentVillain = getRandomVillain(currentEra, false); // Get the boss
+                    console.log(`Boss battle started! Fighting: ${currentVillain.name}`);
                     enemyHp = 150; // Boss has more HP
+                    
+                    // Update enemy name display
+                    document.getElementById('enemyName').textContent = currentVillain.name;
                     updateEnemyDisplay();
                     updateHP();
+                    
+                    // Update enemy sprite to boss sprite
+                    updateCharacterSprites();
                     setCharacterState('enemy', 'idle');
                     
                     // Show boss warning
@@ -1545,8 +1582,15 @@ function attackEnemy() {
                         // Reset enemy HP and get new enemy
                         enemyHp = 100;
                         currentVillain = getRandomVillain(currentEra, true);
+                        console.log(`Next enemy: ${currentVillain.name}`);
+                        
+                        // Update enemy name display
+                        document.getElementById('enemyName').textContent = currentVillain.name;
                         updateEnemyDisplay();
                         updateHP();
+                        
+                        // Update enemy sprite
+                        updateCharacterSprites();
                         setCharacterState('enemy', 'idle');
                         
                         // Load next question

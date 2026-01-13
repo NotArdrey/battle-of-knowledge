@@ -578,5 +578,47 @@
     <script src="js/characterData.js"></script>
     <script src="js/collection.js"></script>
     <script src="js/language.js"></script>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="assets/Game-BGM/mainMenu/The Whole Menu BGM.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Background Music Controller
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.2;
+
+        // Try to play music on first user interaction
+        function startBGMusic() {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(e => console.log('Audio play prevented:', e));
+            }
+        }
+
+        // Listen for user interactions to start music
+        ['click', 'touchstart', 'keydown'].forEach(event => {
+            document.addEventListener(event, startBGMusic, { once: true });
+        });
+
+        // Store music state for page transitions
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('bgMusicTime', bgMusic.currentTime);
+            sessionStorage.setItem('bgMusicPlaying', !bgMusic.paused);
+        });
+
+        // Resume music from previous page if applicable
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTime = sessionStorage.getItem('bgMusicTime');
+            const wasPlaying = sessionStorage.getItem('bgMusicPlaying') === 'true';
+            
+            if (savedTime) {
+                bgMusic.currentTime = parseFloat(savedTime);
+            }
+            if (wasPlaying) {
+                bgMusic.play().catch(e => console.log('Audio autoplay prevented:', e));
+            }
+        });
+    </script>
 </body>
 </html>
