@@ -98,6 +98,7 @@ CREATE TABLE progress (
     enemies_defeated INTEGER DEFAULT 0,
     highest_streak INTEGER DEFAULT 0,
     time_spent_seconds INTEGER DEFAULT 0,
+    unlocked_heroes JSONB DEFAULT '[0]'::jsonb, -- Array of hero indices unlocked for this era (first hero always unlocked)
     last_played_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),

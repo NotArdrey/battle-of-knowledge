@@ -574,10 +574,24 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/progress-sync.js"></script>
     <script src="js/eraData.js"></script>
     <script src="js/characterData.js"></script>
     <script src="js/collection.js"></script>
     <script src="js/language.js"></script>
+    
+    <script>
+        // Initialize ProgressSync for collection page
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.ProgressSync) {
+                await window.ProgressSync.init();
+                // Re-render after progress is loaded
+                loadAllCharacters();
+            }
+        });
+    </script>
 
     <!-- Background Music -->
     <audio id="bgMusic" loop preload="auto">

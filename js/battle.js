@@ -279,8 +279,13 @@ function setDefaultBackground() {
     }
 }
 
-// Get unlocked heroes for an era
+// Get unlocked heroes for an era - uses ProgressSync for cross-browser sync
 function getUnlockedHeroesForEra(eraKey) {
+    // Use ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        return window.ProgressSync.getUnlockedHeroes(eraKey);
+    }
+    // Fallback to localStorage for offline/unauthenticated
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     return unlockedHeroes[eraKey] || [0];
 }
@@ -1781,23 +1786,32 @@ function checkBattleEnd() {
 // Era order for progression
 const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
-// Save unlocked heroes for an era
-function saveUnlockedHeroesForEra(eraKey, heroIndices) {
+// Save unlocked heroes for an era - uses ProgressSync for cross-browser sync
+async function saveUnlockedHeroesForEra(eraKey, heroIndices) {
+    // Save to ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        await window.ProgressSync.saveUnlockedHeroes(eraKey, heroIndices);
+    }
+    // Also save to localStorage as fallback
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     unlockedHeroes[eraKey] = heroIndices;
     localStorage.setItem('unlockedHeroes', JSON.stringify(unlockedHeroes));
 }
 
 // Unlock next hero for the current era
-function unlockNextHero(eraKey) {
+async function unlockNextHero(eraKey) {
     const heroes = eraData[eraKey].heroes;
     const unlockedIndices = getUnlockedHeroesForEra(eraKey);
     
     const nextHeroIndex = unlockedIndices.length;
     
     if (nextHeroIndex < heroes.length) {
+        // Use ProgressSync.unlockHero if available
+        if (window.ProgressSync && window.ProgressSync.userId) {
+            await window.ProgressSync.unlockHero(eraKey, nextHeroIndex);
+        }
         unlockedIndices.push(nextHeroIndex);
-        saveUnlockedHeroesForEra(eraKey, unlockedIndices);
+        await saveUnlockedHeroesForEra(eraKey, unlockedIndices);
         return heroes[nextHeroIndex];
     }
     
@@ -1838,8 +1852,8 @@ async function unlockHeroAndShowVictory() {
         victoryTitle.classList.remove('text-amber-800');
     }
     
-    // Try to unlock the next hero
-    const unlockedHero = unlockNextHero(currentEra);
+    // Try to unlock the next hero (now async)
+    const unlockedHero = await unlockNextHero(currentEra);
     const heroAchievementDiv = document.querySelector('#victoryModal .bg-gradient-to-br.from-amber-50');
     const heroUnlockedTitle = document.querySelector('#victoryModal [data-lang-key="heroUnlocked"]');
     

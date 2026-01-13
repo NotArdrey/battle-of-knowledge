@@ -10,6 +10,7 @@ const ProgressSync = {
     progress: {
         eras: {},
         completedLessons: {},
+        unlockedHeroes: {},  // Track unlocked heroes per era
         achievements: []
     },
 
@@ -28,6 +29,7 @@ const ProgressSync = {
         this.progress = {
             eras: {},
             completedLessons: {},
+            unlockedHeroes: {},
             achievements: []
         };
     },
@@ -91,7 +93,16 @@ const ProgressSync = {
                 this.progress.completedLessons[p.era_key] = Array.isArray(p.lessons_completed)
                     ? p.lessons_completed
                     : [];
+                // Load unlocked heroes (default to [0] - first hero always unlocked)
+                this.progress.unlockedHeroes[p.era_key] = Array.isArray(p.unlocked_heroes)
+                    ? p.unlocked_heroes
+                    : [0];
             });
+
+            // Sync unlocked heroes from DB to localStorage (for offline fallback)
+            if (Object.keys(this.progress.unlockedHeroes).length > 0) {
+                localStorage.setItem('unlockedHeroes', JSON.stringify(this.progress.unlockedHeroes));
+            }
 
             await this.loadAchievements();
         } catch (error) {
@@ -117,6 +128,53 @@ const ProgressSync = {
 
     getCompletedLessons(eraKey) {
         return this.progress.completedLessons[eraKey] || [];
+    },
+
+    // Get unlocked heroes for an era (first hero always unlocked)
+    getUnlockedHeroes(eraKey) {
+        return this.progress.unlockedHeroes[eraKey] || [0];
+    },
+
+    // Get all unlocked heroes across all eras
+    getAllUnlockedHeroes() {
+        return this.progress.unlockedHeroes;
+    },
+
+    // Unlock a hero for an era
+    async unlockHero(eraKey, heroIndex) {
+        const unlocked = new Set(this.getUnlockedHeroes(eraKey));
+        unlocked.add(heroIndex);
+        const heroArray = [...unlocked].sort((a, b) => a - b);
+        this.progress.unlockedHeroes[eraKey] = heroArray;
+        await this.saveUnlockedHeroes(eraKey, heroArray);
+        return heroArray;
+    },
+
+    // Save unlocked heroes to database
+    async saveUnlockedHeroes(eraKey, heroIndices) {
+        if (!this.userId) {
+            console.warn('Cannot save unlocked heroes without a signed-in user');
+            return;
+        }
+
+        const client = this.getClient();
+        if (!client) return;
+
+        try {
+            const { error } = await client
+                .from('progress')
+                .upsert({
+                    user_id: this.userId,
+                    era_key: eraKey,
+                    unlocked_heroes: heroIndices
+                }, {
+                    onConflict: 'user_id,era_key'
+                });
+
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error saving unlocked heroes:', error);
+        }
     },
 
     async updateEraProgress(eraKey, updates) {
@@ -178,6 +236,7 @@ const ProgressSync = {
 
         try {
             const lessonsCompleted = this.getCompletedLessons(eraKey);
+            const unlockedHeroes = this.getUnlockedHeroes(eraKey);
             const { error } = await client
                 .from('progress')
                 .upsert({
@@ -190,6 +249,7 @@ const ProgressSync = {
                     battle_score: data.battleScore || 0,
                     enemies_defeated: data.enemiesDefeated || 0,
                     highest_streak: data.highestStreak || 0,
+                    unlocked_heroes: unlockedHeroes,
                     last_played_at: new Date().toISOString()
                 }, {
                     onConflict: 'user_id,era_key'

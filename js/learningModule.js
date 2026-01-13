@@ -510,8 +510,13 @@ function selectCharacter(heroIndex) {
     window.location.href = 'battlefield.html';
 }
 
-// Get unlocked heroes
+// Get unlocked heroes - uses ProgressSync for cross-browser sync
 function getUnlockedHeroesForEra(eraKey) {
+    // Use ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        return window.ProgressSync.getUnlockedHeroes(eraKey);
+    }
+    // Fallback to localStorage for offline/unauthenticated
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     return unlockedHeroes[eraKey] || [0];
 }

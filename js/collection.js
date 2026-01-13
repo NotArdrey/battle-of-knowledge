@@ -130,8 +130,13 @@ function getPreviousEraName(eraKey, lang) {
     return translations[lang][prevEra.name] || prevEra.name;
 }
 
-// Retrieve unlocked heroes map from localStorage
+// Retrieve unlocked heroes map - uses ProgressSync for cross-browser sync
 function getUnlockedHeroes() {
+    // Use ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        return window.ProgressSync.getAllUnlockedHeroes() || {};
+    }
+    // Fallback to localStorage for offline/unauthenticated
     try {
         return JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     } catch (error) {

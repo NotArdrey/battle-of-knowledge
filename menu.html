@@ -327,6 +327,12 @@
     <script src="js/achievements.js"></script>
     <script src="js/language.js"></script>
     
+    <!-- Profile Button (Upper Left) -->
+    <button id="profileBtn" onclick="window.location.href='account.html'" class="hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-2 hover:scale-105 transition-transform">
+        <img id="profileAvatar" src="assets/Characters/1. Early Spanish Era/Heroes/1. Lapu-Lapu/Idle.png" alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-amber-500">
+        <span class="font-semibold text-amber-900 text-sm">Profile</span>
+    </button>
+    
     <!-- User Auth Status Bar -->
     <div id="authStatusBar" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
         <span id="userNameDisplay" class="font-semibold text-amber-900"></span>
@@ -356,6 +362,12 @@
                         document.getElementById('userRoleBadge').textContent = profile.role.toUpperCase();
                         authBar.classList.remove('hidden');
                         loginPrompt.classList.add('hidden');
+                        
+                        // Show profile button and set avatar
+                        document.getElementById('profileBtn').classList.remove('hidden');
+                        if (profile.avatar_url) {
+                            document.getElementById('profileAvatar').src = profile.avatar_url;
+                        }
                         
                         // Initialize progress sync
                         await ProgressSync.init();
