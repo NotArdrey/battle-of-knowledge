@@ -3,6 +3,83 @@
 // Battle of Knowledge - Educational Game
 // ============================================
 
+// ============================================
+// GUEST SESSION MANAGEMENT
+// ============================================
+
+/**
+ * Check if current user is a guest
+ * @returns {boolean}
+ */
+function isGuestUser() {
+    const guestSession = JSON.parse(localStorage.getItem('guestSession') || 'null');
+    return guestSession && guestSession.isGuest === true;
+}
+
+/**
+ * Get guest session data
+ * @returns {Object|null}
+ */
+function getGuestSession() {
+    const guestSession = JSON.parse(localStorage.getItem('guestSession') || 'null');
+    return guestSession && guestSession.isGuest ? guestSession : null;
+}
+
+/**
+ * Clear guest session
+ */
+function clearGuestSession() {
+    localStorage.removeItem('guestSession');
+}
+
+/**
+ * Create a guest profile object (for compatibility with code expecting profile data)
+ * @returns {Object}
+ */
+function getGuestProfile() {
+    const guestSession = getGuestSession();
+    if (!guestSession) return null;
+    
+    return {
+        id: guestSession.guestId,
+        email: 'guest@local',
+        full_name: 'Guest Player',
+        role: 'guest',
+        is_verified: false,
+        isGuest: true
+    };
+}
+
+/**
+ * Get guest mode settings (set by admin)
+ * @returns {Object} Guest settings
+ */
+function getGuestModeSettings() {
+    const GUEST_SETTINGS_KEY = 'guestModeSettings';
+    const defaultSettings = {
+        unlockProgress: false,
+        unlockCollections: false,
+        skipVideos: false
+    };
+    
+    const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
+    if (saved) {
+        return { ...defaultSettings, ...JSON.parse(saved) };
+    }
+    return { ...defaultSettings };
+}
+
+/**
+ * Check if guest has a specific permission unlocked
+ * @param {string} permission - 'unlockProgress', 'unlockCollections', or 'skipVideos'
+ * @returns {boolean}
+ */
+function guestHasPermission(permission) {
+    if (!isGuestUser()) return false;
+    const settings = getGuestModeSettings();
+    return settings[permission] === true;
+}
+
 // Safely retrieve the Supabase client regardless of load order
 function getSupabaseClient() {
     // Try SupabaseConfig first (uses getter with lazy init)
@@ -417,6 +494,14 @@ function validateEmail(email) {
 
 // Export for use in other files
 window.SharedAuth = {
+    // Guest session functions
+    isGuestUser,
+    getGuestSession,
+    clearGuestSession,
+    getGuestProfile,
+    getGuestModeSettings,
+    guestHasPermission,
+    // Auth functions
     validateStudentId,
     signUpUser,
     signInUser,

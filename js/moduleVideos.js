@@ -1,13 +1,16 @@
 // Module Videos Data with English and Tagalog Captions
 // Videos organized by era and lesson, with bilingual captions derived from script files
 
+// Supabase Storage base URL for videos
+const SUPABASE_STORAGE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co/storage/v1/object/public/videos';
+
 const moduleVideos = {
     'early-spanish': {
         lessons: [
             {
                 lessonId: 1,
                 title: 'Pre-Colonial Philippines',
-                videoFile: 'assets/ModuleVideos/early%20spanish/Early%20Spanish%201.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/early-spanish/Early%20Spanish%201.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Before 1521, the Philippines was made up of independent communities called barangays, each led by a datu or chieftain." },
@@ -26,7 +29,7 @@ const moduleVideos = {
             {
                 lessonId: 2,
                 title: "Magellan's Arrival (1521)",
-                videoFile: 'assets/ModuleVideos/early%20spanish/Early%20spanish%202.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/early-spanish/Early%20spanish%202.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "On March 16, 1521, Portuguese explorer Ferdinand Magellan, sailing under the Spanish flag, arrived in the Philippines." },
@@ -47,7 +50,7 @@ const moduleVideos = {
             {
                 lessonId: 3,
                 title: 'Lapu-Lapu: The Hero',
-                videoFile: 'assets/ModuleVideos/early%20spanish/early%20spanish%203.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/early-spanish/early%20spanish%203.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Lapu-Lapu stands as a towering figure in Philippine history as the datu of Mactan Island in Cebu." },
@@ -70,7 +73,7 @@ const moduleVideos = {
             {
                 lessonId: 4,
                 title: 'Battle of Mactan',
-                videoFile: 'assets/ModuleVideos/early%20spanish/early%20spanish%204.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/early-spanish/early%20spanish%204.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "The Battle of Mactan, on April 27, 1521, marked a pivotal moment in Philippine history." },
@@ -93,7 +96,7 @@ const moduleVideos = {
             {
                 lessonId: 5,
                 title: 'Aftermath & Legacy',
-                videoFile: 'assets/ModuleVideos/early%20spanish/Early%20Spanish%205.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/early-spanish/Early%20Spanish%205.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Although the victory at Mactan showed that Filipinos could resist foreign powers, it did not stop Spanish colonization." },
@@ -120,7 +123,7 @@ const moduleVideos = {
             {
                 lessonId: 1,
                 title: 'Jose Rizal',
-                videoFile: 'assets/ModuleVideos/late%20spanish/Late%20spanish%201.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/late-spanish/Late%20spanish%201.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Dr. Jose Rizal was a Filipino writer, doctor, and reformist who fought Spanish abuse through peaceful means." },
@@ -143,7 +146,7 @@ const moduleVideos = {
             {
                 lessonId: 2,
                 title: 'Andres Bonifacio',
-                videoFile: 'assets/ModuleVideos/late%20spanish/late%20spanish%202.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/late-spanish/late%20spanish%202.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Andres Bonifacio, known as the Father of the Philippine Revolution, founded the Katipunan or KKK in 1892." },
@@ -166,7 +169,7 @@ const moduleVideos = {
             {
                 lessonId: 3,
                 title: 'Emilio Aguinaldo',
-                videoFile: 'assets/ModuleVideos/late%20spanish/Late%20Spanish%203.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/late-spanish/Late%20Spanish%203.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Emilio Aguinaldo became an important leader of the Philippine Revolution through his success in battles, especially the victory at Imus." },
@@ -189,7 +192,7 @@ const moduleVideos = {
             {
                 lessonId: 4,
                 title: 'Apolinario Mabini',
-                videoFile: 'assets/ModuleVideos/late%20spanish/Late%20Spanish%204.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/late-spanish/Late%20Spanish%204.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Apolinario Mabini was known as the 'Brains of the Revolution' and served as Emilio Aguinaldo's most trusted adviser." },
@@ -212,7 +215,7 @@ const moduleVideos = {
             {
                 lessonId: 5,
                 title: 'Treaty of Paris',
-                videoFile: 'assets/ModuleVideos/late%20spanish/Late%20Spanish%205.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/late-spanish/Late%20Spanish%205.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "The Spanish-American War of 1898 reshaped the Philippines' future and Pacific power." },
@@ -243,7 +246,7 @@ const moduleVideos = {
             {
                 lessonId: 1,
                 title: 'The Transition',
-                videoFile: 'assets/ModuleVideos/American%20Colonial/American%20Colonial%20Chapter%201.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/american-colonial/American%20Colonial%20Chapter%201.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "War broke out between Spain and the U.S., ending Spanish power in the Philippines." },
@@ -272,7 +275,7 @@ const moduleVideos = {
             {
                 lessonId: 2,
                 title: 'Philippine-American War',
-                videoFile: 'assets/ModuleVideos/American%20Colonial/American%20Colonial%20Chapter%202.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/american-colonial/American%20Colonial%20Chapter%202.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "In 1899, fighting began between Filipino and American forces." },
@@ -303,7 +306,7 @@ const moduleVideos = {
             {
                 lessonId: 3,
                 title: 'Benevolent Assimilation',
-                videoFile: 'assets/ModuleVideos/American%20Colonial/American%20Colonial%20Chapter%203.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/american-colonial/American%20Colonial%20Chapter%203.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "The U.S. introduced 'benevolent assimilation' to control and govern the Philippines." },
@@ -336,7 +339,7 @@ const moduleVideos = {
             {
                 lessonId: 1,
                 title: 'Japanese Invasion',
-                videoFile: 'assets/ModuleVideos/WW2%20Era/WW2%20Chapter%201.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/ww2/WW2%20Chapter%201.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "On December 8, 1941, Japan launched a surprise attack on the Philippines." },
@@ -367,7 +370,7 @@ const moduleVideos = {
             {
                 lessonId: 2,
                 title: 'Bataan Death March',
-                videoFile: 'assets/ModuleVideos/WW2%20Era/WW2%20Chapter%202.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/ww2/WW2%20Chapter%202.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "On April 9, 1942, Allied forces in Bataan surrendered." },
@@ -398,7 +401,7 @@ const moduleVideos = {
             {
                 lessonId: 3,
                 title: 'Filipino Resistance',
-                videoFile: 'assets/ModuleVideos/WW2%20Era/WW2%20Chapter%203.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/ww2/WW2%20Chapter%203.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "Filipino civilians became guerrilla fighters, resisting Japanese occupation." },
@@ -429,7 +432,7 @@ const moduleVideos = {
             {
                 lessonId: 4,
                 title: 'Liberation',
-                videoFile: 'assets/ModuleVideos/WW2%20Era/WW2%20Chapter%204.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/ww2/WW2%20Chapter%204.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "General MacArthur vowed to return—a promise that gave Filipinos hope." },
@@ -460,7 +463,7 @@ const moduleVideos = {
             {
                 lessonId: 5,
                 title: 'Independence',
-                videoFile: 'assets/ModuleVideos/WW2%20Era/WW2%20Chapter%205.mp4',
+                videoFile: `${SUPABASE_STORAGE_URL}/ww2/WW2%20Chapter%205.mp4`,
                 captions: {
                     en: [
                         { time: 0, text: "After decades of American rule, the Philippines neared freedom." },

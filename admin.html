@@ -436,6 +436,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('users')">👥 User Management</button>
             <button class="tab-btn" onclick="switchTab('students')">📚 Student Registry</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ Guest Settings</button>
         </div>
         
         <!-- User Management Tab -->
@@ -520,6 +521,74 @@
                     <div class="empty-icon">📚</div>
                     <p>No registered students yet</p>
                     <p class="text-sm">Click "Add Student" or upload an Excel file to add students</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Guest Settings Tab -->
+        <div id="settingsTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Guest User Settings</h2>
+                </div>
+                
+                <div class="p-6">
+                    <p class="text-amber-700 mb-6">Configure what guest users (non-logged-in players) can access. These settings are stored locally and apply to all guest sessions on this device.</p>
+                    
+                    <!-- Guest Unlock All Progress -->
+                    <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress for Guests</h3>
+                                <p class="text-amber-700 text-sm mt-1">Allow guests to access all eras and lessons without completing previous ones.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="guestUnlockProgress" class="sr-only peer" onchange="toggleGuestSetting('unlockProgress', this.checked)">
+                                <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Guest Unlock All Collections -->
+                    <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-amber-900">🏆 Unlock All Collections for Guests</h3>
+                                <p class="text-amber-700 text-sm mt-1">Allow guests to view all heroes and characters in the collection without unlocking them.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="guestUnlockCollections" class="sr-only peer" onchange="toggleGuestSetting('unlockCollections', this.checked)">
+                                <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Guest Skip Videos -->
+                    <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-amber-900">⏭️ Allow Guests to Skip Videos</h3>
+                                <p class="text-amber-700 text-sm mt-1">Let guests skip lesson videos immediately instead of waiting for them to finish.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="guestSkipVideos" class="sr-only peer" onchange="toggleGuestSetting('skipVideos', this.checked)">
+                                <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Status -->
+                    <div class="mt-6 p-4 bg-gray-100 rounded-xl">
+                        <h4 class="font-bold text-gray-700 mb-2">📋 Current Guest Settings</h4>
+                        <pre id="guestSettingsDisplay" class="text-sm text-gray-600 font-mono"></pre>
+                    </div>
+                    
+                    <!-- Reset Button -->
+                    <div class="mt-6 flex gap-4">
+                        <button onclick="resetGuestSettings()" class="px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
+                            🔄 Reset to Defaults
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1257,6 +1326,77 @@
             
             document.getElementById(`${tabName}Tab`).classList.add('active');
             event.target.classList.add('active');
+            
+            // Load guest settings when settings tab is opened
+            if (tabName === 'settings') {
+                loadGuestSettings();
+            }
+        }
+        
+        // ============================================
+        // GUEST SETTINGS MANAGEMENT
+        // ============================================
+        
+        const GUEST_SETTINGS_KEY = 'guestModeSettings';
+        
+        // Default guest settings
+        const defaultGuestSettings = {
+            unlockProgress: false,
+            unlockCollections: false,
+            skipVideos: false
+        };
+        
+        // Get current guest settings
+        function getGuestSettings() {
+            const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
+            if (saved) {
+                return { ...defaultGuestSettings, ...JSON.parse(saved) };
+            }
+            return { ...defaultGuestSettings };
+        }
+        
+        // Save guest settings
+        function saveGuestSettings(settings) {
+            localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(settings));
+            updateGuestSettingsDisplay();
+        }
+        
+        // Toggle a specific guest setting
+        function toggleGuestSetting(settingName, value) {
+            const settings = getGuestSettings();
+            settings[settingName] = value;
+            saveGuestSettings(settings);
+            showToast(`Guest setting updated: ${settingName} = ${value}`, 'success');
+        }
+        
+        // Load guest settings into the UI
+        function loadGuestSettings() {
+            const settings = getGuestSettings();
+            
+            // Set checkbox states
+            document.getElementById('guestUnlockProgress').checked = settings.unlockProgress;
+            document.getElementById('guestUnlockCollections').checked = settings.unlockCollections;
+            document.getElementById('guestSkipVideos').checked = settings.skipVideos;
+            
+            updateGuestSettingsDisplay();
+        }
+        
+        // Update the display of current settings
+        function updateGuestSettingsDisplay() {
+            const settings = getGuestSettings();
+            const display = document.getElementById('guestSettingsDisplay');
+            if (display) {
+                display.textContent = JSON.stringify(settings, null, 2);
+            }
+        }
+        
+        // Reset guest settings to defaults
+        function resetGuestSettings() {
+            if (confirm('Reset all guest settings to defaults?')) {
+                localStorage.removeItem(GUEST_SETTINGS_KEY);
+                loadGuestSettings();
+                showToast('Guest settings reset to defaults', 'success');
+            }
         }
         
         // Toast notification helper

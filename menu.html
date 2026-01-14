@@ -350,16 +350,22 @@
         // Session check and user status
         async function checkAuthStatus() {
             try {
-                const session = await SupabaseConfig.getSession();
                 const authBar = document.getElementById('authStatusBar');
                 const loginPrompt = document.getElementById('loginPrompt');
                 
+                // PRIORITY 1: Check for real authenticated session first
+                const session = await SupabaseConfig.getSession();
+                
                 if (session) {
-                    // User is logged in
+                    // Real user is logged in - clear any stale guest session
+                    localStorage.removeItem('guestSession');
+                    
                     const profile = await SupabaseConfig.getCurrentProfile();
                     if (profile) {
                         document.getElementById('userNameDisplay').textContent = profile.full_name;
                         document.getElementById('userRoleBadge').textContent = profile.role.toUpperCase();
+                        document.getElementById('userRoleBadge').classList.remove('bg-gray-500');
+                        document.getElementById('userRoleBadge').classList.add('bg-blue-500');
                         authBar.classList.remove('hidden');
                         loginPrompt.classList.add('hidden');
                         
@@ -372,17 +378,38 @@
                         // Initialize progress sync
                         await ProgressSync.init();
                     }
-                } else {
-                    // User not logged in - show login prompt
-                    authBar.classList.add('hidden');
-                    loginPrompt.classList.remove('hidden');
+                    return;
                 }
+                
+                // PRIORITY 2: Check for guest session (only if no real auth)
+                const guestSession = JSON.parse(localStorage.getItem('guestSession') || 'null');
+                
+                if (guestSession && guestSession.isGuest) {
+                    // Guest user
+                    document.getElementById('userNameDisplay').textContent = 'Guest Player';
+                    document.getElementById('userRoleBadge').textContent = 'GUEST';
+                    document.getElementById('userRoleBadge').classList.remove('bg-blue-500');
+                    document.getElementById('userRoleBadge').classList.add('bg-gray-500');
+                    authBar.classList.remove('hidden');
+                    loginPrompt.classList.add('hidden');
+                    
+                    // Hide profile button for guests
+                    document.getElementById('profileBtn').classList.add('hidden');
+                    return;
+                }
+                
+                // PRIORITY 3: No session at all - show login prompt
+                authBar.classList.add('hidden');
+                loginPrompt.classList.remove('hidden');
+                
             } catch (error) {
                 console.error('Auth check error:', error);
             }
         }
         
         async function handleLogout() {
+            // Clear guest session if exists
+            localStorage.removeItem('guestSession');
             await SupabaseConfig.signOut();
             window.location.href = 'index.html';
         }
