@@ -25,6 +25,26 @@
         position: fixed;
         /* Page background - always blue gradient */
         background: linear-gradient(to bottom, #7dd3fc, #3b82f6);
+        /* Performance optimizations */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* GPU acceleration for main containers */
+    .battle-screen,
+    .battle-area,
+    .question-area {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
+    /* Character sprites - GPU accelerated */
+    #playerSprite,
+    #enemySprite {
+        will-change: transform;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        image-rendering: -webkit-optimize-contrast;
     }
     
     /* Remove era-background div - we don't need page background */

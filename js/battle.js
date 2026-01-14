@@ -90,13 +90,23 @@ async function updateEraProgress(eraKey, updates) {
     console.warn('ProgressSync unavailable; progress update skipped');
 }
 
-// Mobile detection
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// Mobile detection - more comprehensive check
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || ('ontouchstart' in window) 
+    || (navigator.maxTouchPoints > 0);
+
+// Check for low-end device (less RAM, older device)
+const isLowEndDevice = navigator.deviceMemory ? navigator.deviceMemory < 4 : isMobile;
 
 // Prefer lighter effects on mobile or when the user requests reduced motion
 const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
-let reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion;
+let reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion || isLowEndDevice;
+
+// Always use reduced FX on mobile for performance
+if (isMobile) {
+    reducedFxMode = true;
+}
 
 // Function to dynamically update graphics mode
 function updateReducedFxMode(isLowQuality) {
@@ -584,16 +594,29 @@ function showBossWarning() {
     }, 2000);
 }
 
+// Image cache for preloaded sprites
+const spriteCache = new Map();
+
 // Preload a character sprite and return a promise
 function preloadCharacterSprite(characterData, state) {
     return new Promise((resolve) => {
         const src = getCharacterSprite(characterData, state);
+        
+        // Return cached if already loaded
+        if (spriteCache.has(src)) {
+            resolve(src);
+            return;
+        }
+        
         const img = new Image();
-        img.onload = () => resolve(src);
+        img.onload = () => {
+            spriteCache.set(src, img);
+            resolve(src);
+        };
         img.onerror = () => resolve(src); // Still resolve on error to avoid blocking
         img.src = src;
-        // Timeout fallback in case image takes too long
-        setTimeout(() => resolve(src), 2000);
+        // Shorter timeout on mobile
+        setTimeout(() => resolve(src), isMobile ? 1000 : 2000);
     });
 }
 
@@ -609,19 +632,25 @@ function updateCharacterSprites() {
     const playerSprite = document.getElementById('playerSprite');
     const enemySprite = document.getElementById('enemySprite');
     
-    playerSprite.src = getCharacterSprite(currentHero, 'idle');
-    playerSprite.alt = currentHero.name;
+    if (playerSprite && currentHero) {
+        playerSprite.src = getCharacterSprite(currentHero, 'idle');
+        playerSprite.alt = currentHero.name;
+    }
     
-    enemySprite.src = getCharacterSprite(currentVillain, 'idle');
-    enemySprite.alt = currentVillain.name;
+    if (enemySprite && currentVillain) {
+        enemySprite.src = getCharacterSprite(currentVillain, 'idle');
+        enemySprite.alt = currentVillain.name;
+    }
 }
 
-// Set character state
+// Set character state with mobile optimization
 function setCharacterState(character, state) {
     const sprite = character === 'player' ? document.getElementById('playerSprite') : document.getElementById('enemySprite');
     const characterData = character === 'player' ? currentHero : currentVillain;
     const enemyContainer = character === 'enemy' ? document.getElementById('enemyCharacter') : null;
     const isEarlySpanishSoldier = enemyContainer && characterData && characterData.name === 'Early Spanish Soldier';
+
+    if (!sprite || !characterData) return;
 
     // Early Spanish Soldier attack sprite already faces left, so temporarily remove the default flip
     if (isEarlySpanishSoldier) {
@@ -632,16 +661,23 @@ function setCharacterState(character, state) {
         }
     }
     
-    sprite.src = getCharacterSprite(characterData, state);
+    // Use requestAnimationFrame for smoother sprite changes
+    requestAnimationFrame(() => {
+        sprite.src = getCharacterSprite(characterData, state);
+    });
     
     if (state !== 'idle') {
+        // Shorter timeout on mobile for snappier feel
+        const returnToIdleTime = isMobile ? 600 : 1200;
         setTimeout(() => {
-            sprite.src = getCharacterSprite(characterData, 'idle');
+            requestAnimationFrame(() => {
+                sprite.src = getCharacterSprite(characterData, 'idle');
+            });
             
             if (isEarlySpanishSoldier && enemyContainer) {
                 enemyContainer.classList.remove('no-flip');
             }
-        }, 1200);
+        }, returnToIdleTime);
     }
 }
 
@@ -1944,10 +1980,17 @@ function disableAnswers() {
 window.addEventListener('DOMContentLoaded', async function() {
     console.log('DOMContentLoaded - Initializing battle with boss mechanics and automatic background music...');
 
-    // Require auth so progress can be saved; redirect to login if missing
+    // Guest mode allowed - progress will only be saved for logged-in users
+    // Check if user is logged in (for progress saving later)
     if (window.SupabaseConfig) {
-        const authed = await window.SupabaseConfig.requireAuth('login.html');
-        if (!authed) return;
+        try {
+            const { data: { session } } = await window.SupabaseConfig.supabase.getSession();
+            window.isLoggedIn = !!session;
+            console.log('User logged in:', window.isLoggedIn);
+        } catch (e) {
+            window.isLoggedIn = false;
+            console.log('Guest mode - progress will not be saved to cloud');
+        }
     }
     
     // Initialize the battle (now async to wait for ProgressSync)
