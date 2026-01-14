@@ -101,18 +101,17 @@ const isLowEndDevice = navigator.deviceMemory ? navigator.deviceMemory < 4 : isM
 // Prefer lighter effects on mobile or when the user requests reduced motion
 const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
-let reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion || isLowEndDevice;
+let reducedFxMode = fxQuality !== 'high';
 
-// Always use reduced FX on mobile for performance
-if (isMobile) {
-    reducedFxMode = true;
-}
+// Ultra low mode - skip ALL particle effects, only show minimal feedback
+let ultraLowMode = fxQuality === 'low';
 
 // Function to dynamically update graphics mode
 function updateReducedFxMode(isLowQuality) {
-    reducedFxMode = isLowQuality || isMobile || prefersReducedMotion;
+    reducedFxMode = isLowQuality;
+    ultraLowMode = isLowQuality;
     fxQuality = isLowQuality ? 'low' : 'high';
-    console.log('Graphics quality updated:', reducedFxMode ? 'Low' : 'High');
+    console.log('Graphics quality updated:', reducedFxMode ? 'Low (Ultra Performance)' : 'High');
 }
 
 // Expose to window for settings panel
@@ -788,9 +787,11 @@ function selectAnswer(index) {
 
 // Mobile-optimized screen shake
 function mobileShake() {
+    // Skip shake entirely in ultra low mode
+    if (ultraLowMode) return;
     const target = document.querySelector('.battle-area') || document.body;
     if (!target) return;
-    const duration = reducedFxMode ? 180 : 280;
+    const duration = reducedFxMode ? 100 : 280;
     target.classList.remove('shake-hit');
     // Force reflow so the animation can restart
     void target.offsetWidth;
@@ -840,8 +841,9 @@ function createGiantSwordEffect(isAttacker) {
     `;
 
     if (reducedFxMode) {
-        swordSlash.style.filter = 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.7))';
+        swordSlash.style.filter = 'none';
         swordSlash.style.mixBlendMode = 'normal';
+        swordSlash.style.background = 'linear-gradient(45deg, #fbbf24 0%, #dc2626 100%)';
     }
     
     // For player (left side) attacking: start from player's right, move toward enemy
@@ -856,9 +858,8 @@ function createGiantSwordEffect(isAttacker) {
     
     document.body.appendChild(swordSlash);
     
-    // Enhanced effect for boss battles
-    const baseCount = isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6);
-    const effectCount = reducedFxMode ? 1 : Math.max(1, Math.round(baseCount));
+    // SKIP all trail effects in low quality mode
+    const effectCount = ultraLowMode ? 0 : (reducedFxMode ? 1 : (isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6)));
     
     for (let i = 0; i < effectCount; i++) {
         setTimeout(() => {
@@ -928,6 +929,8 @@ function createGiantSwordEffect(isAttacker) {
     });
     
     setTimeout(() => {
+        // Skip wave effects entirely in ultra low mode
+        if (ultraLowMode) return;
         const waveCount = reducedFxMode ? 1 : (isMobile ? 2 : 4);
         for (let i = 0; i < waveCount; i++) {
             const wave = document.createElement('div');
@@ -1004,9 +1007,22 @@ function createGiantGunEffect(isAttacker) {
 
     if (reducedFxMode) {
         muzzleFlash.style.filter = 'none';
+        muzzleFlash.style.mixBlendMode = 'normal';
+        muzzleFlash.style.background = 'radial-gradient(circle, #fbbf24 0%, #dc2626 100%)';
     }
     
     document.body.appendChild(muzzleFlash);
+    
+    // In ultra low mode, just flash briefly and done
+    if (ultraLowMode) {
+        muzzleFlash.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
+        ], { duration: 150, fill: 'forwards' });
+        setTimeout(() => muzzleFlash.remove(), 150);
+        return muzzleFlash;
+    }
     
     muzzleFlash.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
@@ -1152,11 +1168,23 @@ function createGiantMagicEffect(isAttacker) {
     `;
 
     if (reducedFxMode) {
-        magicSphere.style.filter = 'drop-shadow(0 0 24px rgba(139, 92, 246, 0.7))';
+        magicSphere.style.filter = 'none';
         magicSphere.style.mixBlendMode = 'normal';
+        magicSphere.style.background = 'radial-gradient(circle, #8b5cf6 0%, #4f46e5 100%)';
     }
     
     document.body.appendChild(magicSphere);
+    
+    // In ultra low mode, just do a quick flash and exit
+    if (ultraLowMode) {
+        magicSphere.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
+        ], { duration: 200, fill: 'forwards' });
+        setTimeout(() => magicSphere.remove(), 200);
+        return magicSphere;
+    }
     
     magicSphere.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
@@ -1169,6 +1197,11 @@ function createGiantMagicEffect(isAttacker) {
         fill: 'forwards'
     });
     
+    // Skip magic waves entirely in ultra low mode
+    if (ultraLowMode) {
+        setTimeout(() => magicSphere.remove(), 400);
+        return magicSphere;
+    }
     const magicWaveCount = reducedFxMode ? 1 : (isMobile ? 3 : 6);
     for (let i = 0; i < magicWaveCount; i++) {
         setTimeout(() => {
@@ -1317,6 +1350,31 @@ function createGiantImpactEffect(isAttacker, damage) {
     const centerY = rect.top + rect.height / 2;
     
     const impactExplosion = document.createElement('div');
+    
+    // Ultra low mode: just a quick color flash, no fancy effects
+    if (ultraLowMode) {
+        impactExplosion.style.cssText = `
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #fbbf24 0%, #dc2626 100%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            left: ${centerX}px;
+            top: ${centerY}px;
+            transform: translate(-50%, -50%) scale(0);
+        `;
+        document.body.appendChild(impactExplosion);
+        impactExplosion.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
+        ], { duration: 150, fill: 'forwards' });
+        setTimeout(() => impactExplosion.remove(), 150);
+        return impactExplosion;
+    }
+    
     const explosionSize = (isMobile ? 80 : 160) + damage * (isMobile ? 3 : 6);
     impactExplosion.style.cssText = `
         position: fixed;
@@ -1351,6 +1409,12 @@ function createGiantImpactEffect(isAttacker, damage) {
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
+    
+    // Skip shockwaves in reduced mode
+    if (reducedFxMode) {
+        setTimeout(() => impactExplosion.remove(), isMobile ? 500 : 800);
+        return impactExplosion;
+    }
     
     for (let i = 0; i < (isMobile ? 3 : 6); i++) {
         setTimeout(() => {
@@ -1419,6 +1483,11 @@ function createGiantImpactEffect(isAttacker, damage) {
         setTimeout(() => crack.remove(), isMobile ? 400 : 600);
     }
     
+    // Skip all impact particles in ultra low mode
+    if (ultraLowMode) {
+        setTimeout(() => impactExplosion.remove(), 150);
+        return impactExplosion;
+    }
     const impactParticleCount = reducedFxMode ? 4 : (isMobile ? 20 : 40);
     for (let i = 0; i < impactParticleCount; i++) {
         setTimeout(() => {
@@ -1503,11 +1572,11 @@ function showDamage(damage, target) {
     damageEl.className = 'damage-number';
     damageEl.textContent = `-${damage}`;
     
-    const baseShadow = reducedFxMode ? '1px 1px 2px rgba(0, 0, 0, 0.6)' : isMobile ?
+    const baseShadow = reducedFxMode ? '1px 1px 2px rgba(0,0,0,0.5)' : isMobile ?
         `3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 25px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 50px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 75px ${damage > 25 ? '#f59e0b' : '#b91c1c'}` :
         `5px 5px 10px rgba(0, 0, 0, 0.9), 0 0 35px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 70px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 105px ${damage > 25 ? '#f59e0b' : '#b91c1c'}`;
-    const baseSize = reducedFxMode ? (isMobile ? '32px' : '40px') : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
-    const baseDuration = reducedFxMode ? 900 : (isMobile ? 1200 : 1500);
+    const baseSize = reducedFxMode ? '28px' : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
+    const baseDuration = reducedFxMode ? 500 : (isMobile ? 1200 : 1500);
     damageEl.style.cssText = `
         position: fixed;
         font-size: ${baseSize};
@@ -1528,7 +1597,8 @@ function showDamage(damage, target) {
     
     document.body.appendChild(damageEl);
     
-    if (!reducedFxMode && damage > 25) {
+    // Skip critical hit visual effects in low quality mode
+    if (!reducedFxMode && !ultraLowMode && damage > 25) {
         setTimeout(() => {
             const critEl = document.createElement('div');
             critEl.textContent = 'CRITICAL!';
