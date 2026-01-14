@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Login - Battle of Knowledge</title>
+    <title>Battle of Knowledge - Philippine History Educational Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
@@ -22,14 +22,15 @@
             width: 100%;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow: auto;
             padding: 20px;
         }
         
         .login-bg-overlay {
-            position: absolute;
+            position: fixed;
             inset: 0;
             background-image: 
                 linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
@@ -41,6 +42,22 @@
             z-index: 1;
         }
         
+        .game-logo {
+            position: relative;
+            z-index: 10;
+            max-width: 320px;
+            width: 90%;
+            height: auto;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+            animation: floatLogo 3s ease-in-out infinite;
+        }
+        
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
         .login-card {
             position: relative;
             z-index: 10;
@@ -48,9 +65,9 @@
             backdrop-filter: blur(10px);
             border: 4px solid rgba(120, 53, 15, 0.4);
             border-radius: 24px;
-            padding: 2.5rem;
+            padding: 2rem;
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         
@@ -142,7 +159,7 @@
         .divider {
             display: flex;
             align-items: center;
-            margin: 1.5rem 0;
+            margin: 1.25rem 0;
         }
         
         .divider::before, .divider::after {
@@ -189,16 +206,86 @@
             background: rgba(120, 53, 15, 0.2);
             color: #78350f;
         }
+
+        .btn-guest {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(to right, #6b7280, #4b5563);
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-guest:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.4);
+            background: linear-gradient(to right, #4b5563, #374151);
+        }
+
+        .guest-note {
+            font-size: 0.8rem;
+            color: #92400e;
+            text-align: center;
+            margin-top: -0.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .lang-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .lang-toggle img {
+            height: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        @media (max-width: 480px) {
+            .game-logo {
+                max-width: 260px;
+                margin-bottom: 1rem;
+            }
+            
+            .login-card {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Language Toggle -->
+    <button id="langToggle" class="lang-toggle" aria-label="Toggle Language">
+        <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog">
+    </button>
+    
     <div class="main-container">
         <div class="login-bg-overlay"></div>
         
+        <!-- Game Logo -->
+        <img 
+            id="gameLogo" 
+            class="game-logo" 
+            src="assets/Background/Title/Game-English-Title.png" 
+            alt="Battle of Knowledge"
+            data-lang-img-en="assets/Background/Title/Game-English-Title.png"
+            data-lang-img-tl="assets/Background/Title/Game-Tagalog-Title.png"
+        >
+        
         <div class="login-card">
-            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-1">Welcome Back!</h1>
-            <p class="text-center text-amber-700 mb-6">Sign in to continue your journey</p>
-            
             <!-- Error/Success Messages -->
             <div id="errorMessage" class="error-message"></div>
             <div id="successMessage" class="success-message"></div>
@@ -206,20 +293,21 @@
             <!-- Login Form -->
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="mb-4">
-                    <label for="email" class="form-label">Email Address</label>
+                    <label for="email" class="form-label" data-translate="Email Address">Email Address</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email" 
                         class="form-input" 
                         placeholder="Enter your email"
+                        data-placeholder-key="Enter your email"
                         required
                         autocomplete="email"
                     >
                 </div>
                 
                 <div class="mb-4">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label" data-translate="Password">Password</label>
                     <div style="position: relative;">
                         <input 
                             type="password" 
@@ -227,6 +315,7 @@
                             name="password" 
                             class="form-input" 
                             placeholder="Enter your password"
+                            data-placeholder-key="Enter your password"
                             required
                             autocomplete="current-password"
                             style="padding-right: 45px;"
@@ -237,27 +326,32 @@
                     </div>
                 </div>
                 
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-5">
                     <label class="flex items-center cursor-pointer">
                         <input type="checkbox" id="rememberMe" class="mr-2 accent-amber-600">
-                        <span class="text-sm text-amber-800">Remember me</span>
+                        <span class="text-sm text-amber-800" data-translate="Remember me">Remember me</span>
                     </label>
-                    <a href="#" onclick="showForgotPassword()" class="link-text text-sm">Forgot password?</a>
+                    <a href="#" onclick="showForgotPassword()" class="link-text text-sm" data-translate="Forgot password?">Forgot password?</a>
                 </div>
                 
                 <button type="submit" id="loginBtn" class="btn-primary">
-                    <span id="loginBtnText">Sign In</span>
-                    <span id="loginSpinner" style="display: none;">⏳ Signing in...</span>
+                    <span id="loginBtnText" data-translate="Sign In">Sign In</span>
+                    <span id="loginSpinner" style="display: none;">⏳ <span data-translate="Signing in...">Signing in...</span></span>
                 </button>
             </form>
             
             <div class="divider">
-                <span>OR</span>
+                <span data-translate="OR">OR</span>
             </div>
+
+            <button type="button" class="btn-guest" onclick="playAsGuest()">
+                🎮 <span data-translate="Play as Guest">Play as Guest</span>
+            </button>
+            <p class="guest-note">⚠️ <span data-translate="Progress won't be saved online">Progress won't be saved online</span></p>
         
-            <p class="text-center text-amber-800">
-                Don't have an account? 
-                <a href="signup.html" class="link-text">Sign up here</a>
+            <p class="text-center text-amber-800 text-sm">
+                <span data-translate="Don't have an account?">Don't have an account?</span> 
+                <a href="signup.html" class="link-text" data-translate="Sign up here">Sign up here</a>
             </p>
         </div>
     </div>
@@ -265,29 +359,30 @@
     <!-- Forgot Password Modal -->
     <div id="forgotPasswordModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
         <div class="login-card max-w-md">
-            <h2 class="text-xl font-bold text-amber-900 mb-4">Reset Password</h2>
-            <p class="text-amber-700 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+            <h2 class="text-xl font-bold text-amber-900 mb-4" data-translate="Reset Password">Reset Password</h2>
+            <p class="text-amber-700 mb-4" data-translate="Enter your email to receive a password reset link">Enter your email address and we'll send you a link to reset your password.</p>
             
             <div id="resetError" class="error-message"></div>
             <div id="resetSuccess" class="success-message"></div>
             
             <form onsubmit="handleForgotPassword(event)">
                 <div class="mb-4">
-                    <label for="resetEmail" class="form-label">Email Address</label>
+                    <label for="resetEmail" class="form-label" data-translate="Email Address">Email Address</label>
                     <input 
                         type="email" 
                         id="resetEmail" 
                         class="form-input" 
                         placeholder="Enter your email"
+                        data-placeholder-key="Enter your email"
                         required
                     >
                 </div>
                 
                 <div class="flex gap-3">
-                    <button type="button" onclick="closeForgotPassword()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100 transition-colors">
+                    <button type="button" onclick="closeForgotPassword()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100 transition-colors" data-translate="Cancel">
                         Cancel
                     </button>
-                    <button type="submit" class="flex-1 btn-primary">
+                    <button type="submit" class="flex-1 btn-primary" data-translate="Send Reset Link">
                         Send Reset Link
                     </button>
                 </div>
@@ -307,6 +402,9 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session }, error } = await sb.auth.getSession();
             if (session?.user) {
+                // Clear any stale guest session if real user is logged in
+                localStorage.removeItem('guestSession');
+                
                 redirectUser({
                     id: session.user.id,
                     email: session.user.email,
@@ -377,6 +475,9 @@
                 });
                 
                 if (error) throw error;
+                
+                // Clear any guest session when real user logs in
+                localStorage.removeItem('guestSession');
                 
                 successDiv.textContent = 'Login successful! Redirecting...';
                 successDiv.classList.add('show');
@@ -461,10 +562,45 @@
                 closeForgotPassword();
             }
         });
+
+        // Play as Guest
+        async function playAsGuest() {
+            // Clear any existing auth session first (wait for it to complete)
+            await sb.auth.signOut();
+            
+            // Set guest session in localStorage
+            const guestSession = {
+                isGuest: true,
+                guestId: 'guest_' + Date.now(),
+                startedAt: new Date().toISOString()
+            };
+            localStorage.setItem('guestSession', JSON.stringify(guestSession));
+            
+            // Redirect to menu
+            window.location.href = 'menu.html';
+        }
+        
+        // Update placeholders based on language
+        function updatePlaceholders() {
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            document.querySelectorAll('[data-placeholder-key]').forEach(input => {
+                const key = input.getAttribute('data-placeholder-key');
+                if (typeof translations !== 'undefined' && translations[lang] && translations[lang][key]) {
+                    input.placeholder = translations[lang][key];
+                }
+            });
+        }
+        
+        // Override toggle to also update placeholders
+        const originalToggle = window.toggleLanguage;
+        window.toggleLanguage = function() {
+            if (originalToggle) originalToggle();
+            updatePlaceholders();
+        };
+        
+        // Update placeholders on load
+        document.addEventListener('DOMContentLoaded', updatePlaceholders);
     </script>
-</body>
-</html>
-        });
-    </script>
+    <script src="js/language.js"></script>
 </body>
 </html>

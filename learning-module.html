@@ -425,6 +425,26 @@
             border-radius: 16px;
         }
         
+        /* YouTube Container - Responsive 16:9 */
+        .youtube-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+        
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+        }
+        
         .video-placeholder {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -783,9 +803,35 @@
                     // Load captions
                     currentCaptions = lessonData.captions[captionLanguage] || lessonData.captions['en'] || [];
                     
-                    // Check if video file exists
-                    if (lessonData.videoFile) {
-                        // Show actual video
+                    // Check if YouTube video exists
+                    if (lessonData.youtubeId) {
+                        // Show YouTube iframe
+                        videoContainer.innerHTML = `
+                            <div class="youtube-container">
+                                <iframe 
+                                    id="lessonVideo"
+                                    src="https://www.youtube.com/embed/${lessonData.youtubeId}?enablejsapi=1&rel=0&modestbranding=1"
+                                    title="${lessonData.title}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                            <div id="captionContainer" class="caption-container" style="display: none;">
+                                <p id="captionText" class="caption-text">Captions are embedded in the YouTube video</p>
+                            </div>
+                        `;
+                        
+                        // Hide custom captions for YouTube (use YouTube's built-in captions)
+                        const liveCaptionContainer = document.getElementById('captionContainer');
+                        if (liveCaptionContainer) {
+                            liveCaptionContainer.style.display = 'none';
+                        }
+                        
+                        // Mute BGM when YouTube video is displayed
+                        muteModuleBGMForVideo();
+                    } else if (lessonData.videoFile) {
+                        // Show actual video (fallback for local videos)
                         videoContainer.innerHTML = `
                             <video id="lessonVideo" controls>
                                 <source src="${lessonData.videoFile}" type="video/mp4">

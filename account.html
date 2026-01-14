@@ -301,19 +301,42 @@
             background: #ef4444;
             color: white;
         }
+        
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .lang-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .lang-toggle img {
+            height: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
     </style>
 </head>
 <body>
+    <!-- Language Toggle -->
+    <button id="langToggle" class="lang-toggle" aria-label="Toggle Language">
+        <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog">
+    </button>
+    
     <div class="main-container">
         <div class="account-bg-overlay"></div>
         
         <!-- Back Button -->
-        <button onclick="window.location.href='menu.html'" class="back-btn">
+        <button onclick="window.location.href='menu.html'" class="back-btn" data-translate="Back to Menu">
             ← Back to Menu
         </button>
         
         <div class="account-card">
-            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-2">👤 My Account</h1>
+            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-2" data-translate="My Account">👤 My Account</h1>
             
             <!-- Current Avatar Display -->
             <div class="current-avatar">
@@ -643,5 +666,6 @@
             }, 5000);
         }
     </script>
+    <script src="js/language.js"></script>
 </body>
 </html>
