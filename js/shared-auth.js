@@ -58,15 +58,16 @@ function getGuestModeSettings() {
     const GUEST_SETTINGS_KEY = 'guestModeSettings';
     const defaultSettings = {
         unlockProgress: false,
-        unlockCollections: false,
         skipVideos: false
     };
     
     const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
-    if (saved) {
-        return { ...defaultSettings, ...JSON.parse(saved) };
-    }
-    return { ...defaultSettings };
+    const settings = saved ? { ...defaultSettings, ...JSON.parse(saved) } : { ...defaultSettings };
+    
+    // unlockCollections is automatically enabled when unlockProgress is enabled
+    settings.unlockCollections = settings.unlockProgress;
+    
+    return settings;
 }
 
 /**
