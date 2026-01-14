@@ -597,8 +597,7 @@
                     <div class="video-toolbar">
                         <button id="bgmToggleBtn" class="caption-toggle" onclick="toggleModuleBGM()">🔊 BGM</button>
                         <div class="caption-controls">
-                            <button id="captionVisibilityToggle" class="caption-toggle" onclick="toggleCaptionsVisibility()">Hide CC</button>
-                            <button id="captionLangToggle" class="caption-toggle" onclick="toggleCaptionLanguage()">EN/TL</button>
+                            <button id="captionLangToggle" class="caption-toggle" onclick="toggleCaptionLanguage()">CC: EN</button>
                         </div>
                     </div>
                     
@@ -779,13 +778,9 @@
         let captionsVisible = true;
 
         function refreshCaptionControls() {
-            const captionToggleBtn = document.getElementById('captionVisibilityToggle');
             const captionLangBtn = document.getElementById('captionLangToggle');
-            if (captionToggleBtn) {
-                captionToggleBtn.textContent = captionsVisible ? 'Hide CC' : 'Show CC';
-            }
             if (captionLangBtn) {
-                captionLangBtn.textContent = captionLanguage === 'en' ? 'EN' : 'TL';
+                captionLangBtn.textContent = captionLanguage === 'en' ? 'CC: EN' : 'CC: TL';
             }
         }
 
@@ -800,8 +795,12 @@
                 const lessonData = moduleVideos[currentEraKey].lessons.find(l => l.lessonId === lessonId);
                 
                 if (lessonData) {
-                    // Load captions
-                    currentCaptions = lessonData.captions[captionLanguage] || lessonData.captions['en'] || [];
+                    // Load captions (handle missing captions gracefully)
+                    if (lessonData.captions) {
+                        currentCaptions = lessonData.captions[captionLanguage] || lessonData.captions['en'] || [];
+                    } else {
+                        currentCaptions = [];
+                    }
                     
                     // Check if YouTube video exists
                     if (lessonData.youtubeId) {
@@ -1636,13 +1635,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOMContentLoaded fired');
             
-            // Require login so lesson progress is stored to the user account
-            if (window.SupabaseConfig) {
-                const authed = await window.SupabaseConfig.requireAuth('login.html');
-                if (!authed) return;
-            }
-
-            // Initialize ProgressSync FIRST to ensure progress is loaded
+            // Initialize ProgressSync (works for both logged-in users and guests)
             if (window.ProgressSync) {
                 try {
                     await window.ProgressSync.init();

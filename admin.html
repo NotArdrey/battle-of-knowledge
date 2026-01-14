@@ -226,13 +226,6 @@
         
         .btn-verify:hover { background: #059669; }
         
-        .btn-promote {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-promote:hover { background: #2563eb; }
-        
         .btn-delete {
             background: #ef4444;
             color: white;
@@ -549,20 +542,6 @@
                         </div>
                     </div>
                     
-                    <!-- Guest Skip Videos -->
-                    <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
-                        <div class="flex items-center justify-between flex-wrap gap-4">
-                            <div>
-                                <h3 class="text-lg font-bold text-amber-900">⏭️ Allow Guests to Skip Videos</h3>
-                                <p class="text-amber-700 text-sm mt-1">Let guests skip lesson videos immediately instead of waiting for them to finish.</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="guestSkipVideos" class="sr-only peer" onchange="toggleGuestSetting('skipVideos', this.checked)">
-                                <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
-                            </label>
-                        </div>
-                    </div>
-                    
                     <!-- Current Status -->
                     <div class="mt-6 p-4 bg-gray-100 rounded-xl">
                         <h4 class="font-bold text-gray-700 mb-2">📋 Current Guest Settings</h4>
@@ -666,8 +645,8 @@
 
     <script>
         // Supabase config - standalone, no external dependencies
-        const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
+        const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aHlxY3pwdGxqZGhtaW9hZ3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzOTY2NzAsImV4cCI6MjA4Mzk3MjY3MH0.QKFZapzgWYcCtuw3eEvqg6U6qi06QNpvIRNBw7ABf9I';
         
         let sb = null;
         let allUsers = [];
@@ -785,9 +764,6 @@
                         ${!user.is_verified && user.role === 'teacher' ? 
                             `<button class="btn-action btn-verify" onclick="verifyUser('${user.id}')">Verify</button>` : ''
                         }
-                        ${user.role === 'student' ? 
-                            `<button class="btn-action btn-promote" onclick="promoteUser('${user.id}')">→ Teacher</button>` : ''
-                        }
                         ${user.role !== 'admin' ? 
                             `<button class="btn-action btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''
                         }
@@ -828,27 +804,6 @@
             } catch (error) {
                 console.error('Error verifying user:', error);
                 showToast('Failed to verify user', 'error');
-            }
-        }
-        
-        // Promote user to teacher
-        async function promoteUser(userId) {
-            if (!confirm('Are you sure you want to promote this user to Teacher?')) return;
-            
-            try {
-                const { error } = await sb
-                    .from('profiles')
-                    .update({ role: 'teacher', is_verified: true })
-                    .eq('id', userId);
-                
-                if (error) throw error;
-                
-                showToast('User promoted to Teacher!', 'success');
-                loadUsers();
-                loadStats();
-            } catch (error) {
-                console.error('Error promoting user:', error);
-                showToast('Failed to promote user', 'error');
             }
         }
         
@@ -1325,10 +1280,9 @@
         
         const GUEST_SETTINGS_KEY = 'guestModeSettings';
         
-        // Default guest settings (unlockCollections is tied to unlockProgress)
+        // Default guest settings
         const defaultGuestSettings = {
-            unlockProgress: false,  // Also unlocks collections
-            skipVideos: false
+            unlockProgress: false  // Unlocks all eras and collections
         };
         
         // Get current guest settings
@@ -1351,8 +1305,7 @@
             const settings = getGuestSettings();
             settings[settingName] = value;
             saveGuestSettings(settings);
-            const displayName = settingName === 'unlockProgress' ? 'Unlock Progress & Collections' : 'Skip Videos';
-            showToast(`Guest setting updated: ${displayName} = ${value}`, 'success');
+            showToast(`Guest setting updated: Unlock Progress & Collections = ${value}`, 'success');
         }
         
         // Load guest settings into the UI
@@ -1361,7 +1314,6 @@
             
             // Set checkbox states
             document.getElementById('guestUnlockProgress').checked = settings.unlockProgress;
-            document.getElementById('guestSkipVideos').checked = settings.skipVideos;
             
             updateGuestSettingsDisplay();
         }

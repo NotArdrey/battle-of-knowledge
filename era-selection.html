@@ -839,7 +839,20 @@
             }
         }
 
+        // Check if admin has enabled unlock all for guests
+        function isGuestUnlockEnabled() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('guestModeSettings') || '{}');
+                return settings.unlockProgress === true;
+            } catch (e) {
+                return false;
+            }
+        }
+
         function isEraUnlocked(eraKey) {
+            // If guest unlock is enabled by admin, all eras are unlocked
+            if (isGuestUnlockEnabled()) return true;
+            
             const eraIndex = eraOrder.indexOf(eraKey);
             if (eraIndex <= 0) return true; // First era always unlocked
 
