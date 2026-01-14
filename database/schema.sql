@@ -581,7 +581,20 @@ GROUP BY role;
 -- STEP 1: CREATE AUTH USERS (must be first - profiles depend on these)
 -- ============================================
 
--- Delete existing test users first (if any)
+-- Delete existing test identities and users first (if any)
+DELETE FROM auth.identities WHERE user_id IN (
+    SELECT id FROM auth.users WHERE email IN (
+        'admin@battleofknowledge.com',
+        'teacher1@school.edu',
+        'teacher2@school.edu',
+        'student1@school.edu',
+        'student2@school.edu',
+        'student3@school.edu',
+        'student4@school.edu',
+        'student5@school.edu'
+    )
+);
+
 DELETE FROM auth.users WHERE email IN (
     'admin@battleofknowledge.com',
     'teacher1@school.edu',
@@ -594,66 +607,72 @@ DELETE FROM auth.users WHERE email IN (
 );
 
 -- Create Admin User
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at)
-VALUES ('a0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'admin@battleofknowledge.com', crypt('admin123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"System Admin", "role":"admin"}', 'authenticated', 'authenticated', NOW(), NOW());
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, recovery_token)
+VALUES ('a0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'admin@battleofknowledge.com', crypt('admin123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"System Admin", "role":"admin"}', 'authenticated', 'authenticated', NOW(), NOW(), '', '');
 
 -- Create Teacher Users
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, recovery_token)
 VALUES 
-    ('t0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'teacher1@school.edu', crypt('teacher123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Maria Santos", "role":"teacher"}', 'authenticated', 'authenticated', NOW(), NOW()),
-    ('t0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'teacher2@school.edu', crypt('teacher123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Juan Dela Cruz", "role":"teacher"}', 'authenticated', 'authenticated', NOW(), NOW());
+    ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'teacher1@school.edu', crypt('teacher123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Maria Santos", "role":"teacher"}', 'authenticated', 'authenticated', NOW(), NOW(), '', ''),
+    ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'teacher2@school.edu', crypt('teacher123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Juan Dela Cruz", "role":"teacher"}', 'authenticated', 'authenticated', NOW(), NOW(), '', '');
 
 -- Create Student Users
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, recovery_token)
 VALUES 
-    ('s0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'student1@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ana Garcia", "role":"student", "student_id_number":"STU-2024-001"}', 'authenticated', 'authenticated', NOW(), NOW()),
-    ('s0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'student2@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pedro Reyes", "role":"student", "student_id_number":"STU-2024-002"}', 'authenticated', 'authenticated', NOW(), NOW()),
-    ('s0000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'student3@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Sofia Cruz", "role":"student", "student_id_number":"STU-2024-003"}', 'authenticated', 'authenticated', NOW(), NOW()),
-    ('s0000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000000', 'student4@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Miguel Torres", "role":"student", "student_id_number":"STU-2024-004"}', 'authenticated', 'authenticated', NOW(), NOW()),
-    ('s0000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000000', 'student5@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Isabella Luna", "role":"student", "student_id_number":"STU-2024-005"}', 'authenticated', 'authenticated', NOW(), NOW());
+    ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'student1@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ana Garcia", "role":"student", "student_id_number":"STU-2024-001"}', 'authenticated', 'authenticated', NOW(), NOW(), '', ''),
+    ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'student2@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pedro Reyes", "role":"student", "student_id_number":"STU-2024-002"}', 'authenticated', 'authenticated', NOW(), NOW(), '', ''),
+    ('20000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'student3@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Sofia Cruz", "role":"student", "student_id_number":"STU-2024-003"}', 'authenticated', 'authenticated', NOW(), NOW(), '', ''),
+    ('20000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000000', 'student4@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Miguel Torres", "role":"student", "student_id_number":"STU-2024-004"}', 'authenticated', 'authenticated', NOW(), NOW(), '', ''),
+    ('20000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000000', 'student5@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Isabella Luna", "role":"student", "student_id_number":"STU-2024-005"}', 'authenticated', 'authenticated', NOW(), NOW(), '', '');
 
 -- ============================================
--- STEP 2: CREATE PROFILES AND OTHER DATA
+-- STEP 2: CREATE IDENTITIES (required for Supabase Auth login)
 -- ============================================
 
--- Create UUIDs for test users
+INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+VALUES 
+    -- Admin
+    ('a0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', '{"sub":"a0000000-0000-0000-0000-000000000001","email":"admin@battleofknowledge.com"}', 'email', 'a0000000-0000-0000-0000-000000000001', NOW(), NOW(), NOW()),
+    -- Teachers
+    ('10000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '{"sub":"10000000-0000-0000-0000-000000000001","email":"teacher1@school.edu"}', 'email', '10000000-0000-0000-0000-000000000001', NOW(), NOW(), NOW()),
+    ('10000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', '{"sub":"10000000-0000-0000-0000-000000000002","email":"teacher2@school.edu"}', 'email', '10000000-0000-0000-0000-000000000002', NOW(), NOW(), NOW()),
+    -- Students
+    ('20000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '{"sub":"20000000-0000-0000-0000-000000000001","email":"student1@school.edu"}', 'email', '20000000-0000-0000-0000-000000000001', NOW(), NOW(), NOW()),
+    ('20000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', '{"sub":"20000000-0000-0000-0000-000000000002","email":"student2@school.edu"}', 'email', '20000000-0000-0000-0000-000000000002', NOW(), NOW(), NOW()),
+    ('20000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', '{"sub":"20000000-0000-0000-0000-000000000003","email":"student3@school.edu"}', 'email', '20000000-0000-0000-0000-000000000003', NOW(), NOW(), NOW()),
+    ('20000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000004', '{"sub":"20000000-0000-0000-0000-000000000004","email":"student4@school.edu"}', 'email', '20000000-0000-0000-0000-000000000004', NOW(), NOW(), NOW()),
+    ('20000000-0000-0000-0000-000000000005', '20000000-0000-0000-0000-000000000005', '{"sub":"20000000-0000-0000-0000-000000000005","email":"student5@school.edu"}', 'email', '20000000-0000-0000-0000-000000000005', NOW(), NOW(), NOW());
+
+-- ============================================
+-- STEP 3: CREATE PROFILES AND OTHER DATA
+-- Note: The trigger handle_new_user() already created profiles from auth.users
+-- So we just need to UPDATE them with correct roles and verification status
+-- ============================================
+
+-- Update profiles created by trigger with correct roles
+UPDATE profiles SET role = 'admin', is_verified = true WHERE email = 'admin@battleofknowledge.com';
+UPDATE profiles SET role = 'teacher', is_verified = true WHERE email IN ('teacher1@school.edu', 'teacher2@school.edu');
+UPDATE profiles SET role = 'student', is_verified = true WHERE email IN ('student1@school.edu', 'student2@school.edu', 'student3@school.edu', 'student4@school.edu', 'student5@school.edu');
+
+-- ============================================
+-- STEP 4: CREATE CLASSES, ENROLLMENTS, PROGRESS, etc.
+-- Note: Profiles are already created by the handle_new_user() trigger
+-- ============================================
+
 DO $$
 DECLARE
     admin_id UUID := 'a0000000-0000-0000-0000-000000000001';
-    teacher1_id UUID := 't0000000-0000-0000-0000-000000000001';
-    teacher2_id UUID := 't0000000-0000-0000-0000-000000000002';
-    student1_id UUID := 's0000000-0000-0000-0000-000000000001';
-    student2_id UUID := 's0000000-0000-0000-0000-000000000002';
-    student3_id UUID := 's0000000-0000-0000-0000-000000000003';
-    student4_id UUID := 's0000000-0000-0000-0000-000000000004';
-    student5_id UUID := 's0000000-0000-0000-0000-000000000005';
+    teacher1_id UUID := '10000000-0000-0000-0000-000000000001';
+    teacher2_id UUID := '10000000-0000-0000-0000-000000000002';
+    student1_id UUID := '20000000-0000-0000-0000-000000000001';
+    student2_id UUID := '20000000-0000-0000-0000-000000000002';
+    student3_id UUID := '20000000-0000-0000-0000-000000000003';
+    student4_id UUID := '20000000-0000-0000-0000-000000000004';
+    student5_id UUID := '20000000-0000-0000-0000-000000000005';
     class1_id UUID := 'c0000000-0000-0000-0000-000000000001';
     class2_id UUID := 'c0000000-0000-0000-0000-000000000002';
     class3_id UUID := 'c0000000-0000-0000-0000-000000000003';
 BEGIN
-    -- ========================================
-    -- INSERT TEST PROFILES
-    -- ========================================
-    
-    -- Admin
-    INSERT INTO profiles (id, email, full_name, role, is_verified)
-    VALUES (admin_id, 'admin@battleofknowledge.com', 'System Admin', 'admin', true);
-    
-    -- Teachers
-    INSERT INTO profiles (id, email, full_name, role, is_verified)
-    VALUES 
-        (teacher1_id, 'teacher1@school.edu', 'Maria Santos', 'teacher', true),
-        (teacher2_id, 'teacher2@school.edu', 'Juan Dela Cruz', 'teacher', true);
-    
-    -- Students
-    INSERT INTO profiles (id, email, full_name, role, is_verified, student_id_number)
-    VALUES 
-        (student1_id, 'student1@school.edu', 'Ana Garcia', 'student', true, 'STU-2024-001'),
-        (student2_id, 'student2@school.edu', 'Pedro Reyes', 'student', true, 'STU-2024-002'),
-        (student3_id, 'student3@school.edu', 'Sofia Cruz', 'student', true, 'STU-2024-003'),
-        (student4_id, 'student4@school.edu', 'Miguel Torres', 'student', true, 'STU-2024-004'),
-        (student5_id, 'student5@school.edu', 'Isabella Luna', 'student', true, 'STU-2024-005');
-
     -- ========================================
     -- INSERT REGISTERED STUDENTS (for validation)
     -- ========================================
