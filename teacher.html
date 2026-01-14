@@ -1727,7 +1727,7 @@
                     </td>
                     <td>
                         ${lesson.is_system ? 
-                            '<button class="btn-action btn-view" onclick="viewLesson(\'${lesson.id}\')">View</button>' :
+                            `<button class="btn-action btn-view" onclick="viewLesson('${lesson.id}')">View</button>` :
                             `<button class="btn-action btn-view" onclick="editLesson('${lesson.id}')">Edit</button>
                              <button class="btn-action btn-remove" onclick="deleteLesson('${lesson.id}')">Delete</button>`
                         }
