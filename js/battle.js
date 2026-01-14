@@ -22,7 +22,7 @@ let totalEnemiesBeforeBoss = 3; // Default: defeat 3 normal enemies before boss
 const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier', 
                     'Andres Bonifacio', 'Emilio Aguinaldo', 
                     'Commodore George Dewey', 'General Juan Luna',
-                    'American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
+                    'American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 'Japanese Commander',
                     'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era', 'Spanish Soldier'];
 
 // gunUsers removed - all characters now use sword sounds

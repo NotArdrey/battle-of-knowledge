@@ -1009,10 +1009,21 @@
                 // Start era-specific background music
                 playModuleBackgroundMusic(currentEraKey);
                 
-                // Load completed lessons for this era from localStorage
-                const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
-                if (savedProgress) {
-                    completedLessons = new Set(JSON.parse(savedProgress));
+                // Load completed lessons from ProgressSync (database) first, fallback to localStorage
+                if (window.ProgressSync) {
+                    const lessonList = window.ProgressSync.getCompletedLessons(currentEraKey);
+                    completedLessons = new Set(lessonList);
+                    // Also restore current lesson index from database
+                    const eraProgress = window.ProgressSync.getEraProgress(currentEraKey);
+                    if (eraProgress && typeof eraProgress.currentLessonIndex === 'number') {
+                        currentLessonIndex = eraProgress.currentLessonIndex;
+                    }
+                } else {
+                    // Fallback to localStorage if ProgressSync not available
+                    const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
+                    if (savedProgress) {
+                        completedLessons = new Set(JSON.parse(savedProgress));
+                    }
                 }
                 
                 loadEraContent();
@@ -1176,7 +1187,7 @@
         }
 
         // Complete current lesson
-        function completeCurrentLesson() {
+        async function completeCurrentLesson() {
             if (currentEraLessons.length === 0) return;
             
             const lesson = currentEraLessons[currentLessonIndex];
@@ -1184,11 +1195,16 @@
             // Mark as complete
             completedLessons.add(lesson.id);
             
-            // Save progress to localStorage
+            // Save progress to localStorage (for offline/fallback)
             localStorage.setItem(
                 `learning_${currentEraKey}`, 
                 JSON.stringify([...completedLessons])
             );
+            
+            // Sync to database via ProgressSync
+            if (window.ProgressSync) {
+                await window.ProgressSync.markLessonComplete(currentEraKey, lesson.id);
+            }
             
             // Show completion animation
             showLessonCompletion();
@@ -1198,8 +1214,11 @@
             updateNavigationButtons();
             createLessonIndicators();
             
-            // If all lessons completed, show celebration
+            // If all lessons completed, mark era lessons as complete and show celebration
             if (completedLessons.size === currentEraLessons.length) {
+                if (window.ProgressSync) {
+                    await window.ProgressSync.updateEraProgress(currentEraKey, { lessonsComplete: true });
+                }
                 setTimeout(showAllLessonsCompleted, 500);
             }
             
