@@ -283,10 +283,22 @@ CREATE POLICY "Admins can update any profile"
 ON profiles FOR UPDATE
 USING (is_admin());
 
--- Teachers can view their students
+-- Teachers can view their students (students enrolled in their classes)
 CREATE POLICY "Teachers can view their students"
 ON profiles FOR SELECT
-USING (is_teacher() AND teacher_id = auth.uid());
+USING (
+    is_teacher() AND (
+        -- Check if student is enrolled in any of teacher's classes
+        EXISTS (
+            SELECT 1 FROM class_enrollments ce
+            JOIN classes c ON ce.class_id = c.id
+            WHERE ce.student_id = profiles.id 
+            AND c.teacher_id = auth.uid()
+        )
+        -- OR student has teacher_id set directly (legacy/alternative method)
+        OR teacher_id = auth.uid()
+    )
+);
 
 -- Allow insert during signup
 CREATE POLICY "Enable insert for signup"
@@ -332,6 +344,31 @@ ON classes FOR SELECT
 USING (is_admin());
 
 -- ============================================
+-- CLASS ENROLLMENTS POLICIES
+-- ============================================
+
+-- Teachers can manage enrollments in their classes
+CREATE POLICY "Teachers can manage class enrollments"
+ON class_enrollments FOR ALL
+USING (
+    EXISTS (
+        SELECT 1 FROM classes
+        WHERE classes.id = class_enrollments.class_id 
+        AND classes.teacher_id = auth.uid()
+    )
+);
+
+-- Students can view their own enrollments
+CREATE POLICY "Students can view own enrollments"
+ON class_enrollments FOR SELECT
+USING (student_id = auth.uid());
+
+-- Admins can manage all enrollments
+CREATE POLICY "Admins can manage all enrollments"
+ON class_enrollments FOR ALL
+USING (is_admin());
+
+-- ============================================
 -- PROGRESS POLICIES
 -- ============================================
 
@@ -340,11 +377,17 @@ CREATE POLICY "Users can manage own progress"
 ON progress FOR ALL
 USING (user_id = auth.uid());
 
--- Teachers can view their students' progress
+-- Teachers can view their students' progress (students enrolled in their classes)
 CREATE POLICY "Teachers can view student progress"
 ON progress FOR SELECT
 USING (
     EXISTS (
+        SELECT 1 FROM class_enrollments ce
+        JOIN classes c ON ce.class_id = c.id
+        WHERE ce.student_id = progress.user_id 
+        AND c.teacher_id = auth.uid()
+    )
+    OR EXISTS (
         SELECT 1 FROM profiles
         WHERE id = progress.user_id AND teacher_id = auth.uid()
     )
@@ -411,11 +454,17 @@ CREATE POLICY "Users can manage own sessions"
 ON game_sessions FOR ALL
 USING (user_id = auth.uid());
 
--- Teachers can view student sessions
+-- Teachers can view student sessions (students enrolled in their classes)
 CREATE POLICY "Teachers can view student sessions"
 ON game_sessions FOR SELECT
 USING (
     EXISTS (
+        SELECT 1 FROM class_enrollments ce
+        JOIN classes c ON ce.class_id = c.id
+        WHERE ce.student_id = game_sessions.user_id 
+        AND c.teacher_id = auth.uid()
+    )
+    OR EXISTS (
         SELECT 1 FROM profiles
         WHERE id = game_sessions.user_id AND teacher_id = auth.uid()
     )
@@ -520,3 +569,303 @@ SELECT
     COUNT(*) FILTER (WHERE is_verified = true) AS verified_count
 FROM profiles
 GROUP BY role;
+
+-- ============================================
+-- DUMMY DATA FOR TESTING
+-- ============================================
+
+-- Note: In production, users are created via Supabase Auth signup
+-- These test accounts are created directly for development/testing
+
+-- ============================================
+-- STEP 1: CREATE AUTH USERS (must be first - profiles depend on these)
+-- ============================================
+
+-- Delete existing test users first (if any)
+DELETE FROM auth.users WHERE email IN (
+    'admin@battleofknowledge.com',
+    'teacher1@school.edu',
+    'teacher2@school.edu',
+    'student1@school.edu',
+    'student2@school.edu',
+    'student3@school.edu',
+    'student4@school.edu',
+    'student5@school.edu'
+);
+
+-- Create Admin User
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at)
+VALUES ('a0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'admin@battleofknowledge.com', crypt('admin123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"System Admin", "role":"admin"}', 'authenticated', 'authenticated', NOW(), NOW());
+
+-- Create Teacher Users
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at)
+VALUES 
+    ('t0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'teacher1@school.edu', crypt('teacher123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Maria Santos", "role":"teacher"}', 'authenticated', 'authenticated', NOW(), NOW()),
+    ('t0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'teacher2@school.edu', crypt('teacher123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Juan Dela Cruz", "role":"teacher"}', 'authenticated', 'authenticated', NOW(), NOW());
+
+-- Create Student Users
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at)
+VALUES 
+    ('s0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'student1@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ana Garcia", "role":"student", "student_id_number":"STU-2024-001"}', 'authenticated', 'authenticated', NOW(), NOW()),
+    ('s0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'student2@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pedro Reyes", "role":"student", "student_id_number":"STU-2024-002"}', 'authenticated', 'authenticated', NOW(), NOW()),
+    ('s0000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'student3@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Sofia Cruz", "role":"student", "student_id_number":"STU-2024-003"}', 'authenticated', 'authenticated', NOW(), NOW()),
+    ('s0000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000000', 'student4@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Miguel Torres", "role":"student", "student_id_number":"STU-2024-004"}', 'authenticated', 'authenticated', NOW(), NOW()),
+    ('s0000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000000', 'student5@school.edu', crypt('student123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Isabella Luna", "role":"student", "student_id_number":"STU-2024-005"}', 'authenticated', 'authenticated', NOW(), NOW());
+
+-- ============================================
+-- STEP 2: CREATE PROFILES AND OTHER DATA
+-- ============================================
+
+-- Create UUIDs for test users
+DO $$
+DECLARE
+    admin_id UUID := 'a0000000-0000-0000-0000-000000000001';
+    teacher1_id UUID := 't0000000-0000-0000-0000-000000000001';
+    teacher2_id UUID := 't0000000-0000-0000-0000-000000000002';
+    student1_id UUID := 's0000000-0000-0000-0000-000000000001';
+    student2_id UUID := 's0000000-0000-0000-0000-000000000002';
+    student3_id UUID := 's0000000-0000-0000-0000-000000000003';
+    student4_id UUID := 's0000000-0000-0000-0000-000000000004';
+    student5_id UUID := 's0000000-0000-0000-0000-000000000005';
+    class1_id UUID := 'c0000000-0000-0000-0000-000000000001';
+    class2_id UUID := 'c0000000-0000-0000-0000-000000000002';
+    class3_id UUID := 'c0000000-0000-0000-0000-000000000003';
+BEGIN
+    -- ========================================
+    -- INSERT TEST PROFILES
+    -- ========================================
+    
+    -- Admin
+    INSERT INTO profiles (id, email, full_name, role, is_verified)
+    VALUES (admin_id, 'admin@battleofknowledge.com', 'System Admin', 'admin', true);
+    
+    -- Teachers
+    INSERT INTO profiles (id, email, full_name, role, is_verified)
+    VALUES 
+        (teacher1_id, 'teacher1@school.edu', 'Maria Santos', 'teacher', true),
+        (teacher2_id, 'teacher2@school.edu', 'Juan Dela Cruz', 'teacher', true);
+    
+    -- Students
+    INSERT INTO profiles (id, email, full_name, role, is_verified, student_id_number)
+    VALUES 
+        (student1_id, 'student1@school.edu', 'Ana Garcia', 'student', true, 'STU-2024-001'),
+        (student2_id, 'student2@school.edu', 'Pedro Reyes', 'student', true, 'STU-2024-002'),
+        (student3_id, 'student3@school.edu', 'Sofia Cruz', 'student', true, 'STU-2024-003'),
+        (student4_id, 'student4@school.edu', 'Miguel Torres', 'student', true, 'STU-2024-004'),
+        (student5_id, 'student5@school.edu', 'Isabella Luna', 'student', true, 'STU-2024-005');
+
+    -- ========================================
+    -- INSERT REGISTERED STUDENTS (for validation)
+    -- ========================================
+    INSERT INTO registered_students (student_id_number, full_name, email, grade_level, section, is_claimed, claimed_by, uploaded_by)
+    VALUES 
+        ('STU-2024-001', 'Ana Garcia', 'student1@school.edu', 'Grade 7', 'Section A', true, student1_id, admin_id),
+        ('STU-2024-002', 'Pedro Reyes', 'student2@school.edu', 'Grade 7', 'Section A', true, student2_id, admin_id),
+        ('STU-2024-003', 'Sofia Cruz', 'student3@school.edu', 'Grade 7', 'Section B', true, student3_id, admin_id),
+        ('STU-2024-004', 'Miguel Torres', 'student4@school.edu', 'Grade 8', 'Section A', true, student4_id, admin_id),
+        ('STU-2024-005', 'Isabella Luna', 'student5@school.edu', 'Grade 8', 'Section B', true, student5_id, admin_id),
+        ('STU-2024-006', 'Carlos Mendoza', 'carlos@school.edu', 'Grade 7', 'Section C', false, NULL, admin_id),
+        ('STU-2024-007', 'Elena Fernandez', 'elena@school.edu', 'Grade 8', 'Section A', false, NULL, admin_id);
+
+    -- ========================================
+    -- INSERT CLASSES
+    -- ========================================
+    INSERT INTO classes (id, teacher_id, class_name, class_code, description, grade_level, section, is_active)
+    VALUES 
+        (class1_id, teacher1_id, 'Philippine History - Grade 7A', 'PH7A01', 'Learn about Philippine history from pre-colonial to modern times', 'Grade 7', 'Section A', true),
+        (class2_id, teacher1_id, 'Philippine History - Grade 7B', 'PH7B02', 'Philippine history for Section B students', 'Grade 7', 'Section B', true),
+        (class3_id, teacher2_id, 'Kasaysayan ng Pilipinas - Grade 8', 'KP8A03', 'Advanced Philippine history in Filipino', 'Grade 8', 'Section A', true);
+
+    -- ========================================
+    -- INSERT CLASS ENROLLMENTS
+    -- ========================================
+    INSERT INTO class_enrollments (class_id, student_id, status)
+    VALUES 
+        -- Class 1: Grade 7A (Teacher: Maria Santos)
+        (class1_id, student1_id, 'active'),
+        (class1_id, student2_id, 'active'),
+        -- Class 2: Grade 7B (Teacher: Maria Santos)
+        (class2_id, student3_id, 'active'),
+        -- Class 3: Grade 8 (Teacher: Juan Dela Cruz)
+        (class3_id, student4_id, 'active'),
+        (class3_id, student5_id, 'active');
+
+    -- ========================================
+    -- INSERT STUDENT PROGRESS
+    -- ========================================
+    
+    -- Ana Garcia - completed Early Spanish, working on Late Spanish
+    INSERT INTO progress (user_id, era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, enemies_defeated, highest_streak)
+    VALUES 
+        (student1_id, 'early-spanish', '[1,2,3,4,5]', true, true, 2500, 15, 8),
+        (student1_id, 'late-spanish', '[1,2,3]', false, false, 800, 5, 4);
+    
+    -- Pedro Reyes - just started
+    INSERT INTO progress (user_id, era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, enemies_defeated, highest_streak)
+    VALUES 
+        (student2_id, 'early-spanish', '[1,2]', false, false, 300, 3, 2);
+    
+    -- Sofia Cruz - completed all eras!
+    INSERT INTO progress (user_id, era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, enemies_defeated, highest_streak)
+    VALUES 
+        (student3_id, 'early-spanish', '[1,2,3,4,5]', true, true, 3000, 20, 12),
+        (student3_id, 'late-spanish', '[1,2,3,4,5]', true, true, 2800, 18, 10),
+        (student3_id, 'american-colonial', '[1,2,3,4,5]', true, true, 2600, 16, 9),
+        (student3_id, 'ww2', '[1,2,3,4,5]', true, true, 3200, 22, 15);
+    
+    -- Miguel Torres - moderate progress
+    INSERT INTO progress (user_id, era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, enemies_defeated, highest_streak)
+    VALUES 
+        (student4_id, 'early-spanish', '[1,2,3,4,5]', true, true, 2200, 14, 7),
+        (student4_id, 'late-spanish', '[1,2,3,4,5]', true, true, 1900, 12, 6),
+        (student4_id, 'american-colonial', '[1,2]', false, false, 400, 4, 3);
+    
+    -- Isabella Luna - good progress
+    INSERT INTO progress (user_id, era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, enemies_defeated, highest_streak)
+    VALUES 
+        (student5_id, 'early-spanish', '[1,2,3,4,5]', true, true, 2700, 17, 11),
+        (student5_id, 'late-spanish', '[1,2,3,4]', false, false, 1200, 8, 5);
+
+    -- ========================================
+    -- INSERT ACHIEVEMENTS
+    -- ========================================
+    INSERT INTO achievements (user_id, achievement_key)
+    VALUES 
+        -- Ana's achievements
+        (student1_id, 'first_victory'),
+        (student1_id, 'early_spanish_complete'),
+        (student1_id, 'streak_5'),
+        -- Sofia's achievements (completed everything!)
+        (student3_id, 'first_victory'),
+        (student3_id, 'early_spanish_complete'),
+        (student3_id, 'late_spanish_complete'),
+        (student3_id, 'american_complete'),
+        (student3_id, 'ww2_complete'),
+        (student3_id, 'streak_5'),
+        (student3_id, 'streak_10'),
+        (student3_id, 'master_historian'),
+        -- Miguel's achievements
+        (student4_id, 'first_victory'),
+        (student4_id, 'early_spanish_complete'),
+        (student4_id, 'late_spanish_complete'),
+        (student4_id, 'streak_5');
+
+    -- ========================================
+    -- INSERT CUSTOM QUESTIONS (Teacher Created)
+    -- ========================================
+    INSERT INTO custom_questions (created_by, era_key, question_text_en, question_text_tl, correct_answer_en, correct_answer_tl, wrong_answers_en, wrong_answers_tl, difficulty, is_active, is_approved, class_id)
+    VALUES 
+        -- Teacher 1's questions for Early Spanish
+        (teacher1_id, 'early-spanish', 
+         'What year did Magellan arrive in the Philippines?', 
+         'Anong taon dumating si Magellan sa Pilipinas?',
+         '1521', '1521',
+         '["1565", "1492", "1571"]'::jsonb, '["1565", "1492", "1571"]'::jsonb,
+         'easy', true, true, class1_id),
+        
+        (teacher1_id, 'early-spanish', 
+         'Who was the chieftain of Mactan who defeated Magellan?', 
+         'Sino ang pinuno ng Mactan na tumalo kay Magellan?',
+         'Lapu-Lapu', 'Lapu-Lapu',
+         '["Raja Humabon", "Raja Soliman", "Rajah Tupas"]'::jsonb, '["Raja Humabon", "Raja Soliman", "Rajah Tupas"]'::jsonb,
+         'easy', true, true, class1_id),
+        
+        (teacher1_id, 'late-spanish', 
+         'Who wrote the novel Noli Me Tangere?', 
+         'Sino ang sumulat ng nobelang Noli Me Tangere?',
+         'Jose Rizal', 'Jose Rizal',
+         '["Andres Bonifacio", "Emilio Aguinaldo", "Apolinario Mabini"]'::jsonb, '["Andres Bonifacio", "Emilio Aguinaldo", "Apolinario Mabini"]'::jsonb,
+         'easy', true, true, class1_id),
+        
+        -- Teacher 2's questions
+        (teacher2_id, 'american-colonial', 
+         'What battle marked the beginning of American colonization?', 
+         'Anong labanan ang nagmarka ng simula ng kolonisasyon ng Amerika?',
+         'Battle of Manila Bay', 'Labanan sa Manila Bay',
+         '["Battle of Mactan", "Battle of Tirad Pass", "Battle of Balangiga"]'::jsonb, '["Labanan sa Mactan", "Labanan sa Tirad Pass", "Labanan sa Balangiga"]'::jsonb,
+         'medium', true, true, class3_id),
+        
+        (teacher2_id, 'ww2', 
+         'Who said "I shall return" during World War 2?', 
+         'Sino ang nagsabing "I shall return" noong Ikalawang Digmaang Pandaigdig?',
+         'General Douglas MacArthur', 'Heneral Douglas MacArthur',
+         '["General Yamashita", "President Quezon", "General Homma"]'::jsonb, '["Heneral Yamashita", "Pangulong Quezon", "Heneral Homma"]'::jsonb,
+         'easy', true, true, class3_id);
+
+    -- ========================================
+    -- INSERT CUSTOM LESSONS (Teacher Created)
+    -- ========================================
+    INSERT INTO custom_lessons (created_by, era_key, lesson_order, title_en, title_tl, content_en, content_tl, icon, is_active, is_approved, class_id)
+    VALUES 
+        -- Teacher 1's custom lesson for Early Spanish
+        (teacher1_id, 'early-spanish', 6, 
+         'Local Heroes of the Early Spanish Era', 
+         'Mga Lokal na Bayani ng Maagang Panahon ng Espanyol',
+         '<div class="space-y-4">
+            <h3 class="text-xl font-bold mb-3">Unsung Heroes</h3>
+            <p class="mb-3">While Lapu-Lapu is the most famous hero of the early Spanish era, there were many other local leaders who resisted colonization.</p>
+            <p class="mb-3">Raja Humabon, though he initially allied with Magellan, later played a complex role in Filipino history. Other datus across the islands also defended their territories.</p>
+            <div class="bg-blue-100 border-l-4 border-blue-500 p-4 mt-4">
+                <p class="font-semibold">Discussion Question:</p>
+                <p>Why do you think some local leaders chose to ally with the Spanish while others resisted?</p>
+            </div>
+         </div>',
+         '<div class="space-y-4">
+            <h3 class="text-xl font-bold mb-3">Mga Hindi Kilalang Bayani</h3>
+            <p class="mb-3">Bagaman si Lapu-Lapu ang pinakasikat na bayani ng maagang panahon ng Espanyol, maraming ibang lokal na pinuno ang lumaban sa kolonisasyon.</p>
+         </div>',
+         '6', true, true, class1_id),
+        
+        -- Teacher 2's custom lesson for WW2
+        (teacher2_id, 'ww2', 6, 
+         'Filipino Guerrilla Resistance', 
+         'Paglaban ng mga Gerilyang Pilipino',
+         '<div class="space-y-4">
+            <h3 class="text-xl font-bold mb-3">The Guerrilla Movement</h3>
+            <p class="mb-3">When the Japanese occupied the Philippines, many Filipinos formed guerrilla units to resist. These brave fighters operated in the mountains and jungles.</p>
+            <p class="mb-3">Notable guerrilla leaders included Colonel Macario Peralta in the Visayas and Captain Juan Pajota in Luzon.</p>
+            <div class="bg-green-100 border-l-4 border-green-500 p-4 mt-4">
+                <p class="font-semibold">Did You Know?</p>
+                <p>Filipino guerrillas played a crucial role in helping American forces during the liberation of the Philippines.</p>
+            </div>
+         </div>',
+         NULL,
+         '🎖️', true, true, class3_id);
+
+    -- ========================================
+    -- INSERT GAME SESSIONS (Analytics)
+    -- ========================================
+    INSERT INTO game_sessions (user_id, era_key, session_type, started_at, ended_at, questions_answered, correct_answers, score)
+    VALUES 
+        -- Ana's sessions
+        (student1_id, 'early-spanish', 'learning', NOW() - INTERVAL '7 days', NOW() - INTERVAL '7 days' + INTERVAL '25 minutes', 0, 0, 0),
+        (student1_id, 'early-spanish', 'battle', NOW() - INTERVAL '6 days', NOW() - INTERVAL '6 days' + INTERVAL '15 minutes', 20, 16, 2500),
+        (student1_id, 'late-spanish', 'learning', NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days' + INTERVAL '20 minutes', 0, 0, 0),
+        
+        -- Sofia's sessions (she plays a lot!)
+        (student3_id, 'early-spanish', 'battle', NOW() - INTERVAL '14 days', NOW() - INTERVAL '14 days' + INTERVAL '18 minutes', 25, 22, 3000),
+        (student3_id, 'late-spanish', 'battle', NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days' + INTERVAL '20 minutes', 23, 19, 2800),
+        (student3_id, 'american-colonial', 'battle', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days' + INTERVAL '17 minutes', 22, 18, 2600),
+        (student3_id, 'ww2', 'battle', NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days' + INTERVAL '22 minutes', 28, 25, 3200);
+
+END $$;
+
+-- ============================================
+-- TEST ACCOUNTS SUMMARY
+-- ============================================
+-- 
+-- +----------+------------------+-------------------------------+-------------+
+-- | ROLE     | NAME             | EMAIL                         | PASSWORD    |
+-- +----------+------------------+-------------------------------+-------------+
+-- | Admin    | System Admin     | admin@battleofknowledge.com   | admin123    |
+-- +----------+------------------+-------------------------------+-------------+
+-- | Teacher  | Maria Santos     | teacher1@school.edu           | teacher123  |
+-- | Teacher  | Juan Dela Cruz   | teacher2@school.edu           | teacher123  |
+-- +----------+------------------+-------------------------------+-------------+
+-- | Student  | Ana Garcia       | student1@school.edu           | student123  |
+-- | Student  | Pedro Reyes      | student2@school.edu           | student123  |
+-- | Student  | Sofia Cruz       | student3@school.edu           | student123  |
+-- | Student  | Miguel Torres    | student4@school.edu           | student123  |
+-- | Student  | Isabella Luna    | student5@school.edu           | student123  |
+-- +----------+------------------+-------------------------------+-------------+
+-- ============================================
