@@ -1462,8 +1462,11 @@
             <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-800 mb-4">
                 ⚠️ Leave Battle? ⚠️
             </h1>
-            <p class="text-lg sm:text-xl text-amber-700 mb-6" data-translate="exitBattleWarning">
-                Your battle progress will be lost. Are you sure you want to leave?
+            <p class="text-lg sm:text-xl text-amber-700 mb-2" data-translate="exitBattleWarning">
+                Your battle progress will be lost!
+            </p>
+            <p class="text-md text-red-600 font-bold mb-6">
+                ⚠️ All lesson progress for this era will be RESET. You will need to complete the lessons again.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1570,6 +1573,24 @@
         function confirmExit() {
             // Clear battle progress when leaving
             localStorage.removeItem('battleProgress');
+            
+            // Reset the current era's lesson progress (penalty for leaving mid-battle)
+            // Get currentEra from battle.js global or URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const eraToReset = window.currentEra || urlParams.get('era');
+            
+            if (eraToReset && window.ProgressSync) {
+                // Reset era lessons for logged-in users
+                window.ProgressSync.resetEraLessons(eraToReset);
+                console.log('Reset lesson progress for era:', eraToReset);
+            }
+            
+            // Also clear local storage lesson progress for guests
+            if (eraToReset) {
+                const guestLessonsKey = `completedLessons_${eraToReset}`;
+                localStorage.removeItem(guestLessonsKey);
+            }
+            
             window.location.href = 'learning-module.html';
         }
         

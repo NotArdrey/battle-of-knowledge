@@ -854,6 +854,7 @@ function createGiantSwordEffect(isAttacker) {
         swordSlash.style.filter = 'none';
         swordSlash.style.mixBlendMode = 'normal';
         swordSlash.style.background = 'linear-gradient(45deg, #fbbf24 0%, #dc2626 100%)';
+        swordSlash.style.willChange = 'transform, opacity'; // GPU acceleration
     }
     
     // For player (left side) attacking: start from player's right, move toward enemy
@@ -871,11 +872,13 @@ function createGiantSwordEffect(isAttacker) {
     // Ultra low mode: simple fast slash animation, no trails or waves
     if (ultraLowMode) {
         swordSlash.animate([
-            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 },
-            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(1.8)`, opacity: 0.9 },
-            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 }
-        ], { duration: 350, fill: 'forwards' });
-        setTimeout(() => swordSlash.remove(), 350);
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0, offset: 0 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(1.6)`, opacity: 1, offset: 0.3 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(2)`, opacity: 0.9, offset: 0.5 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(1.8)`, opacity: 0.6, offset: 0.7 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0.5)`, opacity: 0, offset: 1 }
+        ], { duration: 400, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => swordSlash.remove(), 400);
         return swordSlash;
     }
     
@@ -1030,6 +1033,7 @@ function createGiantGunEffect(isAttacker) {
         muzzleFlash.style.filter = 'none';
         muzzleFlash.style.mixBlendMode = 'normal';
         muzzleFlash.style.background = 'radial-gradient(circle, #fbbf24 0%, #dc2626 100%)';
+        muzzleFlash.style.willChange = 'transform, opacity'; // GPU acceleration
     }
     
     document.body.appendChild(muzzleFlash);
@@ -1037,11 +1041,13 @@ function createGiantGunEffect(isAttacker) {
     // In ultra low mode, just flash briefly and done
     if (ultraLowMode) {
         muzzleFlash.animate([
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-        ], { duration: 350, fill: 'forwards' });
-        setTimeout(() => muzzleFlash.remove(), 350);
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 1, offset: 0.25 },
+            { transform: 'translate(-50%, -50%) scale(2)', opacity: 0.9, offset: 0.5 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.5, offset: 0.75 },
+            { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0, offset: 1 }
+        ], { duration: 380, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => muzzleFlash.remove(), 380);
         return muzzleFlash;
     }
     
@@ -1192,6 +1198,7 @@ function createGiantMagicEffect(isAttacker) {
         magicSphere.style.filter = 'none';
         magicSphere.style.mixBlendMode = 'normal';
         magicSphere.style.background = 'radial-gradient(circle, #8b5cf6 0%, #4f46e5 100%)';
+        magicSphere.style.willChange = 'transform, opacity'; // GPU acceleration
     }
     
     document.body.appendChild(magicSphere);
@@ -1199,11 +1206,13 @@ function createGiantMagicEffect(isAttacker) {
     // In ultra low mode, just do a quick flash and exit
     if (ultraLowMode) {
         magicSphere.animate([
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-        ], { duration: 400, fill: 'forwards' });
-        setTimeout(() => magicSphere.remove(), 400);
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.4)', opacity: 1, offset: 0.25 },
+            { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 0.9, offset: 0.5 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.5, offset: 0.75 },
+            { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0, offset: 1 }
+        ], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => magicSphere.remove(), 420);
         return magicSphere;
     }
     
@@ -1376,23 +1385,26 @@ function createGiantImpactEffect(isAttacker, damage) {
     if (ultraLowMode) {
         impactExplosion.style.cssText = `
             position: fixed;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, #fbbf24 0%, #dc2626 100%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #fff 0%, #fbbf24 40%, #dc2626 100%);
             border-radius: 50%;
             z-index: 9999;
             pointer-events: none;
             left: ${centerX}px;
             top: ${centerY}px;
             transform: translate(-50%, -50%) scale(0);
+            will-change: transform, opacity;
         `;
         document.body.appendChild(impactExplosion);
         impactExplosion.animate([
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0.9 },
-            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-        ], { duration: 350, fill: 'forwards' });
-        setTimeout(() => impactExplosion.remove(), 350);
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 1, offset: 0.2 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9, offset: 0.4 },
+            { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 0.6, offset: 0.7 },
+            { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0, offset: 1 }
+        ], { duration: 380, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => impactExplosion.remove(), 380);
         return impactExplosion;
     }
     
@@ -2117,9 +2129,14 @@ function getRandomEra() {
     return eras[randomIndex];
 }
 
-// Export functions for global use
+// Export functions and variables for global use
 window.selectAnswer = selectAnswer;
 window.proceedToNextEra = proceedToNextEra;
 window.restartBattle = function() {
     location.reload();
 };
+
+// Expose currentEra globally so battlefield.html can access it for progress reset
+Object.defineProperty(window, 'currentEra', {
+    get: function() { return currentEra; }
+});

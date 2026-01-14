@@ -196,6 +196,28 @@ const ProgressSync = {
         await this.saveToServer(eraKey, this.getEraProgress(eraKey));
     },
 
+    // Reset a specific era's progress (lessons only, keep heroes)
+    async resetEraLessons(eraKey) {
+        // Clear completed lessons for this era
+        this.progress.completedLessons[eraKey] = [];
+        
+        // Reset era progress to initial state (keep unlocked heroes)
+        this.progress.eras[eraKey] = {
+            lessonsComplete: false,
+            bossDefeated: false,
+            currentLessonIndex: 0,
+            battleScore: 0,
+            enemiesDefeated: 0,
+            highestStreak: 0,
+            lastPlayedAt: null
+        };
+        
+        // Save to server if logged in
+        if (this.userId && this.isOnline) {
+            await this.saveToServer(eraKey, this.progress.eras[eraKey]);
+        }
+    },
+
     async markAllLessonsComplete(eraKey) {
         await this.updateEraProgress(eraKey, { lessonsComplete: true });
     },

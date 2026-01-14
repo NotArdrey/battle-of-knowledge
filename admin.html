@@ -394,10 +394,6 @@
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">🛡️ Admin Dashboard</h1>
-                <div class="nav-links">
-                    <a href="index.html" class="nav-link">← Home</a>
-                    <a href="era-selection.html" class="nav-link">🎮 Play Game</a>
-                </div>
             </div>
             <div class="user-info">
                 <span id="userName" class="text-amber-800 font-semibold"></span>
@@ -533,13 +529,26 @@
                     <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
                         <div class="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress & Collections for Guests</h3>
-                                <p class="text-amber-700 text-sm mt-1">Allow guests to access all eras, lessons, and character collections without completing previous stages.</p>
+                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress & Collections (Guest Only)</h3>
+                                <p class="text-amber-700 text-sm mt-1">Allow <strong>guest users only</strong> (not logged-in accounts) to access all eras, lessons, and character collections without completing previous stages.</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="guestUnlockProgress" class="sr-only peer" onchange="toggleGuestSetting('unlockProgress', this.checked)">
                                 <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
                             </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Reset All Progress (Logged-in users) -->
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-red-900">🗑️ Reset All Progress (Logged-in Users)</h3>
+                                <p class="text-red-700 text-sm mt-1">Reset all progress for all logged-in user accounts. This will clear all eras, lessons, achievements, and unlocked characters from the database.</p>
+                            </div>
+                            <button onclick="resetAllUsersProgress()" class="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors">
+                                ⚠️ Reset All Users
+                            </button>
                         </div>
                     </div>
                     
@@ -1334,6 +1343,48 @@
                 localStorage.removeItem(GUEST_SETTINGS_KEY);
                 loadGuestSettings();
                 showToast('Guest settings reset to defaults', 'success');
+            }
+        }
+        
+        // Reset all users progress (admin function)
+        async function resetAllUsersProgress() {
+            if (!confirm('⚠️ WARNING: This will DELETE all progress for ALL logged-in users!\n\nThis includes:\n- All era progress\n- All completed lessons\n- All achievements\n- All unlocked characters\n\nThis action CANNOT be undone. Are you sure?')) {
+                return;
+            }
+            
+            // Double confirmation
+            if (!confirm('Are you ABSOLUTELY sure? Type OK to confirm this will delete all user progress.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Delete all progress records
+                const { error: progressError } = await sb
+                    .from('progress')
+                    .delete()
+                    .neq('user_id', '00000000-0000-0000-0000-000000000000'); // Delete all (dummy condition)
+                
+                if (progressError) throw progressError;
+                
+                // Delete all achievements records
+                const { error: achievementsError } = await sb
+                    .from('achievements')
+                    .delete()
+                    .neq('user_id', '00000000-0000-0000-0000-000000000000');
+                
+                if (achievementsError) throw achievementsError;
+                
+                showToast('All user progress has been reset successfully!', 'success');
+                
+                // Refresh stats
+                await loadDashboardStats();
+            } catch (error) {
+                console.error('Error resetting all progress:', error);
+                showToast('Error resetting progress: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
             }
         }
         
