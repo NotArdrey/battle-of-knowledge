@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -444,12 +445,21 @@
                 teacher: 'teacher.html',
                 student: 'menu.html'
             };
-            window.location.href = redirectMap[role] || 'menu.html';
+            
+            // Show loading before redirect
+            if (window.showPageLoading) window.showPageLoading('Redirecting');
+            setTimeout(() => {
+                window.location.href = redirectMap[role] || 'menu.html';
+            }, 150);
         }
         
         // Handle login form submission
         async function handleLogin(event) {
             event.preventDefault();
+            
+            // Prevent double submission
+            if (window.isButtonLocked && window.isButtonLocked('login')) return;
+            if (window.lockButton) window.lockButton('login', 5000);
             
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -565,6 +575,10 @@
 
         // Play as Guest
         async function playAsGuest() {
+            // Prevent double clicks
+            if (window.isButtonLocked && window.isButtonLocked('playAsGuest')) return;
+            if (window.lockButton) window.lockButton('playAsGuest', 3000);
+            
             // Clear any existing auth session first (wait for it to complete)
             await sb.auth.signOut();
             
@@ -576,8 +590,11 @@
             };
             localStorage.setItem('guestSession', JSON.stringify(guestSession));
             
-            // Redirect to menu
-            window.location.href = 'menu.html';
+            // Show loading and redirect
+            if (window.showPageLoading) window.showPageLoading('Starting Game');
+            setTimeout(() => {
+                window.location.href = 'menu.html';
+            }, 150);
         }
         
         // Update placeholders based on language

@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -283,8 +284,8 @@
             
             <div class="button-container">
                 <!-- START Button as Image -->
-                <button onclick="window.location.href='era-selection.html'" 
-                        class="image-button">
+                <button onclick="navigateTo('era-selection.html', this)" 
+                        class="image-button" data-protect="start" data-protect-duration="2000">
                     <img id="startButtonImg" 
                         src="assets/Buttons/START Button.png" 
                         alt="START" 
@@ -292,8 +293,8 @@
                 </button>
 
                 <!-- COLLECTION Button as Image -->
-                <button onclick="window.location.href='collection.html'" 
-                        class="image-button">
+                <button onclick="navigateTo('collection.html', this)" 
+                        class="image-button" data-protect="collection" data-protect-duration="2000">
                     <img id="collectionButtonImg"
                         src="assets/Buttons/COLLECTION Button.png" 
                         alt="COLLECTION" 
@@ -310,7 +311,7 @@
     <script src="js/language.js"></script>
     
     <!-- Profile Button (Upper Left) -->
-    <button id="profileBtn" onclick="window.location.href='account.html'" class="hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-2 hover:scale-105 transition-transform">
+    <button id="profileBtn" onclick="navigateTo('account.html', this)" class="hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-2 hover:scale-105 transition-transform" data-protect="profile" data-protect-duration="2000">
         <img id="profileAvatar" src="assets/Characters/1. Early Spanish Era/Heroes/1. Lapu-Lapu/Idle.png" alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-amber-500">
         <span class="font-semibold text-amber-900 text-sm">Profile</span>
     </button>
@@ -390,10 +391,17 @@
         }
         
         async function handleLogout() {
+            if (window.isButtonLocked && window.isButtonLocked('logout')) return;
+            if (window.lockButton) window.lockButton('logout', 3000);
+            
             // Clear guest session if exists
             localStorage.removeItem('guestSession');
             await SupabaseConfig.signOut();
-            window.location.href = 'index.html';
+            
+            if (window.showPageLoading) window.showPageLoading('Logging out');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 150);
         }
         
         // Language toggle functionality with localStorage (synced with language.js)

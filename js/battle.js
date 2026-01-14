@@ -98,6 +98,13 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 // Check for low-end device (less RAM, older device)
 const isLowEndDevice = navigator.deviceMemory ? navigator.deviceMemory < 4 : isMobile;
 
+// Click protection - prevents button spam
+let answerLocked = false;
+function lockAnswers(duration = 2500) {
+    answerLocked = true;
+    setTimeout(() => answerLocked = false, duration);
+}
+
 // Prefer lighter effects on mobile or when the user requests reduced motion
 const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
@@ -750,6 +757,9 @@ function loadQuestion() {
 
 // Select answer
 function selectAnswer(index) {
+    // Prevent spam clicks
+    if (answerLocked) return;
+    lockAnswers(2500);
     disableAnswers();
     
     const selectedAnswer = currentQuestion.shuffledAnswers[index];
@@ -858,8 +868,19 @@ function createGiantSwordEffect(isAttacker) {
     
     document.body.appendChild(swordSlash);
     
+    // Ultra low mode: simple fast slash animation, no trails or waves
+    if (ultraLowMode) {
+        swordSlash.animate([
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(1.8)`, opacity: 0.9 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0 }
+        ], { duration: 350, fill: 'forwards' });
+        setTimeout(() => swordSlash.remove(), 350);
+        return swordSlash;
+    }
+    
     // SKIP all trail effects in low quality mode
-    const effectCount = ultraLowMode ? 0 : (reducedFxMode ? 1 : (isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6)));
+    const effectCount = reducedFxMode ? 1 : (isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6));
     
     for (let i = 0; i < effectCount; i++) {
         setTimeout(() => {
@@ -1017,10 +1038,10 @@ function createGiantGunEffect(isAttacker) {
     if (ultraLowMode) {
         muzzleFlash.animate([
             { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
             { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-        ], { duration: 150, fill: 'forwards' });
-        setTimeout(() => muzzleFlash.remove(), 150);
+        ], { duration: 350, fill: 'forwards' });
+        setTimeout(() => muzzleFlash.remove(), 350);
         return muzzleFlash;
     }
     
@@ -1179,10 +1200,10 @@ function createGiantMagicEffect(isAttacker) {
     if (ultraLowMode) {
         magicSphere.animate([
             { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9 },
             { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-        ], { duration: 200, fill: 'forwards' });
-        setTimeout(() => magicSphere.remove(), 200);
+        ], { duration: 400, fill: 'forwards' });
+        setTimeout(() => magicSphere.remove(), 400);
         return magicSphere;
     }
     
@@ -1368,10 +1389,10 @@ function createGiantImpactEffect(isAttacker, damage) {
         document.body.appendChild(impactExplosion);
         impactExplosion.animate([
             { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 0.9 },
             { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 }
-        ], { duration: 150, fill: 'forwards' });
-        setTimeout(() => impactExplosion.remove(), 150);
+        ], { duration: 350, fill: 'forwards' });
+        setTimeout(() => impactExplosion.remove(), 350);
         return impactExplosion;
     }
     
@@ -1575,8 +1596,8 @@ function showDamage(damage, target) {
     const baseShadow = reducedFxMode ? '1px 1px 2px rgba(0,0,0,0.5)' : isMobile ?
         `3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 25px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 50px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 75px ${damage > 25 ? '#f59e0b' : '#b91c1c'}` :
         `5px 5px 10px rgba(0, 0, 0, 0.9), 0 0 35px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 70px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 105px ${damage > 25 ? '#f59e0b' : '#b91c1c'}`;
-    const baseSize = reducedFxMode ? '28px' : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
-    const baseDuration = reducedFxMode ? 500 : (isMobile ? 1200 : 1500);
+    const baseSize = reducedFxMode ? '32px' : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
+    const baseDuration = reducedFxMode ? 800 : (isMobile ? 1200 : 1500);
     damageEl.style.cssText = `
         position: fixed;
         font-size: ${baseSize};

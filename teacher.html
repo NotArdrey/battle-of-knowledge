@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -1920,8 +1921,14 @@
         
         // Handle logout
         async function handleLogout() {
+            if (window.isButtonLocked && window.isButtonLocked('logout')) return;
+            if (window.lockButton) window.lockButton('logout', 3000);
+            
             await sb.auth.signOut();
-            window.location.href = 'login.html';
+            if (window.showPageLoading) window.showPageLoading('Logging out');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 150);
         }
         
         // Close modals on outside click

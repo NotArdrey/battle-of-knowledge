@@ -6,6 +6,7 @@
     <title>Select Era - Battle of Knowledge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -662,7 +663,7 @@
         </button>
 
         <!-- Back Button -->
-        <button onclick="window.location.href='index.html'" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0">
+        <button onclick="navigateTo('menu.html', this)" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0" data-protect="back" data-protect-duration="2000">
             <img
                 src="assets/Buttons/era-selection/back.png"
                 data-lang-img-en="assets/Buttons/era-selection/back.png"
@@ -986,6 +987,10 @@
         }
         
         function selectEra(era) {
+            // Prevent double clicks
+            if (window.isButtonLocked && window.isButtonLocked('selectEra')) return;
+            if (window.lockButton) window.lockButton('selectEra', 2000);
+            
             if (!isEraUnlocked(era)) {
                 alert(getEraRequirementText(era) || 'Complete the previous era first.');
                 return;
@@ -994,7 +999,12 @@
             // Save selected era and go to learning module
             localStorage.setItem('selectedEra', era);
             localStorage.removeItem('selectedHero');
-            window.location.href = 'learning-module.html';
+            
+            // Show loading and navigate
+            if (window.showPageLoading) window.showPageLoading('Loading Era');
+            setTimeout(() => {
+                window.location.href = 'learning-module.html';
+            }, 150);
         }
     </script>
 

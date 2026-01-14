@@ -6,6 +6,7 @@
     <title>Learn About This Era - Battle of Knowledge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -547,7 +548,7 @@
         </button>
 
         <!-- Back Button -->
-        <button onclick="window.location.href='era-selection.html'" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0">
+        <button onclick="navigateTo('era-selection.html', this)" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0" data-protect="back" data-protect-duration="2000">
             <img
                 src="assets/Buttons/era-selection/back.png"
                 data-lang-img-en="assets/Buttons/era-selection/back.png"
@@ -672,6 +673,16 @@
     <script src="js/moduleVideos.js"></script>
     <script src="js/language.js"></script>
     <script>
+        // Click protection - prevents button spam
+        const buttonLocks = new Map();
+        function isButtonLocked(buttonId) {
+            return buttonLocks.get(buttonId) === true;
+        }
+        function lockButton(buttonId, duration = 1000) {
+            buttonLocks.set(buttonId, true);
+            setTimeout(() => buttonLocks.set(buttonId, false), duration);
+        }
+        
         // Era-specific Background Music for Learning Module
         const moduleBackgroundMusic = {
             'early-spanish': new Audio('assets/Game-BGM/modulePartBGM/Early Spanish Whole Menu BGM.mp3'),
@@ -1233,9 +1244,16 @@
 
         // Complete current lesson
         async function completeCurrentLesson() {
+            // Prevent spam clicks
+            if (isButtonLocked('complete')) return;
+            lockButton('complete', 1500);
+            
             if (currentEraLessons.length === 0) return;
             
             const lesson = currentEraLessons[currentLessonIndex];
+            
+            // Already completed - skip
+            if (completedLessons.has(lesson.id)) return;
             
             // Mark as complete
             completedLessons.add(lesson.id);
@@ -1359,6 +1377,9 @@
 
         // Previous lesson
         function previousLesson() {
+            if (isButtonLocked('prev')) return;
+            lockButton('prev', 500);
+            
             if (currentLessonIndex > 0) {
                 currentLessonIndex--;
                 loadCurrentLesson();
@@ -1368,6 +1389,9 @@
 
         // Next lesson
         function nextLesson() {
+            if (isButtonLocked('next')) return;
+            lockButton('next', 500);
+            
             const lesson = currentEraLessons[currentLessonIndex];
             const isCompleted = completedLessons.has(lesson.id);
             
@@ -1428,6 +1452,9 @@
 
         // Start battle
         function startBattle() {
+            if (isButtonLocked('startBattle')) return;
+            lockButton('startBattle', 2000);
+            
             const selectedEra = localStorage.getItem('selectedEra');
             
             // Always show character selection for eras with multiple heroes
@@ -1437,8 +1464,11 @@
             } else {
                 // Clear any previous battle progress to start a fresh session
                 localStorage.removeItem('battleProgress');
-                // Go directly to battlefield
-                window.location.href = 'battlefield.html';
+                // Show loading and go to battlefield
+                if (window.showPageLoading) window.showPageLoading('Preparing Battle');
+                setTimeout(() => {
+                    window.location.href = 'battlefield.html';
+                }, 150);
             }
         }
 
@@ -1504,10 +1534,19 @@
 
         // Select character
         function selectCharacter(heroIndex) {
+            // Prevent double clicks
+            if (isButtonLocked('selectCharacter')) return;
+            lockButton('selectCharacter', 2000);
+            
             // Clear any previous battle progress to start a fresh session
             localStorage.removeItem('battleProgress');
             localStorage.setItem('selectedHero', heroIndex);
-            window.location.href = 'battlefield.html';
+            
+            // Show loading and navigate
+            if (window.showPageLoading) window.showPageLoading('Preparing Battle');
+            setTimeout(() => {
+                window.location.href = 'battlefield.html';
+            }, 150);
         }
 
         // Get unlocked heroes

@@ -6,6 +6,16 @@ let currentLessonIndex = 0;
 let currentEraLessons = [];
 const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
+// Click protection - prevents button spam
+const buttonLocks = new Map();
+function isButtonLocked(buttonId) {
+    return buttonLocks.get(buttonId) === true;
+}
+function lockButton(buttonId, duration = 1000) {
+    buttonLocks.set(buttonId, true);
+    setTimeout(() => buttonLocks.set(buttonId, false), duration);
+}
+
 // Era-specific Background Music for Learning Module
 const moduleBackgroundMusic = {
     'early-spanish': new Audio('assets/Game-BGM/modulePartBGM/Early Spanish Whole Menu BGM.mp3'),
@@ -241,9 +251,16 @@ function updateNavigationButtons() {
 
 // Complete current lesson
 async function completeCurrentLesson() {
+    // Prevent spam clicks
+    if (isButtonLocked('complete')) return;
+    lockButton('complete', 1500);
+    
     if (currentEraLessons.length === 0) return;
     
     const lesson = currentEraLessons[currentLessonIndex];
+    
+    // Already completed - skip
+    if (completedLessons.has(lesson.id)) return;
     
     // Mark as complete
     completedLessons.add(lesson.id);
@@ -359,6 +376,9 @@ function showAllLessonsCompleted() {
 
 // Previous lesson
 function previousLesson() {
+    if (isButtonLocked('prev')) return;
+    lockButton('prev', 500);
+    
     if (currentLessonIndex > 0) {
         currentLessonIndex--;
         loadCurrentLesson();
@@ -368,6 +388,9 @@ function previousLesson() {
 
 // Next lesson
 function nextLesson() {
+    if (isButtonLocked('next')) return;
+    lockButton('next', 500);
+    
     const lesson = currentEraLessons[currentLessonIndex];
     const isCompleted = completedLessons.has(lesson.id);
     
@@ -428,6 +451,9 @@ function setupLessonNavigation() {
 
 // Start battle
 function startBattle() {
+    if (isButtonLocked('startBattle')) return;
+    lockButton('startBattle', 2000);
+    
     const selectedEra = localStorage.getItem('selectedEra');
     
     // Always show character selection for eras with multiple heroes
@@ -437,8 +463,11 @@ function startBattle() {
     } else {
         // Clear any previous battle progress to start a fresh session
         localStorage.removeItem('battleProgress');
-        // Go directly to battlefield
-        window.location.href = 'battlefield.html';
+        // Show loading and go to battlefield
+        if (window.showPageLoading) window.showPageLoading('Preparing Battle');
+        setTimeout(() => {
+            window.location.href = 'battlefield.html';
+        }, 150);
     }
 }
 
@@ -504,10 +533,19 @@ function showCharacterSelect() {
 
 // Select character
 function selectCharacter(heroIndex) {
+    // Prevent double clicks
+    if (isButtonLocked('selectCharacter')) return;
+    lockButton('selectCharacter', 2000);
+    
     // Clear any previous battle progress to start a fresh session
     localStorage.removeItem('battleProgress');
     localStorage.setItem('selectedHero', heroIndex);
-    window.location.href = 'battlefield.html';
+    
+    // Show loading and navigate
+    if (window.showPageLoading) window.showPageLoading('Preparing Battle');
+    setTimeout(() => {
+        window.location.href = 'battlefield.html';
+    }, 150);
 }
 
 // Get unlocked heroes - uses ProgressSync for cross-browser sync
