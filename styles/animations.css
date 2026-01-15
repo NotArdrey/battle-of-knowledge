@@ -49,9 +49,9 @@
 
 @keyframes victory-bounce-flipped {
     0%, 100% { transform: scaleX(-1) translateY(0) scaleY(1); }
-    25% { transform: scaleX(-1) translateY(-15px) scaleY(1.08); }
-    50% { transform: scaleX(-1) translateY(0) scaleY(1.03); }
-    75% { transform: scaleX(-1) translateY(-8px) scaleY(1.05); }
+    25% { transform: scaleX(-1) translateY(-8px) scaleY(1.04); }
+    50% { transform: scaleX(-1) translateY(0) scaleY(1.02); }
+    75% { transform: scaleX(-1) translateY(-4px) scaleY(1.03); }
 }
 
 @keyframes hurt-animation {
@@ -65,9 +65,9 @@
 
 @keyframes victory-bounce {
     0%, 100% { transform: translateY(0) scale(1); }
-    25% { transform: translateY(-15px) scale(1.08); }
-    50% { transform: scale(1.03); }
-    75% { transform: translateY(-8px) scale(1.05); }
+    25% { transform: translateY(-8px) scale(1.04); }
+    50% { transform: scale(1.02); }
+    75% { transform: translateY(-4px) scale(1.03); }
 }
 
 .animate-pulse-glow {

@@ -1507,10 +1507,34 @@
         }
         
         // Confirm and execute reset
-        function confirmResetProgress() {
+        async function confirmResetProgress() {
             // Clear completed lessons for current era
             completedLessons.clear();
             localStorage.removeItem(`learning_${currentEraKey}`);
+            
+            // Sync reset to database via ProgressSync
+            if (window.ProgressSync && window.ProgressSync.userId) {
+                try {
+                    // Reset progress in database for current era
+                    await window.ProgressSync.updateEraProgress(currentEraKey, {
+                        lessonsComplete: false,
+                        currentLessonIndex: 0
+                    });
+                    
+                    // Clear completed lessons in database
+                    const client = window.ProgressSync.getClient();
+                    if (client) {
+                        await client
+                            .from('progress')
+                            .update({ lessons_completed: [] })
+                            .eq('user_id', window.ProgressSync.userId)
+                            .eq('era_key', currentEraKey);
+                    }
+                    console.log('Progress reset synced to database');
+                } catch (error) {
+                    console.error('Error syncing progress reset to database:', error);
+                }
+            }
             
             // Reset to first lesson
             currentLessonIndex = 0;
