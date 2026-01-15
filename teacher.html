@@ -457,10 +457,6 @@
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">👩‍🏫 Teacher Dashboard</h1>
-                <div class="nav-links">
-                    <a href="index.html" class="nav-link">← Home</a>
-                    <a href="era-selection.html" class="nav-link">🎮 Play Game</a>
-                </div>
             </div>
             <div class="user-info">
                 <span id="userName" class="text-amber-800 font-semibold"></span>
@@ -517,7 +513,10 @@
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">My Classes</h2>
-                    <button class="btn-primary" onclick="showCreateClassModal()">➕ Create Class</button>
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="btn-secondary" onclick="showAddStudentModal()">👥 Add Student</button>
+                        <button class="btn-primary" onclick="showCreateClassModal()">➕ Create Class</button>
+                    </div>
                 </div>
                 
                 <div id="classesList">
@@ -538,10 +537,7 @@
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">Student Progress Tracking</h2>
-                    <div class="flex gap-2 flex-wrap">
-                        <input type="text" class="search-input" placeholder="🔍 Search students..." oninput="filterStudents(this.value)">
-                        <button class="btn-primary" onclick="showAddStudentModal()">➕ Add Student</button>
-                    </div>
+                    <input type="text" class="search-input" placeholder="🔍 Search students..." oninput="filterStudents(this.value)">
                 </div>
                 
                 <div class="table-container">
@@ -784,7 +780,7 @@
     
     <!-- Add Student Modal -->
     <div id="addStudentModal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh;">
             <div class="flex justify-between items-start mb-4">
                 <h2 class="modal-title">Add Student to Class</h2>
                 <button onclick="closeAddStudentModal()" class="text-2xl text-amber-900 hover:text-red-600">&times;</button>
@@ -800,13 +796,25 @@
             <div class="form-group">
                 <label class="form-label">Search Student by Email or Name</label>
                 <div class="flex gap-2">
-                    <input type="text" id="studentSearchInput" class="form-input flex-1" placeholder="Enter email or name...">
+                    <input type="text" id="studentSearchInput" class="form-input flex-1" placeholder="🔍 Type to search or browse all students below..." oninput="handleStudentSearchInput(this.value)">
                     <button onclick="searchStudents()" class="btn-primary">🔍 Search</button>
+                    <button onclick="clearStudentSearch()" class="btn-secondary">Clear</button>
                 </div>
             </div>
             
-            <div id="studentSearchResults" class="mt-4">
-                <!-- Search results will appear here -->
+            <!-- Student count and pagination info -->
+            <div id="studentListHeader" class="flex justify-between items-center mb-2">
+                <span id="studentCountLabel" class="text-amber-700 font-semibold">Loading students...</span>
+                <span id="paginationInfo" class="text-sm text-amber-600"></span>
+            </div>
+            
+            <div id="studentSearchResults" class="mt-2" style="max-height: 350px; overflow-y: auto;">
+                <!-- Search results / All students will appear here -->
+            </div>
+            
+            <!-- Pagination Controls -->
+            <div id="paginationControls" class="flex justify-center items-center gap-2 mt-4 flex-wrap">
+                <!-- Pagination buttons will be generated here -->
             </div>
             
             <div class="mt-4 p-3 bg-amber-100 rounded-lg border-2 border-amber-300">
@@ -928,6 +936,14 @@
         let currentLessonType = 'system'; // 'system' or 'custom'
         let currentEraFilter = 'all';
         
+        // Pagination state for Add Student Modal
+        let allAvailableStudents = [];
+        let filteredStudentsForModal = [];
+        let currentStudentPage = 1;
+        const studentsPerPage = 10;
+        let isSearchMode = false;
+        let searchDebounceTimer = null;
+        
         const eraNames = {
             'early-spanish': 'Early Spanish Era',
             'late-spanish': 'Late Spanish Era',
@@ -951,19 +967,66 @@
             }
             
             // Get profile
-            const { data: profile } = await sb
+            const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
             
-            if (!profile || (profile.role !== 'teacher' && profile.role !== 'admin')) {
-                alert('Access denied. Teacher or Admin role required.');
+            console.log('Profile loaded:', profile, 'Error:', profileError);
+            
+            // If profile fetch failed, try to get role from user metadata
+            let userRole = profile?.role;
+            if (!profile && session.user.user_metadata?.role) {
+                userRole = session.user.user_metadata.role;
+                console.log('Using role from user metadata:', userRole);
+            }
+            
+            if (!profile) {
+                console.error('Could not load profile. Creating one...');
+                // Try to create the profile if it doesn't exist
+                const { data: newProfile, error: createError } = await sb
+                    .from('profiles')
+                    .upsert({
+                        id: session.user.id,
+                        email: session.user.email,
+                        full_name: session.user.user_metadata?.full_name || 'Teacher',
+                        role: session.user.user_metadata?.role || 'teacher',
+                        is_verified: true
+                    })
+                    .select()
+                    .single();
+                
+                if (createError) {
+                    console.error('Failed to create profile:', createError);
+                }
+                
+                if (newProfile) {
+                    currentProfile = newProfile;
+                    userRole = newProfile.role;
+                }
+            } else {
+                currentProfile = profile;
+            }
+            
+            // Check role - allow teacher or admin
+            if (userRole !== 'teacher' && userRole !== 'admin') {
+                console.error('User role is:', userRole, 'Expected: teacher or admin');
+                alert('Access denied. Your role is: ' + (userRole || 'unknown') + '. Teacher or Admin role required.');
                 window.location.href = 'login.html';
                 return;
             }
             
-            currentProfile = profile;
+            // Ensure currentProfile is set
+            if (!currentProfile) {
+                currentProfile = {
+                    id: session.user.id,
+                    email: session.user.email,
+                    full_name: session.user.user_metadata?.full_name || 'Teacher',
+                    role: userRole
+                };
+            }
+            
             document.getElementById('userName').textContent = currentProfile.full_name;
             
             // Show verification warning if not verified
@@ -1046,7 +1109,7 @@
                             ${cls.description ? `<p class="text-sm opacity-70 mt-1">${cls.description}</p>` : ''}
                         </div>
                         <div class="text-right">
-                            <p class="text-sm opacity-80">Class Code</p>
+                            <p class="text-sm opacity-80">Class Code (Share with students)</p>
                             <p class="class-code">${cls.class_code}</p>
                             <button onclick="copyClassCode('${cls.class_code}')" class="mt-2 px-4 py-1 bg-white/20 rounded-lg text-sm hover:bg-white/30 transition-colors">
                                 📋 Copy Code
@@ -1055,7 +1118,10 @@
                     </div>
                     <div class="mt-4 pt-4 border-t border-white/20 flex justify-between items-center flex-wrap gap-2">
                         <span>👥 ${cls.enrollments?.[0]?.count || 0} students enrolled</span>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="showAddStudentToSpecificClass('${cls.id}', '${cls.class_name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-green-500/70 rounded-lg text-sm hover:bg-green-500/90">
+                                ➕ Add Student
+                            </button>
                             <button onclick="toggleClassStatus('${cls.id}', ${!cls.is_active})" class="px-3 py-1 bg-white/20 rounded-lg text-sm hover:bg-white/30">
                                 ${cls.is_active ? '🔒 Deactivate' : '🔓 Activate'}
                             </button>
@@ -1167,7 +1233,10 @@
         // Load students
         async function loadStudents() {
             try {
-                const { data, error } = await sb
+                console.log('Loading students for teacher:', currentProfile.id);
+                
+                // First try: Get students by teacher_id
+                let { data, error } = await sb
                     .from('profiles')
                     .select(`
                         id,
@@ -1175,13 +1244,69 @@
                         email,
                         class_id,
                         created_at,
+                        teacher_id,
                         classes!profiles_class_id_fkey(class_name),
                         progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
                     `)
                     .eq('teacher_id', currentProfile.id)
                     .eq('role', 'student');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Error loading students by teacher_id:', error);
+                }
+                
+                console.log('Students by teacher_id:', data?.length || 0);
+                
+                // Also get students from class_enrollments (in case teacher_id wasn't set)
+                if (allClasses.length > 0) {
+                    const classIds = allClasses.map(c => c.id);
+                    
+                    const { data: enrolledData, error: enrollError } = await sb
+                        .from('class_enrollments')
+                        .select(`
+                            student_id,
+                            class_id,
+                            status,
+                            profiles!class_enrollments_student_id_fkey(
+                                id,
+                                full_name,
+                                email,
+                                class_id,
+                                created_at,
+                                teacher_id,
+                                progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
+                            )
+                        `)
+                        .in('class_id', classIds)
+                        .eq('status', 'active');
+                    
+                    if (enrollError) {
+                        console.error('Error loading enrolled students:', enrollError);
+                    } else {
+                        console.log('Students from enrollments:', enrolledData?.length || 0);
+                        
+                        // Merge enrolled students with those found by teacher_id
+                        if (enrolledData && enrolledData.length > 0) {
+                            const existingIds = new Set((data || []).map(s => s.id));
+                            
+                            enrolledData.forEach(enrollment => {
+                                if (enrollment.profiles && !existingIds.has(enrollment.profiles.id)) {
+                                    // Get class name for this student
+                                    const studentClass = allClasses.find(c => c.id === enrollment.class_id);
+                                    const studentData = {
+                                        ...enrollment.profiles,
+                                        classes: studentClass ? { class_name: studentClass.class_name } : null
+                                    };
+                                    data = data || [];
+                                    data.push(studentData);
+                                    existingIds.add(enrollment.profiles.id);
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                console.log('Total students loaded:', data?.length || 0, data);
                 
                 allStudents = data || [];
                 renderStudents(allStudents);
@@ -1363,39 +1488,215 @@
             
             // Clear search
             document.getElementById('studentSearchInput').value = '';
-            document.getElementById('studentSearchResults').innerHTML = '';
+            document.getElementById('studentSearchResults').innerHTML = '<p class="text-amber-700 text-center py-4">Loading all students...</p>';
+            document.getElementById('paginationControls').innerHTML = '';
+            
+            // Reset pagination state
+            currentStudentPage = 1;
+            isSearchMode = false;
             
             document.getElementById('addStudentModal').classList.remove('hidden');
+            
+            // Load all students with pagination
+            loadAllStudentsForModal();
+        }
+        
+        // Show add student modal with a specific class pre-selected
+        function showAddStudentToSpecificClass(classId, className) {
+            // Populate class dropdown
+            const classSelect = document.getElementById('addStudentClassSelect');
+            classSelect.innerHTML = '<option value="">Choose a class...</option>' + 
+                allClasses.map(cls => `<option value="${cls.id}" ${cls.id === classId ? 'selected' : ''}>${cls.class_name}</option>`).join('');
+            
+            // Clear search
+            document.getElementById('studentSearchInput').value = '';
+            document.getElementById('studentSearchResults').innerHTML = '<p class="text-amber-700 text-center py-4">Loading all students...</p>';
+            document.getElementById('paginationControls').innerHTML = '';
+            
+            // Reset pagination state
+            currentStudentPage = 1;
+            isSearchMode = false;
+            
+            document.getElementById('addStudentModal').classList.remove('hidden');
+            
+            // Load all students with pagination
+            loadAllStudentsForModal();
+            
+            showToast(`Adding students to: ${className}`, 'info');
         }
         
         // Close add student modal
         function closeAddStudentModal() {
             document.getElementById('addStudentModal').classList.add('hidden');
+            // Clear state
+            allAvailableStudents = [];
+            filteredStudentsForModal = [];
+            currentStudentPage = 1;
+            isSearchMode = false;
+        }
+        
+        // Load all available students for the modal with pagination
+        async function loadAllStudentsForModal() {
+            const resultsDiv = document.getElementById('studentSearchResults');
+            const countLabel = document.getElementById('studentCountLabel');
+            
+            try {
+                console.log('Loading all students for modal...');
+                
+                // Get all students - query ALL student accounts regardless of teacher assignment
+                const { data, error } = await sb
+                    .from('profiles')
+                    .select('id, full_name, email, class_id, teacher_id, created_at, role')
+                    .eq('role', 'student')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading students:', error);
+                    throw error;
+                }
+                
+                console.log('All students found:', data?.length || 0, data);
+                
+                // If no students found, also try without role filter to debug
+                if (!data || data.length === 0) {
+                    console.log('No students with role=student found, checking all profiles...');
+                    const { data: allProfiles, error: allError } = await sb
+                        .from('profiles')
+                        .select('id, full_name, email, role, teacher_id')
+                        .limit(50);
+                    
+                    if (allError) {
+                        console.error('Error fetching all profiles:', allError);
+                    } else {
+                        console.log('All profiles in database:', allProfiles);
+                        console.log('Roles found:', [...new Set(allProfiles?.map(p => p.role))]);
+                        
+                        // Show helpful message if there are profiles but none with student role visible
+                        if (allProfiles && allProfiles.length > 0) {
+                            const studentProfiles = allProfiles.filter(p => p.role === 'student');
+                            if (studentProfiles.length > 0) {
+                                resultsDiv.innerHTML = `
+                                    <div class="text-center py-6">
+                                        <p class="text-amber-700 mb-2">⚠️ Found ${studentProfiles.length} student accounts but cannot access them</p>
+                                        <p class="text-sm text-amber-600 mb-3">Database permissions may need to be updated. Please contact your administrator.</p>
+                                        <button onclick="loadAllStudentsForModal()" class="btn-secondary">🔄 Retry</button>
+                                    </div>
+                                `;
+                                countLabel.textContent = 'Permission issue detected';
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Truly no students exist
+                    resultsDiv.innerHTML = `
+                        <div class="text-center py-6">
+                            <div class="text-4xl mb-3">📭</div>
+                            <p class="text-amber-700 mb-2">No student accounts found</p>
+                            <p class="text-sm text-amber-600">Students need to create accounts first before you can add them to classes.</p>
+                            <p class="text-sm text-amber-600 mt-2">Or share your class code so students can join directly!</p>
+                        </div>
+                    `;
+                    countLabel.textContent = 'No students in system yet';
+                    document.getElementById('paginationControls').innerHTML = '';
+                    return;
+                }
+                
+                // Store all students
+                allAvailableStudents = data || [];
+                
+                // Separate students by status
+                const notAssigned = allAvailableStudents.filter(s => !s.teacher_id);
+                const assignedToOther = allAvailableStudents.filter(s => s.teacher_id && s.teacher_id !== currentProfile.id);
+                const assignedToMe = allAvailableStudents.filter(s => s.teacher_id === currentProfile.id);
+                
+                console.log('Not assigned:', notAssigned.length);
+                console.log('Assigned to other:', assignedToOther.length);
+                console.log('Assigned to me:', assignedToMe.length);
+                
+                // For display, show unassigned first, then assigned to others (mine are excluded from adding)
+                filteredStudentsForModal = [...notAssigned, ...assignedToOther];
+                
+                const totalAvailable = filteredStudentsForModal.length;
+                countLabel.innerHTML = `
+                    📊 <strong>${totalAvailable}</strong> student(s) available to add 
+                    <span class="text-sm">(${assignedToMe.length} already in your classes)</span>
+                `;
+                
+                // Reset to page 1 and render
+                currentStudentPage = 1;
+                isSearchMode = false;
+                renderStudentList();
+                
+            } catch (error) {
+                console.error('Error loading students:', error);
+                resultsDiv.innerHTML = `
+                    <div class="text-center py-6">
+                        <p class="text-red-600 mb-2">⚠️ Failed to load students</p>
+                        <p class="text-sm text-amber-700 mb-3">This may be due to database permissions. Error: ${error.message || 'Unknown error'}</p>
+                        <button onclick="loadAllStudentsForModal()" class="btn-primary">🔄 Retry</button>
+                        <p class="text-xs text-gray-500 mt-3">If this persists, the database may need updated RLS policies to allow teachers to view student accounts.</p>
+                    </div>
+                `;
+                countLabel.textContent = 'Error loading students';
+            }
+        }
+        
+        // Handle search input with debounce
+        function handleStudentSearchInput(value) {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                if (value.trim().length >= 2) {
+                    searchStudents();
+                } else if (value.trim().length === 0) {
+                    clearStudentSearch();
+                }
+            }, 300);
+        }
+        
+        // Clear search and show all students
+        function clearStudentSearch() {
+            document.getElementById('studentSearchInput').value = '';
+            isSearchMode = false;
+            currentStudentPage = 1;
+            
+            // Re-filter from all available (exclude those already in my classes)
+            const notAssigned = allAvailableStudents.filter(s => !s.teacher_id);
+            const assignedToOther = allAvailableStudents.filter(s => s.teacher_id && s.teacher_id !== currentProfile.id);
+            filteredStudentsForModal = [...notAssigned, ...assignedToOther];
+            
+            document.getElementById('studentCountLabel').innerHTML = `
+                📊 <strong>${filteredStudentsForModal.length}</strong> student(s) available to add
+            `;
+            
+            renderStudentList();
         }
         
         // Search for students to add
         async function searchStudents() {
             const searchQuery = document.getElementById('studentSearchInput').value.trim();
             const resultsDiv = document.getElementById('studentSearchResults');
+            const countLabel = document.getElementById('studentCountLabel');
             
             if (!searchQuery || searchQuery.length < 2) {
-                resultsDiv.innerHTML = '<p class="text-amber-700 text-center">Please enter at least 2 characters to search.</p>';
+                countLabel.textContent = 'Please enter at least 2 characters to search.';
                 return;
             }
             
-            resultsDiv.innerHTML = '<p class="text-amber-700 text-center">Searching...</p>';
+            resultsDiv.innerHTML = '<p class="text-amber-700 text-center py-4">🔍 Searching...</p>';
+            isSearchMode = true;
             
             try {
                 // Search for students by email or name
-                // Use separate queries to avoid issues with OR and foreign key joins
                 const searchPattern = `%${searchQuery}%`;
                 
                 const { data, error } = await sb
                     .from('profiles')
-                    .select('id, full_name, email, class_id, teacher_id')
+                    .select('id, full_name, email, class_id, teacher_id, created_at')
                     .eq('role', 'student')
                     .or(`email.ilike.${searchPattern},full_name.ilike.${searchPattern}`)
-                    .limit(20);
+                    .order('full_name', { ascending: true })
+                    .limit(100);
                 
                 if (error) {
                     console.error('Search error:', error);
@@ -1409,46 +1710,27 @@
                         <div class="text-center py-4">
                             <p class="text-amber-700 mb-2">No students found matching "${searchQuery}"</p>
                             <p class="text-sm text-amber-600">Make sure the student has already created an account.</p>
+                            <button onclick="clearStudentSearch()" class="btn-secondary mt-2">Show All Students</button>
                         </div>
                     `;
+                    document.getElementById('paginationControls').innerHTML = '';
+                    countLabel.textContent = '0 results found';
                     return;
                 }
                 
-                // Filter out students already in teacher's classes
-                const availableStudents = data.filter(s => s.teacher_id !== currentProfile.id);
-                const alreadyInClass = data.filter(s => s.teacher_id === currentProfile.id);
+                // Filter out students already in my classes for adding
+                const availableInSearch = data.filter(s => s.teacher_id !== currentProfile.id);
+                const alreadyMine = data.filter(s => s.teacher_id === currentProfile.id);
                 
-                let html = '';
+                filteredStudentsForModal = availableInSearch;
                 
-                if (alreadyInClass.length > 0) {
-                    html += `<p class="text-sm text-amber-600 mb-2">${alreadyInClass.length} student(s) already in your classes.</p>`;
-                }
+                countLabel.innerHTML = `
+                    🔍 Found <strong>${data.length}</strong> result(s) for "${searchQuery}"
+                    ${alreadyMine.length > 0 ? `<span class="text-sm">(${alreadyMine.length} already in your classes)</span>` : ''}
+                `;
                 
-                if (availableStudents.length === 0) {
-                    html += `<p class="text-amber-700 text-center">All matching students are already in your classes.</p>`;
-                } else {
-                    html += '<div class="space-y-2">';
-                    availableStudents.forEach(student => {
-                        const hasOtherTeacher = student.teacher_id && student.teacher_id !== currentProfile.id;
-                        
-                        html += `
-                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border-2 border-amber-200">
-                                <div>
-                                    <p class="font-bold text-amber-900">${student.full_name}</p>
-                                    <p class="text-sm text-amber-700">${student.email || 'No email'}</p>
-                                    ${hasOtherTeacher ? '<p class="text-xs text-red-600">⚠️ Assigned to another teacher</p>' : ''}
-                                </div>
-                                <button onclick="addStudentToClass('${student.id}', '${student.full_name.replace(/'/g, "\\'")}')" 
-                                        class="btn-primary text-sm">
-                                    ➕ Add
-                                </button>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                }
-                
-                resultsDiv.innerHTML = html;
+                currentStudentPage = 1;
+                renderStudentList();
                 
             } catch (error) {
                 console.error('Error searching students:', error);
@@ -1456,13 +1738,171 @@
             }
         }
         
+        // Render student list with pagination
+        function renderStudentList() {
+            const resultsDiv = document.getElementById('studentSearchResults');
+            const paginationDiv = document.getElementById('paginationControls');
+            const paginationInfo = document.getElementById('paginationInfo');
+            
+            const totalStudents = filteredStudentsForModal.length;
+            const totalPages = Math.ceil(totalStudents / studentsPerPage);
+            
+            // Ensure current page is valid
+            if (currentStudentPage > totalPages) currentStudentPage = totalPages || 1;
+            if (currentStudentPage < 1) currentStudentPage = 1;
+            
+            // Calculate slice indices
+            const startIdx = (currentStudentPage - 1) * studentsPerPage;
+            const endIdx = Math.min(startIdx + studentsPerPage, totalStudents);
+            const studentsOnPage = filteredStudentsForModal.slice(startIdx, endIdx);
+            
+            // Update pagination info
+            if (totalStudents > 0) {
+                paginationInfo.textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalStudents}`;
+            } else {
+                paginationInfo.textContent = '';
+            }
+            
+            // Render students
+            if (studentsOnPage.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="text-center py-6">
+                        <p class="text-amber-700">No students available to add.</p>
+                        <p class="text-sm text-amber-600">All students may already be in your classes.</p>
+                    </div>
+                `;
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = '<div class="space-y-2">';
+            studentsOnPage.forEach(student => {
+                const hasOtherTeacher = student.teacher_id && student.teacher_id !== currentProfile.id;
+                const joinDate = student.created_at ? new Date(student.created_at).toLocaleDateString() : 'N/A';
+                
+                html += `
+                    <div class="flex items-center justify-between p-3 bg-white rounded-lg border-2 border-amber-200 hover:border-amber-400 transition-colors">
+                        <div class="flex-1">
+                            <p class="font-bold text-amber-900">${student.full_name}</p>
+                            <p class="text-sm text-amber-700">${student.email || 'No email'}</p>
+                            <p class="text-xs text-gray-500">Joined: ${joinDate}</p>
+                            ${hasOtherTeacher ? '<p class="text-xs text-orange-600">⚠️ Currently assigned to another teacher</p>' : '<p class="text-xs text-green-600">✓ Available</p>'}
+                        </div>
+                        <button onclick="addStudentToClass('${student.id}', '${student.full_name.replace(/'/g, "\\'")}')" 
+                                class="btn-primary text-sm whitespace-nowrap ml-2"
+                                id="addBtn-${student.id}">
+                            ➕ Add
+                        </button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            resultsDiv.innerHTML = html;
+            
+            // Render pagination controls
+            renderPaginationControls(totalPages);
+        }
+        
+        // Render pagination controls
+        function renderPaginationControls(totalPages) {
+            const paginationDiv = document.getElementById('paginationControls');
+            
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Previous button
+            html += `
+                <button onclick="changeStudentPage(${currentStudentPage - 1})" 
+                        class="px-3 py-1 rounded-lg font-semibold ${currentStudentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-amber-200 text-amber-800 hover:bg-amber-300'}"
+                        ${currentStudentPage === 1 ? 'disabled' : ''}>
+                    ← Prev
+                </button>
+            `;
+            
+            // Page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentStudentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            // Adjust start if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // First page + ellipsis
+            if (startPage > 1) {
+                html += `
+                    <button onclick="changeStudentPage(1)" class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200">1</button>
+                `;
+                if (startPage > 2) {
+                    html += '<span class="px-2 text-amber-600">...</span>';
+                }
+            }
+            
+            // Page buttons
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentStudentPage;
+                html += `
+                    <button onclick="changeStudentPage(${i})" 
+                            class="px-3 py-1 rounded-lg font-semibold ${isActive ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Last page + ellipsis
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += '<span class="px-2 text-amber-600">...</span>';
+                }
+                html += `
+                    <button onclick="changeStudentPage(${totalPages})" class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200">${totalPages}</button>
+                `;
+            }
+            
+            // Next button
+            html += `
+                <button onclick="changeStudentPage(${currentStudentPage + 1})" 
+                        class="px-3 py-1 rounded-lg font-semibold ${currentStudentPage === totalPages ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-amber-200 text-amber-800 hover:bg-amber-300'}"
+                        ${currentStudentPage === totalPages ? 'disabled' : ''}>
+                    Next →
+                </button>
+            `;
+            
+            paginationDiv.innerHTML = html;
+        }
+        
+        // Change page
+        function changeStudentPage(page) {
+            const totalPages = Math.ceil(filteredStudentsForModal.length / studentsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentStudentPage = page;
+            renderStudentList();
+            
+            // Scroll to top of results
+            document.getElementById('studentSearchResults').scrollTop = 0;
+        }
+        
         // Add student to selected class
         async function addStudentToClass(studentId, studentName) {
             const classId = document.getElementById('addStudentClassSelect').value;
+            const addButton = document.getElementById(`addBtn-${studentId}`);
             
             if (!classId) {
                 showToast('Please select a class first', 'error');
                 return;
+            }
+            
+            // Disable button to prevent double-clicks
+            if (addButton) {
+                addButton.disabled = true;
+                addButton.innerHTML = '⏳ Adding...';
             }
             
             try {
@@ -1470,49 +1910,119 @@
                 const selectedClass = allClasses.find(c => c.id === classId);
                 if (!selectedClass) {
                     showToast('Class not found', 'error');
+                    if (addButton) {
+                        addButton.disabled = false;
+                        addButton.innerHTML = '➕ Add';
+                    }
                     return;
                 }
                 
+                console.log(`Adding student ${studentId} to class ${classId} (teacher: ${currentProfile.id})`);
+                
                 // Update the student's profile with teacher_id and class_id
-                const { error: profileError } = await sb
+                const { data: profileData, error: profileError } = await sb
                     .from('profiles')
                     .update({ 
                         teacher_id: currentProfile.id,
-                        class_id: classId
+                        class_id: classId,
+                        updated_at: new Date().toISOString()
                     })
-                    .eq('id', studentId);
+                    .eq('id', studentId)
+                    .select();
                 
-                if (profileError) throw profileError;
+                if (profileError) {
+                    console.error('Profile update error:', profileError);
+                    throw profileError;
+                }
                 
-                // Also add to class_enrollments table
-                const { error: enrollError } = await sb
+                console.log('Profile updated:', profileData);
+                
+                // Check if update actually happened (RLS might silently block it)
+                if (!profileData || profileData.length === 0) {
+                    console.error('Profile update returned no data - RLS policy may be blocking the update');
+                    showToast('Failed to add student - permission denied. Database policies may need updating.', 'error');
+                    if (addButton) {
+                        addButton.disabled = false;
+                        addButton.innerHTML = '➕ Add';
+                    }
+                    return;
+                }
+                
+                // Also add to class_enrollments table for tracking
+                const { data: enrollData, error: enrollError } = await sb
                     .from('class_enrollments')
                     .upsert({
                         class_id: classId,
                         student_id: studentId,
-                        status: 'active'
+                        status: 'active',
+                        enrolled_at: new Date().toISOString()
                     }, {
                         onConflict: 'class_id,student_id'
-                    });
+                    })
+                    .select();
                 
                 if (enrollError) {
                     console.warn('Enrollment table update failed:', enrollError);
                     // Continue anyway since profile was updated
+                } else {
+                    console.log('Enrollment record:', enrollData);
                 }
                 
-                showToast(`${studentName} added to ${selectedClass.class_name}!`, 'success');
+                // Verify the update was successful by fetching the profile again
+                const { data: verifyData, error: verifyError } = await sb
+                    .from('profiles')
+                    .select('id, full_name, teacher_id, class_id')
+                    .eq('id', studentId)
+                    .single();
                 
-                // Refresh the search results
-                searchStudents();
+                if (verifyError) {
+                    console.error('Verification error:', verifyError);
+                } else {
+                    console.log('Verified student profile:', verifyData);
+                    
+                    if (verifyData.teacher_id !== currentProfile.id || verifyData.class_id !== classId) {
+                        console.warn('Warning: Profile may not have been updated correctly');
+                        showToast('Warning: Student may not have been added correctly. Please check.', 'error');
+                        if (addButton) {
+                            addButton.disabled = false;
+                            addButton.innerHTML = '➕ Add';
+                        }
+                        return;
+                    }
+                }
                 
-                // Reload students list
+                showToast(`✓ ${studentName} added to ${selectedClass.class_name}!`, 'success');
+                
+                // Remove this student from the available list and update display
+                filteredStudentsForModal = filteredStudentsForModal.filter(s => s.id !== studentId);
+                allAvailableStudents = allAvailableStudents.map(s => 
+                    s.id === studentId ? { ...s, teacher_id: currentProfile.id, class_id: classId } : s
+                );
+                
+                // Update the count label
+                const countLabel = document.getElementById('studentCountLabel');
+                const remaining = filteredStudentsForModal.length;
+                const mine = allAvailableStudents.filter(s => s.teacher_id === currentProfile.id).length;
+                countLabel.innerHTML = `
+                    📊 <strong>${remaining}</strong> student(s) available to add 
+                    <span class="text-sm">(${mine} already in your classes)</span>
+                `;
+                
+                // Re-render the current page
+                renderStudentList();
+                
+                // Reload students list and stats in the background
                 loadStudents();
                 loadClasses();
                 loadStats();
                 
             } catch (error) {
                 console.error('Error adding student to class:', error);
-                showToast('Failed to add student to class', 'error');
+                showToast('Failed to add student to class: ' + (error.message || 'Unknown error'), 'error');
+                if (addButton) {
+                    addButton.disabled = false;
+                    addButton.innerHTML = '➕ Add';
+                }
             }
         }
         

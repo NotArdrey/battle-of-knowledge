@@ -231,6 +231,8 @@ CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.
 CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (is_admin());
 CREATE POLICY "Admins can update any profile" ON profiles FOR UPDATE USING (is_admin());
 CREATE POLICY "Teachers can view direct students" ON profiles FOR SELECT USING (is_teacher() AND teacher_id = auth.uid());
+CREATE POLICY "Teachers can view all student profiles" ON profiles FOR SELECT USING (is_teacher() AND role = 'student');
+CREATE POLICY "Teachers can update student assignments" ON profiles FOR UPDATE USING (is_teacher() AND role = 'student');
 CREATE POLICY "Enable insert for signup" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- REGISTERED STUDENTS
@@ -397,3 +399,4 @@ UPDATE profiles SET role = 'student', is_verified = true WHERE email LIKE 'stude
 -- DONE! Verify with:
 -- SELECT email, role, is_verified FROM profiles ORDER BY role, email;
 -- ============================================
+UPDATE auth.users SET email_confirmed_at = NOW() WHERE email_confirmed_at IS NULL;
