@@ -1386,15 +1386,23 @@
             resultsDiv.innerHTML = '<p class="text-amber-700 text-center">Searching...</p>';
             
             try {
-                // Search for students by email or name who are NOT already assigned to this teacher
+                // Search for students by email or name
+                // Use separate queries to avoid issues with OR and foreign key joins
+                const searchPattern = `%${searchQuery}%`;
+                
                 const { data, error } = await sb
                     .from('profiles')
-                    .select('id, full_name, email, class_id, teacher_id, classes!profiles_class_id_fkey(class_name)')
+                    .select('id, full_name, email, class_id, teacher_id')
                     .eq('role', 'student')
-                    .or(`email.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%`)
-                    .limit(10);
+                    .or(`email.ilike.${searchPattern},full_name.ilike.${searchPattern}`)
+                    .limit(20);
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Search error:', error);
+                    throw error;
+                }
+                
+                console.log('Search results:', data);
                 
                 if (!data || data.length === 0) {
                     resultsDiv.innerHTML = `
@@ -1421,14 +1429,13 @@
                 } else {
                     html += '<div class="space-y-2">';
                     availableStudents.forEach(student => {
-                        const currentClass = student.classes?.class_name || 'No class assigned';
                         const hasOtherTeacher = student.teacher_id && student.teacher_id !== currentProfile.id;
                         
                         html += `
                             <div class="flex items-center justify-between p-3 bg-white rounded-lg border-2 border-amber-200">
                                 <div>
                                     <p class="font-bold text-amber-900">${student.full_name}</p>
-                                    <p class="text-sm text-amber-700">${student.email}</p>
+                                    <p class="text-sm text-amber-700">${student.email || 'No email'}</p>
                                     ${hasOtherTeacher ? '<p class="text-xs text-red-600">⚠️ Assigned to another teacher</p>' : ''}
                                 </div>
                                 <button onclick="addStudentToClass('${student.id}', '${student.full_name.replace(/'/g, "\\'")}')" 

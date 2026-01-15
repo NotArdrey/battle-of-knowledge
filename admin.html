@@ -1335,30 +1335,54 @@
             }
             
             // Double confirmation
-            if (!confirm('Are you ABSOLUTELY sure? Type OK to confirm this will delete all user progress.')) {
+            if (!confirm('Are you ABSOLUTELY sure? This will delete ALL user progress from the database.')) {
                 return;
             }
             
             showLoading(true);
             
             try {
-                // Delete all progress records
-                const { error: progressError } = await sb
+                // Delete all progress records - use gte on created_at to match all records
+                const { error: progressError, count: progressCount } = await sb
                     .from('progress')
-                    .delete()
-                    .neq('user_id', '00000000-0000-0000-0000-000000000000'); // Delete all (dummy condition)
+                    .delete({ count: 'exact' })
+                    .gte('created_at', '1970-01-01');
                 
-                if (progressError) throw progressError;
+                if (progressError) {
+                    console.error('Progress delete error:', progressError);
+                    throw progressError;
+                }
+                
+                console.log(`Deleted ${progressCount} progress records`);
                 
                 // Delete all achievements records
-                const { error: achievementsError } = await sb
+                const { error: achievementsError, count: achievementsCount } = await sb
                     .from('achievements')
-                    .delete()
-                    .neq('user_id', '00000000-0000-0000-0000-000000000000');
+                    .delete({ count: 'exact' })
+                    .gte('created_at', '1970-01-01');
                 
-                if (achievementsError) throw achievementsError;
+                if (achievementsError) {
+                    console.error('Achievements delete error:', achievementsError);
+                    throw achievementsError;
+                }
                 
-                showToast('All user progress has been reset successfully!', 'success');
+                console.log(`Deleted ${achievementsCount} achievement records`);
+                
+                // Also delete game_sessions if it exists
+                try {
+                    const { error: sessionsError } = await sb
+                        .from('game_sessions')
+                        .delete()
+                        .gte('created_at', '1970-01-01');
+                    
+                    if (sessionsError) {
+                        console.warn('Game sessions delete warning:', sessionsError);
+                    }
+                } catch (e) {
+                    console.warn('Game sessions table may not exist:', e);
+                }
+                
+                showToast(`All user progress has been reset! (${progressCount || 0} progress, ${achievementsCount || 0} achievements deleted)`, 'success');
                 
                 // Refresh stats
                 await loadStats();
