@@ -577,6 +577,10 @@
                     <button class="btn-primary" onclick="showQuestionModal()">➕ Add Custom Question</button>
                 </div>
                 
+                <div style="display: flex; justify-content: center; padding: 0 1.5rem 1rem;">
+                    <input type="text" id="questionsSearchInput" class="form-input" style="width: 100%; max-width: 400px; text-align: center;" placeholder="🔍 Search questions..." oninput="handleQuestionsSearch(this.value)">
+                </div>
+                
                 <!-- Question Type Tabs -->
                 <div id="questionTypeTabs" class="tabs" style="margin-bottom: 0.5rem;">
                     <button class="tab-btn active" onclick="renderQuestions('system')">📚 System Questions</button>
@@ -610,6 +614,13 @@
                     </table>
                 </div>
                 
+                <!-- Questions Pagination -->
+                <div id="questionsPagination" class="flex justify-center items-center gap-2 mt-4 flex-wrap">
+                    <button id="questionsPrevBtn" class="btn-action btn-view" onclick="changeQuestionsPage(-1)" disabled>← Previous</button>
+                    <span id="questionsPageInfo" class="text-amber-800 font-semibold px-4">Page 1 of 1</span>
+                    <button id="questionsNextBtn" class="btn-action btn-view" onclick="changeQuestionsPage(1)" disabled>Next →</button>
+                </div>
+                
                 <div id="questionsEmpty" class="empty-state hidden">
                     <div class="empty-icon">❓</div>
                     <p>No custom questions yet</p>
@@ -626,12 +637,16 @@
                     <button class="btn-primary" onclick="showLessonModal()">➕ Add Custom Lesson</button>
                 </div>
                 
-                <div class="tabs">
+                <div style="display: flex; justify-content: center; padding: 0 1.5rem 1rem;">
+                    <input type="text" id="lessonsSearchInput" class="form-input" style="width: 100%; max-width: 400px; text-align: center;" placeholder="🔍 Search lessons..." oninput="handleLessonsSearch(this.value)">
+                </div>
+                
+                <div class="tabs" id="lessonTypeTabs">
                     <button class="tab-btn active" onclick="renderLessons('system')">📚 System Lessons</button>
                     <button class="tab-btn" onclick="renderLessons('custom')">✏️ Custom Lessons</button>
                 </div>
                 
-                <div class="tabs mt-3">
+                <div class="tabs mt-3" id="lessonEraTabs">
                     <button class="tab-btn active" onclick="filterLessonsByEra('all')">All Eras</button>
                     <button class="tab-btn" onclick="filterLessonsByEra('early-spanish')">Early Spanish</button>
                     <button class="tab-btn" onclick="filterLessonsByEra('late-spanish')">Late Spanish</button>
@@ -655,6 +670,13 @@
                             <!-- Lessons will be loaded here -->
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Lessons Pagination -->
+                <div id="lessonsPagination" class="flex justify-center items-center gap-2 mt-4 flex-wrap">
+                    <button id="lessonsPrevBtn" class="btn-action btn-view" onclick="changeLessonsPage(-1)" disabled>← Previous</button>
+                    <span id="lessonsPageInfo" class="text-amber-800 font-semibold px-4">Page 1 of 1</span>
+                    <button id="lessonsNextBtn" class="btn-action btn-view" onclick="changeLessonsPage(1)" disabled>Next →</button>
                 </div>
                 
                 <div id="lessonsEmpty" class="empty-state hidden">
@@ -944,6 +966,18 @@
         const studentsPerPage = 10;
         let isSearchMode = false;
         let searchDebounceTimer = null;
+        
+        // Pagination state for Questions
+        let filteredQuestions = [];
+        let currentQuestionsPage = 1;
+        const questionsPerPage = 10;
+        let questionsSearchTerm = '';
+        
+        // Pagination state for Lessons
+        let filteredLessons = [];
+        let currentLessonsPage = 1;
+        const lessonsPerPage = 10;
+        let lessonsSearchTerm = '';
         
         const eraNames = {
             'early-spanish': 'Early Spanish Era',
@@ -2071,8 +2105,10 @@
         // Render questions
         function renderQuestions(type = 'system') {
             currentQuestionType = type;
-            const tbody = document.getElementById('questionsTableBody');
-            const emptyState = document.getElementById('questionsEmpty');
+            currentQuestionsPage = 1;
+            questionsSearchTerm = '';
+            currentEraFilter = 'all';
+            document.getElementById('questionsSearchInput').value = '';
             
             // Update type tab styling
             document.querySelectorAll('#questionTypeTabs .tab-btn').forEach(btn => {
@@ -2093,17 +2129,83 @@
             // Update era counts
             updateEraCounts(questions);
             
-            if (questions.length === 0) {
+            // Apply filters and render
+            applyQuestionsFilters();
+        }
+        
+        // Handle questions search
+        function handleQuestionsSearch(value) {
+            questionsSearchTerm = value.toLowerCase().trim();
+            currentQuestionsPage = 1;
+            applyQuestionsFilters();
+        }
+        
+        // Apply all filters to questions and render with pagination
+        function applyQuestionsFilters() {
+            const questions = currentQuestionType === 'system' ? allSystemQuestions : allQuestions;
+            const tbody = document.getElementById('questionsTableBody');
+            const emptyState = document.getElementById('questionsEmpty');
+            
+            // Filter by era
+            let filtered = currentEraFilter === 'all' ? questions : questions.filter(q => q.era_key === currentEraFilter);
+            
+            // Filter by search term
+            if (questionsSearchTerm) {
+                filtered = filtered.filter(q => 
+                    (q.question_text_en || '').toLowerCase().includes(questionsSearchTerm) ||
+                    (q.correct_answer_en || '').toLowerCase().includes(questionsSearchTerm) ||
+                    (q.question_text_tl || '').toLowerCase().includes(questionsSearchTerm)
+                );
+            }
+            
+            filteredQuestions = filtered;
+            
+            if (filtered.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
-                emptyState.querySelector('p').textContent = type === 'system' 
-                    ? 'No system questions loaded' 
-                    : 'No custom questions yet';
+                emptyState.querySelector('p').textContent = questionsSearchTerm 
+                    ? 'No questions match your search' 
+                    : `No ${currentQuestionType} questions for this era`;
+                document.getElementById('questionsPagination').style.display = 'none';
                 return;
             }
             
             emptyState.classList.add('hidden');
-            renderQuestionRows(questions);
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filtered.length / questionsPerPage);
+            if (currentQuestionsPage > totalPages) currentQuestionsPage = totalPages;
+            
+            const start = (currentQuestionsPage - 1) * questionsPerPage;
+            const end = start + questionsPerPage;
+            const pageQuestions = filtered.slice(start, end);
+            
+            renderQuestionRows(pageQuestions);
+            updateQuestionsPagination(filtered.length, totalPages);
+        }
+        
+        // Update questions pagination controls
+        function updateQuestionsPagination(total, totalPages) {
+            const paginationDiv = document.getElementById('questionsPagination');
+            const pageInfo = document.getElementById('questionsPageInfo');
+            const prevBtn = document.getElementById('questionsPrevBtn');
+            const nextBtn = document.getElementById('questionsNextBtn');
+            
+            if (total <= questionsPerPage) {
+                paginationDiv.style.display = 'none';
+                return;
+            }
+            
+            paginationDiv.style.display = 'flex';
+            pageInfo.textContent = `Page ${currentQuestionsPage} of ${totalPages} (${total} total)`;
+            prevBtn.disabled = currentQuestionsPage <= 1;
+            nextBtn.disabled = currentQuestionsPage >= totalPages;
+        }
+        
+        // Change questions page
+        function changeQuestionsPage(delta) {
+            currentQuestionsPage += delta;
+            applyQuestionsFilters();
         }
         
         // Update era filter counts
@@ -2155,6 +2257,9 @@
         
         // Filter questions by era or type
         function filterQuestionsByEra(filter) {
+            currentEraFilter = filter;
+            currentQuestionsPage = 1;
+            
             // Update era tab styling
             document.querySelectorAll('#questionEraTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -2168,23 +2273,7 @@
                 }
             });
             
-            // Get current question set
-            const questions = currentQuestionType === 'system' ? allSystemQuestions : allQuestions;
-            
-            // Filter by era
-            const filtered = filter === 'all' ? questions : questions.filter(q => q.era_key === filter);
-            
-            const tbody = document.getElementById('questionsTableBody');
-            const emptyState = document.getElementById('questionsEmpty');
-            
-            if (filtered.length === 0) {
-                tbody.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                emptyState.querySelector('p').textContent = `No ${currentQuestionType} questions for this era`;
-            } else {
-                emptyState.classList.add('hidden');
-                renderQuestionRows(filtered);
-            }
+            applyQuestionsFilters();
         }
         
         // View system question (read-only)
@@ -2383,11 +2472,13 @@
         // Render lessons
         function renderLessons(type = 'system') {
             currentLessonType = type;
-            const tbody = document.getElementById('lessonsTableBody');
-            const emptyState = document.getElementById('lessonsEmpty');
+            currentLessonsPage = 1;
+            lessonsSearchTerm = '';
+            currentEraFilter = 'all';
+            document.getElementById('lessonsSearchInput').value = '';
             
             // Update type tab styling
-            document.querySelectorAll('#lessonsTab .tabs:first-of-type .tab-btn').forEach(btn => {
+            document.querySelectorAll('#lessonTypeTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if ((type === 'system' && btn.textContent.includes('System')) ||
                     (type === 'custom' && btn.textContent.includes('Custom'))) {
@@ -2396,41 +2487,98 @@
             });
             
             // Reset era filter to "All" when switching types
-            currentEraFilter = 'all';
-            document.querySelectorAll('#lessonsTab .tabs:nth-of-type(2) .tab-btn').forEach((btn, idx) => {
+            document.querySelectorAll('#lessonEraTabs .tab-btn').forEach((btn, idx) => {
                 btn.classList.toggle('active', idx === 0);
             });
             
-            const lessons = type === 'system' ? allSystemLessons : allLessons;
+            applyLessonsFilters();
+        }
+        
+        // Handle lessons search
+        function handleLessonsSearch(value) {
+            lessonsSearchTerm = value.toLowerCase().trim();
+            currentLessonsPage = 1;
+            applyLessonsFilters();
+        }
+        
+        // Apply all filters to lessons and render with pagination
+        function applyLessonsFilters() {
+            const lessons = currentLessonType === 'system' ? allSystemLessons : allLessons;
+            const tbody = document.getElementById('lessonsTableBody');
+            const emptyState = document.getElementById('lessonsEmpty');
             
-            if (lessons.length === 0) {
+            // Filter by era
+            let filtered = currentEraFilter === 'all' ? lessons : lessons.filter(l => l.era_key === currentEraFilter);
+            
+            // Filter by search term
+            if (lessonsSearchTerm) {
+                filtered = filtered.filter(l => 
+                    (l.title_en || '').toLowerCase().includes(lessonsSearchTerm) ||
+                    (l.title_tl || '').toLowerCase().includes(lessonsSearchTerm) ||
+                    (l.content_en || '').toLowerCase().includes(lessonsSearchTerm)
+                );
+            }
+            
+            filteredLessons = filtered;
+            
+            if (filtered.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
-                emptyState.querySelector('p').textContent = type === 'system' 
-                    ? 'No system lessons loaded' 
-                    : 'No custom lessons yet';
+                emptyState.querySelector('p').textContent = lessonsSearchTerm 
+                    ? 'No lessons match your search' 
+                    : `No ${currentLessonType} lessons for this era`;
+                document.getElementById('lessonsPagination').style.display = 'none';
                 return;
             }
             
             emptyState.classList.add('hidden');
-            renderLessonRows(lessons);
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filtered.length / lessonsPerPage);
+            if (currentLessonsPage > totalPages) currentLessonsPage = totalPages;
+            
+            const start = (currentLessonsPage - 1) * lessonsPerPage;
+            const end = start + lessonsPerPage;
+            const pageLessons = filtered.slice(start, end);
+            
+            renderLessonRows(pageLessons);
+            updateLessonsPagination(filtered.length, totalPages);
         }
         
-        // Render lesson rows
-        function renderLessonRows(lessons) {
-            const tbody = document.getElementById('lessonsTableBody');
+        // Update lessons pagination controls
+        function updateLessonsPagination(total, totalPages) {
+            const paginationDiv = document.getElementById('lessonsPagination');
+            const pageInfo = document.getElementById('lessonsPageInfo');
+            const prevBtn = document.getElementById('lessonsPrevBtn');
+            const nextBtn = document.getElementById('lessonsNextBtn');
             
-            // Filter by era if needed
-            let filteredLessons = currentEraFilter === 'all' 
-                ? lessons 
-                : lessons.filter(l => l.era_key === currentEraFilter);
-            
-            if (filteredLessons.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-amber-700">No lessons found for this era</td></tr>';
+            if (total <= lessonsPerPage) {
+                paginationDiv.style.display = 'none';
                 return;
             }
             
-            tbody.innerHTML = filteredLessons.map(lesson => `
+            paginationDiv.style.display = 'flex';
+            pageInfo.textContent = `Page ${currentLessonsPage} of ${totalPages} (${total} total)`;
+            prevBtn.disabled = currentLessonsPage <= 1;
+            nextBtn.disabled = currentLessonsPage >= totalPages;
+        }
+        
+        // Change lessons page
+        function changeLessonsPage(delta) {
+            currentLessonsPage += delta;
+            applyLessonsFilters();
+        }
+        
+        // Render lesson rows (just the table body, no filtering)
+        function renderLessonRows(lessons) {
+            const tbody = document.getElementById('lessonsTableBody');
+            
+            if (lessons.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-amber-700">No lessons found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = lessons.map(lesson => `
                 <tr>
                     <td>${eraNames[lesson.era_key] || lesson.era_key}</td>
                     <td class="text-center font-bold">${lesson.lesson_order}</td>
@@ -2458,9 +2606,10 @@
         // Filter lessons by era
         function filterLessonsByEra(era) {
             currentEraFilter = era;
+            currentLessonsPage = 1;
             
             // Update era tab styling
-            document.querySelectorAll('#lessonsTab .tabs:nth-of-type(2) .tab-btn').forEach(btn => {
+            document.querySelectorAll('#lessonEraTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if ((era === 'all' && btn.textContent.includes('All')) ||
                     btn.textContent.toLowerCase().includes(era.split('-')[0])) {
@@ -2468,8 +2617,7 @@
                 }
             });
             
-            const lessons = currentLessonType === 'system' ? allSystemLessons : allLessons;
-            renderLessonRows(lessons);
+            applyLessonsFilters();
         }
         
         // Show lesson modal
