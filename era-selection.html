@@ -803,6 +803,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/progress-sync.js"></script>
+    <script src="js/shared-auth.js"></script>
     
     <script src="js/language.js"></script>
     <script>
@@ -821,6 +822,10 @@
         (async function() {
             if (window.ProgressSync) {
                 await window.ProgressSync.init();
+            }
+            // Initialize guest settings from database for cross-browser sync
+            if (typeof initGuestSettings === 'function') {
+                await initGuestSettings();
             }
             // Refresh UI after progress loaded
             refreshEraLocks();
@@ -842,6 +847,12 @@
 
         // Check if admin has enabled unlock all for guests
         function isGuestUnlockEnabled() {
+            // Use shared function for cross-browser sync
+            if (typeof getGuestModeSettings === 'function') {
+                const settings = getGuestModeSettings();
+                return settings.unlockProgress === true;
+            }
+            // Fallback to localStorage
             try {
                 const settings = JSON.parse(localStorage.getItem('guestModeSettings') || '{}');
                 return settings.unlockProgress === true;

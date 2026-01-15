@@ -50,8 +50,66 @@ function getGuestProfile() {
     };
 }
 
+// Cache for guest settings fetched from database
+let guestSettingsCache = null;
+let guestSettingsFetchPromise = null;
+
+/**
+ * Fetch guest settings from database (for cross-browser sync)
+ * @returns {Promise<Object>} Guest settings from database
+ */
+async function fetchGuestSettingsFromDB() {
+    const GUEST_SETTINGS_KEY = 'guestModeSettings';
+    
+    try {
+        const client = getSupabaseClient();
+        if (!client) {
+            return null;
+        }
+        
+        // Get settings from admin profile's avatar_url field
+        const { data, error } = await client
+            .from('profiles')
+            .select('avatar_url')
+            .eq('role', 'admin')
+            .limit(1)
+            .single();
+        
+        if (!error && data && data.avatar_url) {
+            try {
+                const dbSettings = JSON.parse(data.avatar_url);
+                if (dbSettings && dbSettings.guestSettings) {
+                    // Cache the settings and update localStorage
+                    guestSettingsCache = dbSettings.guestSettings;
+                    localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(guestSettingsCache));
+                    return guestSettingsCache;
+                }
+            } catch (e) {
+                // avatar_url is not JSON, that's fine
+            }
+        }
+    } catch (e) {
+        console.warn('Could not fetch guest settings from database:', e);
+    }
+    
+    return null;
+}
+
+/**
+ * Initialize guest settings from database (call on page load)
+ */
+async function initGuestSettings() {
+    if (guestSettingsFetchPromise) {
+        return guestSettingsFetchPromise;
+    }
+    
+    guestSettingsFetchPromise = fetchGuestSettingsFromDB();
+    await guestSettingsFetchPromise;
+}
+
 /**
  * Get guest mode settings (set by admin)
+ * Now checks both localStorage and database cache
  * @returns {Object} Guest settings
  */
 function getGuestModeSettings() {
@@ -61,6 +119,14 @@ function getGuestModeSettings() {
         skipVideos: false
     };
     
+    // Use cache from database if available
+    if (guestSettingsCache) {
+        const settings = { ...defaultSettings, ...guestSettingsCache };
+        settings.unlockCollections = settings.unlockProgress;
+        return settings;
+    }
+    
+    // Fallback to localStorage
     const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
     const settings = saved ? { ...defaultSettings, ...JSON.parse(saved) } : { ...defaultSettings };
     

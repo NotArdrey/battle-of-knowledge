@@ -1261,7 +1261,7 @@
         }
         
         // Switch tabs
-        function switchTab(tabName) {
+        async function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1274,57 +1274,123 @@
             
             // Load guest settings when settings tab is opened
             if (tabName === 'settings') {
-                loadGuestSettings();
+                await loadGuestSettings();
             }
         }
         
         // ============================================
-        // GUEST SETTINGS MANAGEMENT
+        // GUEST SETTINGS MANAGEMENT (DATABASE-BACKED)
         // ============================================
         
         const GUEST_SETTINGS_KEY = 'guestModeSettings';
+        const GUEST_SETTINGS_DB_KEY = 'guest_unlock_progress'; // Key used in database
         
         // Default guest settings
         const defaultGuestSettings = {
             unlockProgress: false  // Unlocks all eras and collections
         };
         
-        // Get current guest settings
-        function getGuestSettings() {
+        // In-memory cache
+        let cachedGuestSettings = null;
+        
+        // Get current guest settings from database
+        async function getGuestSettings() {
+            // Return cached if available
+            if (cachedGuestSettings !== null) {
+                return { ...defaultGuestSettings, ...cachedGuestSettings };
+            }
+            
+            try {
+                // Try to get from database first (stored in a special admin profile metadata or custom table)
+                // We'll use localStorage as fallback but primary is database
+                const { data, error } = await sb
+                    .from('profiles')
+                    .select('avatar_url')
+                    .eq('role', 'admin')
+                    .limit(1)
+                    .single();
+                
+                if (!error && data && data.avatar_url) {
+                    try {
+                        // We're storing settings in avatar_url field as JSON (hacky but works without schema change)
+                        const dbSettings = JSON.parse(data.avatar_url);
+                        if (dbSettings && dbSettings.guestSettings) {
+                            cachedGuestSettings = dbSettings.guestSettings;
+                            // Also update localStorage for offline access
+                            localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(cachedGuestSettings));
+                            return { ...defaultGuestSettings, ...cachedGuestSettings };
+                        }
+                    } catch (e) {
+                        // avatar_url is not JSON, that's fine
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load settings from database:', e);
+            }
+            
+            // Fallback to localStorage
             const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
             if (saved) {
-                return { ...defaultGuestSettings, ...JSON.parse(saved) };
+                cachedGuestSettings = JSON.parse(saved);
+                return { ...defaultGuestSettings, ...cachedGuestSettings };
             }
             return { ...defaultGuestSettings };
         }
         
-        // Save guest settings
-        function saveGuestSettings(settings) {
+        // Save guest settings to database AND localStorage
+        async function saveGuestSettings(settings) {
+            cachedGuestSettings = settings;
+            
+            // Save to localStorage for immediate access
             localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(settings));
+            
+            // Save to database so it works across all browsers
+            try {
+                const settingsJson = JSON.stringify({ guestSettings: settings });
+                
+                // Update all admin profiles with the settings
+                const { error } = await sb
+                    .from('profiles')
+                    .update({ avatar_url: settingsJson })
+                    .eq('role', 'admin');
+                
+                if (error) {
+                    console.error('Failed to save settings to database:', error);
+                } else {
+                    console.log('Guest settings saved to database successfully');
+                }
+            } catch (e) {
+                console.error('Error saving to database:', e);
+            }
         }
         
         // Toggle a specific guest setting
-        function toggleGuestSetting(settingName, value) {
-            const settings = getGuestSettings();
+        async function toggleGuestSetting(settingName, value) {
+            const settings = await getGuestSettings();
             settings[settingName] = value;
-            saveGuestSettings(settings);
+            await saveGuestSettings(settings);
             showToast(`Guest setting updated: Unlock Progress & Collections = ${value}`, 'success');
         }
         
         // Load guest settings into the UI
-        function loadGuestSettings() {
-            const settings = getGuestSettings();
+        async function loadGuestSettings() {
+            const settings = await getGuestSettings();
             
             // Set checkbox states
-            document.getElementById('guestUnlockProgress').checked = settings.unlockProgress;
+            const checkbox = document.getElementById('guestUnlockProgress');
+            if (checkbox) {
+                checkbox.checked = settings.unlockProgress;
+            }
         }
         
         // Reset guest settings to defaults
-        function resetGuestSettings() {
-            if (confirm('Reset all guest settings to defaults?')) {
+        async function resetGuestSettings() {
+            if (confirm('Reset all guest settings to defaults? This will apply to ALL browsers.')) {
                 localStorage.removeItem(GUEST_SETTINGS_KEY);
-                loadGuestSettings();
-                showToast('Guest settings reset to defaults', 'success');
+                cachedGuestSettings = null;
+                await saveGuestSettings(defaultGuestSettings);
+                await loadGuestSettings();
+                showToast('Guest settings reset to defaults (applied globally)', 'success');
             }
         }
         
