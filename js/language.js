@@ -7,6 +7,63 @@ const translations = {
         'START': 'START',
         '📚 COLLECTION': 'COLLECTION',
         
+        // Login page
+        'Welcome Back!': 'Welcome Back!',
+        'Sign in to continue your journey': 'Sign in to continue your journey',
+        'Email Address': 'Email Address',
+        'Password': 'Password',
+        'Enter your email': 'Enter your email',
+        'Enter your password': 'Enter your password',
+        'Remember me': 'Remember me',
+        'Forgot password?': 'Forgot password?',
+        'Sign In': 'Sign In',
+        'Signing in...': 'Signing in...',
+        'OR': 'OR',
+        'Play as Guest': 'Play as Guest',
+        'Progress won\'t be saved online': 'Progress won\'t be saved online',
+        'Don\'t have an account?': 'Don\'t have an account?',
+        'Sign up here': 'Sign up here',
+        'Reset Password': 'Reset Password',
+        'Enter your email to receive a password reset link': 'Enter your email to receive a password reset link',
+        'Send Reset Link': 'Send Reset Link',
+        'Sending...': 'Sending...',
+        'Cancel': 'Cancel',
+        'Login successful!': 'Login successful!',
+        
+        // Signup page
+        'Create Account': 'Create Account',
+        'Join the adventure': 'Join the adventure of learning history!',
+        'Full Name': 'Full Name',
+        'Enter your full name': 'Enter your full name',
+        'Student ID Number': 'Student ID Number',
+        'Enter your student ID': 'Enter your student ID',
+        'Class Code': 'Class Code',
+        'Enter class code': 'Enter class code',
+        'Confirm Password': 'Confirm Password',
+        'Confirm your password': 'Confirm your password',
+        'I agree to the': 'I agree to the',
+        'Terms of Service': 'Terms of Service',
+        'and': 'and',
+        'Privacy Policy': 'Privacy Policy',
+        'Creating account...': 'Creating account...',
+        'Already have an account?': 'Already have an account?',
+        'Sign in here': 'Sign in here',
+        
+        // Account page
+        'My Account': 'My Account',
+        'Profile': 'Profile',
+        'Avatar': 'Avatar',
+        'Statistics': 'Statistics',
+        'Save Changes': 'Save Changes',
+        'Saving...': 'Saving...',
+        'Logout': 'Logout',
+        'Back to Menu': 'Back to Menu',
+        
+        // Exit battle modal
+        'exitBattleWarning': 'Are you sure you want to leave the battle? Your progress will be lost.',
+        'Yes, Leave': 'Yes, Leave',
+        'No, Stay': 'No, Stay',
+        
         // Era selection
         'Choose Your Historical Era': 'Choose Your Historical Era',
         'Early Spanish Era': 'Early Spanish Era',
@@ -24,10 +81,10 @@ const translations = {
         
         // Character selection
         'Choose Your Hero': 'Choose Your Hero',
-        'Cancel': 'Cancel',
         
         // Collection page
         '📚 Character Collection 📚': 'Character Collection',
+        'Character Collection': 'Character Collection',
         'Learn about the Heroes and Villains of Philippine History': 'Learn about the Heroes and Villains of Philippine History',
         'Historical Contributions': 'Historical Contributions',
         'HERO': 'HERO',
@@ -89,6 +146,63 @@ const translations = {
         'START': 'MAGSIMULA',
         '📚 COLLECTION': '📚 KOLEKSYON' ,
         
+        // Login page
+        'Welcome Back!': 'Maligayang Pagbabalik!',
+        'Sign in to continue your journey': 'Mag-sign in upang ipagpatuloy ang iyong paglalakbay',
+        'Email Address': 'Email Address',
+        'Password': 'Password',
+        'Enter your email': 'Ilagay ang iyong email',
+        'Enter your password': 'Ilagay ang iyong password',
+        'Remember me': 'Tandaan ako',
+        'Forgot password?': 'Nakalimutan ang password?',
+        'Sign In': 'Mag-sign In',
+        'Signing in...': 'Nagsa-sign in...',
+        'OR': 'O',
+        'Play as Guest': 'Maglaro bilang Bisita',
+        'Progress won\'t be saved online': 'Hindi mase-save online ang progreso',
+        'Don\'t have an account?': 'Wala pang account?',
+        'Sign up here': 'Mag-sign up dito',
+        'Reset Password': 'I-reset ang Password',
+        'Enter your email to receive a password reset link': 'Ilagay ang iyong email upang makatanggap ng reset link',
+        'Send Reset Link': 'Ipadala ang Reset Link',
+        'Sending...': 'Ipinapadala...',
+        'Cancel': 'Kanselahin',
+        'Login successful!': 'Matagumpay na naka-login!',
+        
+        // Signup page
+        'Create Account': 'Gumawa ng Account',
+        'Join the adventure': 'Sumali sa pakikipagsapalaran ng pag-aaral ng kasaysayan!',
+        'Full Name': 'Buong Pangalan',
+        'Enter your full name': 'Ilagay ang iyong buong pangalan',
+        'Student ID Number': 'Student ID Number',
+        'Enter your student ID': 'Ilagay ang iyong student ID',
+        'Class Code': 'Class Code',
+        'Enter class code': 'Ilagay ang class code',
+        'Confirm Password': 'Kumpirmahin ang Password',
+        'Confirm your password': 'Kumpirmahin ang iyong password',
+        'I agree to the': 'Sumasang-ayon ako sa',
+        'Terms of Service': 'Mga Tuntunin ng Serbisyo',
+        'and': 'at',
+        'Privacy Policy': 'Patakaran sa Privacy',
+        'Creating account...': 'Gumagawa ng account...',
+        'Already have an account?': 'Mayroon nang account?',
+        'Sign in here': 'Mag-sign in dito',
+        
+        // Account page
+        'My Account': 'Aking Account',
+        'Profile': 'Profile',
+        'Avatar': 'Avatar',
+        'Statistics': 'Mga Istatistika',
+        'Save Changes': 'I-save ang mga Pagbabago',
+        'Saving...': 'Sine-save...',
+        'Logout': 'Mag-logout',
+        'Back to Menu': 'Bumalik sa Menu',
+        
+        // Exit battle modal
+        'exitBattleWarning': 'Sigurado ka bang gusto mong umalis sa labanan? Mawawala ang iyong progreso.',
+        'Yes, Leave': 'Oo, Umalis',
+        'No, Stay': 'Hindi, Manatili',
+        
         // Era selection
         'Choose Your Historical Era': 'Pumili ng Panahon sa Kasaysayan',
         'Early Spanish Era': 'Unang Panahon ng Kastila',
@@ -111,6 +225,7 @@ const translations = {
         
         // Collection page
         '📚 Character Collection 📚': 'Koleksyon ng mga Tauhan',
+        'Character Collection': 'Koleksyon ng mga Tauhan',
         'Learn about the Heroes and Villains of Philippine History': 'Alamin ang mga Bayani at Kontrabida sa Kasaysayan ng Pilipinas',
         'Historical Contributions': 'Mga Kontribusyon sa Kasaysayan',
         'HERO': 'BAYANI',

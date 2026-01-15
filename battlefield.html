@@ -25,6 +25,26 @@
         position: fixed;
         /* Page background - always blue gradient */
         background: linear-gradient(to bottom, #7dd3fc, #3b82f6);
+        /* Performance optimizations */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* GPU acceleration for main containers */
+    .battle-screen,
+    .battle-area,
+    .question-area {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    
+    /* Character sprites - GPU accelerated */
+    #playerSprite,
+    #enemySprite {
+        will-change: transform;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        image-rendering: -webkit-optimize-contrast;
     }
     
     /* Remove era-background div - we don't need page background */
@@ -490,6 +510,151 @@
         background: transparent;
         border: none;
         padding: 0;
+    }
+
+    /* Graphics Settings Button */
+    .settings-btn {
+        top: 10px;
+        right: 120px;
+        background: linear-gradient(135deg, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+        border: 3px solid #92400e;
+        border-radius: 10px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #78350f;
+    }
+
+    .settings-btn:hover {
+        background: linear-gradient(135deg, rgba(253, 230, 138, 0.95), rgba(245, 158, 11, 0.95));
+    }
+
+    .settings-icon {
+        font-size: 16px;
+    }
+
+    @media (max-width: 640px) {
+        .settings-btn {
+            right: 100px;
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .settings-btn {
+            right: 85px;
+            padding: 5px 8px;
+            font-size: 10px;
+        }
+        .settings-btn span:not(.settings-icon) {
+            display: none;
+        }
+    }
+
+    /* Graphics Settings Modal */
+    .settings-modal {
+        background: linear-gradient(135deg, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
+        border: 4px solid #92400e;
+        border-radius: 20px;
+        padding: 24px;
+        max-width: 350px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .settings-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #78350f;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .graphics-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .graphics-option {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 3px solid rgba(120, 53, 15, 0.3);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .graphics-option:hover {
+        border-color: #b45309;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .graphics-option.selected {
+        border-color: #b45309;
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.3));
+        box-shadow: 0 4px 12px rgba(180, 83, 9, 0.2);
+    }
+
+    .option-radio {
+        width: 22px;
+        height: 22px;
+        border: 3px solid #92400e;
+        border-radius: 50%;
+        margin-right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .graphics-option.selected .option-radio::after {
+        content: '';
+        width: 12px;
+        height: 12px;
+        background: #b45309;
+        border-radius: 50%;
+    }
+
+    .option-content {
+        flex: 1;
+    }
+
+    .option-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #78350f;
+        margin-bottom: 2px;
+    }
+
+    .option-desc {
+        font-size: 12px;
+        color: #92400e;
+    }
+
+    .settings-close-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #b45309, #d97706);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .settings-close-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(180, 83, 9, 0.4);
     }
     
     @media (max-width: 640px) {
@@ -1040,6 +1205,58 @@
             }
         }
     }
+
+    /* Low Graphics Mode - Performance Optimizations */
+    .low-graphics .battle-area::before {
+        display: none !important;
+    }
+
+    .low-graphics .battle-platform-overlay {
+        display: none !important;
+    }
+
+    .low-graphics .character-shadow {
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3)) !important;
+    }
+
+    .low-graphics .battle-area::after {
+        box-shadow: none !important;
+        border-width: 2px !important;
+    }
+
+    .low-graphics .answer-btn {
+        transition: none !important;
+    }
+
+    .low-graphics .answer-btn:hover {
+        transform: none !important;
+    }
+
+    .low-graphics .hp-bar-fill {
+        transition: width 0.3s linear !important;
+    }
+
+    .low-graphics * {
+        animation-duration: 0.1s !important;
+    }
+
+    .low-graphics .animate-bounce,
+    .low-graphics .animate-pulse {
+        animation: none !important;
+    }
+
+    .low-graphics .victory-glow {
+        animation: none !important;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.5) !important;
+    }
+
+    .low-graphics .boss-hp-bar-animation {
+        animation: none !important;
+    }
+
+    .low-graphics .title-glow {
+        animation: none !important;
+    }
 </style>
 </head>
 <body>
@@ -1076,6 +1293,12 @@
              src="assets/Buttons/TAGALOG BUTTON.png" 
              alt="Switch to Tagalog" 
              class="h-10 md:h-14 w-auto drop-shadow-lg">
+    </button>
+
+    <!-- Graphics Settings Button -->
+    <button id="settingsBtn" onclick="openGraphicsSettings()" class="control-btn settings-btn">
+        <span class="settings-icon">⚙️</span>
+        <span id="graphicsLabel">GFX</span>
     </button>
     
     <!-- Main Battle Screen -->
@@ -1239,8 +1462,11 @@
             <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-800 mb-4">
                 ⚠️ Leave Battle? ⚠️
             </h1>
-            <p class="text-lg sm:text-xl text-amber-700 mb-6" data-translate="exitBattleWarning">
-                Your battle progress will be lost. Are you sure you want to leave?
+            <p class="text-lg sm:text-xl text-amber-700 mb-2" data-translate="exitBattleWarning">
+                Your battle progress will be lost!
+            </p>
+            <p class="text-md text-red-600 font-bold mb-6">
+                ⚠️ All lesson progress for this era will be RESET. You will need to complete the lessons again.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1266,6 +1492,35 @@
     
     <!-- Floating Damage Indicators -->
     <div id="damageIndicators" class="fixed inset-0 pointer-events-none z-40"></div>
+
+    <!-- Graphics Settings Modal -->
+    <div id="graphicsModal" class="modal-overlay hidden">
+        <div class="settings-modal">
+            <h2 class="settings-title">⚙️ Graphics Settings</h2>
+            
+            <div class="graphics-options">
+                <div id="optionHigh" class="graphics-option" onclick="setGraphicsQuality('high')">
+                    <div class="option-radio"></div>
+                    <div class="option-content">
+                        <div class="option-title">🌟 High Quality</div>
+                        <div class="option-desc">Full visual effects, animations, and particles</div>
+                    </div>
+                </div>
+                
+                <div id="optionLow" class="graphics-option" onclick="setGraphicsQuality('low')">
+                    <div class="option-radio"></div>
+                    <div class="option-content">
+                        <div class="option-title">⚡ Low Quality</div>
+                        <div class="option-desc">Reduced effects for smoother performance</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeGraphicsSettings()" class="settings-close-btn">
+                Apply & Close
+            </button>
+        </div>
+    </div>
     
     <!-- Supabase SDK and Auth -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1282,7 +1537,7 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Battlefield page loaded with boss mechanics');
             
-            // Initialize ProgressSync if available
+            // Initialize ProgressSync (works for both logged-in users and guests)
             if (window.ProgressSync) {
                 await window.ProgressSync.init();
             }
@@ -1318,6 +1573,24 @@
         function confirmExit() {
             // Clear battle progress when leaving
             localStorage.removeItem('battleProgress');
+            
+            // Reset the current era's lesson progress (penalty for leaving mid-battle)
+            // Get currentEra from battle.js global or URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const eraToReset = window.currentEra || urlParams.get('era');
+            
+            if (eraToReset && window.ProgressSync) {
+                // Reset era lessons for logged-in users
+                window.ProgressSync.resetEraLessons(eraToReset);
+                console.log('Reset lesson progress for era:', eraToReset);
+            }
+            
+            // Also clear local storage lesson progress for guests
+            if (eraToReset) {
+                const guestLessonsKey = `completedLessons_${eraToReset}`;
+                localStorage.removeItem(guestLessonsKey);
+            }
+            
             window.location.href = 'learning-module.html';
         }
         
@@ -1379,6 +1652,65 @@
                 }
             }, 2000);
         }
+
+        // Graphics Settings Functions
+        function openGraphicsSettings() {
+            const modal = document.getElementById('graphicsModal');
+            modal.classList.remove('hidden');
+            updateGraphicsUI();
+        }
+
+        function closeGraphicsSettings() {
+            const modal = document.getElementById('graphicsModal');
+            modal.classList.add('hidden');
+        }
+
+        function setGraphicsQuality(quality) {
+            localStorage.setItem('fxQuality', quality);
+            updateGraphicsUI();
+            applyGraphicsSettings();
+        }
+
+        function updateGraphicsUI() {
+            const currentQuality = localStorage.getItem('fxQuality') || 'low';
+            const optionHigh = document.getElementById('optionHigh');
+            const optionLow = document.getElementById('optionLow');
+            const label = document.getElementById('graphicsLabel');
+
+            optionHigh.classList.remove('selected');
+            optionLow.classList.remove('selected');
+
+            if (currentQuality === 'high') {
+                optionHigh.classList.add('selected');
+                if (label) label.textContent = 'HIGH';
+            } else {
+                optionLow.classList.add('selected');
+                if (label) label.textContent = 'LOW';
+            }
+        }
+
+        function applyGraphicsSettings() {
+            const quality = localStorage.getItem('fxQuality') || 'low';
+            const isLowQuality = quality !== 'high';
+
+            // Update the reducedFxMode in battle.js context
+            if (typeof window.updateReducedFxMode === 'function') {
+                window.updateReducedFxMode(isLowQuality);
+            }
+
+            // Apply CSS-based optimizations for low quality
+            if (isLowQuality) {
+                document.body.classList.add('low-graphics');
+            } else {
+                document.body.classList.remove('low-graphics');
+            }
+        }
+
+        // Initialize graphics settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGraphicsUI();
+            applyGraphicsSettings();
+        });
     </script>
 </body>
 </html>

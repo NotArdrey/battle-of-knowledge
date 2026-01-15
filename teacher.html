@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -497,6 +498,10 @@
                 <div class="stat-number" id="totalQuestions">0</div>
                 <div class="stat-label">My Questions</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalLessons">0</div>
+                <div class="stat-label">My Lessons</div>
+            </div>
         </div>
         
         <!-- Tabs -->
@@ -504,6 +509,7 @@
             <button class="tab-btn active" onclick="switchTab('classes')">🏫 My Classes</button>
             <button class="tab-btn" onclick="switchTab('students')">👥 Student Progress</button>
             <button class="tab-btn" onclick="switchTab('questions')">❓ Questions</button>
+            <button class="tab-btn" onclick="switchTab('lessons')">📚 Lessons</button>
         </div>
         
         <!-- Classes Tab -->
@@ -612,6 +618,53 @@
                     <div class="empty-icon">❓</div>
                     <p>No custom questions yet</p>
                     <p class="text-sm">Add questions for your students</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons Tab -->
+        <div id="lessonsTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Learning Module Management</h2>
+                    <button class="btn-primary" onclick="showLessonModal()">➕ Add Custom Lesson</button>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="renderLessons('system')">📚 System Lessons</button>
+                    <button class="tab-btn" onclick="renderLessons('custom')">✏️ Custom Lessons</button>
+                </div>
+                
+                <div class="tabs mt-3">
+                    <button class="tab-btn active" onclick="filterLessonsByEra('all')">All Eras</button>
+                    <button class="tab-btn" onclick="filterLessonsByEra('early-spanish')">Early Spanish</button>
+                    <button class="tab-btn" onclick="filterLessonsByEra('late-spanish')">Late Spanish</button>
+                    <button class="tab-btn" onclick="filterLessonsByEra('american-colonial')">American Era</button>
+                    <button class="tab-btn" onclick="filterLessonsByEra('ww2')">WW2 Era</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="lessonsTable">
+                        <thead>
+                            <tr>
+                                <th>Era</th>
+                                <th>Order</th>
+                                <th>Title</th>
+                                <th>Icon</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lessonsTableBody">
+                            <!-- Lessons will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="lessonsEmpty" class="empty-state hidden">
+                    <div class="empty-icon">📖</div>
+                    <p>No custom lessons yet</p>
+                    <p class="text-sm">Add lessons for your students</p>
                 </div>
             </div>
         </div>
@@ -764,11 +817,73 @@
         </div>
     </div>
 
+    <!-- Add Lesson Modal -->
+    <div id="lessonModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 800px;">
+            <h2 class="modal-title" id="lessonModalTitle">Add New Lesson</h2>
+            <form id="lessonForm" onsubmit="handleSaveLesson(event)">
+                <input type="hidden" id="editLessonId">
+                
+                <div class="form-group">
+                    <label class="form-label">Era</label>
+                    <select id="lessonEra" class="form-input" required>
+                        <option value="">Select Era</option>
+                        <option value="early-spanish">Early Spanish Era</option>
+                        <option value="late-spanish">Late Spanish Era</option>
+                        <option value="american-colonial">American Colonial Era</option>
+                        <option value="ww2">WW2 Era</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Lesson Order (Position in sequence)</label>
+                    <input type="number" id="lessonOrder" class="form-input" min="1" placeholder="e.g., 6" required>
+                    <p class="text-sm text-amber-700 mt-1">Note: System lessons typically use 1-5. Use 6+ for custom lessons.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Lesson Title (English)</label>
+                    <input type="text" id="lessonTitleEn" class="form-input" placeholder="e.g., Additional Historical Events" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Lesson Title (Tagalog) - Optional</label>
+                    <input type="text" id="lessonTitleTl" class="form-input" placeholder="e.g., Karagdagang Makasaysayang Pangyayari">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Lesson Content (English) - HTML Supported</label>
+                    <textarea id="lessonContentEn" class="form-input" rows="8" placeholder="<div class='space-y-4'>&#10;    <h3 class='text-xl font-bold mb-3'>Section Title</h3>&#10;    <p class='mb-3'>Content here...</p>&#10;</div>" required></textarea>
+                    <p class="text-sm text-amber-700 mt-1">You can use HTML for formatting. Include divs, paragraphs, headings, etc.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Lesson Content (Tagalog) - Optional</label>
+                    <textarea id="lessonContentTl" class="form-input" rows="6" placeholder="Optional Tagalog translation"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Icon (Emoji or Number)</label>
+                    <input type="text" id="lessonIcon" class="form-input" placeholder="e.g., 📖 or 6" maxlength="2" required>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeLessonModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Save Lesson
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="js/questions.js"></script>
     <script>
         // Supabase config - standalone
-        const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
+        const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aHlxY3pwdGxqZGhtaW9hZ3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzOTY2NzAsImV4cCI6MjA4Mzk3MjY3MH0.QKFZapzgWYcCtuw3eEvqg6U6qi06QNpvIRNBw7ABf9I';
         
         let sb = null;
         function getClient() {
@@ -806,8 +921,12 @@
         let allStudents = [];
         let allQuestions = [];
         let allSystemQuestions = [];
+        let allLessons = [];
+        let allSystemLessons = [];
         let currentProfile = null;
         let currentQuestionType = 'system'; // 'system' or 'custom'
+        let currentLessonType = 'system'; // 'system' or 'custom'
+        let currentEraFilter = 'all';
         
         const eraNames = {
             'early-spanish': 'Early Spanish Era',
@@ -860,6 +979,7 @@
                 loadClasses(),
                 loadStudents(),
                 loadCustomQuestions(),
+                loadCustomLessons(),
                 loadStats()
             ]);
         });
@@ -869,6 +989,7 @@
             document.getElementById('totalStudents').textContent = allStudents.length;
             document.getElementById('totalClasses').textContent = allClasses.length;
             document.getElementById('totalQuestions').textContent = allSystemQuestions.length + allQuestions.length;
+            document.getElementById('totalLessons').textContent = allSystemLessons.length + allLessons.length;
             
             // Calculate average progress
             if (allStudents.length > 0) {
@@ -1055,7 +1176,7 @@
                         class_id,
                         created_at,
                         classes!profiles_class_id_fkey(class_name),
-                        progress(era_key, lessons_complete, boss_defeated, battle_score, last_played_at)
+                        progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
                     `)
                     .eq('teacher_id', currentProfile.id)
                     .eq('role', 'student');
@@ -1095,7 +1216,10 @@
                     const p = eraProgress[era];
                     if (!p) return '<span class="era-badge era-notstarted">Not Started</span>';
                     if (p.boss_defeated) return '<span class="era-badge era-complete">✓ Complete</span>';
-                    if (p.lessons_complete) return '<span class="era-badge era-incomplete">Learning</span>';
+                    if (p.lessons_complete) return '<span class="era-badge era-incomplete">Battle Ready</span>';
+                    // Show lesson progress count
+                    const lessonsCount = Array.isArray(p.lessons_completed) ? p.lessons_completed.length : 0;
+                    if (lessonsCount > 0) return `<span class="era-badge era-incomplete">${lessonsCount} Lessons</span>`;
                     return '<span class="era-badge era-incomplete">In Progress</span>';
                 };
                 
@@ -1169,6 +1293,8 @@
                 <div class="era-progress-grid">
                     ${Object.entries(eraNames).map(([key, name]) => {
                         const p = eraProgress[key];
+                        const lessonsCompleted = Array.isArray(p?.lessons_completed) ? p.lessons_completed : [];
+                        const currentLesson = (p?.current_lesson_index || 0) + 1;
                         return `
                             <div class="era-progress-card">
                                 <div class="era-progress-title">${name}</div>
@@ -1177,17 +1303,21 @@
                                         <span class="status-icon ${p?.lessons_complete ? 'status-complete' : 'status-notstarted'}">
                                             ${p?.lessons_complete ? '✓' : '○'}
                                         </span>
-                                        Lessons: ${p?.lessons_complete ? 'Complete' : 'Incomplete'}
+                                        Lessons: ${p?.lessons_complete ? 'All Complete' : `${lessonsCompleted.length} completed`}
+                                    </p>
+                                    <p class="text-xs text-amber-600">
+                                        Current: Lesson ${currentLesson}
                                     </p>
                                     <p>
                                         <span class="status-icon ${p?.boss_defeated ? 'status-complete' : 'status-notstarted'}">
                                             ${p?.boss_defeated ? '✓' : '○'}
                                         </span>
-                                        Boss: ${p?.boss_defeated ? 'Defeated' : 'Not Defeated'}
+                                        Boss: ${p?.boss_defeated ? 'Defeated ✓' : 'Not Defeated'}
                                     </p>
                                     <p class="mt-1 text-sm text-amber-700">
                                         Battle Score: ${p?.battle_score || 0}
                                     </p>
+                                    ${p?.last_played_at ? `<p class="text-xs text-gray-500">Last: ${formatDate(p.last_played_at)}</p>` : ''}
                                 </div>
                             </div>
                         `;
@@ -1684,6 +1814,291 @@
             }
         }
         
+        // ============================================
+        // LESSON MANAGEMENT FUNCTIONS
+        // ============================================
+        
+        // Load custom lessons from database
+        async function loadCustomLessons() {
+            try {
+                const { data, error } = await sb
+                    .from('custom_lessons')
+                    .select('*')
+                    .order('era_key', { ascending: true })
+                    .order('lesson_order', { ascending: true });
+                
+                if (error) throw error;
+                
+                allLessons = data || [];
+                
+                // Load system lessons from learningData.js if available
+                if (window.learningData) {
+                    allSystemLessons = [];
+                    Object.entries(window.learningData).forEach(([eraKey, eraData]) => {
+                        const lessons = eraData.en?.lessons || [];
+                        lessons.forEach(lesson => {
+                            allSystemLessons.push({
+                                id: `system-${eraKey}-${lesson.id}`,
+                                era_key: eraKey,
+                                lesson_order: lesson.id,
+                                title_en: lesson.title,
+                                icon: lesson.icon,
+                                is_system: true
+                            });
+                        });
+                    });
+                }
+                
+                renderLessons('system'); // Default to system lessons view
+            } catch (error) {
+                console.error('Error loading lessons:', error);
+            }
+        }
+        
+        // Render lessons
+        function renderLessons(type = 'system') {
+            currentLessonType = type;
+            const tbody = document.getElementById('lessonsTableBody');
+            const emptyState = document.getElementById('lessonsEmpty');
+            
+            // Update type tab styling
+            document.querySelectorAll('#lessonsTab .tabs:first-of-type .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((type === 'system' && btn.textContent.includes('System')) ||
+                    (type === 'custom' && btn.textContent.includes('Custom'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Reset era filter to "All" when switching types
+            currentEraFilter = 'all';
+            document.querySelectorAll('#lessonsTab .tabs:nth-of-type(2) .tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === 0);
+            });
+            
+            const lessons = type === 'system' ? allSystemLessons : allLessons;
+            
+            if (lessons.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('p').textContent = type === 'system' 
+                    ? 'No system lessons loaded' 
+                    : 'No custom lessons yet';
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            renderLessonRows(lessons);
+        }
+        
+        // Render lesson rows
+        function renderLessonRows(lessons) {
+            const tbody = document.getElementById('lessonsTableBody');
+            
+            // Filter by era if needed
+            let filteredLessons = currentEraFilter === 'all' 
+                ? lessons 
+                : lessons.filter(l => l.era_key === currentEraFilter);
+            
+            if (filteredLessons.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-amber-700">No lessons found for this era</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredLessons.map(lesson => `
+                <tr>
+                    <td>${eraNames[lesson.era_key] || lesson.era_key}</td>
+                    <td class="text-center font-bold">${lesson.lesson_order}</td>
+                    <td>${lesson.title_en}</td>
+                    <td class="text-center text-2xl">${lesson.icon}</td>
+                    <td>
+                        ${lesson.is_system ? 
+                            '<span class="era-badge era-complete">System</span>' :
+                            (lesson.is_approved ? 
+                                '<span class="era-badge era-complete">Approved</span>' : 
+                                '<span class="era-badge era-incomplete">Pending</span>')
+                        }
+                    </td>
+                    <td>
+                        ${lesson.is_system ? 
+                            `<button class="btn-action btn-view" onclick="viewLesson('${lesson.id}')">View</button>` :
+                            `<button class="btn-action btn-view" onclick="editLesson('${lesson.id}')">Edit</button>
+                             <button class="btn-action btn-remove" onclick="deleteLesson('${lesson.id}')">Delete</button>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Filter lessons by era
+        function filterLessonsByEra(era) {
+            currentEraFilter = era;
+            
+            // Update era tab styling
+            document.querySelectorAll('#lessonsTab .tabs:nth-of-type(2) .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((era === 'all' && btn.textContent.includes('All')) ||
+                    btn.textContent.toLowerCase().includes(era.split('-')[0])) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            const lessons = currentLessonType === 'system' ? allSystemLessons : allLessons;
+            renderLessonRows(lessons);
+        }
+        
+        // Show lesson modal
+        function showLessonModal() {
+            document.getElementById('lessonModalTitle').textContent = 'Add New Lesson';
+            document.getElementById('editLessonId').value = '';
+            document.getElementById('lessonForm').reset();
+            
+            document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                el.removeAttribute('readonly');
+                el.removeAttribute('disabled');
+            });
+            
+            document.getElementById('lessonModal').classList.remove('hidden');
+        }
+        
+        // Close lesson modal
+        function closeLessonModal() {
+            document.getElementById('lessonModal').classList.add('hidden');
+        }
+        
+        // View system lesson (read-only)
+        function viewLesson(lessonId) {
+            const [, eraKey, lessonOrder] = lessonId.split('-');
+            const eraData = window.learningData?.[eraKey];
+            const lesson = eraData?.en?.lessons?.find(l => l.id === parseInt(lessonOrder));
+            
+            if (!lesson) return;
+            
+            document.getElementById('lessonModalTitle').textContent = 'View System Lesson (Read-Only)';
+            document.getElementById('editLessonId').value = '';
+            document.getElementById('lessonEra').value = eraKey;
+            document.getElementById('lessonOrder').value = lesson.id;
+            document.getElementById('lessonTitleEn').value = lesson.title;
+            document.getElementById('lessonTitleTl').value = eraData?.tl?.lessons?.[lesson.id - 1]?.title || '';
+            document.getElementById('lessonContentEn').value = lesson.content?.replace(/<[^>]*>/g, ' ').substring(0, 500) + '...';
+            document.getElementById('lessonContentTl').value = '';
+            document.getElementById('lessonIcon').value = lesson.icon;
+            
+            // Make read-only
+            document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                el.setAttribute('readonly', 'readonly');
+                el.setAttribute('disabled', 'disabled');
+            });
+            
+            // Hide save button
+            document.querySelector('#lessonForm button[type="submit"]').style.display = 'none';
+            
+            document.getElementById('lessonModal').classList.remove('hidden');
+        }
+        
+        // Edit lesson
+        function editLesson(lessonId) {
+            const lesson = allLessons.find(l => l.id === lessonId);
+            if (!lesson) return;
+            
+            document.getElementById('lessonModalTitle').textContent = 'Edit Lesson';
+            document.getElementById('editLessonId').value = lessonId;
+            document.getElementById('lessonEra').value = lesson.era_key;
+            document.getElementById('lessonOrder').value = lesson.lesson_order;
+            document.getElementById('lessonTitleEn').value = lesson.title_en;
+            document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
+            document.getElementById('lessonContentEn').value = lesson.content_en;
+            document.getElementById('lessonContentTl').value = lesson.content_tl || '';
+            document.getElementById('lessonIcon').value = lesson.icon;
+            
+            document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                el.removeAttribute('readonly');
+                el.removeAttribute('disabled');
+            });
+            
+            // Show save button
+            document.querySelector('#lessonForm button[type="submit"]').style.display = '';
+            
+            document.getElementById('lessonModal').classList.remove('hidden');
+        }
+        
+        // Handle save lesson
+        async function handleSaveLesson(event) {
+            event.preventDefault();
+            
+            const lessonId = document.getElementById('editLessonId').value;
+            const era = document.getElementById('lessonEra').value;
+            const order = parseInt(document.getElementById('lessonOrder').value);
+            const titleEn = document.getElementById('lessonTitleEn').value.trim();
+            const titleTl = document.getElementById('lessonTitleTl').value.trim();
+            const contentEn = document.getElementById('lessonContentEn').value.trim();
+            const contentTl = document.getElementById('lessonContentTl').value.trim();
+            const icon = document.getElementById('lessonIcon').value.trim();
+            
+            const lessonData = {
+                era_key: era,
+                lesson_order: order,
+                title_en: titleEn,
+                title_tl: titleTl || null,
+                content_en: contentEn,
+                content_tl: contentTl || null,
+                icon: icon,
+                is_active: true,
+                is_approved: currentProfile?.role === 'admin' // Auto-approve for admins
+            };
+            
+            try {
+                if (lessonId) {
+                    // Update existing lesson
+                    const { error } = await sb
+                        .from('custom_lessons')
+                        .update(lessonData)
+                        .eq('id', lessonId);
+                    
+                    if (error) throw error;
+                    showToast('Lesson updated!', 'success');
+                } else {
+                    // Add new lesson
+                    lessonData.created_by = currentProfile.id;
+                    
+                    const { error } = await sb
+                        .from('custom_lessons')
+                        .insert([lessonData]);
+                    
+                    if (error) throw error;
+                    showToast(currentProfile.role === 'admin' ? 'Lesson added!' : 'Lesson added! Awaiting admin approval.', 'success');
+                }
+                
+                closeLessonModal();
+                loadCustomLessons();
+                loadStats();
+            } catch (error) {
+                console.error('Error saving lesson:', error);
+                showToast('Failed to save lesson', 'error');
+            }
+        }
+        
+        // Delete lesson
+        async function deleteLesson(lessonId) {
+            if (!confirm('Delete this lesson? This cannot be undone.')) return;
+            
+            try {
+                const { error } = await sb
+                    .from('custom_lessons')
+                    .delete()
+                    .eq('id', lessonId);
+                
+                if (error) throw error;
+                
+                showToast('Lesson deleted!', 'success');
+                loadCustomLessons();
+                loadStats();
+            } catch (error) {
+                console.error('Error deleting lesson:', error);
+                showToast('Failed to delete lesson', 'error');
+            }
+        }
+        
         // Switch tabs
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -1699,8 +2114,14 @@
         
         // Handle logout
         async function handleLogout() {
+            if (window.isButtonLocked && window.isButtonLocked('logout')) return;
+            if (window.lockButton) window.lockButton('logout', 3000);
+            
             await sb.auth.signOut();
-            window.location.href = 'login.html';
+            if (window.showPageLoading) window.showPageLoading('Logging out');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 150);
         }
         
         // Close modals on outside click

@@ -22,7 +22,7 @@ let totalEnemiesBeforeBoss = 3; // Default: defeat 3 normal enemies before boss
 const swordUsers = ['Lapu-Lapu', 'Raja Humabon', 'Ferdinand Magellan', 'Early Spanish Soldier', 
                     'Andres Bonifacio', 'Emilio Aguinaldo', 
                     'Commodore George Dewey', 'General Juan Luna',
-                    'American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 
+                    'American Soldier', 'Douglas MacArthur', 'Japanese Soldier', 'Japanese Commander',
                     'Spanish Commander', 'Late Spanish Commander Era', 'Late Spanish Soldier Era', 'Spanish Soldier'];
 
 // gunUsers removed - all characters now use sword sounds
@@ -54,7 +54,7 @@ const bossDefinitions = {
         bossName: 'Spanish Commander',
         isBoss: true,
         isFinalBoss: true,
-        preBossEnemies: ['Spanish Soldier', 'Late Spanish Soldier Era'],
+        preBossEnemies: ['Spanish Soldier'],
         enemiesBeforeBoss: 3 // Defeat 3 Spanish Soldiers before Commander
     },
     'american-colonial': {
@@ -90,13 +90,39 @@ async function updateEraProgress(eraKey, updates) {
     console.warn('ProgressSync unavailable; progress update skipped');
 }
 
-// Mobile detection
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// Mobile detection - more comprehensive check
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || ('ontouchstart' in window) 
+    || (navigator.maxTouchPoints > 0);
+
+// Check for low-end device (less RAM, older device)
+const isLowEndDevice = navigator.deviceMemory ? navigator.deviceMemory < 4 : isMobile;
+
+// Click protection - prevents button spam
+let answerLocked = false;
+function lockAnswers(duration = 2500) {
+    answerLocked = true;
+    setTimeout(() => answerLocked = false, duration);
+}
 
 // Prefer lighter effects on mobile or when the user requests reduced motion
 const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
-const reducedFxMode = fxQuality !== 'high' || isMobile || prefersReducedMotion;
+let fxQuality = (localStorage.getItem('fxQuality') || 'low').toLowerCase();
+let reducedFxMode = fxQuality !== 'high';
+
+// Ultra low mode - skip ALL particle effects, only show minimal feedback
+let ultraLowMode = fxQuality === 'low';
+
+// Function to dynamically update graphics mode
+function updateReducedFxMode(isLowQuality) {
+    reducedFxMode = isLowQuality;
+    ultraLowMode = isLowQuality;
+    fxQuality = isLowQuality ? 'low' : 'high';
+    console.log('Graphics quality updated:', reducedFxMode ? 'Low (Ultra Performance)' : 'High');
+}
+
+// Expose to window for settings panel
+window.updateReducedFxMode = updateReducedFxMode;
 
 // Save battle progress to localStorage
 function saveBattleProgress() {
@@ -174,14 +200,14 @@ const backgroundMusic = {
 // Configure sound settings
 Object.values(soundEffects).forEach(sound => {
     sound.preload = 'auto';
-    sound.volume = isMobile ? 0.5 : 0.7;
+    sound.volume = 0.2;
 });
 
 // Configure background music settings
 Object.values(backgroundMusic).forEach(bgm => {
     bgm.preload = 'auto';
     bgm.loop = true;
-    bgm.volume = isMobile ? 0.4 : 0.6;
+    bgm.volume = 0.2;
 });
 
 // Play sound effect with error handling
@@ -209,7 +235,7 @@ function playBackgroundMusic() {
         // Play the current era's music
         const bgm = backgroundMusic[currentEra];
         bgm.currentTime = 0;
-        bgm.volume = isMobile ? 0.4 : 0.6;
+        bgm.volume = 0.2;
         
         // Try to play automatically
         bgm.play().catch(e => {
@@ -269,8 +295,13 @@ function setDefaultBackground() {
     }
 }
 
-// Get unlocked heroes for an era
+// Get unlocked heroes for an era - uses ProgressSync for cross-browser sync
 function getUnlockedHeroesForEra(eraKey) {
+    // Use ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        return window.ProgressSync.getUnlockedHeroes(eraKey);
+    }
+    // Fallback to localStorage for offline/unauthenticated
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     return unlockedHeroes[eraKey] || [0];
 }
@@ -278,26 +309,46 @@ function getUnlockedHeroesForEra(eraKey) {
 // Get random villain for current era
 function getRandomVillain(eraKey, isPreBoss = false) {
     const bossDef = bossDefinitions[eraKey];
+    const villains = eraData[eraKey].villains;
     
+    // If it's a boss battle, ALWAYS return the boss
     if (isBossBattle && bossDef && bossDef.bossName) {
-        // Return the boss
-        const villains = eraData[eraKey].villains;
         const boss = villains.find(v => v.name === bossDef.bossName);
-        if (boss) return boss;
+        if (boss) {
+            console.log(`Boss battle: Returning boss ${boss.name}`);
+            return boss;
+        }
     }
     
+    // If explicitly requesting the boss (isPreBoss = false and boss exists)
+    if (!isPreBoss && bossDef && bossDef.bossName) {
+        const boss = villains.find(v => v.name === bossDef.bossName);
+        if (boss) {
+            console.log(`Requesting boss: Returning ${boss.name}`);
+            return boss;
+        }
+    }
+    
+    // Return a pre-boss enemy (regular soldier)
     if (isPreBoss && bossDef && bossDef.preBossEnemies.length > 0) {
-        // Return a pre-boss enemy
-        const villains = eraData[eraKey].villains;
         const preBossEnemies = villains.filter(v => bossDef.preBossEnemies.includes(v.name));
         if (preBossEnemies.length > 0) {
             const randomIndex = Math.floor(Math.random() * preBossEnemies.length);
+            console.log(`Pre-boss battle: Returning soldier ${preBossEnemies[randomIndex].name}`);
             return preBossEnemies[randomIndex];
         }
     }
     
-    // Return any random villain
-    const villains = eraData[eraKey].villains;
+    // Fallback: Return any random villain (excluding boss during pre-boss phase)
+    if (isPreBoss && bossDef && bossDef.bossName) {
+        const nonBossVillains = villains.filter(v => v.name !== bossDef.bossName);
+        if (nonBossVillains.length > 0) {
+            const randomIndex = Math.floor(Math.random() * nonBossVillains.length);
+            return nonBossVillains[randomIndex];
+        }
+    }
+    
+    // Final fallback
     const randomIndex = Math.floor(Math.random() * villains.length);
     return villains[randomIndex];
 }
@@ -323,7 +374,17 @@ function getCharacterSprite(characterData, state) {
 }
 
 // Initialize battle with boss mechanics
-function initBattle() {
+async function initBattle() {
+    // Wait for ProgressSync to be initialized if available
+    if (window.ProgressSync && !window.ProgressSync.userId) {
+        try {
+            await window.ProgressSync.init();
+            console.log('ProgressSync initialized in initBattle');
+        } catch (e) {
+            console.warn('ProgressSync init failed:', e);
+        }
+    }
+    
     const selectedEra = localStorage.getItem('selectedEra') || 'early-spanish';
     
     // Check for saved battle progress
@@ -539,24 +600,63 @@ function showBossWarning() {
     }, 2000);
 }
 
+// Image cache for preloaded sprites
+const spriteCache = new Map();
+
+// Preload a character sprite and return a promise
+function preloadCharacterSprite(characterData, state) {
+    return new Promise((resolve) => {
+        const src = getCharacterSprite(characterData, state);
+        
+        // Return cached if already loaded
+        if (spriteCache.has(src)) {
+            resolve(src);
+            return;
+        }
+        
+        const img = new Image();
+        img.onload = () => {
+            spriteCache.set(src, img);
+            resolve(src);
+        };
+        img.onerror = () => resolve(src); // Still resolve on error to avoid blocking
+        img.src = src;
+        // Shorter timeout on mobile
+        setTimeout(() => resolve(src), isMobile ? 1000 : 2000);
+    });
+}
+
+// Preload all sprites for a character (idle, attack, hurt, victory)
+async function preloadAllSprites(characterData) {
+    const states = ['idle', 'attack', 'hurt', 'victory'];
+    const promises = states.map(state => preloadCharacterSprite(characterData, state));
+    await Promise.all(promises);
+}
+
 // Update character sprites to idle state
 function updateCharacterSprites() {
     const playerSprite = document.getElementById('playerSprite');
     const enemySprite = document.getElementById('enemySprite');
     
-    playerSprite.src = getCharacterSprite(currentHero, 'idle');
-    playerSprite.alt = currentHero.name;
+    if (playerSprite && currentHero) {
+        playerSprite.src = getCharacterSprite(currentHero, 'idle');
+        playerSprite.alt = currentHero.name;
+    }
     
-    enemySprite.src = getCharacterSprite(currentVillain, 'idle');
-    enemySprite.alt = currentVillain.name;
+    if (enemySprite && currentVillain) {
+        enemySprite.src = getCharacterSprite(currentVillain, 'idle');
+        enemySprite.alt = currentVillain.name;
+    }
 }
 
-// Set character state
+// Set character state with mobile optimization
 function setCharacterState(character, state) {
     const sprite = character === 'player' ? document.getElementById('playerSprite') : document.getElementById('enemySprite');
     const characterData = character === 'player' ? currentHero : currentVillain;
     const enemyContainer = character === 'enemy' ? document.getElementById('enemyCharacter') : null;
     const isEarlySpanishSoldier = enemyContainer && characterData && characterData.name === 'Early Spanish Soldier';
+
+    if (!sprite || !characterData) return;
 
     // Early Spanish Soldier attack sprite already faces left, so temporarily remove the default flip
     if (isEarlySpanishSoldier) {
@@ -567,16 +667,23 @@ function setCharacterState(character, state) {
         }
     }
     
-    sprite.src = getCharacterSprite(characterData, state);
+    // Use requestAnimationFrame for smoother sprite changes
+    requestAnimationFrame(() => {
+        sprite.src = getCharacterSprite(characterData, state);
+    });
     
     if (state !== 'idle') {
+        // Shorter timeout on mobile for snappier feel
+        const returnToIdleTime = isMobile ? 600 : 1200;
         setTimeout(() => {
-            sprite.src = getCharacterSprite(characterData, 'idle');
+            requestAnimationFrame(() => {
+                sprite.src = getCharacterSprite(characterData, 'idle');
+            });
             
             if (isEarlySpanishSoldier && enemyContainer) {
                 enemyContainer.classList.remove('no-flip');
             }
-        }, 1200);
+        }, returnToIdleTime);
     }
 }
 
@@ -650,6 +757,9 @@ function loadQuestion() {
 
 // Select answer
 function selectAnswer(index) {
+    // Prevent spam clicks
+    if (answerLocked) return;
+    lockAnswers(2500);
     disableAnswers();
     
     const selectedAnswer = currentQuestion.shuffledAnswers[index];
@@ -687,9 +797,11 @@ function selectAnswer(index) {
 
 // Mobile-optimized screen shake
 function mobileShake() {
+    // Skip shake entirely in ultra low mode
+    if (ultraLowMode) return;
     const target = document.querySelector('.battle-area') || document.body;
     if (!target) return;
-    const duration = reducedFxMode ? 180 : 280;
+    const duration = reducedFxMode ? 100 : 280;
     target.classList.remove('shake-hit');
     // Force reflow so the animation can restart
     void target.offsetWidth;
@@ -739,8 +851,10 @@ function createGiantSwordEffect(isAttacker) {
     `;
 
     if (reducedFxMode) {
-        swordSlash.style.filter = 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.7))';
+        swordSlash.style.filter = 'none';
         swordSlash.style.mixBlendMode = 'normal';
+        swordSlash.style.background = 'linear-gradient(45deg, #fbbf24 0%, #dc2626 100%)';
+        swordSlash.style.willChange = 'transform, opacity'; // GPU acceleration
     }
     
     // For player (left side) attacking: start from player's right, move toward enemy
@@ -755,9 +869,21 @@ function createGiantSwordEffect(isAttacker) {
     
     document.body.appendChild(swordSlash);
     
-    // Enhanced effect for boss battles
-    const baseCount = isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6);
-    const effectCount = reducedFxMode ? 1 : Math.max(1, Math.round(baseCount));
+    // Ultra low mode: simple fast slash animation, no trails or waves
+    if (ultraLowMode) {
+        swordSlash.animate([
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0)`, opacity: 0, offset: 0 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(1.6)`, opacity: 1, offset: 0.3 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(2)`, opacity: 0.9, offset: 0.5 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(1.8)`, opacity: 0.6, offset: 0.7 },
+            { transform: `rotate(${isAttacker ? '15' : '-15'}deg) scale(0.5)`, opacity: 0, offset: 1 }
+        ], { duration: 400, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => swordSlash.remove(), 400);
+        return swordSlash;
+    }
+    
+    // SKIP all trail effects in low quality mode
+    const effectCount = reducedFxMode ? 1 : (isBossBattle ? (isMobile ? 6 : 12) : (isMobile ? 3 : 6));
     
     for (let i = 0; i < effectCount; i++) {
         setTimeout(() => {
@@ -827,6 +953,8 @@ function createGiantSwordEffect(isAttacker) {
     });
     
     setTimeout(() => {
+        // Skip wave effects entirely in ultra low mode
+        if (ultraLowMode) return;
         const waveCount = reducedFxMode ? 1 : (isMobile ? 2 : 4);
         for (let i = 0; i < waveCount; i++) {
             const wave = document.createElement('div');
@@ -903,9 +1031,25 @@ function createGiantGunEffect(isAttacker) {
 
     if (reducedFxMode) {
         muzzleFlash.style.filter = 'none';
+        muzzleFlash.style.mixBlendMode = 'normal';
+        muzzleFlash.style.background = 'radial-gradient(circle, #fbbf24 0%, #dc2626 100%)';
+        muzzleFlash.style.willChange = 'transform, opacity'; // GPU acceleration
     }
     
     document.body.appendChild(muzzleFlash);
+    
+    // In ultra low mode, just flash briefly and done
+    if (ultraLowMode) {
+        muzzleFlash.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 1, offset: 0.25 },
+            { transform: 'translate(-50%, -50%) scale(2)', opacity: 0.9, offset: 0.5 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.5, offset: 0.75 },
+            { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0, offset: 1 }
+        ], { duration: 380, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => muzzleFlash.remove(), 380);
+        return muzzleFlash;
+    }
     
     muzzleFlash.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
@@ -1051,11 +1195,26 @@ function createGiantMagicEffect(isAttacker) {
     `;
 
     if (reducedFxMode) {
-        magicSphere.style.filter = 'drop-shadow(0 0 24px rgba(139, 92, 246, 0.7))';
+        magicSphere.style.filter = 'none';
         magicSphere.style.mixBlendMode = 'normal';
+        magicSphere.style.background = 'radial-gradient(circle, #8b5cf6 0%, #4f46e5 100%)';
+        magicSphere.style.willChange = 'transform, opacity'; // GPU acceleration
     }
     
     document.body.appendChild(magicSphere);
+    
+    // In ultra low mode, just do a quick flash and exit
+    if (ultraLowMode) {
+        magicSphere.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.4)', opacity: 1, offset: 0.25 },
+            { transform: 'translate(-50%, -50%) scale(1.8)', opacity: 0.9, offset: 0.5 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.5, offset: 0.75 },
+            { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0, offset: 1 }
+        ], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => magicSphere.remove(), 420);
+        return magicSphere;
+    }
     
     magicSphere.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
@@ -1068,6 +1227,11 @@ function createGiantMagicEffect(isAttacker) {
         fill: 'forwards'
     });
     
+    // Skip magic waves entirely in ultra low mode
+    if (ultraLowMode) {
+        setTimeout(() => magicSphere.remove(), 400);
+        return magicSphere;
+    }
     const magicWaveCount = reducedFxMode ? 1 : (isMobile ? 3 : 6);
     for (let i = 0; i < magicWaveCount; i++) {
         setTimeout(() => {
@@ -1216,6 +1380,34 @@ function createGiantImpactEffect(isAttacker, damage) {
     const centerY = rect.top + rect.height / 2;
     
     const impactExplosion = document.createElement('div');
+    
+    // Ultra low mode: just a quick color flash, no fancy effects
+    if (ultraLowMode) {
+        impactExplosion.style.cssText = `
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #fff 0%, #fbbf24 40%, #dc2626 100%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            left: ${centerX}px;
+            top: ${centerY}px;
+            transform: translate(-50%, -50%) scale(0);
+            will-change: transform, opacity;
+        `;
+        document.body.appendChild(impactExplosion);
+        impactExplosion.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 1, offset: 0.2 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0.9, offset: 0.4 },
+            { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 0.6, offset: 0.7 },
+            { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0, offset: 1 }
+        ], { duration: 380, easing: 'ease-out', fill: 'forwards' });
+        setTimeout(() => impactExplosion.remove(), 380);
+        return impactExplosion;
+    }
+    
     const explosionSize = (isMobile ? 80 : 160) + damage * (isMobile ? 3 : 6);
     impactExplosion.style.cssText = `
         position: fixed;
@@ -1250,6 +1442,12 @@ function createGiantImpactEffect(isAttacker, damage) {
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards'
     });
+    
+    // Skip shockwaves in reduced mode
+    if (reducedFxMode) {
+        setTimeout(() => impactExplosion.remove(), isMobile ? 500 : 800);
+        return impactExplosion;
+    }
     
     for (let i = 0; i < (isMobile ? 3 : 6); i++) {
         setTimeout(() => {
@@ -1318,6 +1516,11 @@ function createGiantImpactEffect(isAttacker, damage) {
         setTimeout(() => crack.remove(), isMobile ? 400 : 600);
     }
     
+    // Skip all impact particles in ultra low mode
+    if (ultraLowMode) {
+        setTimeout(() => impactExplosion.remove(), 150);
+        return impactExplosion;
+    }
     const impactParticleCount = reducedFxMode ? 4 : (isMobile ? 20 : 40);
     for (let i = 0; i < impactParticleCount; i++) {
         setTimeout(() => {
@@ -1402,11 +1605,11 @@ function showDamage(damage, target) {
     damageEl.className = 'damage-number';
     damageEl.textContent = `-${damage}`;
     
-    const baseShadow = reducedFxMode ? '1px 1px 2px rgba(0, 0, 0, 0.6)' : isMobile ?
+    const baseShadow = reducedFxMode ? '1px 1px 2px rgba(0,0,0,0.5)' : isMobile ?
         `3px 3px 6px rgba(0, 0, 0, 0.9), 0 0 25px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 50px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 75px ${damage > 25 ? '#f59e0b' : '#b91c1c'}` :
         `5px 5px 10px rgba(0, 0, 0, 0.9), 0 0 35px ${damage > 25 ? '#fbbf24' : '#ef4444'}, 0 0 70px ${damage > 25 ? '#fb923c' : '#dc2626'}, 0 0 105px ${damage > 25 ? '#f59e0b' : '#b91c1c'}`;
-    const baseSize = reducedFxMode ? (isMobile ? '32px' : '40px') : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
-    const baseDuration = reducedFxMode ? 900 : (isMobile ? 1200 : 1500);
+    const baseSize = reducedFxMode ? '32px' : (isMobile ? (damage > 25 ? '52px' : '42px') : (damage > 25 ? '72px' : '58px'));
+    const baseDuration = reducedFxMode ? 800 : (isMobile ? 1200 : 1500);
     damageEl.style.cssText = `
         position: fixed;
         font-size: ${baseSize};
@@ -1427,7 +1630,8 @@ function showDamage(damage, target) {
     
     document.body.appendChild(damageEl);
     
-    if (!reducedFxMode && damage > 25) {
+    // Skip critical hit visual effects in low quality mode
+    if (!reducedFxMode && !ultraLowMode && damage > 25) {
         setTimeout(() => {
             const critEl = document.createElement('div');
             critEl.textContent = 'CRITICAL!';
@@ -1521,32 +1725,56 @@ function attackEnemy() {
                 // Check if it's time for boss battle
                 const bossDef = bossDefinitions[currentEra];
                 if (bossDef && bossDef.bossName && !isBossBattle && enemiesDefeated >= totalEnemiesBeforeBoss) {
-                    // Start boss battle
+                    // Start boss battle - preload boss sprites first
                     isBossBattle = true;
-                    currentVillain = getRandomVillain(currentEra, false); // Get the boss
-                    enemyHp = 150; // Boss has more HP
-                    updateEnemyDisplay();
-                    updateHP();
-                    setCharacterState('enemy', 'idle');
+                    const bossVillain = getRandomVillain(currentEra, false); // Get the boss
+                    console.log(`Boss battle started! Fighting: ${bossVillain.name}`);
                     
-                    // Show boss warning
-                    showBossWarning();
-                    
-                    // Load next question
-                    questionIndex++;
-                    currentShuffledAnswers = [];
-                    loadQuestion();
+                    // Preload boss sprites before displaying
+                    preloadAllSprites(bossVillain).then(() => {
+                        currentVillain = bossVillain;
+                        enemyHp = 150; // Boss has more HP
+                        
+                        // Update enemy name display
+                        document.getElementById('enemyName').textContent = currentVillain.name;
+                        updateEnemyDisplay();
+                        updateHP();
+                        
+                        // Update enemy sprite to boss sprite
+                        updateCharacterSprites();
+                        setCharacterState('enemy', 'idle');
+                        
+                        // Show boss warning
+                        showBossWarning();
+                        
+                        // Load next question
+                        questionIndex++;
+                        currentShuffledAnswers = [];
+                        loadQuestion();
+                    });
+                    return; // Exit early - the promise will handle the rest
                 } else if (isBossBattle) {
                     // Boss defeated
                     victory();
                 } else {
                     // Regular enemy defeated - continue with next enemy
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         // Reset enemy HP and get new enemy
                         enemyHp = 100;
-                        currentVillain = getRandomVillain(currentEra, true);
+                        const nextVillain = getRandomVillain(currentEra, true);
+                        console.log(`Next enemy: ${nextVillain.name}`);
+                        
+                        // Preload next enemy sprites before displaying
+                        await preloadCharacterSprite(nextVillain, 'idle');
+                        currentVillain = nextVillain;
+                        
+                        // Update enemy name display
+                        document.getElementById('enemyName').textContent = currentVillain.name;
                         updateEnemyDisplay();
                         updateHP();
+                        
+                        // Update enemy sprite
+                        updateCharacterSprites();
                         setCharacterState('enemy', 'idle');
                         
                         // Load next question
@@ -1697,23 +1925,32 @@ function checkBattleEnd() {
 // Era order for progression
 const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
-// Save unlocked heroes for an era
-function saveUnlockedHeroesForEra(eraKey, heroIndices) {
+// Save unlocked heroes for an era - uses ProgressSync for cross-browser sync
+async function saveUnlockedHeroesForEra(eraKey, heroIndices) {
+    // Save to ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        await window.ProgressSync.saveUnlockedHeroes(eraKey, heroIndices);
+    }
+    // Also save to localStorage as fallback
     const unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     unlockedHeroes[eraKey] = heroIndices;
     localStorage.setItem('unlockedHeroes', JSON.stringify(unlockedHeroes));
 }
 
 // Unlock next hero for the current era
-function unlockNextHero(eraKey) {
+async function unlockNextHero(eraKey) {
     const heroes = eraData[eraKey].heroes;
     const unlockedIndices = getUnlockedHeroesForEra(eraKey);
     
     const nextHeroIndex = unlockedIndices.length;
     
     if (nextHeroIndex < heroes.length) {
+        // Use ProgressSync.unlockHero if available
+        if (window.ProgressSync && window.ProgressSync.userId) {
+            await window.ProgressSync.unlockHero(eraKey, nextHeroIndex);
+        }
         unlockedIndices.push(nextHeroIndex);
-        saveUnlockedHeroesForEra(eraKey, unlockedIndices);
+        await saveUnlockedHeroesForEra(eraKey, unlockedIndices);
         return heroes[nextHeroIndex];
     }
     
@@ -1754,8 +1991,8 @@ async function unlockHeroAndShowVictory() {
         victoryTitle.classList.remove('text-amber-800');
     }
     
-    // Try to unlock the next hero
-    const unlockedHero = unlockNextHero(currentEra);
+    // Try to unlock the next hero (now async)
+    const unlockedHero = await unlockNextHero(currentEra);
     const heroAchievementDiv = document.querySelector('#victoryModal .bg-gradient-to-br.from-amber-50');
     const heroUnlockedTitle = document.querySelector('#victoryModal [data-lang-key="heroUnlocked"]');
     
@@ -1843,11 +2080,24 @@ function disableAnswers() {
 }
 
 // Initialize battle when page loads
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', async function() {
     console.log('DOMContentLoaded - Initializing battle with boss mechanics and automatic background music...');
+
+    // Guest mode allowed - progress will only be saved for logged-in users
+    // Check if user is logged in (for progress saving later)
+    if (window.SupabaseConfig) {
+        try {
+            const { data: { session } } = await window.SupabaseConfig.supabase.getSession();
+            window.isLoggedIn = !!session;
+            console.log('User logged in:', window.isLoggedIn);
+        } catch (e) {
+            window.isLoggedIn = false;
+            console.log('Guest mode - progress will not be saved to cloud');
+        }
+    }
     
-    // Initialize the battle
-    initBattle();
+    // Initialize the battle (now async to wait for ProgressSync)
+    await initBattle();
     
     // Update HP bars initially
     updateHP();
@@ -1879,9 +2129,14 @@ function getRandomEra() {
     return eras[randomIndex];
 }
 
-// Export functions for global use
+// Export functions and variables for global use
 window.selectAnswer = selectAnswer;
 window.proceedToNextEra = proceedToNextEra;
 window.restartBattle = function() {
     location.reload();
 };
+
+// Expose currentEra globally so battlefield.html can access it for progress reset
+Object.defineProperty(window, 'currentEra', {
+    get: function() { return currentEra; }
+});

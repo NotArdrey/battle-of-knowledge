@@ -3,6 +3,84 @@
 // Battle of Knowledge - Educational Game
 // ============================================
 
+// ============================================
+// GUEST SESSION MANAGEMENT
+// ============================================
+
+/**
+ * Check if current user is a guest
+ * @returns {boolean}
+ */
+function isGuestUser() {
+    const guestSession = JSON.parse(localStorage.getItem('guestSession') || 'null');
+    return guestSession && guestSession.isGuest === true;
+}
+
+/**
+ * Get guest session data
+ * @returns {Object|null}
+ */
+function getGuestSession() {
+    const guestSession = JSON.parse(localStorage.getItem('guestSession') || 'null');
+    return guestSession && guestSession.isGuest ? guestSession : null;
+}
+
+/**
+ * Clear guest session
+ */
+function clearGuestSession() {
+    localStorage.removeItem('guestSession');
+}
+
+/**
+ * Create a guest profile object (for compatibility with code expecting profile data)
+ * @returns {Object}
+ */
+function getGuestProfile() {
+    const guestSession = getGuestSession();
+    if (!guestSession) return null;
+    
+    return {
+        id: guestSession.guestId,
+        email: 'guest@local',
+        full_name: 'Guest Player',
+        role: 'guest',
+        is_verified: false,
+        isGuest: true
+    };
+}
+
+/**
+ * Get guest mode settings (set by admin)
+ * @returns {Object} Guest settings
+ */
+function getGuestModeSettings() {
+    const GUEST_SETTINGS_KEY = 'guestModeSettings';
+    const defaultSettings = {
+        unlockProgress: false,
+        skipVideos: false
+    };
+    
+    const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
+    const settings = saved ? { ...defaultSettings, ...JSON.parse(saved) } : { ...defaultSettings };
+    
+    // unlockCollections is automatically enabled when unlockProgress is enabled
+    settings.unlockCollections = settings.unlockProgress;
+    
+    return settings;
+}
+
+/**
+ * Check if guest has a specific permission unlocked
+ * @param {string} permission - 'unlockProgress', 'unlockCollections', or 'skipVideos'
+ * @returns {boolean}
+ */
+function guestHasPermission(permission) {
+    if (!isGuestUser()) return false;
+    const settings = getGuestModeSettings();
+    return settings[permission] === true;
+}
+
 // Safely retrieve the Supabase client regardless of load order
 function getSupabaseClient() {
     // Try SupabaseConfig first (uses getter with lazy init)
@@ -35,8 +113,8 @@ function getSupabaseClient() {
     if (supabaseLib?.createClient) {
         console.warn('Attempting emergency Supabase client initialization...');
         try {
-            const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
+            const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aHlxY3pwdGxqZGhtaW9hZ3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzOTY2NzAsImV4cCI6MjA4Mzk3MjY3MH0.QKFZapzgWYcCtuw3eEvqg6U6qi06QNpvIRNBw7ABf9I';
             const client = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             window.supabaseClient = client;
             return client;
@@ -417,6 +495,14 @@ function validateEmail(email) {
 
 // Export for use in other files
 window.SharedAuth = {
+    // Guest session functions
+    isGuestUser,
+    getGuestSession,
+    clearGuestSession,
+    getGuestProfile,
+    getGuestModeSettings,
+    guestHasPermission,
+    // Auth functions
     validateStudentId,
     signUpUser,
     signInUser,

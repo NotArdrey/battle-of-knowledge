@@ -657,3 +657,111 @@ body {
         font-size: 11px;
     }
 }
+
+/* ============================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/* Force GPU acceleration for smoother animations on mobile */
+#playerCharacter,
+#enemyCharacter,
+#playerSprite,
+#enemySprite,
+.character-container,
+.character {
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Enemy flip with GPU acceleration */
+#enemyCharacter {
+    transform: scaleX(-1) translateZ(0);
+    -webkit-transform: scaleX(-1) translateZ(0);
+}
+
+#enemyCharacter.no-flip {
+    transform: scaleX(1) translateZ(0);
+    -webkit-transform: scaleX(1) translateZ(0);
+}
+
+/* Mobile-specific simplified animations */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+    /* Reduce animation complexity */
+    @keyframes attack-animation {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(30px); }
+        100% { transform: translateX(0); }
+    }
+    
+    @keyframes attack-animation-flipped {
+        0% { transform: scaleX(-1) translateZ(0); }
+        50% { transform: scaleX(-1) translateX(-30px) translateZ(0); }
+        100% { transform: scaleX(-1) translateZ(0); }
+    }
+    
+    @keyframes hurt-animation {
+        0% { transform: translateX(0); filter: brightness(1); }
+        25% { transform: translateX(-15px); filter: brightness(1.5); }
+        50% { transform: translateX(5px); filter: brightness(1.2); }
+        100% { transform: translateX(0); filter: brightness(1); }
+    }
+    
+    @keyframes hurt-animation-flipped {
+        0% { transform: scaleX(-1) translateZ(0); filter: brightness(1); }
+        25% { transform: scaleX(-1) translateX(-15px) translateZ(0); filter: brightness(1.5); }
+        50% { transform: scaleX(-1) translateX(5px) translateZ(0); filter: brightness(1.2); }
+        100% { transform: scaleX(-1) translateZ(0); filter: brightness(1); }
+    }
+    
+    @keyframes victory-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes victory-bounce-flipped {
+        0%, 100% { transform: scaleX(-1) translateY(0) translateZ(0); }
+        50% { transform: scaleX(-1) translateY(-10px) translateZ(0); }
+    }
+    
+    @keyframes shake-hit {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+    }
+    
+    /* Faster animations on mobile */
+    .character.attacking {
+        animation-duration: 0.5s !important;
+    }
+    
+    .character.hurt {
+        animation-duration: 0.4s !important;
+    }
+    
+    #enemyCharacter.attacking {
+        animation-duration: 0.5s !important;
+    }
+    
+    #enemyCharacter.hurt {
+        animation-duration: 0.4s !important;
+    }
+    
+    /* Reduce shadows on mobile for performance */
+    .character-shadow {
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+    }
+    
+    /* Simpler damage popup */
+    @keyframes damage-popup {
+        0% { transform: translateY(0) scale(0.8); opacity: 0; }
+        30% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+        100% { transform: translateY(-50px) scale(1); opacity: 0; }
+    }
+    
+    .damage-number {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+}

@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -75,14 +76,14 @@
     
     /* Title image styling - BIGGER and BETTER CENTERED */
     .title-image {
-        width: 80%; /* Changed from max-width to width */
+        width: 95%; /* Increased from 80% */
         height: auto;
         object-fit: contain;
         display: block;
         margin: 0 auto;
         filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
         /* Added for better centering */
-        transform: scale(1.1); /* Slightly bigger */
+        transform: scale(1.2); /* Made bigger */
         transform-origin: center;
         margin-top: 30px;
     }
@@ -163,20 +164,19 @@
         padding: 0;
         z-index: 50;
         outline: none;
+        transition: transform 0.2s;
+    }
+    
+    .language-toggle:hover {
+        transform: scale(1.1);
     }
     
     .language-toggle-img {
-        width: 120px;
-        height: auto;
+        height: 40px;
+        width: auto;
         object-fit: contain;
         display: block;
-        transition: all 0.3s ease;
-        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-    }
-    
-    .language-toggle-img:hover {
-        transform: translateY(-3px) scale(1.05);
-        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     }
     
     /* Responsive adjustments */
@@ -191,9 +191,6 @@
         .button-container {
             max-width: 450px;
             gap: 1.25rem;
-        }
-        .language-toggle-img {
-            width: 110px;
         }
     }
     
@@ -213,9 +210,6 @@
             gap: 1rem;
             margin-top: 0.5rem;
         }
-        .language-toggle-img {
-            width: 100px;
-        }
     }
     
     @media (max-width: 640px) {
@@ -230,9 +224,6 @@
             max-width: 350px;
             gap: 0.75rem;
         }
-        .language-toggle-img {
-            width: 90px;
-        }
     }
     
     @media (max-width: 480px) {
@@ -244,11 +235,6 @@
             max-width: 300px;
             gap: 0.75rem;
         }
-        .language-toggle-img {
-            width: 80px;
-            top: 10px;
-            right: 10px;
-        }
     }
     
     @media (max-width: 360px) {
@@ -259,9 +245,6 @@
         .button-container {
             max-width: 280px;
             gap: 0.5rem;
-        }
-        .language-toggle-img {
-            width: 70px;
         }
     }
 </style>
@@ -301,8 +284,8 @@
             
             <div class="button-container">
                 <!-- START Button as Image -->
-                <button onclick="window.location.href='era-selection.html'" 
-                        class="image-button">
+                <button onclick="navigateTo('era-selection.html', this)" 
+                        class="image-button" data-protect="start" data-protect-duration="2000">
                     <img id="startButtonImg" 
                         src="assets/Buttons/START Button.png" 
                         alt="START" 
@@ -310,8 +293,8 @@
                 </button>
 
                 <!-- COLLECTION Button as Image -->
-                <button onclick="window.location.href='collection.html'" 
-                        class="image-button">
+                <button onclick="navigateTo('collection.html', this)" 
+                        class="image-button" data-protect="collection" data-protect-duration="2000">
                     <img id="collectionButtonImg"
                         src="assets/Buttons/COLLECTION Button.png" 
                         alt="COLLECTION" 
@@ -326,6 +309,12 @@
     <script src="js/progress-sync.js"></script>
     <script src="js/achievements.js"></script>
     <script src="js/language.js"></script>
+    
+    <!-- Profile Button (Upper Left) -->
+    <button id="profileBtn" onclick="navigateTo('account.html', this)" class="hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-2 hover:scale-105 transition-transform" data-protect="profile" data-protect-duration="2000">
+        <img id="profileAvatar" src="assets/Characters/1. Early Spanish Era/Heroes/1. Lapu-Lapu/Idle.png" alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-amber-500">
+        <span class="font-semibold text-amber-900 text-sm">Profile</span>
+    </button>
     
     <!-- User Auth Status Bar -->
     <div id="authStatusBar" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
@@ -344,35 +333,75 @@
         // Session check and user status
         async function checkAuthStatus() {
             try {
-                const session = await SupabaseConfig.getSession();
                 const authBar = document.getElementById('authStatusBar');
                 const loginPrompt = document.getElementById('loginPrompt');
                 
+                // PRIORITY 1: Check for real authenticated session first
+                const session = await SupabaseConfig.getSession();
+                
                 if (session) {
-                    // User is logged in
+                    // Real user is logged in - clear any stale guest session
+                    localStorage.removeItem('guestSession');
+                    
                     const profile = await SupabaseConfig.getCurrentProfile();
                     if (profile) {
                         document.getElementById('userNameDisplay').textContent = profile.full_name;
                         document.getElementById('userRoleBadge').textContent = profile.role.toUpperCase();
+                        document.getElementById('userRoleBadge').classList.remove('bg-gray-500');
+                        document.getElementById('userRoleBadge').classList.add('bg-blue-500');
                         authBar.classList.remove('hidden');
                         loginPrompt.classList.add('hidden');
+                        
+                        // Show profile button and set avatar
+                        document.getElementById('profileBtn').classList.remove('hidden');
+                        if (profile.avatar_url) {
+                            document.getElementById('profileAvatar').src = profile.avatar_url;
+                        }
                         
                         // Initialize progress sync
                         await ProgressSync.init();
                     }
-                } else {
-                    // User not logged in - show login prompt
-                    authBar.classList.add('hidden');
-                    loginPrompt.classList.remove('hidden');
+                    return;
                 }
+                
+                // PRIORITY 2: Check for guest session (only if no real auth)
+                const guestSession = JSON.parse(localStorage.getItem('guestSession') || 'null');
+                
+                if (guestSession && guestSession.isGuest) {
+                    // Guest user
+                    document.getElementById('userNameDisplay').textContent = 'Guest Player';
+                    document.getElementById('userRoleBadge').textContent = 'GUEST';
+                    document.getElementById('userRoleBadge').classList.remove('bg-blue-500');
+                    document.getElementById('userRoleBadge').classList.add('bg-gray-500');
+                    authBar.classList.remove('hidden');
+                    loginPrompt.classList.add('hidden');
+                    
+                    // Hide profile button for guests
+                    document.getElementById('profileBtn').classList.add('hidden');
+                    return;
+                }
+                
+                // PRIORITY 3: No session at all - show login prompt
+                authBar.classList.add('hidden');
+                loginPrompt.classList.remove('hidden');
+                
             } catch (error) {
                 console.error('Auth check error:', error);
             }
         }
         
         async function handleLogout() {
+            if (window.isButtonLocked && window.isButtonLocked('logout')) return;
+            if (window.lockButton) window.lockButton('logout', 3000);
+            
+            // Clear guest session if exists
+            localStorage.removeItem('guestSession');
             await SupabaseConfig.signOut();
-            window.location.reload();
+            
+            if (window.showPageLoading) window.showPageLoading('Logging out');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 150);
         }
         
         // Language toggle functionality with localStorage (synced with language.js)
@@ -448,6 +477,48 @@
                     const img = new Image();
                     img.src = src;
                 });
+            }
+        });
+    </script>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="assets/Game-BGM/mainMenu/The Whole Menu BGM.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Background Music Controller
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.2;
+
+        // Try to play music on first user interaction
+        function startBGMusic() {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(e => console.log('Audio play prevented:', e));
+            }
+        }
+
+        // Listen for user interactions to start music
+        ['click', 'touchstart', 'keydown'].forEach(event => {
+            document.addEventListener(event, startBGMusic, { once: true });
+        });
+
+        // Store music state for page transitions
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('bgMusicTime', bgMusic.currentTime);
+            sessionStorage.setItem('bgMusicPlaying', !bgMusic.paused);
+        });
+
+        // Resume music from previous page if applicable
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTime = sessionStorage.getItem('bgMusicTime');
+            const wasPlaying = sessionStorage.getItem('bgMusicPlaying') === 'true';
+            
+            if (savedTime) {
+                bgMusic.currentTime = parseFloat(savedTime);
+            }
+            if (wasPlaying) {
+                bgMusic.play().catch(e => console.log('Audio autoplay prevented:', e));
             }
         });
     </script>

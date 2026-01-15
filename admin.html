@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -226,13 +227,6 @@
         
         .btn-verify:hover { background: #059669; }
         
-        .btn-promote {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-promote:hover { background: #2563eb; }
-        
         .btn-delete {
             background: #ef4444;
             color: white;
@@ -400,10 +394,6 @@
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">🛡️ Admin Dashboard</h1>
-                <div class="nav-links">
-                    <a href="index.html" class="nav-link">← Home</a>
-                    <a href="era-selection.html" class="nav-link">🎮 Play Game</a>
-                </div>
             </div>
             <div class="user-info">
                 <span id="userName" class="text-amber-800 font-semibold"></span>
@@ -436,6 +426,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('users')">👥 User Management</button>
             <button class="tab-btn" onclick="switchTab('students')">📚 Student Registry</button>
+            <button class="tab-btn" onclick="switchTab('settings')">⚙️ Guest Settings</button>
         </div>
         
         <!-- User Management Tab -->
@@ -520,6 +511,53 @@
                     <div class="empty-icon">📚</div>
                     <p>No registered students yet</p>
                     <p class="text-sm">Click "Add Student" or upload an Excel file to add students</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Guest Settings Tab -->
+        <div id="settingsTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Guest User Settings</h2>
+                </div>
+                
+                <div class="p-6">
+                    <p class="text-amber-700 mb-6">Configure what guest users (non-logged-in players) can access. These settings are stored locally and apply to all guest sessions on this device.</p>
+                    
+                    <!-- Guest Unlock All Progress + Collections -->
+                    <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress & Collections (Guest Only)</h3>
+                                <p class="text-amber-700 text-sm mt-1">Allow <strong>guest users only</strong> (not logged-in accounts) to access all eras, lessons, and character collections without completing previous stages.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="guestUnlockProgress" class="sr-only peer" onchange="toggleGuestSetting('unlockProgress', this.checked)">
+                                <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Reset All Progress (Logged-in users) -->
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-red-900">🗑️ Reset All Progress (Logged-in Users)</h3>
+                                <p class="text-red-700 text-sm mt-1">Reset all progress for all logged-in user accounts. This will clear all eras, lessons, achievements, and unlocked characters from the database.</p>
+                            </div>
+                            <button onclick="resetAllUsersProgress()" class="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors">
+                                ⚠️ Reset All Users
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Reset Button -->
+                    <div class="mt-6 flex gap-4">
+                        <button onclick="resetGuestSettings()" class="px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
+                            🔄 Reset Guest Settings to Defaults
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -611,8 +649,8 @@
 
     <script>
         // Supabase config - standalone, no external dependencies
-        const SUPABASE_URL = 'https://vjrgwoqbewdahoipsuqo.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqcmd3b3FiZXdkYWhvaXBzdXFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNDMzOTUsImV4cCI6MjA4MzcxOTM5NX0.GIrUAmehdtdG3gxnvdjO71uiz-L7yYkBStNrf9_vr3s';
+        const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aHlxY3pwdGxqZGhtaW9hZ3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzOTY2NzAsImV4cCI6MjA4Mzk3MjY3MH0.QKFZapzgWYcCtuw3eEvqg6U6qi06QNpvIRNBw7ABf9I';
         
         let sb = null;
         let allUsers = [];
@@ -730,9 +768,6 @@
                         ${!user.is_verified && user.role === 'teacher' ? 
                             `<button class="btn-action btn-verify" onclick="verifyUser('${user.id}')">Verify</button>` : ''
                         }
-                        ${user.role === 'student' ? 
-                            `<button class="btn-action btn-promote" onclick="promoteUser('${user.id}')">→ Teacher</button>` : ''
-                        }
                         ${user.role !== 'admin' ? 
                             `<button class="btn-action btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''
                         }
@@ -773,27 +808,6 @@
             } catch (error) {
                 console.error('Error verifying user:', error);
                 showToast('Failed to verify user', 'error');
-            }
-        }
-        
-        // Promote user to teacher
-        async function promoteUser(userId) {
-            if (!confirm('Are you sure you want to promote this user to Teacher?')) return;
-            
-            try {
-                const { error } = await sb
-                    .from('profiles')
-                    .update({ role: 'teacher', is_verified: true })
-                    .eq('id', userId);
-                
-                if (error) throw error;
-                
-                showToast('User promoted to Teacher!', 'success');
-                loadUsers();
-                loadStats();
-            } catch (error) {
-                console.error('Error promoting user:', error);
-                showToast('Failed to promote user', 'error');
             }
         }
         
@@ -1257,6 +1271,103 @@
             
             document.getElementById(`${tabName}Tab`).classList.add('active');
             event.target.classList.add('active');
+            
+            // Load guest settings when settings tab is opened
+            if (tabName === 'settings') {
+                loadGuestSettings();
+            }
+        }
+        
+        // ============================================
+        // GUEST SETTINGS MANAGEMENT
+        // ============================================
+        
+        const GUEST_SETTINGS_KEY = 'guestModeSettings';
+        
+        // Default guest settings
+        const defaultGuestSettings = {
+            unlockProgress: false  // Unlocks all eras and collections
+        };
+        
+        // Get current guest settings
+        function getGuestSettings() {
+            const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
+            if (saved) {
+                return { ...defaultGuestSettings, ...JSON.parse(saved) };
+            }
+            return { ...defaultGuestSettings };
+        }
+        
+        // Save guest settings
+        function saveGuestSettings(settings) {
+            localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(settings));
+        }
+        
+        // Toggle a specific guest setting
+        function toggleGuestSetting(settingName, value) {
+            const settings = getGuestSettings();
+            settings[settingName] = value;
+            saveGuestSettings(settings);
+            showToast(`Guest setting updated: Unlock Progress & Collections = ${value}`, 'success');
+        }
+        
+        // Load guest settings into the UI
+        function loadGuestSettings() {
+            const settings = getGuestSettings();
+            
+            // Set checkbox states
+            document.getElementById('guestUnlockProgress').checked = settings.unlockProgress;
+        }
+        
+        // Reset guest settings to defaults
+        function resetGuestSettings() {
+            if (confirm('Reset all guest settings to defaults?')) {
+                localStorage.removeItem(GUEST_SETTINGS_KEY);
+                loadGuestSettings();
+                showToast('Guest settings reset to defaults', 'success');
+            }
+        }
+        
+        // Reset all users progress (admin function)
+        async function resetAllUsersProgress() {
+            if (!confirm('⚠️ WARNING: This will DELETE all progress for ALL logged-in users!\n\nThis includes:\n- All era progress\n- All completed lessons\n- All achievements\n- All unlocked characters\n\nThis action CANNOT be undone. Are you sure?')) {
+                return;
+            }
+            
+            // Double confirmation
+            if (!confirm('Are you ABSOLUTELY sure? Type OK to confirm this will delete all user progress.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Delete all progress records
+                const { error: progressError } = await sb
+                    .from('progress')
+                    .delete()
+                    .neq('user_id', '00000000-0000-0000-0000-000000000000'); // Delete all (dummy condition)
+                
+                if (progressError) throw progressError;
+                
+                // Delete all achievements records
+                const { error: achievementsError } = await sb
+                    .from('achievements')
+                    .delete()
+                    .neq('user_id', '00000000-0000-0000-0000-000000000000');
+                
+                if (achievementsError) throw achievementsError;
+                
+                showToast('All user progress has been reset successfully!', 'success');
+                
+                // Refresh stats
+                await loadStats();
+            } catch (error) {
+                console.error('Error resetting all progress:', error);
+                showToast('Error resetting progress: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
         }
         
         // Toast notification helper
@@ -1283,8 +1394,14 @@
         
         // Handle logout
         async function handleLogout() {
+            if (window.isButtonLocked && window.isButtonLocked('logout')) return;
+            if (window.lockButton) window.lockButton('logout', 3000);
+            
             await sb.auth.signOut();
-            window.location.href = 'login.html';
+            if (window.showPageLoading) window.showPageLoading('Logging out');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 150);
         }
         
         // Close modals on outside click

@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -296,15 +297,138 @@
         .validation-status.invalid {
             color: #ef4444;
         }
+
+        /* Success Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a);
+            border: 4px solid rgba(120, 53, 15, 0.5);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .modal-icon svg {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #7c2d12;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-message {
+            color: #92400e;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-btn {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(180, 83, 9, 0.4);
+        }
+
+        .modal-countdown {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .lang-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .lang-toggle img {
+            height: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
     </style>
 </head>
 <body>
+    <!-- Language Toggle -->
+    <button id="langToggle" class="lang-toggle" aria-label="Toggle Language">
+        <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog">
+    </button>
+    
     <div class="main-container">
         <div class="signup-bg-overlay"></div>
         
         <div class="signup-card">
-            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-1">Create Account</h1>
-            <p class="text-center text-amber-700 mb-4">Join the adventure of learning history!</p>
+            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-1" data-translate="Create Account">Create Account</h1>
+            <p class="text-center text-amber-700 mb-4" data-translate="Join the adventure">Join the adventure of learning history!</p>
             
             <!-- Error/Success Messages -->
             <div id="errorMessage" class="error-message"></div>
@@ -627,6 +751,10 @@
         async function handleSignup(event) {
             event.preventDefault();
             
+            // Prevent double submission
+            if (window.isButtonLocked && window.isButtonLocked('signup')) return;
+            if (window.lockButton) window.lockButton('signup', 5000);
+            
             const fullName = document.getElementById('fullName').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -764,10 +892,8 @@
                 // Clear form
                 document.getElementById('signupForm').reset();
                 
-                // Redirect after delay
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
+                // Show success modal
+                showSuccessModal();
                 
             } catch (error) {
                 console.error('Signup error:', error);
@@ -783,6 +909,52 @@
                 signupSpinner.style.display = 'none';
             }
         }
+
+        // Show success modal with countdown
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            const countdownEl = document.getElementById('modalCountdown');
+            modal.classList.add('show');
+            
+            let countdown = 5;
+            countdownEl.textContent = `Redirecting to login in ${countdown} seconds...`;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    countdownEl.textContent = `Redirecting to login in ${countdown} seconds...`;
+                } else {
+                    clearInterval(countdownInterval);
+                    window.location.href = 'login.html';
+                }
+            }, 1000);
+        }
+
+        // Close modal and redirect
+        function closeModalAndRedirect() {
+            window.location.href = 'login.html';
+        }
     </script>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="modal-title">Registration Successful!</h2>
+            <p class="modal-message">
+                Your account has been created successfully. 
+                You can now log in with your email and password to start your journey!
+            </p>
+            <button class="modal-btn" onclick="closeModalAndRedirect()">
+                Go to Login
+            </button>
+            <p id="modalCountdown" class="modal-countdown">Redirecting to login in 5 seconds...</p>
+        </div>
+    </div>
+    <script src="js/language.js"></script>
 </body>
 </html>

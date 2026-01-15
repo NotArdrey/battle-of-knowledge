@@ -50,10 +50,13 @@ function renderCharacterGrid() {
         // First check if the era itself is unlocked
         const isEraUnlocked = checkEraUnlocked(character.eraKey, eraProgress);
         
+        // If guest unlock is enabled, everything is unlocked
         // Heroes: era must be unlocked AND hero must be in unlockedHeroes
         // Villains: unlocked when era is unlocked
         let isUnlocked = false;
-        if (isEraUnlocked) {
+        if (isGuestUnlockEnabled()) {
+            isUnlocked = true; // All characters unlocked in guest unlock mode
+        } else if (isEraUnlocked) {
             isUnlocked = isHero 
                 ? eraUnlocks.includes(character.heroIndex ?? 0)
                 : true; // Villains unlock when era is unlocked
@@ -110,8 +113,21 @@ function renderCharacterGrid() {
 // Era order for progression checks
 const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
+// Check if admin has enabled unlock all for guests
+function isGuestUnlockEnabled() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('guestModeSettings') || '{}');
+        return settings.unlockProgress === true;
+    } catch (e) {
+        return false;
+    }
+}
+
 // Check if an era is unlocked based on previous era completion
 function checkEraUnlocked(eraKey, eraProgress) {
+    // If guest unlock is enabled by admin, all eras are unlocked
+    if (isGuestUnlockEnabled()) return true;
+    
     const eraIndex = eraOrder.indexOf(eraKey);
     if (eraIndex <= 0) return true; // First era always unlocked
     
@@ -130,8 +146,13 @@ function getPreviousEraName(eraKey, lang) {
     return translations[lang][prevEra.name] || prevEra.name;
 }
 
-// Retrieve unlocked heroes map from localStorage
+// Retrieve unlocked heroes map - uses ProgressSync for cross-browser sync
 function getUnlockedHeroes() {
+    // Use ProgressSync if available (syncs to database)
+    if (window.ProgressSync && window.ProgressSync.userId) {
+        return window.ProgressSync.getAllUnlockedHeroes() || {};
+    }
+    // Fallback to localStorage for offline/unauthenticated
     try {
         return JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
     } catch (error) {

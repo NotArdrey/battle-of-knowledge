@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>My Account - Battle of Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Baloo 2', cursive; 
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .account-bg-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                url('assets/Background/Start Menu/Start Menu.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            z-index: 1;
+        }
+        
+        .account-card {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
+            backdrop-filter: blur(10px);
+            border: 4px solid rgba(120, 53, 15, 0.4);
+            border-radius: 24px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-top: 40px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-family: 'Baloo 2', cursive;
+            color: #7c2d12;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #b45309;
+            box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.2);
+        }
+        
+        .form-input:disabled {
+            background: rgba(200, 200, 200, 0.5);
+            cursor: not-allowed;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 700;
+            color: #7c2d12;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(180, 83, 9, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #7c2d12;
+            font-weight: 700;
+            font-size: 1rem;
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #b45309;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #7c2d12;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(120, 53, 15, 0.2);
+        }
+        
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .avatar-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: white;
+            position: relative;
+        }
+        
+        .avatar-option:hover {
+            transform: scale(1.05);
+            border-color: #b45309;
+        }
+        
+        .avatar-option.selected {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+        
+        .avatar-option.locked {
+            filter: grayscale(0.8);
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-option .lock-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            font-size: 1.5rem;
+        }
+        
+        .current-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #b45309;
+            overflow: hidden;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .current-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+        
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            color: #059669;
+        }
+        
+        .message.show {
+            display: block;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+            background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
+            border: 3px solid rgba(120, 53, 15, 0.3);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            color: #7c2d12;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            border-color: #b45309;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(120, 53, 15, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            color: #92400e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(to right, #b45309, #d97706);
+            color: white;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .character-type-label {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .hero-label {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .villain-label {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .lang-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .lang-toggle img {
+            height: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <button id="langToggle" class="lang-toggle" aria-label="Toggle Language">
+        <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog">
+    </button>
+    
+    <div class="main-container">
+        <div class="account-bg-overlay"></div>
+        
+        <!-- Back Button -->
+        <button onclick="navigateTo('menu.html', this)" class="back-btn" data-translate="Back to Menu" data-protect="back" data-protect-duration="2000">
+            ← Back to Menu
+        </button>
+        
+        <div class="account-card">
+            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-2" data-translate="My Account">👤 My Account</h1>
+            
+            <!-- Current Avatar Display -->
+            <div class="current-avatar">
+                <img id="currentAvatarImg" src="assets/Characters/1. Early Spanish Era/Heroes/1. Lapu-Lapu/Idle.png" alt="Current Avatar">
+            </div>
+            <p id="currentAvatarName" class="text-center font-bold text-amber-900 mb-4">Lapu-Lapu</p>
+            
+            <!-- Messages -->
+            <div id="message" class="message"></div>
+            
+            <!-- Tabs -->
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('profile')">👤 Profile</button>
+                <button class="tab-btn" onclick="switchTab('avatar')">🖼️ Avatar</button>
+                <button class="tab-btn" onclick="switchTab('security')">🔒 Security</button>
+            </div>
+            
+            <!-- Profile Tab -->
+            <div id="profileTab" class="tab-content active">
+                <h2 class="section-title">Profile Information</h2>
+                
+                <form id="profileForm" onsubmit="handleUpdateProfile(event)">
+                    <div class="mb-4">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" id="fullName" class="form-input" placeholder="Your name" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="Your email" disabled>
+                        <p class="text-xs text-amber-600 mt-1">Email cannot be changed directly. Contact support if needed.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Role</label>
+                        <input type="text" id="role" class="form-input" disabled>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full">Save Changes</button>
+                </form>
+            </div>
+            
+            <!-- Avatar Tab -->
+            <div id="avatarTab" class="tab-content">
+                <h2 class="section-title">Choose Your Avatar</h2>
+                <p class="text-amber-700 mb-4">Select a hero or villain as your profile avatar. Unlock more by completing eras!</p>
+                
+                <h3 class="font-bold text-amber-900 mb-2">🦸 Heroes</h3>
+                <div id="heroAvatars" class="avatar-grid"></div>
+                
+                <h3 class="font-bold text-amber-900 mb-2 mt-4">👹 Villains</h3>
+                <div id="villainAvatars" class="avatar-grid"></div>
+            </div>
+            
+            <!-- Security Tab -->
+            <div id="securityTab" class="tab-content">
+                <h2 class="section-title">Change Password</h2>
+                
+                <form id="passwordForm" onsubmit="handleChangePassword(event)">
+                    <div class="mb-4">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" required minlength="6">
+                        <p class="text-xs text-amber-600 mt-1">At least 6 characters</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" class="form-input" placeholder="Confirm new password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full">Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/progress-sync.js"></script>
+    <script src="js/eraData.js"></script>
+    
+    <script>
+        let currentProfile = null;
+        let selectedAvatarUrl = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Require authentication
+            if (window.SupabaseConfig) {
+                const authed = await window.SupabaseConfig.requireAuth('login.html');
+                if (!authed) return;
+            }
+            
+            // Initialize ProgressSync
+            if (window.ProgressSync) {
+                await window.ProgressSync.init();
+            }
+            
+            // Load profile
+            await loadProfile();
+            loadAvatarOptions();
+        });
+        
+        // Load user profile
+        async function loadProfile() {
+            try {
+                currentProfile = await window.SupabaseConfig.getCurrentProfile();
+                if (currentProfile) {
+                    document.getElementById('fullName').value = currentProfile.full_name || '';
+                    document.getElementById('email').value = currentProfile.email || '';
+                    document.getElementById('role').value = (currentProfile.role || 'student').toUpperCase();
+                    
+                    if (currentProfile.avatar_url) {
+                        document.getElementById('currentAvatarImg').src = currentProfile.avatar_url;
+                        selectedAvatarUrl = currentProfile.avatar_url;
+                        // Try to find character name from URL
+                        updateAvatarName(currentProfile.avatar_url);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('Failed to load profile', 'error');
+            }
+        }
+        
+        // Get unlocked characters based on progress - uses ProgressSync for cross-browser sync
+        function getUnlockedCharacters() {
+            // Use ProgressSync for unlocked heroes if available
+            let unlockedHeroes = {};
+            if (window.ProgressSync && window.ProgressSync.userId) {
+                unlockedHeroes = window.ProgressSync.getAllUnlockedHeroes() || {};
+            } else {
+                unlockedHeroes = JSON.parse(localStorage.getItem('unlockedHeroes')) || {};
+            }
+            const eraProgress = window.ProgressSync ? window.ProgressSync.getAllProgress() : {};
+            
+            const unlocked = { heroes: [], villains: [] };
+            const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
+            
+            eraOrder.forEach((eraKey, eraIndex) => {
+                const era = eraData[eraKey];
+                if (!era) return;
+                
+                // Check if era is unlocked
+                let eraUnlocked = eraIndex === 0;
+                if (eraIndex > 0) {
+                    const prevEra = eraOrder[eraIndex - 1];
+                    const prevStatus = eraProgress[prevEra] || {};
+                    eraUnlocked = !!(prevStatus.lessonsComplete && prevStatus.bossDefeated);
+                }
+                
+                // Add heroes
+                const heroUnlocks = unlockedHeroes[eraKey] || [0];
+                era.heroes.forEach((hero, idx) => {
+                    const isUnlocked = eraUnlocked && heroUnlocks.includes(idx);
+                    unlocked.heroes.push({
+                        ...hero,
+                        eraKey,
+                        isUnlocked,
+                        avatarUrl: `${hero.folder}/${hero.idle}`
+                    });
+                });
+                
+                // Add villains (unlocked when era is complete)
+                const eraComplete = eraProgress[eraKey]?.bossDefeated;
+                era.villains.forEach(villain => {
+                    unlocked.villains.push({
+                        ...villain,
+                        eraKey,
+                        isUnlocked: eraComplete,
+                        avatarUrl: `${villain.folder}/${villain.idle}`
+                    });
+                });
+            });
+            
+            return unlocked;
+        }
+        
+        // Load avatar options
+        function loadAvatarOptions() {
+            const { heroes, villains } = getUnlockedCharacters();
+            
+            const heroGrid = document.getElementById('heroAvatars');
+            const villainGrid = document.getElementById('villainAvatars');
+            
+            heroGrid.innerHTML = heroes.map(hero => `
+                <div class="avatar-option ${hero.isUnlocked ? '' : 'locked'} ${selectedAvatarUrl === hero.avatarUrl ? 'selected' : ''}" 
+                     onclick="${hero.isUnlocked ? `selectAvatar('${hero.avatarUrl}', '${hero.name}')` : ''}"
+                     title="${hero.name}">
+                    <img src="${hero.avatarUrl}" alt="${hero.name}">
+                    ${hero.isUnlocked ? '' : '<div class="lock-icon">🔒</div>'}
+                </div>
+            `).join('');
+            
+            villainGrid.innerHTML = villains.map(villain => `
+                <div class="avatar-option ${villain.isUnlocked ? '' : 'locked'} ${selectedAvatarUrl === villain.avatarUrl ? 'selected' : ''}" 
+                     onclick="${villain.isUnlocked ? `selectAvatar('${villain.avatarUrl}', '${villain.name}')` : ''}"
+                     title="${villain.name}">
+                    <img src="${villain.avatarUrl}" alt="${villain.name}">
+                    ${villain.isUnlocked ? '' : '<div class="lock-icon">🔒</div>'}
+                </div>
+            `).join('');
+        }
+        
+        // Select avatar
+        async function selectAvatar(avatarUrl, name) {
+            selectedAvatarUrl = avatarUrl;
+            document.getElementById('currentAvatarImg').src = avatarUrl;
+            document.getElementById('currentAvatarName').textContent = name;
+            
+            // Update selection UI
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            // Save to database
+            try {
+                const client = window.SupabaseConfig.supabase;
+                const { error } = await client
+                    .from('profiles')
+                    .update({ avatar_url: avatarUrl })
+                    .eq('id', currentProfile.id);
+                
+                if (error) throw error;
+                showMessage('Avatar updated!', 'success');
+            } catch (error) {
+                console.error('Error saving avatar:', error);
+                showMessage('Failed to save avatar', 'error');
+            }
+        }
+        
+        // Update avatar name display
+        function updateAvatarName(url) {
+            // Extract character name from URL path
+            const match = url.match(/\/([^\/]+)\/[^\/]+\.png$/i);
+            if (match) {
+                const folderName = match[1];
+                // Clean up folder name (remove numbers and dots)
+                const name = folderName.replace(/^\d+\.\s*/, '');
+                document.getElementById('currentAvatarName').textContent = name;
+            }
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+        
+        // Update profile
+        async function handleUpdateProfile(event) {
+            event.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            
+            try {
+                const client = window.SupabaseConfig.supabase;
+                const { error } = await client
+                    .from('profiles')
+                    .update({ full_name: fullName })
+                    .eq('id', currentProfile.id);
+                
+                if (error) throw error;
+                showMessage('Profile updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showMessage('Failed to update profile: ' + error.message, 'error');
+            }
+        }
+        
+        // Change password
+        async function handleChangePassword(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('New passwords do not match', 'error');
+                return;
+            }
+            
+            try {
+                const client = window.SupabaseConfig.supabase;
+                
+                // First verify current password by attempting to sign in
+                const { error: signInError } = await client.auth.signInWithPassword({
+                    email: currentProfile.email,
+                    password: currentPassword
+                });
+                
+                if (signInError) {
+                    showMessage('Current password is incorrect', 'error');
+                    return;
+                }
+                
+                // Update password
+                const { error } = await client.auth.updateUser({
+                    password: newPassword
+                });
+                
+                if (error) throw error;
+                
+                showMessage('Password updated successfully!', 'success');
+                document.getElementById('passwordForm').reset();
+            } catch (error) {
+                console.error('Error changing password:', error);
+                showMessage('Failed to change password: ' + error.message, 'error');
+            }
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const msgEl = document.getElementById('message');
+            msgEl.textContent = text;
+            msgEl.className = `message ${type} show`;
+            
+            setTimeout(() => {
+                msgEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+    <script src="js/language.js"></script>
+</body>
+</html>

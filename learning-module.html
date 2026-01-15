@@ -6,6 +6,7 @@
     <title>Learn About This Era - Battle of Knowledge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles/animations.css">
+    <script src="js/ui-utils.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -425,6 +426,26 @@
             border-radius: 16px;
         }
         
+        /* YouTube Container - Responsive 16:9 */
+        .youtube-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+        
+        .youtube-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+        }
+        
         .video-placeholder {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -527,7 +548,7 @@
         </button>
 
         <!-- Back Button -->
-        <button onclick="window.location.href='era-selection.html'" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0">
+        <button onclick="navigateTo('era-selection.html', this)" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0" data-protect="back" data-protect-duration="2000">
             <img
                 src="assets/Buttons/era-selection/back.png"
                 data-lang-img-en="assets/Buttons/era-selection/back.png"
@@ -577,8 +598,7 @@
                     <div class="video-toolbar">
                         <button id="bgmToggleBtn" class="caption-toggle" onclick="toggleModuleBGM()">🔊 BGM</button>
                         <div class="caption-controls">
-                            <button id="captionVisibilityToggle" class="caption-toggle" onclick="toggleCaptionsVisibility()">Hide CC</button>
-                            <button id="captionLangToggle" class="caption-toggle" onclick="toggleCaptionLanguage()">EN/TL</button>
+                            <button id="captionLangToggle" class="caption-toggle" onclick="toggleCaptionLanguage()">CC: EN</button>
                         </div>
                     </div>
                     
@@ -653,6 +673,16 @@
     <script src="js/moduleVideos.js"></script>
     <script src="js/language.js"></script>
     <script>
+        // Click protection - prevents button spam
+        const buttonLocks = new Map();
+        function isButtonLocked(buttonId) {
+            return buttonLocks.get(buttonId) === true;
+        }
+        function lockButton(buttonId, duration = 1000) {
+            buttonLocks.set(buttonId, true);
+            setTimeout(() => buttonLocks.set(buttonId, false), duration);
+        }
+        
         // Era-specific Background Music for Learning Module
         const moduleBackgroundMusic = {
             'early-spanish': new Audio('assets/Game-BGM/modulePartBGM/Early Spanish Whole Menu BGM.mp3'),
@@ -665,7 +695,7 @@
         Object.values(moduleBackgroundMusic).forEach(bgm => {
             bgm.preload = 'auto';
             bgm.loop = true;
-            bgm.volume = 0.4; // Lower volume for learning module
+            bgm.volume = 0.2; // Set to 20% volume
         });
 
         // Current playing BGM reference
@@ -683,7 +713,7 @@
                 // Play the current era's music
                 currentModuleBGM = moduleBackgroundMusic[eraKey];
                 currentModuleBGM.currentTime = 0;
-                currentModuleBGM.volume = 0.4;
+                currentModuleBGM.volume = 0.2;
                 
                 // Try to play automatically
                 currentModuleBGM.play().catch(e => {
@@ -759,13 +789,9 @@
         let captionsVisible = true;
 
         function refreshCaptionControls() {
-            const captionToggleBtn = document.getElementById('captionVisibilityToggle');
             const captionLangBtn = document.getElementById('captionLangToggle');
-            if (captionToggleBtn) {
-                captionToggleBtn.textContent = captionsVisible ? 'Hide CC' : 'Show CC';
-            }
             if (captionLangBtn) {
-                captionLangBtn.textContent = captionLanguage === 'en' ? 'EN' : 'TL';
+                captionLangBtn.textContent = captionLanguage === 'en' ? 'CC: EN' : 'CC: TL';
             }
         }
 
@@ -780,12 +806,42 @@
                 const lessonData = moduleVideos[currentEraKey].lessons.find(l => l.lessonId === lessonId);
                 
                 if (lessonData) {
-                    // Load captions
-                    currentCaptions = lessonData.captions[captionLanguage] || lessonData.captions['en'] || [];
+                    // Load captions (handle missing captions gracefully)
+                    if (lessonData.captions) {
+                        currentCaptions = lessonData.captions[captionLanguage] || lessonData.captions['en'] || [];
+                    } else {
+                        currentCaptions = [];
+                    }
                     
-                    // Check if video file exists
-                    if (lessonData.videoFile) {
-                        // Show actual video
+                    // Check if YouTube video exists
+                    if (lessonData.youtubeId) {
+                        // Show YouTube iframe
+                        videoContainer.innerHTML = `
+                            <div class="youtube-container">
+                                <iframe 
+                                    id="lessonVideo"
+                                    src="https://www.youtube.com/embed/${lessonData.youtubeId}?enablejsapi=1&rel=0&modestbranding=1"
+                                    title="${lessonData.title}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                            <div id="captionContainer" class="caption-container" style="display: none;">
+                                <p id="captionText" class="caption-text">Captions are embedded in the YouTube video</p>
+                            </div>
+                        `;
+                        
+                        // Hide custom captions for YouTube (use YouTube's built-in captions)
+                        const liveCaptionContainer = document.getElementById('captionContainer');
+                        if (liveCaptionContainer) {
+                            liveCaptionContainer.style.display = 'none';
+                        }
+                        
+                        // Mute BGM when YouTube video is displayed
+                        muteModuleBGMForVideo();
+                    } else if (lessonData.videoFile) {
+                        // Show actual video (fallback for local videos)
                         videoContainer.innerHTML = `
                             <video id="lessonVideo" controls>
                                 <source src="${lessonData.videoFile}" type="video/mp4">
@@ -1009,10 +1065,21 @@
                 // Start era-specific background music
                 playModuleBackgroundMusic(currentEraKey);
                 
-                // Load completed lessons for this era from localStorage
-                const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
-                if (savedProgress) {
-                    completedLessons = new Set(JSON.parse(savedProgress));
+                // Load completed lessons from ProgressSync (database) first, fallback to localStorage
+                if (window.ProgressSync) {
+                    const lessonList = window.ProgressSync.getCompletedLessons(currentEraKey);
+                    completedLessons = new Set(lessonList);
+                    // Also restore current lesson index from database
+                    const eraProgress = window.ProgressSync.getEraProgress(currentEraKey);
+                    if (eraProgress && typeof eraProgress.currentLessonIndex === 'number') {
+                        currentLessonIndex = eraProgress.currentLessonIndex;
+                    }
+                } else {
+                    // Fallback to localStorage if ProgressSync not available
+                    const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
+                    if (savedProgress) {
+                        completedLessons = new Set(JSON.parse(savedProgress));
+                    }
                 }
                 
                 loadEraContent();
@@ -1176,19 +1243,31 @@
         }
 
         // Complete current lesson
-        function completeCurrentLesson() {
+        async function completeCurrentLesson() {
+            // Prevent spam clicks
+            if (isButtonLocked('complete')) return;
+            lockButton('complete', 1500);
+            
             if (currentEraLessons.length === 0) return;
             
             const lesson = currentEraLessons[currentLessonIndex];
             
+            // Already completed - skip
+            if (completedLessons.has(lesson.id)) return;
+            
             // Mark as complete
             completedLessons.add(lesson.id);
             
-            // Save progress to localStorage
+            // Save progress to localStorage (for offline/fallback)
             localStorage.setItem(
                 `learning_${currentEraKey}`, 
                 JSON.stringify([...completedLessons])
             );
+            
+            // Sync to database via ProgressSync
+            if (window.ProgressSync) {
+                await window.ProgressSync.markLessonComplete(currentEraKey, lesson.id);
+            }
             
             // Show completion animation
             showLessonCompletion();
@@ -1198,8 +1277,11 @@
             updateNavigationButtons();
             createLessonIndicators();
             
-            // If all lessons completed, show celebration
+            // If all lessons completed, mark era lessons as complete and show celebration
             if (completedLessons.size === currentEraLessons.length) {
+                if (window.ProgressSync) {
+                    await window.ProgressSync.updateEraProgress(currentEraKey, { lessonsComplete: true });
+                }
                 setTimeout(showAllLessonsCompleted, 500);
             }
             
@@ -1295,6 +1377,9 @@
 
         // Previous lesson
         function previousLesson() {
+            if (isButtonLocked('prev')) return;
+            lockButton('prev', 500);
+            
             if (currentLessonIndex > 0) {
                 currentLessonIndex--;
                 loadCurrentLesson();
@@ -1304,6 +1389,9 @@
 
         // Next lesson
         function nextLesson() {
+            if (isButtonLocked('next')) return;
+            lockButton('next', 500);
+            
             const lesson = currentEraLessons[currentLessonIndex];
             const isCompleted = completedLessons.has(lesson.id);
             
@@ -1364,6 +1452,9 @@
 
         // Start battle
         function startBattle() {
+            if (isButtonLocked('startBattle')) return;
+            lockButton('startBattle', 2000);
+            
             const selectedEra = localStorage.getItem('selectedEra');
             
             // Always show character selection for eras with multiple heroes
@@ -1373,8 +1464,11 @@
             } else {
                 // Clear any previous battle progress to start a fresh session
                 localStorage.removeItem('battleProgress');
-                // Go directly to battlefield
-                window.location.href = 'battlefield.html';
+                // Show loading and go to battlefield
+                if (window.showPageLoading) window.showPageLoading('Preparing Battle');
+                setTimeout(() => {
+                    window.location.href = 'battlefield.html';
+                }, 150);
             }
         }
 
@@ -1440,10 +1534,19 @@
 
         // Select character
         function selectCharacter(heroIndex) {
+            // Prevent double clicks
+            if (isButtonLocked('selectCharacter')) return;
+            lockButton('selectCharacter', 2000);
+            
             // Clear any previous battle progress to start a fresh session
             localStorage.removeItem('battleProgress');
             localStorage.setItem('selectedHero', heroIndex);
-            window.location.href = 'battlefield.html';
+            
+            // Show loading and navigate
+            if (window.showPageLoading) window.showPageLoading('Preparing Battle');
+            setTimeout(() => {
+                window.location.href = 'battlefield.html';
+            }, 150);
         }
 
         // Get unlocked heroes
@@ -1539,8 +1642,24 @@
             // Reset to first lesson
             currentLessonIndex = 0;
             
+            // Reset progress in database
+            if (window.ProgressSync) {
+                await window.ProgressSync.updateEraProgress(currentEraKey, {
+                    lessonsComplete: false,
+                    bossDefeated: false,
+                    currentLessonIndex: 0,
+                    battleScore: 0,
+                    enemiesDefeated: 0,
+                    highestStreak: 0
+                });
+                // Clear completed lessons array in cache
+                window.ProgressSync.progress.completedLessons[currentEraKey] = [];
+                // Re-save to server with empty lessons
+                await window.ProgressSync.saveToServer(currentEraKey, window.ProgressSync.getEraProgress(currentEraKey));
+            }
+            
             // Update UI
-            loadCurrentLesson();
+            await loadCurrentLesson();
             createLessonIndicators();
             updateProgress();
             checkBattleUnlock();
@@ -1579,21 +1698,21 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOMContentLoaded fired');
             
-            // Initialize learning module immediately - don't wait for ProgressSync
-            try {
-                initLearningModule();
-            } catch (error) {
-                console.error('Error in initLearningModule:', error);
+            // Initialize ProgressSync (works for both logged-in users and guests)
+            if (window.ProgressSync) {
+                try {
+                    await window.ProgressSync.init();
+                    console.log('ProgressSync initialized');
+                } catch (e) {
+                    console.warn('ProgressSync init failed:', e);
+                }
             }
             
-            // Initialize ProgressSync in the background (non-blocking)
-            if (window.ProgressSync) {
-                window.ProgressSync.init().then(() => {
-                    console.log('ProgressSync initialized');
-                    // Reload progress data if needed
-                }).catch(e => {
-                    console.warn('ProgressSync init failed:', e);
-                });
+            // Initialize learning module after ProgressSync is ready
+            try {
+                await initLearningModule();
+            } catch (error) {
+                console.error('Error in initLearningModule:', error);
             }
             
             // Setup language toggle

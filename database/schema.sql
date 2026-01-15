@@ -1,14 +1,37 @@
 -- ============================================
--- BATTLE OF KNOWLEDGE - SUPABASE DATABASE SCHEMA
--- Role-Based Access Control (RBAC) System
+-- BATTLE OF KNOWLEDGE - COMPLETE SCHEMA RESET
+-- Run this ENTIRE script in Supabase SQL Editor
 -- ============================================
 
--- Enable UUID extension
+-- ============================================
+-- STEP 1: CLEANUP EVERYTHING
+-- ============================================
+
+DROP VIEW IF EXISTS teacher_student_progress CASCADE;
+DROP VIEW IF EXISTS admin_user_stats CASCADE;
+DROP TABLE IF EXISTS game_sessions CASCADE;
+DROP TABLE IF EXISTS custom_lessons CASCADE;
+DROP TABLE IF EXISTS custom_questions CASCADE;
+DROP TABLE IF EXISTS achievements CASCADE;
+DROP TABLE IF EXISTS progress CASCADE;
+DROP TABLE IF EXISTS class_enrollments CASCADE;
+DROP TABLE IF EXISTS classes CASCADE;
+DROP TABLE IF EXISTS registered_students CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
+DROP FUNCTION IF EXISTS generate_class_code() CASCADE;
+DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
+DROP FUNCTION IF EXISTS is_teacher() CASCADE;
+DROP FUNCTION IF EXISTS is_admin() CASCADE;
+DROP FUNCTION IF EXISTS get_user_role() CASCADE;
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
--- 1. PROFILES TABLE (Links to Supabase Auth)
+-- STEP 2: CREATE TABLES
 -- ============================================
+
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT UNIQUE NOT NULL,
@@ -16,22 +39,16 @@ CREATE TABLE profiles (
     role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('admin', 'teacher', 'student')),
     teacher_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
     is_verified BOOLEAN DEFAULT FALSE,
-    student_id_number TEXT, -- For student validation
+    student_id_number TEXT,
     class_id UUID,
     avatar_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index for faster lookups
 CREATE INDEX idx_profiles_role ON profiles(role);
 CREATE INDEX idx_profiles_teacher_id ON profiles(teacher_id);
-CREATE INDEX idx_profiles_student_id ON profiles(student_id_number);
 
--- ============================================
--- 2. REGISTERED STUDENTS TABLE (Admin Uploaded)
--- For validating student registrations
--- ============================================
 CREATE TABLE registered_students (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id_number TEXT UNIQUE NOT NULL,
@@ -46,11 +63,6 @@ CREATE TABLE registered_students (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_registered_students_id ON registered_students(student_id_number);
-
--- ============================================
--- 3. CLASSES TABLE (Teacher Class Management)
--- ============================================
 CREATE TABLE classes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     teacher_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -68,9 +80,6 @@ CREATE TABLE classes (
 CREATE INDEX idx_classes_teacher ON classes(teacher_id);
 CREATE INDEX idx_classes_code ON classes(class_code);
 
--- ============================================
--- 4. CLASS ENROLLMENTS (Students in Classes)
--- ============================================
 CREATE TABLE class_enrollments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     class_id UUID NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
@@ -83,9 +92,6 @@ CREATE TABLE class_enrollments (
 CREATE INDEX idx_enrollments_class ON class_enrollments(class_id);
 CREATE INDEX idx_enrollments_student ON class_enrollments(student_id);
 
--- ============================================
--- 5. PROGRESS TABLE (Replaces localStorage)
--- ============================================
 CREATE TABLE progress (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -98,6 +104,7 @@ CREATE TABLE progress (
     enemies_defeated INTEGER DEFAULT 0,
     highest_streak INTEGER DEFAULT 0,
     time_spent_seconds INTEGER DEFAULT 0,
+    unlocked_heroes JSONB DEFAULT '[0]'::jsonb,
     last_played_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -107,9 +114,6 @@ CREATE TABLE progress (
 CREATE INDEX idx_progress_user ON progress(user_id);
 CREATE INDEX idx_progress_era ON progress(era_key);
 
--- ============================================
--- 6. ACHIEVEMENTS TABLE
--- ============================================
 CREATE TABLE achievements (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -120,9 +124,6 @@ CREATE TABLE achievements (
 
 CREATE INDEX idx_achievements_user ON achievements(user_id);
 
--- ============================================
--- 7. CUSTOM QUESTIONS TABLE (Teacher Created)
--- ============================================
 CREATE TABLE custom_questions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -143,11 +144,27 @@ CREATE TABLE custom_questions (
 
 CREATE INDEX idx_questions_creator ON custom_questions(created_by);
 CREATE INDEX idx_questions_era ON custom_questions(era_key);
-CREATE INDEX idx_questions_class ON custom_questions(class_id);
 
--- ============================================
--- 8. GAME SESSIONS TABLE (Analytics)
--- ============================================
+CREATE TABLE custom_lessons (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    created_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    era_key TEXT NOT NULL,
+    lesson_order INTEGER NOT NULL,
+    title_en TEXT NOT NULL,
+    title_tl TEXT,
+    content_en TEXT NOT NULL,
+    content_tl TEXT,
+    icon TEXT DEFAULT '📖',
+    is_active BOOLEAN DEFAULT TRUE,
+    is_approved BOOLEAN DEFAULT FALSE,
+    class_id UUID REFERENCES classes(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_lessons_creator ON custom_lessons(created_by);
+CREATE INDEX idx_lessons_era ON custom_lessons(era_key);
+
 CREATE TABLE game_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -163,10 +180,9 @@ CREATE TABLE game_sessions (
 CREATE INDEX idx_sessions_user ON game_sessions(user_id);
 
 -- ============================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- STEP 3: ROW LEVEL SECURITY
 -- ============================================
 
--- Enable RLS on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE registered_students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE classes ENABLE ROW LEVEL SECURITY;
@@ -174,219 +190,107 @@ ALTER TABLE class_enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE custom_questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE custom_lessons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- PROFILES POLICIES
+-- STEP 4: HELPER FUNCTIONS (SECURITY DEFINER)
 -- ============================================
 
--- Users can view their own profile
-CREATE POLICY "Users can view own profile"
-ON profiles FOR SELECT
-USING (auth.uid() = id);
+CREATE OR REPLACE FUNCTION get_user_role()
+RETURNS TEXT AS $$
+DECLARE
+    user_role TEXT;
+BEGIN
+    SELECT role INTO user_role FROM profiles WHERE id = auth.uid();
+    RETURN COALESCE(user_role, 'student');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
--- Users can update their own profile (except role)
-CREATE POLICY "Users can update own profile"
-ON profiles FOR UPDATE
-USING (auth.uid() = id)
-WITH CHECK (auth.uid() = id);
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN get_user_role() = 'admin';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
--- Admins can view all profiles
-CREATE POLICY "Admins can view all profiles"
-ON profiles FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
-
--- Admins can update any profile
-CREATE POLICY "Admins can update any profile"
-ON profiles FOR UPDATE
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
-
--- Teachers can view their students
-CREATE POLICY "Teachers can view their students"
-ON profiles FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'teacher'
-    )
-    AND teacher_id = auth.uid()
-);
-
--- Allow insert during signup
-CREATE POLICY "Enable insert for signup"
-ON profiles FOR INSERT
-WITH CHECK (auth.uid() = id);
+CREATE OR REPLACE FUNCTION is_teacher()
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN get_user_role() = 'teacher';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
 -- ============================================
--- REGISTERED STUDENTS POLICIES
+-- STEP 5: RLS POLICIES
 -- ============================================
 
--- Admins can manage registered students
-CREATE POLICY "Admins can manage registered students"
-ON registered_students FOR ALL
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
+-- PROFILES
+CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (is_admin());
+CREATE POLICY "Admins can update any profile" ON profiles FOR UPDATE USING (is_admin());
+CREATE POLICY "Teachers can view direct students" ON profiles FOR SELECT USING (is_teacher() AND teacher_id = auth.uid());
+CREATE POLICY "Enable insert for signup" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Anyone can check if student ID exists (for validation)
-CREATE POLICY "Anyone can validate student ID"
-ON registered_students FOR SELECT
-USING (true);
+-- REGISTERED STUDENTS
+CREATE POLICY "Admins can manage registered students" ON registered_students FOR ALL USING (is_admin());
+CREATE POLICY "Anyone can validate student ID" ON registered_students FOR SELECT USING (true);
 
--- ============================================
--- CLASSES POLICIES
--- ============================================
+-- CLASSES
+CREATE POLICY "Teachers can manage own classes" ON classes FOR ALL USING (teacher_id = auth.uid());
+CREATE POLICY "Admins can view all classes" ON classes FOR SELECT USING (is_admin());
+CREATE POLICY "Students can view active classes" ON classes FOR SELECT USING (is_active = true);
 
--- Teachers can manage their own classes
-CREATE POLICY "Teachers can manage own classes"
-ON classes FOR ALL
-USING (teacher_id = auth.uid());
+-- CLASS ENROLLMENTS
+CREATE POLICY "Teachers can manage class enrollments" ON class_enrollments FOR ALL 
+    USING (EXISTS (SELECT 1 FROM classes WHERE classes.id = class_enrollments.class_id AND classes.teacher_id = auth.uid()));
+CREATE POLICY "Students can view own enrollments" ON class_enrollments FOR SELECT USING (student_id = auth.uid());
+CREATE POLICY "Students can enroll themselves" ON class_enrollments FOR INSERT WITH CHECK (student_id = auth.uid());
+CREATE POLICY "Admins can manage all enrollments" ON class_enrollments FOR ALL USING (is_admin());
 
--- Students can view classes they're enrolled in
-CREATE POLICY "Students can view enrolled classes"
-ON classes FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM class_enrollments
-        WHERE class_id = classes.id AND student_id = auth.uid()
-    )
-);
+-- PROGRESS
+CREATE POLICY "Users can manage own progress" ON progress FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Admins can view all progress" ON progress FOR SELECT USING (is_admin());
+CREATE POLICY "Teachers can view student progress" ON progress FOR SELECT 
+    USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = progress.user_id AND profiles.teacher_id = auth.uid()));
 
--- Admins can view all classes
-CREATE POLICY "Admins can view all classes"
-ON classes FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
+-- ACHIEVEMENTS
+CREATE POLICY "Users can manage own achievements" ON achievements FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Admins can view all achievements" ON achievements FOR SELECT USING (is_admin());
 
--- ============================================
--- PROGRESS POLICIES
--- ============================================
+-- CUSTOM QUESTIONS
+CREATE POLICY "Teachers can manage own questions" ON custom_questions FOR ALL USING (created_by = auth.uid());
+CREATE POLICY "Admins can manage all questions" ON custom_questions FOR ALL USING (is_admin());
+CREATE POLICY "Anyone can view approved questions" ON custom_questions FOR SELECT USING (is_active = true AND is_approved = true);
 
--- Users can manage their own progress
-CREATE POLICY "Users can manage own progress"
-ON progress FOR ALL
-USING (user_id = auth.uid());
+-- CUSTOM LESSONS
+CREATE POLICY "Teachers can manage own lessons" ON custom_lessons FOR ALL USING (created_by = auth.uid());
+CREATE POLICY "Admins can manage all lessons" ON custom_lessons FOR ALL USING (is_admin());
+CREATE POLICY "Anyone can view approved lessons" ON custom_lessons FOR SELECT USING (is_active = true AND is_approved = true);
 
--- Teachers can view their students' progress
-CREATE POLICY "Teachers can view student progress"
-ON progress FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = progress.user_id AND teacher_id = auth.uid()
-    )
-);
-
--- Admins can view all progress
-CREATE POLICY "Admins can view all progress"
-ON progress FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
+-- GAME SESSIONS
+CREATE POLICY "Users can manage own sessions" ON game_sessions FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Admins can view all sessions" ON game_sessions FOR SELECT USING (is_admin());
 
 -- ============================================
--- ACHIEVEMENTS POLICIES
+-- STEP 6: TRIGGERS
 -- ============================================
 
--- Users can manage their own achievements
-CREATE POLICY "Users can manage own achievements"
-ON achievements FOR ALL
-USING (user_id = auth.uid());
-
--- ============================================
--- CUSTOM QUESTIONS POLICIES
--- ============================================
-
--- Teachers can manage their own questions
-CREATE POLICY "Teachers can manage own questions"
-ON custom_questions FOR ALL
-USING (created_by = auth.uid());
-
--- Admins can manage all questions
-CREATE POLICY "Admins can manage all questions"
-ON custom_questions FOR ALL
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = auth.uid() AND role = 'admin'
-    )
-);
-
--- Students can view approved questions
-CREATE POLICY "Students can view approved questions"
-ON custom_questions FOR SELECT
-USING (is_active = true AND is_approved = true);
-
--- ============================================
--- GAME SESSIONS POLICIES
--- ============================================
-
--- Users can manage their own sessions
-CREATE POLICY "Users can manage own sessions"
-ON game_sessions FOR ALL
-USING (user_id = auth.uid());
-
--- Teachers can view student sessions
-CREATE POLICY "Teachers can view student sessions"
-ON game_sessions FOR SELECT
-USING (
-    EXISTS (
-        SELECT 1 FROM profiles
-        WHERE id = game_sessions.user_id AND teacher_id = auth.uid()
-    )
-);
-
--- ============================================
--- FUNCTIONS & TRIGGERS
--- ============================================
-
--- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Apply to all tables with updated_at
-CREATE TRIGGER update_profiles_updated_at
-    BEFORE UPDATE ON profiles
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_progress_updated_at BEFORE UPDATE ON progress FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_classes_updated_at BEFORE UPDATE ON classes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_questions_updated_at BEFORE UPDATE ON custom_questions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_lessons_updated_at BEFORE UPDATE ON custom_lessons FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_progress_updated_at
-    BEFORE UPDATE ON progress
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_classes_updated_at
-    BEFORE UPDATE ON classes
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_questions_updated_at
-    BEFORE UPDATE ON custom_questions
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Function to generate unique class code
 CREATE OR REPLACE FUNCTION generate_class_code()
 RETURNS TEXT AS $$
 DECLARE
@@ -402,32 +306,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to handle new user signup
+-- Auth trigger to create profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, email, full_name, role, student_id_number)
+    INSERT INTO public.profiles (id, email, full_name, role, student_id_number, is_verified)
     VALUES (
         NEW.id,
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
         COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
-        NEW.raw_user_meta_data->>'student_id_number'
+        NEW.raw_user_meta_data->>'student_id_number',
+        true
     );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger for new user signup
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
 -- ============================================
--- HELPER VIEWS
+-- STEP 7: VIEWS
 -- ============================================
 
--- View for teacher dashboard - student progress summary
 CREATE OR REPLACE VIEW teacher_student_progress AS
 SELECT 
     p.id AS student_id,
@@ -443,7 +346,6 @@ FROM profiles p
 LEFT JOIN progress pr ON p.id = pr.user_id
 WHERE p.role = 'student';
 
--- View for admin dashboard - user statistics
 CREATE OR REPLACE VIEW admin_user_stats AS
 SELECT
     role,
@@ -452,143 +354,46 @@ SELECT
 FROM profiles
 GROUP BY role;
 
+-- ============================================
+-- STEP 8: GRANTS
+-- ============================================
 
-UPDATE profiles 
-SET role = 'admin', is_verified = true 
-WHERE email = 'admin@battleofknowledge.com';
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA public TO anon, authenticated;
 
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO anon, authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT INSERT, UPDATE, DELETE ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO anon, authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON ROUTINES TO anon, authenticated;
 
--- 1. REMOVE: Delete existing test users to avoid "duplicate key" errors
-DELETE FROM auth.users 
-WHERE email IN ('1', 'admin@battleofknowledge.com', 'teacher@test.com', 'student@test.com');
+-- ============================================
+-- STEP 9: CREATE PROFILES FOR EXISTING AUTH USERS
+-- ============================================
 
--- 2. RE-INSERT: Create the Admin Account properly
-INSERT INTO auth.users (
-    id, 
-    email, 
-    encrypted_password, 
-    email_confirmed_at, 
-    raw_app_meta_data, 
-    raw_user_meta_data, 
-    aud, 
-    role
-)
-VALUES (
-    uuid_generate_v4(), 
-    'admin@battleofknowledge.com', 
-    crypt('admin123', gen_salt('bf')), -- Password is 'admin123'
-    now(), 
-    '{"provider":"email","providers":["email"]}', 
-    '{"full_name":"Main Admin", "role":"admin"}', 
-    'authenticated', 
-    'authenticated'
-);
+INSERT INTO profiles (id, email, full_name, role, is_verified)
+SELECT 
+    id,
+    email,
+    COALESCE(raw_user_meta_data->>'full_name', 'User'),
+    COALESCE(raw_user_meta_data->>'role', 'student'),
+    true
+FROM auth.users
+WHERE id NOT IN (SELECT id FROM profiles)
+ON CONFLICT (id) DO NOTHING;
 
--- 3. UPDATE: Ensure the profile created by the trigger is verified and has admin rights
-UPDATE public.profiles 
-SET is_verified = true, 
-    role = 'admin' 
-WHERE email = 'admin@battleofknowledge.com';
+-- ============================================
+-- STEP 10: SET CORRECT ROLES
+-- ============================================
 
+UPDATE profiles SET role = 'admin', is_verified = true WHERE email = 'admin@battleofknowledge.com';
+UPDATE profiles SET role = 'teacher', is_verified = true WHERE email IN ('teacher1@school.edu', 'teacher2@school.edu');
+UPDATE profiles SET role = 'student', is_verified = true WHERE email LIKE 'student%@school.edu';
 
-DELETE FROM public.profiles WHERE email = 'admin@battleofknowledge.com';
-
-UPDATE public.profiles 
-SET role = 'admin', is_verified = true 
-WHERE email = 'admin@battleofknowledge.com';
-
-
-UPDATE auth.users 
-SET email_confirmed_at = NOW() 
-WHERE email = 'admin@battleofknowledge.com';
-
--- Also make sure admin2 is confirmed if you used that
-UPDATE auth.users 
-SET email_confirmed_at = NOW() 
-WHERE email = 'admin2@battleofknowledge.com';
-
-
-
--- =============================================
--- FIX: Infinite recursion in RLS policies
--- Run this in Supabase SQL Editor
--- =============================================
-
--- Step 1: Create helper functions with SECURITY DEFINER to bypass RLS
-CREATE OR REPLACE FUNCTION is_admin()
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
-
-CREATE OR REPLACE FUNCTION is_teacher()
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM profiles
-    WHERE id = auth.uid() AND role = 'teacher'
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
-
--- Step 2: Drop ALL problematic policies on profiles table
-DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
-DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
-DROP POLICY IF EXISTS "Teachers can view their students" ON profiles;
-
--- Step 3: Recreate policies using the helper functions
-CREATE POLICY "Admins can view all profiles"
-ON profiles FOR SELECT
-USING (is_admin());
-
-CREATE POLICY "Admins can update any profile"
-ON profiles FOR UPDATE
-USING (is_admin());
-
-CREATE POLICY "Teachers can view their students"
-ON profiles FOR SELECT
-USING (is_teacher() AND teacher_id = auth.uid());
-
--- Step 4: Fix registered_students policies
-DROP POLICY IF EXISTS "Admins can manage registered students" ON registered_students;
-
-CREATE POLICY "Admins can manage registered students"
-ON registered_students FOR ALL
-USING (is_admin());
-
--- Step 5: Fix other tables that reference profiles in their policies
-DROP POLICY IF EXISTS "Admins can view all progress" ON progress;
-DROP POLICY IF EXISTS "Admins can view all classes" ON classes;
-DROP POLICY IF EXISTS "Admins can manage all questions" ON custom_questions;
-
-CREATE POLICY "Admins can view all progress"
-ON progress FOR SELECT
-USING (is_admin());
-
-CREATE POLICY "Admins can view all classes"
-ON classes FOR SELECT
-USING (is_admin());
-
-CREATE POLICY "Admins can manage all questions"
-ON custom_questions FOR ALL
-USING (is_admin());
-
-
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.profiles (id, email, full_name, role, student_id_number)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
-        COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
-        NEW.raw_user_meta_data->>'student_id_number'
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- ============================================
+-- DONE! Verify with:
+-- SELECT email, role, is_verified FROM profiles ORDER BY role, email;
+-- ============================================
