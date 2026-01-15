@@ -670,6 +670,7 @@
     
     <script src="js/eraData.js"></script>
     <script src="js/learningData.js"></script>
+    <script src="js/dbContent.js"></script>
     <script src="js/moduleVideos.js"></script>
     <script src="js/language.js"></script>
     <script>
@@ -1706,6 +1707,11 @@
                 } catch (e) {
                     console.warn('ProgressSync init failed:', e);
                 }
+            }
+            
+            // Load lessons from database (with fallback to local files)
+            if (window.dbContent) {
+                await window.dbContent.init();
             }
             
             // Initialize learning module after ProgressSync is ready

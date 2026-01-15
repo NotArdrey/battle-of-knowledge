@@ -126,7 +126,7 @@ CREATE INDEX idx_achievements_user ON achievements(user_id);
 
 CREATE TABLE custom_questions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    created_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
     era_key TEXT NOT NULL,
     question_text_en TEXT NOT NULL,
     question_text_tl TEXT,
@@ -137,6 +137,7 @@ CREATE TABLE custom_questions (
     difficulty TEXT DEFAULT 'medium' CHECK (difficulty IN ('easy', 'medium', 'hard')),
     is_active BOOLEAN DEFAULT TRUE,
     is_approved BOOLEAN DEFAULT FALSE,
+    is_system BOOLEAN DEFAULT FALSE,
     class_id UUID REFERENCES classes(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -144,10 +145,11 @@ CREATE TABLE custom_questions (
 
 CREATE INDEX idx_questions_creator ON custom_questions(created_by);
 CREATE INDEX idx_questions_era ON custom_questions(era_key);
+CREATE INDEX idx_questions_system ON custom_questions(is_system);
 
 CREATE TABLE custom_lessons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    created_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
     era_key TEXT NOT NULL,
     lesson_order INTEGER NOT NULL,
     title_en TEXT NOT NULL,
@@ -157,6 +159,7 @@ CREATE TABLE custom_lessons (
     icon TEXT DEFAULT '📖',
     is_active BOOLEAN DEFAULT TRUE,
     is_approved BOOLEAN DEFAULT FALSE,
+    is_system BOOLEAN DEFAULT FALSE,
     class_id UUID REFERENCES classes(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -164,6 +167,7 @@ CREATE TABLE custom_lessons (
 
 CREATE INDEX idx_lessons_creator ON custom_lessons(created_by);
 CREATE INDEX idx_lessons_era ON custom_lessons(era_key);
+CREATE INDEX idx_lessons_system ON custom_lessons(is_system);
 
 CREATE TABLE game_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

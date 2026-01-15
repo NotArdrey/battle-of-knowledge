@@ -1529,6 +1529,7 @@
     
     <script src="js/eraData.js"></script>
     <script src="js/questions.js"></script>
+    <script src="js/dbContent.js"></script>
     <script src="js/battle.js"></script>
     <script src="js/language.js"></script>
     
@@ -1540,6 +1541,11 @@
             // Initialize ProgressSync (works for both logged-in users and guests)
             if (window.ProgressSync) {
                 await window.ProgressSync.init();
+            }
+            
+            // Load questions from database (with fallback to local files)
+            if (window.dbContent) {
+                await window.dbContent.init();
             }
             
             // Hide loading overlay

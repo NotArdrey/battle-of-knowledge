@@ -620,3 +620,6 @@ const learningData = {
         }
     }
 };
+
+// Export to window for global access
+window.learningData = learningData;

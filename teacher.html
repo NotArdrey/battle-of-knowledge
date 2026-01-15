@@ -888,6 +888,7 @@
     </div>
 
     <script src="js/questions.js"></script>
+    <script src="js/learningData.js"></script>
     <script>
         // Supabase config - standalone
         const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
@@ -2349,10 +2350,13 @@
                 allLessons = data || [];
                 
                 // Load system lessons from learningData.js if available
+                console.log('learningData available:', !!window.learningData);
+                
                 if (window.learningData) {
                     allSystemLessons = [];
                     Object.entries(window.learningData).forEach(([eraKey, eraData]) => {
                         const lessons = eraData.en?.lessons || [];
+                        console.log(`Era ${eraKey}: ${lessons.length} lessons`);
                         lessons.forEach(lesson => {
                             allSystemLessons.push({
                                 id: `system-${eraKey}-${lesson.id}`,
@@ -2364,6 +2368,10 @@
                             });
                         });
                     });
+                    console.log('Total system lessons loaded:', allSystemLessons.length);
+                } else {
+                    console.warn('learningData not found - system lessons will not be available');
+                    allSystemLessons = [];
                 }
                 
                 renderLessons('system'); // Default to system lessons view
