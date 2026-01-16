@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -13,18 +14,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Baloo 2', cursive; 
+        body {
+            font-family: 'Baloo 2', cursive;
             background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
             min-height: 100vh;
         }
-        
+
         .main-container {
             padding: 20px;
             max-width: 1400px;
             margin: 0 auto;
         }
-        
+
         .dashboard-header {
             background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             border: 4px solid rgba(120, 53, 15, 0.3);
@@ -37,19 +38,19 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
+
         .dashboard-title {
             color: #7c2d12;
             font-size: 1.75rem;
             font-weight: 800;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-        
+
         .user-badge {
             background: linear-gradient(to right, #dc2626, #b91c1c);
             color: white;
@@ -58,7 +59,7 @@
             font-weight: 700;
             font-size: 0.9rem;
         }
-        
+
         .btn-logout {
             background: rgba(239, 68, 68, 0.2);
             color: #dc2626;
@@ -69,19 +70,19 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-logout:hover {
             background: #dc2626;
             color: white;
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .stat-card {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             border: 3px solid rgba(120, 53, 15, 0.3);
@@ -89,18 +90,18 @@
             padding: 1.5rem;
             text-align: center;
         }
-        
+
         .stat-number {
             font-size: 2.5rem;
             font-weight: 800;
             color: #7c2d12;
         }
-        
+
         .stat-label {
             color: #92400e;
             font-weight: 600;
         }
-        
+
         .content-card {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             border: 3px solid rgba(120, 53, 15, 0.3);
@@ -108,7 +109,7 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -117,20 +118,20 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
+
         .card-title {
             color: #7c2d12;
             font-size: 1.3rem;
             font-weight: 700;
         }
-        
+
         .tabs {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1rem;
             flex-wrap: wrap;
         }
-        
+
         .tab-btn {
             padding: 0.75rem 1.5rem;
             border: 2px solid rgba(120, 53, 15, 0.3);
@@ -141,25 +142,25 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .tab-btn:hover {
             border-color: #b45309;
         }
-        
+
         .tab-btn.active {
             background: linear-gradient(to right, #b45309, #d97706);
             color: white;
             border-color: #b45309;
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -167,7 +168,7 @@
             border-radius: 12px;
             overflow: hidden;
         }
-        
+
         .data-table th {
             background: rgba(180, 83, 9, 0.2);
             color: #7c2d12;
@@ -175,17 +176,17 @@
             padding: 1rem;
             text-align: left;
         }
-        
+
         .data-table td {
             padding: 0.875rem 1rem;
             border-bottom: 1px solid rgba(120, 53, 15, 0.1);
             color: #7c2d12;
         }
-        
+
         .data-table tr:hover {
             background: rgba(251, 191, 36, 0.1);
         }
-        
+
         .role-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -193,11 +194,22 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-        
-        .role-admin { background: #fecaca; color: #991b1b; }
-        .role-teacher { background: #dbeafe; color: #1e40af; }
-        .role-student { background: #d1fae5; color: #065f46; }
-        
+
+        .role-admin {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .role-teacher {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-student {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
         .status-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -205,10 +217,17 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-        
-        .status-verified { background: #d1fae5; color: #065f46; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        
+
+        .status-verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .btn-action {
             padding: 0.375rem 0.75rem;
             border-radius: 6px;
@@ -219,21 +238,25 @@
             transition: all 0.2s ease;
             margin-right: 0.25rem;
         }
-        
+
         .btn-verify {
             background: #10b981;
             color: white;
         }
-        
-        .btn-verify:hover { background: #059669; }
-        
+
+        .btn-verify:hover {
+            background: #059669;
+        }
+
         .btn-delete {
             background: #ef4444;
             color: white;
         }
-        
-        .btn-delete:hover { background: #dc2626; }
-        
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
         .btn-primary {
             background: linear-gradient(to right, #b45309, #d97706);
             color: white;
@@ -244,12 +267,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
         }
-        
+
         .upload-area {
             border: 3px dashed rgba(120, 53, 15, 0.3);
             border-radius: 16px;
@@ -259,17 +282,18 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        
-        .upload-area:hover, .upload-area.dragover {
+
+        .upload-area:hover,
+        .upload-area.dragover {
             border-color: #b45309;
             background: rgba(251, 191, 36, 0.1);
         }
-        
+
         .upload-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
         }
-        
+
         .search-input {
             padding: 0.75rem 1rem;
             border: 2px solid rgba(120, 53, 15, 0.3);
@@ -280,12 +304,12 @@
             color: #7c2d12;
             min-width: 250px;
         }
-        
+
         .search-input:focus {
             outline: none;
             border-color: #b45309;
         }
-        
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -296,7 +320,7 @@
             z-index: 100;
             padding: 1rem;
         }
-        
+
         .modal-content {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
             border: 4px solid rgba(120, 53, 15, 0.4);
@@ -307,25 +331,25 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
+
         .modal-title {
             color: #7c2d12;
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
         }
-        
+
         .form-group {
             margin-bottom: 1rem;
         }
-        
+
         .form-label {
             display: block;
             color: #7c2d12;
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -335,28 +359,28 @@
             font-family: 'Baloo 2', cursive;
             color: #7c2d12;
         }
-        
+
         .table-container {
             overflow-x: auto;
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 3rem;
             color: #92400e;
         }
-        
+
         .empty-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
         }
-        
+
         .nav-link {
             color: #b45309;
             text-decoration: none;
@@ -365,22 +389,23 @@
             border-radius: 8px;
             transition: all 0.2s;
         }
-        
+
         .nav-link:hover {
             background: rgba(180, 83, 9, 0.1);
         }
-        
+
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
                 text-align: center;
             }
-            
-            .data-table th, .data-table td {
+
+            .data-table th,
+            .data-table td {
                 padding: 0.5rem;
                 font-size: 0.85rem;
             }
-            
+
             .btn-action {
                 padding: 0.25rem 0.5rem;
                 font-size: 0.75rem;
@@ -388,6 +413,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <!-- Header -->
@@ -401,7 +427,7 @@
                 <button onclick="handleLogout()" class="btn-logout">Logout</button>
             </div>
         </div>
-        
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -421,15 +447,17 @@
                 <div class="stat-label">Pending Verification</div>
             </div>
         </div>
-        
+
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('users')">👥 User Management</button>
             <button class="tab-btn" onclick="switchTab('students')">📚 Student Registry</button>
             <button class="tab-btn" onclick="switchTab('content')">📝 Content Management</button>
             <button class="tab-btn" onclick="switchTab('settings')">⚙️ Guest Settings</button>
+            <button class="tab-btn" onclick="switchTab('backup')">📦 Backup & Restore</button>
         </div>
-        
+
+
         <!-- User Management Tab -->
         <div id="usersTab" class="tab-content active">
             <div class="content-card">
@@ -437,10 +465,11 @@
                     <h2 class="card-title">All Users</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
                         <button class="btn-primary" onclick="showTeacherModal()">➕ Add Teacher</button>
-                        <input type="text" class="search-input" placeholder="🔍 Search users..." oninput="filterUsers(this.value)">
+                        <input type="text" class="search-input" placeholder="🔍 Search users..."
+                            oninput="filterUsers(this.value)">
                     </div>
                 </div>
-                
+
                 <div class="table-container">
                     <table class="data-table" id="usersTable">
                         <thead>
@@ -458,14 +487,14 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div id="usersEmpty" class="empty-state hidden">
                     <div class="empty-icon">👥</div>
                     <p>No users found</p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Student Registry Tab -->
         <div id="studentsTab" class="tab-content">
             <div class="content-card">
@@ -473,23 +502,27 @@
                     <h2 class="card-title">Registered Students Database</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <button class="btn-primary" onclick="showStudentModal()">➕ Add Student</button>
-                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);" onclick="document.getElementById('excelFile').click()">📤 Upload Excel</button>
+                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
+                            onclick="document.getElementById('excelFile').click()">📤 Upload Excel</button>
                     </div>
                 </div>
-                
+
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('excelFile').click()">
                     <div class="upload-icon">📊</div>
                     <p class="text-amber-800 font-semibold mb-2">Upload Student List (Excel)</p>
                     <p class="text-amber-600 text-sm">Click or drag & drop an Excel file (.xlsx, .xls)</p>
-                    <p class="text-amber-500 text-xs mt-2">Required columns: student_id_number, full_name, email (optional), grade_level, section</p>
-                    <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden" onchange="handleExcelUpload(event)">
+                    <p class="text-amber-500 text-xs mt-2">Required columns: student_id_number, full_name, email
+                        (optional), grade_level, section</p>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden"
+                        onchange="handleExcelUpload(event)">
                 </div>
-                
+
                 <div class="card-header mt-6">
                     <h3 class="card-title">Student List</h3>
-                    <input type="text" class="search-input" placeholder="🔍 Search students..." oninput="filterStudents(this.value)">
+                    <input type="text" class="search-input" placeholder="🔍 Search students..."
+                        oninput="filterStudents(this.value)">
                 </div>
-                
+
                 <div class="table-container">
                     <table class="data-table" id="studentsTable">
                         <thead>
@@ -507,7 +540,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div id="studentsEmpty" class="empty-state hidden">
                     <div class="empty-icon">📚</div>
                     <p>No registered students yet</p>
@@ -515,7 +548,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Content Management Tab -->
         <div id="contentTab" class="tab-content">
             <div class="content-card">
@@ -523,30 +556,34 @@
                     <h2 class="card-title">📝 Questions & Lessons Management</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <button class="btn-primary" onclick="showQuestionModal()">➕ Add Question</button>
-                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);" onclick="showLessonModal()">➕ Add Lesson</button>
+                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
+                            onclick="showLessonModal()">➕ Add Lesson</button>
                     </div>
                 </div>
-                
+
                 <!-- Questions Section -->
                 <div class="p-6 border-b-2 border-amber-200">
                     <h3 class="text-lg font-bold text-amber-900 mb-4">📚 Questions</h3>
-                    
+
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <select id="questionsEraFilter" class="search-input" style="min-width: 150px;" onchange="loadQuestions()">
+                        <select id="questionsEraFilter" class="search-input" style="min-width: 150px;"
+                            onchange="loadQuestions()">
                             <option value="">All Eras</option>
                             <option value="early-spanish">Early Spanish Era</option>
                             <option value="late-spanish">Late Spanish Era</option>
                             <option value="american-colonial">American Colonial Era</option>
                             <option value="ww2">WW2 Era</option>
                         </select>
-                        <select id="questionsTypeFilter" class="search-input" style="min-width: 150px;" onchange="loadQuestions()">
+                        <select id="questionsTypeFilter" class="search-input" style="min-width: 150px;"
+                            onchange="loadQuestions()">
                             <option value="">All Types</option>
                             <option value="system">System Questions</option>
                             <option value="custom">Custom Questions</option>
                         </select>
-                        <input type="text" class="search-input" placeholder="🔍 Search questions..." id="questionsSearch" oninput="filterQuestionsList(this.value)">
+                        <input type="text" class="search-input" placeholder="🔍 Search questions..."
+                            id="questionsSearch" oninput="filterQuestionsList(this.value)">
                     </div>
-                    
+
                     <div class="table-container" style="max-height: 400px; overflow-y: auto;">
                         <table class="data-table" id="questionsTable">
                             <thead>
@@ -564,33 +601,36 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div id="questionsEmpty" class="empty-state hidden">
                         <div class="empty-icon">❓</div>
                         <p>No questions found</p>
                     </div>
                 </div>
-                
+
                 <!-- Lessons Section -->
                 <div class="p-6">
                     <h3 class="text-lg font-bold text-amber-900 mb-4">📖 Lessons</h3>
-                    
+
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <select id="lessonsEraFilter" class="search-input" style="min-width: 150px;" onchange="loadLessons()">
+                        <select id="lessonsEraFilter" class="search-input" style="min-width: 150px;"
+                            onchange="loadLessons()">
                             <option value="">All Eras</option>
                             <option value="early-spanish">Early Spanish Era</option>
                             <option value="late-spanish">Late Spanish Era</option>
                             <option value="american-colonial">American Colonial Era</option>
                             <option value="ww2">WW2 Era</option>
                         </select>
-                        <select id="lessonsTypeFilter" class="search-input" style="min-width: 150px;" onchange="loadLessons()">
+                        <select id="lessonsTypeFilter" class="search-input" style="min-width: 150px;"
+                            onchange="loadLessons()">
                             <option value="">All Types</option>
                             <option value="system">System Lessons</option>
                             <option value="custom">Custom Lessons</option>
                         </select>
-                        <input type="text" class="search-input" placeholder="🔍 Search lessons..." id="lessonsSearch" oninput="filterLessonsList(this.value)">
+                        <input type="text" class="search-input" placeholder="🔍 Search lessons..." id="lessonsSearch"
+                            oninput="filterLessonsList(this.value)">
                     </div>
-                    
+
                     <div class="table-container" style="max-height: 400px; overflow-y: auto;">
                         <table class="data-table" id="lessonsTable">
                             <thead>
@@ -608,7 +648,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div id="lessonsEmpty" class="empty-state hidden">
                         <div class="empty-icon">📖</div>
                         <p>No lessons found</p>
@@ -616,56 +656,184 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Guest Settings Tab -->
         <div id="settingsTab" class="tab-content">
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">Guest User Settings</h2>
                 </div>
-                
+
                 <div class="p-6">
-                    <p class="text-amber-700 mb-6">Configure what guest users (non-logged-in players) can access. These settings are stored locally and apply to all guest sessions on this device.</p>
-                    
+                    <p class="text-amber-700 mb-6">Configure what guest users (non-logged-in players) can access. These
+                        settings are stored locally and apply to all guest sessions on this device.</p>
+
                     <!-- Guest Unlock All Progress + Collections -->
                     <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
                         <div class="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress & Collections (Guest Only)</h3>
-                                <p class="text-amber-700 text-sm mt-1">Allow <strong>guest users only</strong> (not logged-in accounts) to access all eras, lessons, and character collections without completing previous stages.</p>
+                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress & Collections (Guest
+                                    Only)</h3>
+                                <p class="text-amber-700 text-sm mt-1">Allow <strong>guest users only</strong> (not
+                                    logged-in accounts) to access all eras, lessons, and character collections without
+                                    completing previous stages.</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="guestUnlockProgress" class="sr-only peer" onchange="toggleGuestSetting('unlockProgress', this.checked)">
-                                <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                                <input type="checkbox" id="guestUnlockProgress" class="sr-only peer"
+                                    onchange="toggleGuestSetting('unlockProgress', this.checked)">
+                                <div
+                                    class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500">
+                                </div>
                             </label>
                         </div>
                     </div>
-                    
+
                     <!-- Reset All Progress (Logged-in users) -->
                     <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-4">
                         <div class="flex items-center justify-between flex-wrap gap-4">
                             <div>
                                 <h3 class="text-lg font-bold text-red-900">🗑️ Reset All Progress (Logged-in Users)</h3>
-                                <p class="text-red-700 text-sm mt-1">Reset all progress for all logged-in user accounts. This will clear all eras, lessons, achievements, and unlocked characters from the database.</p>
+                                <p class="text-red-700 text-sm mt-1">Reset all progress for all logged-in user accounts.
+                                    This will clear all eras, lessons, achievements, and unlocked characters from the
+                                    database.</p>
                             </div>
-                            <button onclick="resetAllUsersProgress()" class="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors">
+                            <button onclick="resetAllUsersProgress()"
+                                class="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors">
                                 ⚠️ Reset All Users
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Reset Button -->
                     <div class="mt-6 flex gap-4">
-                        <button onclick="resetGuestSettings()" class="px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
+                        <button onclick="resetGuestSettings()"
+                            class="px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
                             🔄 Reset Guest Settings to Defaults
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        
+
+        <!-- Backup & Restore Tab -->
+        <div id="backupTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">📦 Full System Backup & Restore</h2>
+                </div>
+
+                <!-- Export Section -->
+                <div class="p-6 border-b-2 border-amber-200">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">📤 Export System Data</h3>
+                    <p class="text-amber-700 mb-4">Select the tables you want to include in your backup. The exported
+                        JSON file can be used to restore data.</p>
+
+                    <!-- Table Selection -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                        <label
+                            class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" id="exportQuestions" checked class="w-5 h-5 text-amber-600">
+                            <span class="font-semibold text-amber-800">📝 Questions</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" id="exportLessons" checked class="w-5 h-5 text-amber-600">
+                            <span class="font-semibold text-amber-800">📚 Lessons</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" id="exportClasses" checked class="w-5 h-5 text-amber-600">
+                            <span class="font-semibold text-amber-800">🏫 Classes</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" id="exportStudents" checked class="w-5 h-5 text-amber-600">
+                            <span class="font-semibold text-amber-800">👥 Registered Students</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" id="exportProfiles" class="w-5 h-5 text-amber-600">
+                            <span class="font-semibold text-amber-800">👤 User Profiles</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" id="exportProgress" class="w-5 h-5 text-amber-600">
+                            <span class="font-semibold text-amber-800">📊 Progress Data</span>
+                        </label>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <button class="btn-primary" onclick="exportFullBackup()">
+                            📦 Export Selected Tables
+                        </button>
+                        <button class="btn-primary" style="background: linear-gradient(to right, #7c3aed, #8b5cf6);"
+                            onclick="selectAllTables(true)">
+                            ✅ Select All
+                        </button>
+                        <button class="btn-action" style="background: #9ca3af; color: white;"
+                            onclick="selectAllTables(false)">
+                            ❌ Deselect All
+                        </button>
+                    </div>
+
+                    <div id="adminExportStatus" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
+                </div>
+
+                <!-- Import Section -->
+                <div class="p-6 border-b-2 border-amber-200">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">📥 Import / Restore Data</h3>
+                    <p class="text-amber-700 mb-4">Upload a backup JSON file to restore data. Choose how to handle
+                        conflicts.</p>
+
+                    <!-- Conflict Resolution Strategy -->
+                    <div class="mb-4">
+                        <label class="form-label">Conflict Resolution Strategy:</label>
+                        <select id="conflictStrategy" class="form-input" style="max-width: 300px;">
+                            <option value="skip">Skip - Don't import if ID already exists</option>
+                            <option value="overwrite">Overwrite - Replace existing data</option>
+                            <option value="merge" selected>Merge - Add new items only</option>
+                        </select>
+                    </div>
+
+                    <div class="upload-area" id="adminBackupUploadArea"
+                        onclick="document.getElementById('adminBackupFile').click()">
+                        <div class="upload-icon">📁</div>
+                        <p class="text-amber-800 font-semibold mb-2">Click or drag & drop a backup file</p>
+                        <p class="text-amber-600 text-sm">Accepts JSON files from admin or teacher exports</p>
+                        <input type="file" id="adminBackupFile" accept=".json" class="hidden"
+                            onchange="handleAdminImportFile(event)">
+                    </div>
+
+                    <div id="adminImportPreview" class="hidden mt-4">
+                        <h4 class="font-bold text-amber-900 mb-2">📋 Import Preview</h4>
+                        <div id="adminImportPreviewContent"
+                            class="bg-white rounded-lg p-4 border-2 border-amber-200 max-h-60 overflow-y-auto">
+                            <!-- Preview will be shown here -->
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <button class="btn-secondary flex-1" onclick="cancelAdminImport()">Cancel</button>
+                            <button class="btn-primary flex-1" onclick="confirmAdminImport()">✅ Import Data</button>
+                        </div>
+                    </div>
+
+                    <div id="adminImportStatus" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
+                </div>
+
+                <!-- Recent Backups -->
+                <div class="p-6">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">📜 Recent Export History</h3>
+                    <div id="adminBackupHistory" class="space-y-2">
+                        <!-- Backup history will be loaded here -->
+                    </div>
+                    <p id="noAdminBackupHistory" class="text-amber-600 text-sm hidden">No recent exports recorded on
+                        this device.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
-    
+
+
     <!-- Add Student Modal -->
     <div id="studentModal" class="modal-overlay hidden">
         <div class="modal-content">
@@ -675,31 +843,32 @@
                     <label class="form-label">Student ID Number</label>
                     <input type="text" id="newStudentId" class="form-input" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
                     <input type="text" id="newStudentName" class="form-input" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Email (Optional)</label>
                     <input type="email" id="newStudentEmail" class="form-input">
                 </div>
-                
+
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Grade Level</label>
                         <input type="text" id="newStudentGrade" class="form-input" placeholder="e.g., Grade 7">
                     </div>
-                    
+
                     <div class="form-group flex-1">
                         <label class="form-label">Section</label>
                         <input type="text" id="newStudentSection" class="form-input" placeholder="e.g., Section A">
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeStudentModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeStudentModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
@@ -717,28 +886,34 @@
             <form id="teacherForm" onsubmit="handleAddTeacher(event)">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
-                    <input type="text" id="newTeacherName" class="form-input" required placeholder="Enter teacher's full name">
+                    <input type="text" id="newTeacherName" class="form-input" required
+                        placeholder="Enter teacher's full name">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" id="newTeacherEmail" class="form-input" required placeholder="teacher@school.edu">
+                    <input type="email" id="newTeacherEmail" class="form-input" required
+                        placeholder="teacher@school.edu">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" id="newTeacherPassword" class="form-input" required minlength="12" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}" placeholder="Min 12 chars with upper/lower/number/special">
+                    <input type="password" id="newTeacherPassword" class="form-input" required minlength="12"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}"
+                        placeholder="Min 12 chars with upper/lower/number/special">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Confirm Password</label>
-                    <input type="password" id="newTeacherPasswordConfirm" class="form-input" required minlength="12" placeholder="Confirm password">
+                    <input type="password" id="newTeacherPasswordConfirm" class="form-input" required minlength="12"
+                        placeholder="Confirm password">
                 </div>
-                
+
                 <div id="teacherFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mb-4"></div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeTeacherModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeTeacherModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" id="addTeacherBtn" class="flex-1 btn-primary">
@@ -755,7 +930,7 @@
             <h2 class="modal-title" id="questionModalTitle">Add Question</h2>
             <form id="questionForm" onsubmit="handleSaveQuestion(event)">
                 <input type="hidden" id="editQuestionId">
-                
+
                 <div class="form-group">
                     <label class="form-label">Era</label>
                     <select id="questionEra" class="form-input" required>
@@ -765,37 +940,42 @@
                         <option value="ww2">WW2 Era</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Question (English)</label>
-                    <textarea id="questionTextEn" class="form-input" rows="2" required placeholder="Enter the question in English"></textarea>
+                    <textarea id="questionTextEn" class="form-input" rows="2" required
+                        placeholder="Enter the question in English"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Question (Tagalog)</label>
-                    <textarea id="questionTextTl" class="form-input" rows="2" placeholder="Enter the question in Tagalog"></textarea>
+                    <textarea id="questionTextTl" class="form-input" rows="2"
+                        placeholder="Enter the question in Tagalog"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Correct Answer (English)</label>
-                    <input type="text" id="correctAnswerEn" class="form-input" required placeholder="The correct answer">
+                    <input type="text" id="correctAnswerEn" class="form-input" required
+                        placeholder="The correct answer">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Correct Answer (Tagalog)</label>
-                    <input type="text" id="correctAnswerTl" class="form-input" placeholder="The correct answer in Tagalog">
+                    <input type="text" id="correctAnswerTl" class="form-input"
+                        placeholder="The correct answer in Tagalog">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Wrong Answers (English) - comma separated</label>
-                    <input type="text" id="wrongAnswersEn" class="form-input" required placeholder="Wrong 1, Wrong 2, Wrong 3">
+                    <input type="text" id="wrongAnswersEn" class="form-input" required
+                        placeholder="Wrong 1, Wrong 2, Wrong 3">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Wrong Answers (Tagalog) - comma separated</label>
                     <input type="text" id="wrongAnswersTl" class="form-input" placeholder="Mali 1, Mali 2, Mali 3">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Difficulty</label>
                     <select id="questionDifficulty" class="form-input">
@@ -804,7 +984,7 @@
                         <option value="hard">Hard</option>
                     </select>
                 </div>
-                
+
                 <div class="flex items-center gap-4 mt-4">
                     <label class="flex items-center gap-2">
                         <input type="checkbox" id="questionActive" checked>
@@ -815,11 +995,12 @@
                         <span class="text-amber-800">Approved</span>
                     </label>
                 </div>
-                
+
                 <div id="questionFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mt-4"></div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeQuestionModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeQuestionModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
@@ -836,7 +1017,7 @@
             <h2 class="modal-title" id="lessonModalTitle">Add Lesson</h2>
             <form id="lessonForm" onsubmit="handleSaveLesson(event)">
                 <input type="hidden" id="editLessonId">
-                
+
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Era</label>
@@ -847,38 +1028,41 @@
                             <option value="ww2">WW2 Era</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group" style="width: 100px;">
                         <label class="form-label">Order</label>
                         <input type="number" id="lessonOrder" class="form-input" required min="1" value="1">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Title (English)</label>
-                    <input type="text" id="lessonTitleEn" class="form-input" required placeholder="Lesson title in English">
+                    <input type="text" id="lessonTitleEn" class="form-input" required
+                        placeholder="Lesson title in English">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Title (Tagalog)</label>
                     <input type="text" id="lessonTitleTl" class="form-input" placeholder="Lesson title in Tagalog">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Content (English) - HTML supported</label>
-                    <textarea id="lessonContentEn" class="form-input" rows="6" required placeholder="Lesson content in English (HTML allowed)"></textarea>
+                    <textarea id="lessonContentEn" class="form-input" rows="6" required
+                        placeholder="Lesson content in English (HTML allowed)"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Content (Tagalog) - HTML supported</label>
-                    <textarea id="lessonContentTl" class="form-input" rows="6" placeholder="Lesson content in Tagalog (HTML allowed)"></textarea>
+                    <textarea id="lessonContentTl" class="form-input" rows="6"
+                        placeholder="Lesson content in Tagalog (HTML allowed)"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Icon (emoji or number)</label>
                     <input type="text" id="lessonIcon" class="form-input" placeholder="1, 2, 📚, etc." value="1">
                 </div>
-                
+
                 <div class="flex items-center gap-4 mt-4">
                     <label class="flex items-center gap-2">
                         <input type="checkbox" id="lessonActive" checked>
@@ -889,11 +1073,12 @@
                         <span class="text-amber-800">Approved</span>
                     </label>
                 </div>
-                
+
                 <div id="lessonFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mt-4"></div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeLessonModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeLessonModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
@@ -908,14 +1093,14 @@
         // Supabase config - standalone, no external dependencies
         const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aHlxY3pwdGxqZGhtaW9hZ3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzOTY2NzAsImV4cCI6MjA4Mzk3MjY3MH0.QKFZapzgWYcCtuw3eEvqg6U6qi06QNpvIRNBw7ABf9I';
-        
+
         let sb = null;
         let allUsers = [];
         let allStudents = [];
         let allQuestions = [];
         let allLessons = [];
         let currentProfile = null;
-        
+
         // Get Supabase client
         function getClient() {
             if (sb) return sb;
@@ -926,7 +1111,7 @@
             }
             return null;
         }
-        
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', async () => {
             sb = getClient();
@@ -934,25 +1119,25 @@
                 alert('Failed to initialize Supabase client');
                 return;
             }
-            
+
             // Check if logged in
             const { data: { session } } = await sb.auth.getSession();
             if (!session) {
                 window.location.href = 'login.html';
                 return;
             }
-            
+
             // Get profile
             const { data: profile } = await sb
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
-            
+
             // Allow access even without profile (for new admins)
             currentProfile = profile || { id: session.user.id, full_name: session.user.email, role: 'admin' };
             document.getElementById('userName').textContent = currentProfile.full_name;
-            
+
             // Load data
             await Promise.all([
                 loadUsers(),
@@ -961,25 +1146,25 @@
                 loadQuestions(),
                 loadLessons()
             ]);
-            
+
             // Setup drag and drop
             setupDragAndDrop();
         });
-        
+
         // Load statistics
         async function loadStats() {
             try {
                 const { data: users, error } = await sb
                     .from('profiles')
                     .select('role, is_verified');
-                
+
                 if (error) throw error;
-                
+
                 const total = users.length;
                 const teachers = users.filter(u => u.role === 'teacher').length;
                 const students = users.filter(u => u.role === 'student').length;
                 const pending = users.filter(u => !u.is_verified && u.role === 'teacher').length;
-                
+
                 document.getElementById('totalUsers').textContent = total;
                 document.getElementById('totalTeachers').textContent = teachers;
                 document.getElementById('totalStudents').textContent = students;
@@ -988,7 +1173,7 @@
                 console.error('Error loading stats:', error);
             }
         }
-        
+
         // Load all users
         async function loadUsers() {
             try {
@@ -996,27 +1181,27 @@
                     .from('profiles')
                     .select('*')
                     .order('created_at', { ascending: false });
-                
+
                 if (error) throw error;
-                
+
                 allUsers = data || [];
                 renderUsers(allUsers);
             } catch (error) {
                 console.error('Error loading users:', error);
             }
         }
-        
+
         // Render users table
         function renderUsers(users) {
             const tbody = document.getElementById('usersTableBody');
             const emptyState = document.getElementById('usersEmpty');
-            
+
             if (users.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
             tbody.innerHTML = users.map(user => `
                 <tr>
@@ -1026,33 +1211,33 @@
                     <td><span class="status-badge ${user.is_verified ? 'status-verified' : 'status-pending'}">${user.is_verified ? 'Verified' : 'Pending'}</span></td>
                     <td>${formatDate(user.created_at)}</td>
                     <td>
-                        ${!user.is_verified && user.role === 'teacher' ? 
-                            `<button class="btn-action btn-verify" onclick="verifyUser('${user.id}')">Verify</button>` : ''
-                        }
-                        ${user.role !== 'admin' ? 
-                            `<button class="btn-action btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''
-                        }
+                        ${!user.is_verified && user.role === 'teacher' ?
+                    `<button class="btn-action btn-verify" onclick="verifyUser('${user.id}')">Verify</button>` : ''
+                }
+                        ${user.role !== 'admin' ?
+                    `<button class="btn-action btn-delete" onclick="deleteUser('${user.id}')">Delete</button>` : ''
+                }
                     </td>
                 </tr>
             `).join('');
         }
-        
+
         // Format date helper
         function formatDate(dateStr) {
             if (!dateStr) return '-';
             return new Date(dateStr).toLocaleDateString();
         }
-        
+
         // Filter users
         function filterUsers(query) {
-            const filtered = allUsers.filter(u => 
+            const filtered = allUsers.filter(u =>
                 u.full_name.toLowerCase().includes(query.toLowerCase()) ||
                 u.email.toLowerCase().includes(query.toLowerCase()) ||
                 u.role.toLowerCase().includes(query.toLowerCase())
             );
             renderUsers(filtered);
         }
-        
+
         // Verify user
         async function verifyUser(userId) {
             try {
@@ -1060,9 +1245,9 @@
                     .from('profiles')
                     .update({ is_verified: true })
                     .eq('id', userId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('User verified successfully!', 'success');
                 loadUsers();
                 loadStats();
@@ -1071,19 +1256,19 @@
                 showToast('Failed to verify user', 'error');
             }
         }
-        
+
         // Delete user
         async function deleteUser(userId) {
             if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
-            
+
             try {
                 const { error } = await sb
                     .from('profiles')
                     .delete()
                     .eq('id', userId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('User deleted successfully!', 'success');
                 loadUsers();
                 loadStats();
@@ -1092,7 +1277,7 @@
                 showToast('Failed to delete user', 'error');
             }
         }
-        
+
         // Load registered students
         async function loadRegisteredStudents() {
             try {
@@ -1100,27 +1285,27 @@
                     .from('registered_students')
                     .select('*')
                     .order('created_at', { ascending: false });
-                
+
                 if (error) throw error;
-                
+
                 allStudents = data || [];
                 renderStudents(allStudents);
             } catch (error) {
                 console.error('Error loading students:', error);
             }
         }
-        
+
         // Render students table
         function renderStudents(students) {
             const tbody = document.getElementById('studentsTableBody');
             const emptyState = document.getElementById('studentsEmpty');
-            
+
             if (students.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
             tbody.innerHTML = students.map(student => `
                 <tr>
@@ -1135,35 +1320,35 @@
                 </tr>
             `).join('');
         }
-        
+
         // Filter students
         function filterStudents(query) {
-            const filtered = allStudents.filter(s => 
+            const filtered = allStudents.filter(s =>
                 s.full_name.toLowerCase().includes(query.toLowerCase()) ||
                 s.student_id_number.toLowerCase().includes(query.toLowerCase()) ||
                 (s.email && s.email.toLowerCase().includes(query.toLowerCase()))
             );
             renderStudents(filtered);
         }
-        
+
         // Handle Excel upload
         async function handleExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             showLoading(true);
-            
+
             try {
                 const data = await readExcelFile(file);
-                
+
                 if (data.length === 0) {
                     throw new Error('No data found in Excel file');
                 }
-                
+
                 // Validate required columns exist
                 const requiredColumns = ['student_id_number', 'full_name'];
                 const headers = Object.keys(data[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'));
-                
+
                 const missingColumns = [];
                 for (const col of requiredColumns) {
                     const variations = {
@@ -1175,48 +1360,48 @@
                         missingColumns.push(col);
                     }
                 }
-                
+
                 if (missingColumns.length > 0) {
                     throw new Error(`Missing required columns: ${missingColumns.join(', ')}\n\nRequired: student_id_number, full_name`);
                 }
-                
+
                 // Normalize and validate each row
                 const validStudents = [];
                 const invalidRows = [];
-                
+
                 data.forEach((row, index) => {
                     const rowNumber = index + 2; // Excel rows start at 1, plus header row
-                    
+
                     // Normalize column names
                     const normalized = {};
                     for (const [key, value] of Object.entries(row)) {
                         const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
                         normalized[normalizedKey] = value;
                     }
-                    
+
                     // Extract values with fallbacks
                     const studentId = String(
-                        normalized.student_id_number || 
-                        normalized.studentid || 
-                        normalized.student_id || 
-                        normalized.id || 
-                        normalized.studentidnumber || 
+                        normalized.student_id_number ||
+                        normalized.studentid ||
+                        normalized.student_id ||
+                        normalized.id ||
+                        normalized.studentidnumber ||
                         ''
                     ).trim();
-                    
+
                     const fullName = String(
-                        normalized.full_name || 
-                        normalized.fullname || 
-                        normalized.name || 
-                        normalized.student_name || 
-                        normalized.studentname || 
+                        normalized.full_name ||
+                        normalized.fullname ||
+                        normalized.name ||
+                        normalized.student_name ||
+                        normalized.studentname ||
                         ''
                     ).trim();
-                    
+
                     const email = normalized.email ? String(normalized.email).trim() : null;
                     const gradeLevel = normalized.grade_level || normalized.grade || normalized.gradelevel || null;
                     const section = normalized.section || null;
-                    
+
                     // Validate required fields
                     const errors = [];
                     if (!studentId) errors.push('missing student_id_number');
@@ -1224,7 +1409,7 @@
                     if (studentId && studentId.length < 3) errors.push('student_id_number too short');
                     if (fullName && fullName.length < 2) errors.push('full_name too short');
                     if (email && !email.includes('@')) errors.push('invalid email format');
-                    
+
                     if (errors.length > 0) {
                         invalidRows.push({ row: rowNumber, errors: errors.join(', ') });
                     } else {
@@ -1238,18 +1423,18 @@
                         });
                     }
                 });
-                
+
                 // Check for duplicates within the file
                 const idCounts = {};
                 validStudents.forEach(s => {
                     idCounts[s.student_id_number] = (idCounts[s.student_id_number] || 0) + 1;
                 });
                 const duplicateIds = Object.entries(idCounts).filter(([id, count]) => count > 1).map(([id]) => id);
-                
+
                 if (duplicateIds.length > 0) {
                     throw new Error(`Duplicate student IDs found in file: ${duplicateIds.join(', ')}`);
                 }
-                
+
                 if (validStudents.length === 0) {
                     let errorMsg = 'No valid student records found.\n\n';
                     if (invalidRows.length > 0) {
@@ -1263,25 +1448,25 @@
                     }
                     throw new Error(errorMsg);
                 }
-                
+
                 // Upsert to database
                 const { error } = await sb
                     .from('registered_students')
-                    .upsert(validStudents, { 
+                    .upsert(validStudents, {
                         onConflict: 'student_id_number',
-                        ignoreDuplicates: false 
+                        ignoreDuplicates: false
                     });
-                
+
                 if (error) throw error;
-                
+
                 // Build success message
                 let successMsg = `Successfully uploaded ${validStudents.length} students!`;
                 if (invalidRows.length > 0) {
                     successMsg += ` (${invalidRows.length} rows skipped due to errors)`;
                 }
-                
+
                 showToast(successMsg, 'success');
-                
+
                 // Show warning for skipped rows
                 if (invalidRows.length > 0) {
                     console.warn('Skipped rows:', invalidRows);
@@ -1296,9 +1481,9 @@
                         alert(warningMsg);
                     }, 500);
                 }
-                
+
                 loadRegisteredStudents();
-                
+
             } catch (error) {
                 console.error('Excel upload error:', error);
                 showToast(error.message || 'Failed to upload file', 'error');
@@ -1307,7 +1492,7 @@
                 event.target.value = ''; // Reset file input
             }
         }
-        
+
         // Read Excel file
         function readExcelFile(file) {
             return new Promise((resolve, reject) => {
@@ -1328,24 +1513,24 @@
                 reader.readAsArrayBuffer(file);
             });
         }
-        
+
         // Setup drag and drop
         function setupDragAndDrop() {
             const uploadArea = document.getElementById('uploadArea');
-            
+
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('dragover');
             });
-            
+
             uploadArea.addEventListener('dragleave', () => {
                 uploadArea.classList.remove('dragover');
             });
-            
+
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('dragover');
-                
+
                 const file = e.dataTransfer.files[0];
                 if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
                     handleExcelUpload({ target: { files: [file] } });
@@ -1354,19 +1539,19 @@
                 }
             });
         }
-        
+
         // Delete student from registry
         async function deleteStudent(studentId) {
             if (!confirm('Are you sure you want to delete this student from the registry?')) return;
-            
+
             try {
                 const { error } = await sb
                     .from('registered_students')
                     .delete()
                     .eq('id', studentId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('Student deleted successfully!', 'success');
                 loadRegisteredStudents();
             } catch (error) {
@@ -1374,28 +1559,28 @@
                 showToast('Failed to delete student', 'error');
             }
         }
-        
+
         // Show student modal
         function showStudentModal() {
             document.getElementById('studentModal').classList.remove('hidden');
         }
-        
+
         // Close student modal
         function closeStudentModal() {
             document.getElementById('studentModal').classList.add('hidden');
             document.getElementById('studentForm').reset();
         }
-        
+
         // Handle add student
         async function handleAddStudent(event) {
             event.preventDefault();
-            
+
             const studentId = document.getElementById('newStudentId').value.trim();
             const name = document.getElementById('newStudentName').value.trim();
             const email = document.getElementById('newStudentEmail').value.trim();
             const grade = document.getElementById('newStudentGrade').value.trim();
             const section = document.getElementById('newStudentSection').value.trim();
-            
+
             try {
                 const { error } = await sb
                     .from('registered_students')
@@ -1407,9 +1592,9 @@
                         section: section || null,
                         uploaded_by: currentProfile.id
                     });
-                
+
                 if (error) throw error;
-                
+
                 showToast('Student added successfully!', 'success');
                 closeStudentModal();
                 loadRegisteredStudents();
@@ -1422,41 +1607,41 @@
                 }
             }
         }
-        
+
         // Show teacher modal
         function showTeacherModal() {
             document.getElementById('teacherModal').classList.remove('hidden');
             document.getElementById('teacherFormError').classList.add('hidden');
         }
-        
+
         // Close teacher modal
         function closeTeacherModal() {
             document.getElementById('teacherModal').classList.add('hidden');
             document.getElementById('teacherForm').reset();
             document.getElementById('teacherFormError').classList.add('hidden');
         }
-        
+
         // Handle add teacher
         async function handleAddTeacher(event) {
             event.preventDefault();
-            
+
             const name = document.getElementById('newTeacherName').value.trim();
             const email = document.getElementById('newTeacherEmail').value.trim();
             const password = document.getElementById('newTeacherPassword').value;
             const passwordConfirm = document.getElementById('newTeacherPasswordConfirm').value;
             const errorDiv = document.getElementById('teacherFormError');
             const submitBtn = document.getElementById('addTeacherBtn');
-            
+
             // Reset error
             errorDiv.classList.add('hidden');
-            
+
             // Validate passwords match
             if (password !== passwordConfirm) {
                 errorDiv.textContent = 'Passwords do not match';
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            
+
             // Validate password length
             const hasLength = password.length >= 12;
             const hasUpper = /[A-Z]/.test(password);
@@ -1468,10 +1653,10 @@
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating...';
-            
+
             try {
                 // Create user with Supabase Auth
                 const { data: authData, error: authError } = await sb.auth.signUp({
@@ -1484,34 +1669,34 @@
                         }
                     }
                 });
-                
+
                 if (authError) throw authError;
-                
+
                 // The trigger should create the profile, but let's update it to ensure teacher role
                 if (authData.user) {
                     // Wait a moment for the trigger to run
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    
+
                     // Update the profile to ensure it has teacher role and is verified
                     const { error: updateError } = await sb
                         .from('profiles')
-                        .update({ 
-                            role: 'teacher', 
+                        .update({
+                            role: 'teacher',
                             is_verified: true,
                             full_name: name
                         })
                         .eq('id', authData.user.id);
-                    
+
                     if (updateError) {
                         console.warn('Could not update profile, may need manual verification:', updateError);
                     }
                 }
-                
+
                 showToast(`Teacher account created for ${email}!`, 'success');
                 closeTeacherModal();
                 loadUsers();
                 loadStats();
-                
+
             } catch (error) {
                 console.error('Error creating teacher:', error);
                 if (error.message.includes('already registered')) {
@@ -1525,7 +1710,7 @@
                 submitBtn.textContent = 'Create Teacher Account';
             }
         }
-        
+
         // Switch tabs
         async function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -1534,66 +1719,56 @@
             document.querySelectorAll('.tabs > .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             document.getElementById(`${tabName}Tab`).classList.add('active');
             event.target.classList.add('active');
-            
+
             // Load guest settings when settings tab is opened
             if (tabName === 'settings') {
                 await loadGuestSettings();
             }
         }
-        
+
         // ============================================
         // GUEST SETTINGS MANAGEMENT (DATABASE-BACKED)
         // ============================================
-        
+
         const GUEST_SETTINGS_KEY = 'guestModeSettings';
-        const GUEST_SETTINGS_DB_KEY = 'guest_unlock_progress'; // Key used in database
-        
+        const APP_SETTINGS_TABLE = 'app_settings'; // New dedicated table
+
         // Default guest settings
         const defaultGuestSettings = {
             unlockProgress: false  // Unlocks all eras and collections
         };
-        
+
         // In-memory cache
         let cachedGuestSettings = null;
-        
+
         // Get current guest settings from database
         async function getGuestSettings() {
             // Return cached if available
             if (cachedGuestSettings !== null) {
                 return { ...defaultGuestSettings, ...cachedGuestSettings };
             }
-            
+
             try {
-                // Try to get from database first (stored in a special admin profile metadata or custom table)
-                // We'll use localStorage as fallback but primary is database
+                // Try to get from app_settings table
                 const { data, error } = await sb
-                    .from('profiles')
-                    .select('avatar_url')
-                    .eq('role', 'admin')
-                    .limit(1)
+                    .from(APP_SETTINGS_TABLE)
+                    .select('setting_value')
+                    .eq('setting_key', 'guest_settings')
                     .single();
-                
-                if (!error && data && data.avatar_url) {
-                    try {
-                        // We're storing settings in avatar_url field as JSON (hacky but works without schema change)
-                        const dbSettings = JSON.parse(data.avatar_url);
-                        if (dbSettings && dbSettings.guestSettings) {
-                            cachedGuestSettings = dbSettings.guestSettings;
-                            // Also update localStorage for offline access
-                            localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(cachedGuestSettings));
-                            return { ...defaultGuestSettings, ...cachedGuestSettings };
-                        }
-                    } catch (e) {
-                        // avatar_url is not JSON, that's fine
-                    }
+
+                if (!error && data && data.setting_value) {
+                    cachedGuestSettings = data.setting_value;
+                    // Also update localStorage for offline access
+                    localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(cachedGuestSettings));
+                    return { ...defaultGuestSettings, ...cachedGuestSettings };
                 }
             } catch (e) {
                 console.warn('Could not load settings from database:', e);
             }
-            
+
             // Fallback to localStorage
             const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
             if (saved) {
@@ -1602,34 +1777,61 @@
             }
             return { ...defaultGuestSettings };
         }
-        
+
         // Save guest settings to database AND localStorage
         async function saveGuestSettings(settings) {
             cachedGuestSettings = settings;
-            
+
             // Save to localStorage for immediate access
             localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(settings));
-            
-            // Save to database so it works across all browsers
+
+            // Save to database so it works across all browsers/devices
             try {
-                const settingsJson = JSON.stringify({ guestSettings: settings });
-                
-                // Update all admin profiles with the settings
-                const { error } = await sb
-                    .from('profiles')
-                    .update({ avatar_url: settingsJson })
-                    .eq('role', 'admin');
-                
-                if (error) {
-                    console.error('Failed to save settings to database:', error);
+                // First try to update existing record
+                const { data: existing } = await sb
+                    .from(APP_SETTINGS_TABLE)
+                    .select('id')
+                    .eq('setting_key', 'guest_settings')
+                    .single();
+
+                if (existing) {
+                    // Update existing record
+                    const { error } = await sb
+                        .from(APP_SETTINGS_TABLE)
+                        .update({
+                            setting_value: settings,
+                            updated_by: currentProfile?.id || null,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('setting_key', 'guest_settings');
+
+                    if (error) {
+                        console.error('Failed to update settings in database:', error);
+                    } else {
+                        console.log('Guest settings saved to database successfully');
+                    }
                 } else {
-                    console.log('Guest settings saved to database successfully');
+                    // Insert new record
+                    const { error } = await sb
+                        .from(APP_SETTINGS_TABLE)
+                        .insert({
+                            setting_key: 'guest_settings',
+                            setting_value: settings,
+                            updated_by: currentProfile?.id || null
+                        });
+
+                    if (error) {
+                        console.error('Failed to insert settings in database:', error);
+                    } else {
+                        console.log('Guest settings created in database successfully');
+                    }
                 }
             } catch (e) {
                 console.error('Error saving to database:', e);
             }
         }
-        
+
+
         // Toggle a specific guest setting
         async function toggleGuestSetting(settingName, value) {
             const settings = await getGuestSettings();
@@ -1637,18 +1839,18 @@
             await saveGuestSettings(settings);
             showToast(`Guest setting updated: Unlock Progress & Collections = ${value}`, 'success');
         }
-        
+
         // Load guest settings into the UI
         async function loadGuestSettings() {
             const settings = await getGuestSettings();
-            
+
             // Set checkbox states
             const checkbox = document.getElementById('guestUnlockProgress');
             if (checkbox) {
                 checkbox.checked = settings.unlockProgress;
             }
         }
-        
+
         // Reset guest settings to defaults
         async function resetGuestSettings() {
             if (confirm('Reset all guest settings to defaults? This will apply to ALL browsers.')) {
@@ -1659,63 +1861,63 @@
                 showToast('Guest settings reset to defaults (applied globally)', 'success');
             }
         }
-        
+
         // Reset all users progress (admin function)
         async function resetAllUsersProgress() {
             if (!confirm('⚠️ WARNING: This will DELETE all progress for ALL logged-in users!\n\nThis includes:\n- All era progress\n- All completed lessons\n- All achievements\n- All unlocked characters\n\nThis action CANNOT be undone. Are you sure?')) {
                 return;
             }
-            
+
             // Double confirmation
             if (!confirm('Are you ABSOLUTELY sure? This will delete ALL user progress from the database.')) {
                 return;
             }
-            
+
             showLoading(true);
-            
+
             try {
                 // Delete all progress records - use gte on created_at to match all records
                 const { error: progressError, count: progressCount } = await sb
                     .from('progress')
                     .delete({ count: 'exact' })
                     .gte('created_at', '1970-01-01');
-                
+
                 if (progressError) {
                     console.error('Progress delete error:', progressError);
                     throw progressError;
                 }
-                
+
                 console.log(`Deleted ${progressCount} progress records`);
-                
+
                 // Delete all achievements records
                 const { error: achievementsError, count: achievementsCount } = await sb
                     .from('achievements')
                     .delete({ count: 'exact' })
                     .gte('created_at', '1970-01-01');
-                
+
                 if (achievementsError) {
                     console.error('Achievements delete error:', achievementsError);
                     throw achievementsError;
                 }
-                
+
                 console.log(`Deleted ${achievementsCount} achievement records`);
-                
+
                 // Also delete game_sessions if it exists
                 try {
                     const { error: sessionsError } = await sb
                         .from('game_sessions')
                         .delete()
                         .gte('created_at', '1970-01-01');
-                    
+
                     if (sessionsError) {
                         console.warn('Game sessions delete warning:', sessionsError);
                     }
                 } catch (e) {
                     console.warn('Game sessions table may not exist:', e);
                 }
-                
+
                 showToast(`All user progress has been reset! (${progressCount || 0} progress, ${achievementsCount || 0} achievements deleted)`, 'success');
-                
+
                 // Refresh stats
                 await loadStats();
             } catch (error) {
@@ -1725,7 +1927,7 @@
                 showLoading(false);
             }
         }
-        
+
         // Toast notification helper
         function showToast(message, type = 'info') {
             const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
@@ -1741,25 +1943,25 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
-        
+
         // Show loading indicator
         function showLoading(show) {
             // Simple implementation
             document.body.style.cursor = show ? 'wait' : 'default';
         }
-        
+
         // Handle logout
         async function handleLogout() {
             if (window.isButtonLocked && window.isButtonLocked('logout')) return;
             if (window.lockButton) window.lockButton('logout', 3000);
-            
+
             await sb.auth.signOut();
             if (window.showPageLoading) window.showPageLoading('Logging out');
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 150);
         }
-        
+
         // Close modals on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -1768,61 +1970,61 @@
                 }
             });
         });
-        
+
         // ============================================
         // QUESTIONS MANAGEMENT
         // ============================================
-        
+
         async function loadQuestions() {
             try {
                 const eraFilter = document.getElementById('questionsEraFilter').value;
                 const typeFilter = document.getElementById('questionsTypeFilter').value;
-                
+
                 let query = sb.from('custom_questions').select('*').order('era_key').order('created_at', { ascending: false });
-                
+
                 if (eraFilter) {
                     query = query.eq('era_key', eraFilter);
                 }
-                
+
                 if (typeFilter === 'system') {
                     query = query.eq('is_system', true);
                 } else if (typeFilter === 'custom') {
                     query = query.eq('is_system', false);
                 }
-                
+
                 const { data: questions, error } = await query;
-                
+
                 if (error) {
                     console.error('Error loading questions:', error);
                     return;
                 }
-                
+
                 allQuestions = questions || [];
                 renderQuestionsTable(allQuestions);
             } catch (error) {
                 console.error('Error in loadQuestions:', error);
             }
         }
-        
+
         function renderQuestionsTable(questions) {
             const tbody = document.getElementById('questionsTableBody');
             const emptyState = document.getElementById('questionsEmpty');
-            
+
             if (!questions || questions.length === 0) {
                 tbody.innerHTML = '';
                 emptyState?.classList.remove('hidden');
                 return;
             }
-            
+
             emptyState?.classList.add('hidden');
-            
+
             const eraNames = {
                 'early-spanish': 'Early Spanish',
                 'late-spanish': 'Late Spanish',
                 'american-colonial': 'American Colonial',
                 'ww2': 'WW2'
             };
-            
+
             tbody.innerHTML = questions.map(q => `
                 <tr>
                     <td>${eraNames[q.era_key] || q.era_key}</td>
@@ -1837,16 +2039,16 @@
                 </tr>
             `).join('');
         }
-        
+
         function filterQuestionsList(searchValue) {
-            const filtered = allQuestions.filter(q => 
+            const filtered = allQuestions.filter(q =>
                 q.question_text_en.toLowerCase().includes(searchValue.toLowerCase()) ||
                 q.correct_answer_en.toLowerCase().includes(searchValue.toLowerCase()) ||
                 (q.question_text_tl && q.question_text_tl.toLowerCase().includes(searchValue.toLowerCase()))
             );
             renderQuestionsTable(filtered);
         }
-        
+
         function showQuestionModal(question = null) {
             document.getElementById('questionModalTitle').textContent = question ? 'Edit Question' : 'Add Question';
             document.getElementById('editQuestionId').value = question?.id || '';
@@ -1855,47 +2057,47 @@
             document.getElementById('questionTextTl').value = question?.question_text_tl || '';
             document.getElementById('correctAnswerEn').value = question?.correct_answer_en || '';
             document.getElementById('correctAnswerTl').value = question?.correct_answer_tl || '';
-            
+
             // Parse wrong answers
             let wrongEn = question?.wrong_answers_en || [];
             let wrongTl = question?.wrong_answers_tl || [];
             if (typeof wrongEn === 'string') wrongEn = JSON.parse(wrongEn);
             if (typeof wrongTl === 'string') wrongTl = JSON.parse(wrongTl);
-            
+
             document.getElementById('wrongAnswersEn').value = Array.isArray(wrongEn) ? wrongEn.join(', ') : '';
             document.getElementById('wrongAnswersTl').value = Array.isArray(wrongTl) ? wrongTl.join(', ') : '';
             document.getElementById('questionDifficulty').value = question?.difficulty || 'easy';
             document.getElementById('questionActive').checked = question?.is_active !== false;
             document.getElementById('questionApproved').checked = question?.is_approved !== false;
             document.getElementById('questionFormError').classList.add('hidden');
-            
+
             document.getElementById('questionModal').classList.remove('hidden');
         }
-        
+
         function closeQuestionModal() {
             document.getElementById('questionModal').classList.add('hidden');
             document.getElementById('questionForm').reset();
         }
-        
+
         async function editQuestion(id) {
             const question = allQuestions.find(q => q.id === id);
             if (question) {
                 showQuestionModal(question);
             }
         }
-        
+
         async function handleSaveQuestion(event) {
             event.preventDefault();
             const errorEl = document.getElementById('questionFormError');
-            
+
             try {
                 const id = document.getElementById('editQuestionId').value;
                 const wrongAnswersEnStr = document.getElementById('wrongAnswersEn').value;
                 const wrongAnswersTlStr = document.getElementById('wrongAnswersTl').value;
-                
+
                 const wrongAnswersEn = wrongAnswersEnStr.split(',').map(s => s.trim()).filter(s => s);
                 const wrongAnswersTl = wrongAnswersTlStr ? wrongAnswersTlStr.split(',').map(s => s.trim()).filter(s => s) : wrongAnswersEn;
-                
+
                 const questionData = {
                     era_key: document.getElementById('questionEra').value,
                     question_text_en: document.getElementById('questionTextEn').value,
@@ -1908,7 +2110,7 @@
                     is_active: document.getElementById('questionActive').checked,
                     is_approved: document.getElementById('questionApproved').checked
                 };
-                
+
                 let result;
                 if (id) {
                     // Update existing
@@ -1919,9 +2121,9 @@
                     questionData.created_by = currentProfile?.id || null;
                     result = await sb.from('custom_questions').insert(questionData);
                 }
-                
+
                 if (result.error) throw result.error;
-                
+
                 showToast(id ? 'Question updated!' : 'Question added!', 'success');
                 closeQuestionModal();
                 await loadQuestions();
@@ -1931,7 +2133,7 @@
                 errorEl.classList.remove('hidden');
             }
         }
-        
+
         async function deleteQuestion(id, isSystem) {
             if (isSystem) {
                 if (!confirm('⚠️ This is a SYSTEM question used by the game. Are you sure you want to delete it? This may break the game for some eras.')) {
@@ -1942,11 +2144,11 @@
                     return;
                 }
             }
-            
+
             try {
                 const { error } = await sb.from('custom_questions').delete().eq('id', id);
                 if (error) throw error;
-                
+
                 showToast('Question deleted', 'success');
                 await loadQuestions();
             } catch (error) {
@@ -1954,61 +2156,61 @@
                 showToast('Error deleting question: ' + error.message, 'error');
             }
         }
-        
+
         // ============================================
         // LESSONS MANAGEMENT
         // ============================================
-        
+
         async function loadLessons() {
             try {
                 const eraFilter = document.getElementById('lessonsEraFilter').value;
                 const typeFilter = document.getElementById('lessonsTypeFilter').value;
-                
+
                 let query = sb.from('custom_lessons').select('*').order('era_key').order('lesson_order');
-                
+
                 if (eraFilter) {
                     query = query.eq('era_key', eraFilter);
                 }
-                
+
                 if (typeFilter === 'system') {
                     query = query.eq('is_system', true);
                 } else if (typeFilter === 'custom') {
                     query = query.eq('is_system', false);
                 }
-                
+
                 const { data: lessons, error } = await query;
-                
+
                 if (error) {
                     console.error('Error loading lessons:', error);
                     return;
                 }
-                
+
                 allLessons = lessons || [];
                 renderLessonsTable(allLessons);
             } catch (error) {
                 console.error('Error in loadLessons:', error);
             }
         }
-        
+
         function renderLessonsTable(lessons) {
             const tbody = document.getElementById('lessonsTableBody');
             const emptyState = document.getElementById('lessonsEmpty');
-            
+
             if (!lessons || lessons.length === 0) {
                 tbody.innerHTML = '';
                 emptyState?.classList.remove('hidden');
                 return;
             }
-            
+
             emptyState?.classList.add('hidden');
-            
+
             const eraNames = {
                 'early-spanish': 'Early Spanish',
                 'late-spanish': 'Late Spanish',
                 'american-colonial': 'American Colonial',
                 'ww2': 'WW2'
             };
-            
+
             tbody.innerHTML = lessons.map(l => `
                 <tr>
                     <td>${eraNames[l.era_key] || l.era_key}</td>
@@ -2023,16 +2225,16 @@
                 </tr>
             `).join('');
         }
-        
+
         function filterLessonsList(searchValue) {
-            const filtered = allLessons.filter(l => 
+            const filtered = allLessons.filter(l =>
                 l.title_en.toLowerCase().includes(searchValue.toLowerCase()) ||
                 (l.title_tl && l.title_tl.toLowerCase().includes(searchValue.toLowerCase())) ||
                 (l.content_en && l.content_en.toLowerCase().includes(searchValue.toLowerCase()))
             );
             renderLessonsTable(filtered);
         }
-        
+
         function showLessonModal(lesson = null) {
             document.getElementById('lessonModalTitle').textContent = lesson ? 'Edit Lesson' : 'Add Lesson';
             document.getElementById('editLessonId').value = lesson?.id || '';
@@ -2046,29 +2248,29 @@
             document.getElementById('lessonActive').checked = lesson?.is_active !== false;
             document.getElementById('lessonApproved').checked = lesson?.is_approved !== false;
             document.getElementById('lessonFormError').classList.add('hidden');
-            
+
             document.getElementById('lessonModal').classList.remove('hidden');
         }
-        
+
         function closeLessonModal() {
             document.getElementById('lessonModal').classList.add('hidden');
             document.getElementById('lessonForm').reset();
         }
-        
+
         async function editLesson(id) {
             const lesson = allLessons.find(l => l.id === id);
             if (lesson) {
                 showLessonModal(lesson);
             }
         }
-        
+
         async function handleSaveLesson(event) {
             event.preventDefault();
             const errorEl = document.getElementById('lessonFormError');
-            
+
             try {
                 const id = document.getElementById('editLessonId').value;
-                
+
                 const lessonData = {
                     era_key: document.getElementById('lessonEra').value,
                     lesson_order: parseInt(document.getElementById('lessonOrder').value),
@@ -2080,7 +2282,7 @@
                     is_active: document.getElementById('lessonActive').checked,
                     is_approved: document.getElementById('lessonApproved').checked
                 };
-                
+
                 let result;
                 if (id) {
                     // Update existing
@@ -2091,9 +2293,9 @@
                     lessonData.created_by = currentProfile?.id || null;
                     result = await sb.from('custom_lessons').insert(lessonData);
                 }
-                
+
                 if (result.error) throw result.error;
-                
+
                 showToast(id ? 'Lesson updated!' : 'Lesson added!', 'success');
                 closeLessonModal();
                 await loadLessons();
@@ -2103,7 +2305,7 @@
                 errorEl.classList.remove('hidden');
             }
         }
-        
+
         async function deleteLesson(id, isSystem) {
             if (isSystem) {
                 if (!confirm('⚠️ This is a SYSTEM lesson used by the game. Are you sure you want to delete it? This may break the learning module for some eras.')) {
@@ -2114,11 +2316,11 @@
                     return;
                 }
             }
-            
+
             try {
                 const { error } = await sb.from('custom_lessons').delete().eq('id', id);
                 if (error) throw error;
-                
+
                 showToast('Lesson deleted', 'success');
                 await loadLessons();
             } catch (error) {
@@ -2126,6 +2328,348 @@
                 showToast('Error deleting lesson: ' + error.message, 'error');
             }
         }
+
+        // =============================================
+        // ADMIN BACKUP & RESTORE FUNCTIONS
+        // =============================================
+
+        let adminPendingImportData = null;
+
+        // Select/deselect all tables
+        function selectAllTables(select) {
+            ['exportQuestions', 'exportLessons', 'exportClasses', 'exportStudents', 'exportProfiles', 'exportProgress'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.checked = select;
+            });
+        }
+
+        // Export full backup of selected tables
+        async function exportFullBackup() {
+            try {
+                showAdminExportStatus('Starting export...', 'info');
+
+                const include = {
+                    questions: document.getElementById('exportQuestions')?.checked,
+                    lessons: document.getElementById('exportLessons')?.checked,
+                    classes: document.getElementById('exportClasses')?.checked,
+                    students: document.getElementById('exportStudents')?.checked,
+                    profiles: document.getElementById('exportProfiles')?.checked,
+                    progress: document.getElementById('exportProgress')?.checked
+                };
+
+                if (!Object.values(include).some(v => v)) {
+                    showAdminExportStatus('Please select at least one table to export.', 'error');
+                    return;
+                }
+
+                const exportData = {
+                    type: 'admin_full_backup',
+                    version: '1.0',
+                    exportedAt: new Date().toISOString(),
+                    exportedBy: currentProfile?.email || 'admin',
+                    tables: {}
+                };
+
+                let totalItems = 0;
+
+                if (include.questions) {
+                    showAdminExportStatus('Exporting questions...', 'info');
+                    const { data, error } = await sb.from('custom_questions').select('*');
+                    if (!error && data) {
+                        exportData.tables.questions = data;
+                        totalItems += data.length;
+                    }
+                }
+
+                if (include.lessons) {
+                    showAdminExportStatus('Exporting lessons...', 'info');
+                    const { data, error } = await sb.from('custom_lessons').select('*');
+                    if (!error && data) {
+                        exportData.tables.lessons = data;
+                        totalItems += data.length;
+                    }
+                }
+
+                if (include.classes) {
+                    showAdminExportStatus('Exporting classes...', 'info');
+                    const { data, error } = await sb.from('classes').select('*');
+                    if (!error && data) {
+                        exportData.tables.classes = data;
+                        totalItems += data.length;
+                    }
+                }
+
+                if (include.students) {
+                    showAdminExportStatus('Exporting registered students...', 'info');
+                    const { data, error } = await sb.from('registered_students').select('*');
+                    if (!error && data) {
+                        exportData.tables.registered_students = data;
+                        totalItems += data.length;
+                    }
+                }
+
+                if (include.profiles) {
+                    showAdminExportStatus('Exporting profiles...', 'info');
+                    const { data, error } = await sb.from('profiles').select('id, email, full_name, role, teacher_id, is_verified, student_id_number, class_id, created_at');
+                    if (!error && data) {
+                        exportData.tables.profiles = data;
+                        totalItems += data.length;
+                    }
+                }
+
+                if (include.progress) {
+                    showAdminExportStatus('Exporting progress...', 'info');
+                    const { data, error } = await sb.from('progress').select('*');
+                    if (!error && data) {
+                        exportData.tables.progress = data;
+                        totalItems += data.length;
+                    }
+                }
+
+                exportData.summary = {
+                    totalItems,
+                    tables: Object.keys(exportData.tables)
+                };
+
+                downloadAdminJSON(exportData, `admin_backup_${formatAdminDateForFile()}.json`);
+                saveAdminBackupHistory(Object.keys(exportData.tables), totalItems);
+                showAdminExportStatus(`Successfully exported ${totalItems} total items from ${Object.keys(exportData.tables).length} tables!`, 'success');
+                loadAdminBackupHistory();
+            } catch (error) {
+                console.error('Export error:', error);
+                showAdminExportStatus('Failed to export: ' + error.message, 'error');
+            }
+        }
+
+        // Handle file upload for import
+        function handleAdminImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    previewAdminImportData(data);
+                } catch (error) {
+                    showAdminImportStatus('Invalid JSON file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Preview import data
+        function previewAdminImportData(data) {
+            if (!data.type || !data.version) {
+                showAdminImportStatus('Invalid backup format.', 'error');
+                return;
+            }
+
+            adminPendingImportData = data;
+
+            let previewHTML = `
+                <div class="mb-3"><span class="font-semibold">Backup Type:</span> ${data.type.replace(/_/g, ' ')}</div>
+                <div class="mb-3"><span class="font-semibold">Exported At:</span> ${new Date(data.exportedAt).toLocaleString()}</div>
+                <div class="mb-3"><span class="font-semibold">Exported By:</span> ${data.exportedBy || 'Unknown'}</div>
+            `;
+
+            // Handle admin full backup
+            if (data.tables) {
+                previewHTML += '<div class="font-semibold mt-3 mb-2">Tables included:</div><ul class="list-disc list-inside">';
+                for (const [table, items] of Object.entries(data.tables)) {
+                    previewHTML += `<li>${table}: ${items.length} items</li>`;
+                }
+                previewHTML += '</ul>';
+            }
+
+            // Handle teacher backups
+            if (data.type === 'teacher_questions' || data.type === 'teacher_lessons' || data.type === 'teacher_full_backup') {
+                if (data.data) previewHTML += `<div class="mb-2"><span class="font-semibold">Items:</span> ${data.data.length}</div>`;
+                if (data.questions) previewHTML += `<div class="mb-2"><span class="font-semibold">Questions:</span> ${data.questions.length}</div>`;
+                if (data.lessons) previewHTML += `<div class="mb-2"><span class="font-semibold">Lessons:</span> ${data.lessons.length}</div>`;
+            }
+
+            previewHTML += `<div class="mt-3 p-2 bg-amber-100 rounded text-amber-800 text-sm">
+                Strategy: <strong>${document.getElementById('conflictStrategy').value}</strong>
+            </div>`;
+
+            document.getElementById('adminImportPreviewContent').innerHTML = previewHTML;
+            document.getElementById('adminImportPreview').classList.remove('hidden');
+            hideAdminImportStatus();
+        }
+
+        // Cancel import
+        function cancelAdminImport() {
+            adminPendingImportData = null;
+            document.getElementById('adminImportPreview').classList.add('hidden');
+        }
+
+        // Confirm and execute import
+        async function confirmAdminImport() {
+            if (!adminPendingImportData) {
+                showAdminImportStatus('No data to import.', 'error');
+                return;
+            }
+
+            const strategy = document.getElementById('conflictStrategy').value;
+
+            try {
+                showAdminImportStatus('Importing...', 'info');
+                let imported = 0;
+                let skipped = 0;
+
+                // Handle admin full backup
+                if (adminPendingImportData.tables) {
+                    for (const [table, items] of Object.entries(adminPendingImportData.tables)) {
+                        for (const item of items) {
+                            const result = await importItem(table, item, strategy);
+                            if (result.imported) imported++;
+                            else skipped++;
+                        }
+                    }
+                }
+
+                // Handle teacher backups
+                if (adminPendingImportData.type === 'teacher_questions' && adminPendingImportData.data) {
+                    for (const q of adminPendingImportData.data) {
+                        const result = await importItem('custom_questions', { ...q, is_active: true, is_approved: false, is_system: false }, strategy);
+                        if (result.imported) imported++;
+                        else skipped++;
+                    }
+                }
+
+                if (adminPendingImportData.type === 'teacher_lessons' && adminPendingImportData.data) {
+                    for (const l of adminPendingImportData.data) {
+                        const result = await importItem('custom_lessons', { ...l, is_active: true, is_approved: false, is_system: false }, strategy);
+                        if (result.imported) imported++;
+                        else skipped++;
+                    }
+                }
+
+                if (adminPendingImportData.type === 'teacher_full_backup') {
+                    if (adminPendingImportData.questions) {
+                        for (const q of adminPendingImportData.questions) {
+                            const result = await importItem('custom_questions', { ...q, is_active: true, is_approved: false, is_system: false }, strategy);
+                            if (result.imported) imported++;
+                            else skipped++;
+                        }
+                    }
+                    if (adminPendingImportData.lessons) {
+                        for (const l of adminPendingImportData.lessons) {
+                            const result = await importItem('custom_lessons', { ...l, is_active: true, is_approved: false, is_system: false }, strategy);
+                            if (result.imported) imported++;
+                            else skipped++;
+                        }
+                    }
+                }
+
+                cancelAdminImport();
+                showAdminImportStatus(`Imported: ${imported}, Skipped: ${skipped} (${strategy})`, 'success');
+
+                // Reload data
+                loadQuestions();
+                loadLessons();
+            } catch (error) {
+                console.error('Import error:', error);
+                showAdminImportStatus('Failed: ' + error.message, 'error');
+            }
+        }
+
+        // Import a single item with conflict resolution
+        async function importItem(table, item, strategy) {
+            // Remove id for merge strategy (let DB generate new one)
+            const itemToInsert = { ...item };
+            if (strategy === 'merge') {
+                delete itemToInsert.id;
+                delete itemToInsert.created_at;
+                delete itemToInsert.updated_at;
+            }
+
+            if (strategy === 'skip' && item.id) {
+                // Check if exists
+                const { data } = await sb.from(table).select('id').eq('id', item.id).single();
+                if (data) return { imported: false };
+            }
+
+            if (strategy === 'overwrite' && item.id) {
+                // Delete then insert
+                await sb.from(table).delete().eq('id', item.id);
+            }
+
+            const { error } = await sb.from(table).insert(itemToInsert);
+            return { imported: !error };
+        }
+
+        // Helper functions
+        function downloadAdminJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function formatAdminDateForFile() {
+            return new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        }
+
+        function showAdminExportStatus(message, type) {
+            const el = document.getElementById('adminExportStatus');
+            el.textContent = message;
+            el.className = `mt-3 p-3 rounded-lg text-sm ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        function showAdminImportStatus(message, type) {
+            const el = document.getElementById('adminImportStatus');
+            el.textContent = message;
+            el.className = `mt-3 p-3 rounded-lg text-sm ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        function hideAdminImportStatus() {
+            document.getElementById('adminImportStatus').classList.add('hidden');
+        }
+
+        function saveAdminBackupHistory(tables, count) {
+            const history = JSON.parse(localStorage.getItem('adminBackupHistory') || '[]');
+            history.unshift({ tables, count, date: new Date().toISOString() });
+            localStorage.setItem('adminBackupHistory', JSON.stringify(history.slice(0, 10)));
+        }
+
+        function loadAdminBackupHistory() {
+            const history = JSON.parse(localStorage.getItem('adminBackupHistory') || '[]');
+            const container = document.getElementById('adminBackupHistory');
+            const noHistory = document.getElementById('noAdminBackupHistory');
+
+            if (!container) return;
+
+            if (history.length === 0) {
+                container.innerHTML = '';
+                if (noHistory) noHistory.classList.remove('hidden');
+                return;
+            }
+
+            if (noHistory) noHistory.classList.add('hidden');
+            container.innerHTML = history.map(h => `
+                <div class="flex justify-between items-center p-2 bg-white rounded-lg border border-amber-200 text-sm">
+                    <span>📦 ${h.tables.join(', ')} <span class="text-amber-600">(${h.count} items)</span></span>
+                    <span class="text-amber-500">${new Date(h.date).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+
+        // Load backup history on page load
+        if (document.getElementById('adminBackupHistory')) {
+            loadAdminBackupHistory();
+        }
     </script>
+
 </body>
+
 </html>

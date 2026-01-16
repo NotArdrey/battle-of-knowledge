@@ -39,7 +39,7 @@ function clearGuestSession() {
 function getGuestProfile() {
     const guestSession = getGuestSession();
     if (!guestSession) return null;
-    
+
     return {
         id: guestSession.guestId,
         email: 'guest@local',
@@ -60,40 +60,33 @@ let guestSettingsFetchPromise = null;
  */
 async function fetchGuestSettingsFromDB() {
     const GUEST_SETTINGS_KEY = 'guestModeSettings';
-    
+
     try {
         const client = getSupabaseClient();
         if (!client) {
             return null;
         }
-        
-        // Get settings from admin profile's avatar_url field
+
+        // Get settings from app_settings table
         const { data, error } = await client
-            .from('profiles')
-            .select('avatar_url')
-            .eq('role', 'admin')
-            .limit(1)
+            .from('app_settings')
+            .select('setting_value')
+            .eq('setting_key', 'guest_settings')
             .single();
-        
-        if (!error && data && data.avatar_url) {
-            try {
-                const dbSettings = JSON.parse(data.avatar_url);
-                if (dbSettings && dbSettings.guestSettings) {
-                    // Cache the settings and update localStorage
-                    guestSettingsCache = dbSettings.guestSettings;
-                    localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(guestSettingsCache));
-                    return guestSettingsCache;
-                }
-            } catch (e) {
-                // avatar_url is not JSON, that's fine
-            }
+
+        if (!error && data && data.setting_value) {
+            // Cache the settings and update localStorage
+            guestSettingsCache = data.setting_value;
+            localStorage.setItem(GUEST_SETTINGS_KEY, JSON.stringify(guestSettingsCache));
+            return guestSettingsCache;
         }
     } catch (e) {
         console.warn('Could not fetch guest settings from database:', e);
     }
-    
+
     return null;
 }
+
 
 /**
  * Initialize guest settings from database (call on page load)
@@ -102,7 +95,7 @@ async function initGuestSettings() {
     if (guestSettingsFetchPromise) {
         return guestSettingsFetchPromise;
     }
-    
+
     guestSettingsFetchPromise = fetchGuestSettingsFromDB();
     await guestSettingsFetchPromise;
 }
@@ -118,21 +111,21 @@ function getGuestModeSettings() {
         unlockProgress: false,
         skipVideos: false
     };
-    
+
     // Use cache from database if available
     if (guestSettingsCache) {
         const settings = { ...defaultSettings, ...guestSettingsCache };
         settings.unlockCollections = settings.unlockProgress;
         return settings;
     }
-    
+
     // Fallback to localStorage
     const saved = localStorage.getItem(GUEST_SETTINGS_KEY);
     const settings = saved ? { ...defaultSettings, ...JSON.parse(saved) } : { ...defaultSettings };
-    
+
     // unlockCollections is automatically enabled when unlockProgress is enabled
     settings.unlockCollections = settings.unlockProgress;
-    
+
     return settings;
 }
 
@@ -163,17 +156,17 @@ function getSupabaseClient() {
             }
         }
     }
-    
+
     // Fallback to global supabase variable (set by supabase-config.js)
     if (typeof supabase !== 'undefined' && supabase?.auth) {
         return supabase;
     }
-    
+
     // Fallback to window.supabaseClient
     if (window.supabaseClient?.auth) {
         return window.supabaseClient;
     }
-    
+
     // Last resort: try to initialize directly
     const supabaseLib = window.supabase || window.Supabase;
     if (supabaseLib?.createClient) {
@@ -188,14 +181,14 @@ function getSupabaseClient() {
             console.error('Emergency initialization failed:', e);
         }
     }
-    
+
     // Debug info
     console.error('Supabase client not available. Debug info:');
     console.error('- window.SupabaseConfig:', !!window.SupabaseConfig);
     console.error('- window.supabase:', !!window.supabase);
     console.error('- window.supabaseClient:', !!window.supabaseClient);
     console.error('- typeof supabase:', typeof supabase);
-    
+
     throw new Error('Supabase client not initialized. Please ensure the Supabase CDN script and supabase-config.js are loaded first. Check browser console for network errors.');
 }
 
@@ -245,9 +238,9 @@ async function signUpUser(userData) {
 
             const validStudent = await validateStudentId(studentIdNumber);
             if (!validStudent) {
-                return { 
-                    success: false, 
-                    error: 'Invalid Student ID. Please check your ID number or contact the administrator if you believe this is an error.' 
+                return {
+                    success: false,
+                    error: 'Invalid Student ID. Please check your ID number or contact the administrator if you believe this is an error.'
                 };
             }
         }
@@ -305,20 +298,20 @@ async function signUpUser(userData) {
             }
         }
 
-        return { 
-            success: true, 
+        return {
+            success: true,
             user: authData.user,
             message: 'Registration successful! Please check your email to verify your account.'
         };
 
     } catch (error) {
         console.error('Sign up error:', error);
-        
+
         // Handle specific error cases
         if (error.message.includes('already registered')) {
             return { success: false, error: 'This email is already registered. Please log in instead.' };
         }
-        
+
         return { success: false, error: error.message || 'Registration failed. Please try again.' };
     }
 }
@@ -355,8 +348,8 @@ async function signInUser(email, password) {
             localStorage.setItem('userProfile', JSON.stringify(profile));
         }
 
-        return { 
-            success: true, 
+        return {
+            success: true,
             user: data.user,
             profile: profile,
             session: data.session
@@ -364,11 +357,11 @@ async function signInUser(email, password) {
 
     } catch (error) {
         console.error('Sign in error:', error);
-        
+
         if (error.message.includes('Invalid login credentials')) {
             return { success: false, error: 'Invalid email or password. Please try again.' };
         }
-        
+
         return { success: false, error: error.message || 'Login failed. Please try again.' };
     }
 }
@@ -523,9 +516,9 @@ function validatePassword(password) {
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumbers = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
+
     const errors = [];
-    
+
     if (password.length < minLength) {
         errors.push(`Password must be at least ${minLength} characters`);
     }
@@ -538,10 +531,10 @@ function validatePassword(password) {
     if (!hasNumbers) {
         errors.push('Password must contain at least one number');
     }
-    
+
     const strength = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar, password.length >= minLength]
         .filter(Boolean).length;
-    
+
     return {
         valid: errors.length === 0,
         errors: errors,

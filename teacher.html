@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -12,18 +13,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Baloo 2', cursive; 
+        body {
+            font-family: 'Baloo 2', cursive;
             background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
             min-height: 100vh;
         }
-        
+
         .main-container {
             padding: 20px;
             max-width: 1400px;
             margin: 0 auto;
         }
-        
+
         .dashboard-header {
             background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             border: 4px solid rgba(120, 53, 15, 0.3);
@@ -36,19 +37,19 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
+
         .dashboard-title {
             color: #7c2d12;
             font-size: 1.75rem;
             font-weight: 800;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-        
+
         .user-badge {
             background: linear-gradient(to right, #3b82f6, #1d4ed8);
             color: white;
@@ -57,7 +58,7 @@
             font-weight: 700;
             font-size: 0.9rem;
         }
-        
+
         .btn-logout {
             background: rgba(239, 68, 68, 0.2);
             color: #dc2626;
@@ -68,19 +69,19 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-logout:hover {
             background: #dc2626;
             color: white;
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .stat-card {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             border: 3px solid rgba(120, 53, 15, 0.3);
@@ -88,19 +89,19 @@
             padding: 1.25rem;
             text-align: center;
         }
-        
+
         .stat-number {
             font-size: 2.25rem;
             font-weight: 800;
             color: #7c2d12;
         }
-        
+
         .stat-label {
             color: #92400e;
             font-weight: 600;
             font-size: 0.9rem;
         }
-        
+
         .content-card {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
             border: 3px solid rgba(120, 53, 15, 0.3);
@@ -108,7 +109,7 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -117,20 +118,20 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
+
         .card-title {
             color: #7c2d12;
             font-size: 1.3rem;
             font-weight: 700;
         }
-        
+
         .tabs {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1rem;
             flex-wrap: wrap;
         }
-        
+
         .tab-btn {
             padding: 0.75rem 1.5rem;
             border: 2px solid rgba(120, 53, 15, 0.3);
@@ -141,25 +142,25 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .tab-btn:hover {
             border-color: #b45309;
         }
-        
+
         .tab-btn.active {
             background: linear-gradient(to right, #b45309, #d97706);
             color: white;
             border-color: #b45309;
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -167,7 +168,7 @@
             border-radius: 12px;
             overflow: hidden;
         }
-        
+
         .data-table th {
             background: rgba(180, 83, 9, 0.2);
             color: #7c2d12;
@@ -175,17 +176,17 @@
             padding: 1rem;
             text-align: left;
         }
-        
+
         .data-table td {
             padding: 0.875rem 1rem;
             border-bottom: 1px solid rgba(120, 53, 15, 0.1);
             color: #7c2d12;
         }
-        
+
         .data-table tr:hover {
             background: rgba(251, 191, 36, 0.1);
         }
-        
+
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -193,14 +194,14 @@
             border-radius: 4px;
             overflow: hidden;
         }
-        
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(to right, #10b981, #059669);
             border-radius: 4px;
             transition: width 0.3s ease;
         }
-        
+
         .era-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -210,11 +211,22 @@
             margin-right: 0.25rem;
             margin-bottom: 0.25rem;
         }
-        
-        .era-complete { background: #d1fae5; color: #065f46; }
-        .era-incomplete { background: #fef3c7; color: #92400e; }
-        .era-notstarted { background: #f3f4f6; color: #6b7280; }
-        
+
+        .era-complete {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .era-incomplete {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .era-notstarted {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
         .class-code-box {
             background: linear-gradient(to right, #1e40af, #3b82f6);
             color: white;
@@ -223,14 +235,14 @@
             text-align: center;
             margin-bottom: 1rem;
         }
-        
+
         .class-code {
             font-size: 2.5rem;
             font-weight: 800;
             letter-spacing: 0.3em;
             font-family: monospace;
         }
-        
+
         .btn-primary {
             background: linear-gradient(to right, #b45309, #d97706);
             color: white;
@@ -241,12 +253,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
         }
-        
+
         .btn-secondary {
             background: rgba(255, 255, 255, 0.8);
             color: #7c2d12;
@@ -257,11 +269,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-secondary:hover {
             border-color: #b45309;
         }
-        
+
         .btn-action {
             padding: 0.375rem 0.75rem;
             border-radius: 6px;
@@ -272,21 +284,25 @@
             transition: all 0.2s ease;
             margin-right: 0.25rem;
         }
-        
+
         .btn-view {
             background: #3b82f6;
             color: white;
         }
-        
-        .btn-view:hover { background: #2563eb; }
-        
+
+        .btn-view:hover {
+            background: #2563eb;
+        }
+
         .btn-remove {
             background: #ef4444;
             color: white;
         }
-        
-        .btn-remove:hover { background: #dc2626; }
-        
+
+        .btn-remove:hover {
+            background: #dc2626;
+        }
+
         .search-input {
             padding: 0.75rem 1rem;
             border: 2px solid rgba(120, 53, 15, 0.3);
@@ -297,12 +313,12 @@
             color: #7c2d12;
             min-width: 250px;
         }
-        
+
         .search-input:focus {
             outline: none;
             border-color: #b45309;
         }
-        
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -313,7 +329,7 @@
             z-index: 100;
             padding: 1rem;
         }
-        
+
         .modal-content {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
             border: 4px solid rgba(120, 53, 15, 0.4);
@@ -324,25 +340,25 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
+
         .modal-title {
             color: #7c2d12;
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
         }
-        
+
         .form-group {
             margin-bottom: 1rem;
         }
-        
+
         .form-label {
             display: block;
             color: #7c2d12;
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -352,33 +368,33 @@
             font-family: 'Baloo 2', cursive;
             color: #7c2d12;
         }
-        
+
         .form-input:focus {
             outline: none;
             border-color: #b45309;
         }
-        
+
         .table-container {
             overflow-x: auto;
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 3rem;
             color: #92400e;
         }
-        
+
         .empty-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
         }
-        
+
         .nav-link {
             color: #b45309;
             text-decoration: none;
@@ -387,38 +403,38 @@
             border-radius: 8px;
             transition: all 0.2s;
         }
-        
+
         .nav-link:hover {
             background: rgba(180, 83, 9, 0.1);
         }
-        
+
         .student-detail-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
             padding: 1.5rem;
             margin-top: 1rem;
         }
-        
+
         .era-progress-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
         }
-        
+
         .era-progress-card {
             background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;
             padding: 1rem;
             border: 2px solid rgba(120, 53, 15, 0.2);
         }
-        
+
         .era-progress-title {
             font-weight: 700;
             color: #7c2d12;
             margin-bottom: 0.5rem;
         }
-        
+
         .status-icon {
             display: inline-block;
             width: 20px;
@@ -429,28 +445,41 @@
             line-height: 20px;
             font-size: 0.7rem;
         }
-        
-        .status-complete { background: #10b981; color: white; }
-        .status-incomplete { background: #f59e0b; color: white; }
-        .status-notstarted { background: #9ca3af; color: white; }
-        
+
+        .status-complete {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-incomplete {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-notstarted {
+            background: #9ca3af;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
                 text-align: center;
             }
-            
-            .data-table th, .data-table td {
+
+            .data-table th,
+            .data-table td {
                 padding: 0.5rem;
                 font-size: 0.85rem;
             }
-            
+
             .class-code {
                 font-size: 2rem;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <!-- Header -->
@@ -464,18 +493,20 @@
                 <button onclick="handleLogout()" class="btn-logout">Logout</button>
             </div>
         </div>
-        
+
         <!-- Verification Warning -->
-        <div id="verificationWarning" class="hidden content-card" style="background: rgba(251, 191, 36, 0.3); border-color: #f59e0b;">
+        <div id="verificationWarning" class="hidden content-card"
+            style="background: rgba(251, 191, 36, 0.3); border-color: #f59e0b;">
             <div class="flex items-center gap-3">
                 <span class="text-3xl">⚠️</span>
                 <div>
                     <h3 class="font-bold text-amber-900">Account Pending Verification</h3>
-                    <p class="text-amber-800">Your account is awaiting admin verification. Some features may be limited.</p>
+                    <p class="text-amber-800">Your account is awaiting admin verification. Some features may be limited.
+                    </p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -499,15 +530,17 @@
                 <div class="stat-label">My Lessons</div>
             </div>
         </div>
-        
+
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('classes')">🏫 My Classes</button>
             <button class="tab-btn" onclick="switchTab('students')">👥 Student Progress</button>
             <button class="tab-btn" onclick="switchTab('questions')">❓ Questions</button>
             <button class="tab-btn" onclick="switchTab('lessons')">📚 Lessons</button>
+            <button class="tab-btn" onclick="switchTab('backup')">📦 Backup & Restore</button>
         </div>
-        
+
+
         <!-- Classes Tab -->
         <div id="classesTab" class="tab-content active">
             <div class="content-card">
@@ -518,11 +551,11 @@
                         <button class="btn-primary" onclick="showCreateClassModal()">➕ Create Class</button>
                     </div>
                 </div>
-                
+
                 <div id="classesList">
                     <!-- Classes will be loaded here -->
                 </div>
-                
+
                 <div id="classesEmpty" class="empty-state hidden">
                     <div class="empty-icon">🏫</div>
                     <p>No classes yet</p>
@@ -531,15 +564,16 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Students Tab -->
         <div id="studentsTab" class="tab-content">
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">Student Progress Tracking</h2>
-                    <input type="text" class="search-input" placeholder="🔍 Search students..." oninput="filterStudents(this.value)">
+                    <input type="text" class="search-input" placeholder="🔍 Search students..."
+                        oninput="filterStudents(this.value)">
                 </div>
-                
+
                 <div class="table-container">
                     <table class="data-table" id="studentsTable">
                         <thead>
@@ -560,7 +594,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div id="studentsEmpty" class="empty-state hidden">
                     <div class="empty-icon">👥</div>
                     <p>No students enrolled yet</p>
@@ -568,7 +602,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Questions Tab -->
         <div id="questionsTab" class="tab-content">
             <div class="content-card">
@@ -576,17 +610,19 @@
                     <h2 class="card-title">Question Bank</h2>
                     <button class="btn-primary" onclick="showQuestionModal()">➕ Add Custom Question</button>
                 </div>
-                
+
                 <div style="display: flex; justify-content: center; padding: 0 1.5rem 1rem;">
-                    <input type="text" id="questionsSearchInput" class="form-input" style="width: 100%; max-width: 400px; text-align: center;" placeholder="🔍 Search questions..." oninput="handleQuestionsSearch(this.value)">
+                    <input type="text" id="questionsSearchInput" class="form-input"
+                        style="width: 100%; max-width: 400px; text-align: center;" placeholder="🔍 Search questions..."
+                        oninput="handleQuestionsSearch(this.value)">
                 </div>
-                
+
                 <!-- Question Type Tabs -->
                 <div id="questionTypeTabs" class="tabs" style="margin-bottom: 0.5rem;">
                     <button class="tab-btn active" onclick="renderQuestions('system')">📚 System Questions</button>
                     <button class="tab-btn" onclick="renderQuestions('custom')">✏️ Custom Questions</button>
                 </div>
-                
+
                 <!-- Era Filter Tabs -->
                 <div id="questionEraTabs" class="tabs">
                     <button class="tab-btn active" onclick="filterQuestionsByEra('all')">All Eras</button>
@@ -595,7 +631,7 @@
                     <button class="tab-btn" onclick="filterQuestionsByEra('american-colonial')">American Era</button>
                     <button class="tab-btn" onclick="filterQuestionsByEra('ww2')">WW2 Era</button>
                 </div>
-                
+
                 <div class="table-container">
                     <table class="data-table" id="questionsTable">
                         <thead>
@@ -613,14 +649,16 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Questions Pagination -->
                 <div id="questionsPagination" class="flex justify-center items-center gap-2 mt-4 flex-wrap">
-                    <button id="questionsPrevBtn" class="btn-action btn-view" onclick="changeQuestionsPage(-1)" disabled>← Previous</button>
+                    <button id="questionsPrevBtn" class="btn-action btn-view" onclick="changeQuestionsPage(-1)"
+                        disabled>← Previous</button>
                     <span id="questionsPageInfo" class="text-amber-800 font-semibold px-4">Page 1 of 1</span>
-                    <button id="questionsNextBtn" class="btn-action btn-view" onclick="changeQuestionsPage(1)" disabled>Next →</button>
+                    <button id="questionsNextBtn" class="btn-action btn-view" onclick="changeQuestionsPage(1)"
+                        disabled>Next →</button>
                 </div>
-                
+
                 <div id="questionsEmpty" class="empty-state hidden">
                     <div class="empty-icon">❓</div>
                     <p>No custom questions yet</p>
@@ -636,16 +674,18 @@
                     <h2 class="card-title">Learning Module Management</h2>
                     <button class="btn-primary" onclick="showLessonModal()">➕ Add Custom Lesson</button>
                 </div>
-                
+
                 <div style="display: flex; justify-content: center; padding: 0 1.5rem 1rem;">
-                    <input type="text" id="lessonsSearchInput" class="form-input" style="width: 100%; max-width: 400px; text-align: center;" placeholder="🔍 Search lessons..." oninput="handleLessonsSearch(this.value)">
+                    <input type="text" id="lessonsSearchInput" class="form-input"
+                        style="width: 100%; max-width: 400px; text-align: center;" placeholder="🔍 Search lessons..."
+                        oninput="handleLessonsSearch(this.value)">
                 </div>
-                
+
                 <div class="tabs" id="lessonTypeTabs">
                     <button class="tab-btn active" onclick="renderLessons('system')">📚 System Lessons</button>
                     <button class="tab-btn" onclick="renderLessons('custom')">✏️ Custom Lessons</button>
                 </div>
-                
+
                 <div class="tabs mt-3" id="lessonEraTabs">
                     <button class="tab-btn active" onclick="filterLessonsByEra('all')">All Eras</button>
                     <button class="tab-btn" onclick="filterLessonsByEra('early-spanish')">Early Spanish</button>
@@ -653,7 +693,7 @@
                     <button class="tab-btn" onclick="filterLessonsByEra('american-colonial')">American Era</button>
                     <button class="tab-btn" onclick="filterLessonsByEra('ww2')">WW2 Era</button>
                 </div>
-                
+
                 <div class="table-container">
                     <table class="data-table" id="lessonsTable">
                         <thead>
@@ -671,14 +711,16 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Lessons Pagination -->
                 <div id="lessonsPagination" class="flex justify-center items-center gap-2 mt-4 flex-wrap">
-                    <button id="lessonsPrevBtn" class="btn-action btn-view" onclick="changeLessonsPage(-1)" disabled>← Previous</button>
+                    <button id="lessonsPrevBtn" class="btn-action btn-view" onclick="changeLessonsPage(-1)" disabled>←
+                        Previous</button>
                     <span id="lessonsPageInfo" class="text-amber-800 font-semibold px-4">Page 1 of 1</span>
-                    <button id="lessonsNextBtn" class="btn-action btn-view" onclick="changeLessonsPage(1)" disabled>Next →</button>
+                    <button id="lessonsNextBtn" class="btn-action btn-view" onclick="changeLessonsPage(1)" disabled>Next
+                        →</button>
                 </div>
-                
+
                 <div id="lessonsEmpty" class="empty-state hidden">
                     <div class="empty-icon">📖</div>
                     <p>No custom lessons yet</p>
@@ -686,8 +728,81 @@
                 </div>
             </div>
         </div>
+
+        <!-- Backup & Restore Tab -->
+        <div id="backupTab" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">📦 Backup & Restore</h2>
+                </div>
+
+                <!-- Export Section -->
+                <div class="p-6 border-b-2 border-amber-200">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">📤 Export Your Content</h3>
+                    <p class="text-amber-700 mb-4">Download your custom questions and lessons as JSON files. You can use
+                        these to restore your content or transfer to another account.</p>
+
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <button class="btn-primary" onclick="exportTeacherQuestions()">
+                            📝 Export My Questions
+                        </button>
+                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
+                            onclick="exportTeacherLessons()">
+                            📚 Export My Lessons
+                        </button>
+                        <button class="btn-primary" style="background: linear-gradient(to right, #7c3aed, #8b5cf6);"
+                            onclick="exportAllTeacherContent()">
+                            📦 Export All My Content
+                        </button>
+                    </div>
+
+                    <div id="exportStatus" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
+                </div>
+
+                <!-- Import Section -->
+                <div class="p-6">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">📥 Import / Restore Content</h3>
+                    <p class="text-amber-700 mb-4">Upload a previously exported JSON file to restore your questions and
+                        lessons.</p>
+
+                    <div class="upload-area" id="backupUploadArea"
+                        onclick="document.getElementById('backupFile').click()">
+                        <div class="upload-icon">📁</div>
+                        <p class="text-amber-800 font-semibold mb-2">Click or drag & drop a backup file</p>
+                        <p class="text-amber-600 text-sm">Accepts JSON files exported from this dashboard</p>
+                        <input type="file" id="backupFile" accept=".json" class="hidden"
+                            onchange="handleTeacherImportFile(event)">
+                    </div>
+
+                    <div id="importPreview" class="hidden mt-4">
+                        <h4 class="font-bold text-amber-900 mb-2">📋 Import Preview</h4>
+                        <div id="importPreviewContent"
+                            class="bg-white rounded-lg p-4 border-2 border-amber-200 max-h-60 overflow-y-auto">
+                            <!-- Preview will be shown here -->
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <button class="btn-secondary flex-1" onclick="cancelImport()">Cancel</button>
+                            <button class="btn-primary flex-1" onclick="confirmTeacherImport()">✅ Import
+                                Content</button>
+                        </div>
+                    </div>
+
+                    <div id="importStatus" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
+                </div>
+
+                <!-- Recent Backups -->
+                <div class="p-6 border-t-2 border-amber-200">
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">📜 Recent Export History</h3>
+                    <div id="backupHistory" class="space-y-2">
+                        <!-- Backup history will be loaded here -->
+                    </div>
+                    <p id="noBackupHistory" class="text-amber-600 text-sm hidden">No recent exports recorded on this
+                        device.</p>
+                </div>
+            </div>
+        </div>
     </div>
-    
+
     <!-- Create Class Modal -->
     <div id="createClassModal" class="modal-overlay hidden">
         <div class="modal-content">
@@ -695,28 +810,31 @@
             <form id="createClassForm" onsubmit="handleCreateClass(event)">
                 <div class="form-group">
                     <label class="form-label">Class Name</label>
-                    <input type="text" id="className" class="form-input" placeholder="e.g., Philippine History - Grade 7" required>
+                    <input type="text" id="className" class="form-input"
+                        placeholder="e.g., Philippine History - Grade 7" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Description (Optional)</label>
-                    <textarea id="classDescription" class="form-input" rows="2" placeholder="Brief description of the class"></textarea>
+                    <textarea id="classDescription" class="form-input" rows="2"
+                        placeholder="Brief description of the class"></textarea>
                 </div>
-                
+
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Grade Level</label>
                         <input type="text" id="classGrade" class="form-input" placeholder="e.g., Grade 7">
                     </div>
-                    
+
                     <div class="form-group flex-1">
                         <label class="form-label">Section</label>
                         <input type="text" id="classSection" class="form-input" placeholder="e.g., Section A">
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeCreateClassModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeCreateClassModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
@@ -726,14 +844,14 @@
             </form>
         </div>
     </div>
-    
+
     <!-- Add Question Modal -->
     <div id="questionModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h2 class="modal-title" id="questionModalTitle">Add New Question</h2>
             <form id="questionForm" onsubmit="handleSaveQuestion(event)">
                 <input type="hidden" id="editQuestionId">
-                
+
                 <div class="form-group">
                     <label class="form-label">Era</label>
                     <select id="questionEra" class="form-input" required>
@@ -744,27 +862,28 @@
                         <option value="ww2">WW2 Era</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Question (English)</label>
                     <textarea id="questionTextEn" class="form-input" rows="2" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Question (Tagalog) - Optional</label>
                     <textarea id="questionTextTl" class="form-input" rows="2"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Correct Answer (English)</label>
                     <input type="text" id="correctAnswerEn" class="form-input" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Wrong Answers (English) - One per line</label>
-                    <textarea id="wrongAnswersEn" class="form-input" rows="3" placeholder="Wrong answer 1&#10;Wrong answer 2&#10;Wrong answer 3" required></textarea>
+                    <textarea id="wrongAnswersEn" class="form-input" rows="3"
+                        placeholder="Wrong answer 1&#10;Wrong answer 2&#10;Wrong answer 3" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Difficulty</label>
                     <select id="questionDifficulty" class="form-input" required>
@@ -773,9 +892,10 @@
                         <option value="hard">Hard</option>
                     </select>
                 </div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeQuestionModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeQuestionModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
@@ -785,63 +905,68 @@
             </form>
         </div>
     </div>
-    
+
     <!-- Student Detail Modal -->
     <div id="studentDetailModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 700px;">
             <div class="flex justify-between items-start mb-4">
                 <h2 class="modal-title" id="studentDetailName">Student Details</h2>
-                <button onclick="closeStudentDetailModal()" class="text-2xl text-amber-900 hover:text-red-600">&times;</button>
+                <button onclick="closeStudentDetailModal()"
+                    class="text-2xl text-amber-900 hover:text-red-600">&times;</button>
             </div>
-            
+
             <div id="studentDetailContent">
                 <!-- Student details will be loaded here -->
             </div>
         </div>
     </div>
-    
+
     <!-- Add Student Modal -->
     <div id="addStudentModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 700px; max-height: 90vh;">
             <div class="flex justify-between items-start mb-4">
                 <h2 class="modal-title">Add Student to Class</h2>
-                <button onclick="closeAddStudentModal()" class="text-2xl text-amber-900 hover:text-red-600">&times;</button>
+                <button onclick="closeAddStudentModal()"
+                    class="text-2xl text-amber-900 hover:text-red-600">&times;</button>
             </div>
-            
+
             <div class="form-group">
                 <label class="form-label">Select Class</label>
                 <select id="addStudentClassSelect" class="form-input" required>
                     <option value="">Choose a class...</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label class="form-label">Search Student by Email or Name</label>
                 <div class="flex gap-2">
-                    <input type="text" id="studentSearchInput" class="form-input flex-1" placeholder="🔍 Type to search or browse all students below..." oninput="handleStudentSearchInput(this.value)">
+                    <input type="text" id="studentSearchInput" class="form-input flex-1"
+                        placeholder="🔍 Type to search or browse all students below..."
+                        oninput="handleStudentSearchInput(this.value)">
                     <button onclick="searchStudents()" class="btn-primary">🔍 Search</button>
                     <button onclick="clearStudentSearch()" class="btn-secondary">Clear</button>
                 </div>
             </div>
-            
+
             <!-- Student count and pagination info -->
             <div id="studentListHeader" class="flex justify-between items-center mb-2">
                 <span id="studentCountLabel" class="text-amber-700 font-semibold">Loading students...</span>
                 <span id="paginationInfo" class="text-sm text-amber-600"></span>
             </div>
-            
+
             <div id="studentSearchResults" class="mt-2" style="max-height: 350px; overflow-y: auto;">
                 <!-- Search results / All students will appear here -->
             </div>
-            
+
             <!-- Pagination Controls -->
             <div id="paginationControls" class="flex justify-center items-center gap-2 mt-4 flex-wrap">
                 <!-- Pagination buttons will be generated here -->
             </div>
-            
+
             <div class="mt-4 p-3 bg-amber-100 rounded-lg border-2 border-amber-300">
                 <p class="text-amber-800 text-sm">
-                    <strong>💡 Tip:</strong> Students can also join your class by entering the class code during signup or in their profile settings.
+                    <strong>💡 Tip:</strong> Students can also join your class by entering the class code during signup
+                    or in their profile settings.
                 </p>
             </div>
         </div>
@@ -853,7 +978,7 @@
             <h2 class="modal-title" id="lessonModalTitle">Add New Lesson</h2>
             <form id="lessonForm" onsubmit="handleSaveLesson(event)">
                 <input type="hidden" id="editLessonId">
-                
+
                 <div class="form-group">
                     <label class="form-label">Era</label>
                     <select id="lessonEra" class="form-input" required>
@@ -864,41 +989,50 @@
                         <option value="ww2">WW2 Era</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Lesson Order (Position in sequence)</label>
                     <input type="number" id="lessonOrder" class="form-input" min="1" placeholder="e.g., 6" required>
-                    <p class="text-sm text-amber-700 mt-1">Note: System lessons typically use 1-5. Use 6+ for custom lessons.</p>
+                    <p class="text-sm text-amber-700 mt-1">Note: System lessons typically use 1-5. Use 6+ for custom
+                        lessons.</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Lesson Title (English)</label>
-                    <input type="text" id="lessonTitleEn" class="form-input" placeholder="e.g., Additional Historical Events" required>
+                    <input type="text" id="lessonTitleEn" class="form-input"
+                        placeholder="e.g., Additional Historical Events" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Lesson Title (Tagalog) - Optional</label>
-                    <input type="text" id="lessonTitleTl" class="form-input" placeholder="e.g., Karagdagang Makasaysayang Pangyayari">
+                    <input type="text" id="lessonTitleTl" class="form-input"
+                        placeholder="e.g., Karagdagang Makasaysayang Pangyayari">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Lesson Content (English) - HTML Supported</label>
-                    <textarea id="lessonContentEn" class="form-input" rows="8" placeholder="<div class='space-y-4'>&#10;    <h3 class='text-xl font-bold mb-3'>Section Title</h3>&#10;    <p class='mb-3'>Content here...</p>&#10;</div>" required></textarea>
-                    <p class="text-sm text-amber-700 mt-1">You can use HTML for formatting. Include divs, paragraphs, headings, etc.</p>
+                    <textarea id="lessonContentEn" class="form-input" rows="8"
+                        placeholder="<div class='space-y-4'>&#10;    <h3 class='text-xl font-bold mb-3'>Section Title</h3>&#10;    <p class='mb-3'>Content here...</p>&#10;</div>"
+                        required></textarea>
+                    <p class="text-sm text-amber-700 mt-1">You can use HTML for formatting. Include divs, paragraphs,
+                        headings, etc.</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Lesson Content (Tagalog) - Optional</label>
-                    <textarea id="lessonContentTl" class="form-input" rows="6" placeholder="Optional Tagalog translation"></textarea>
+                    <textarea id="lessonContentTl" class="form-input" rows="6"
+                        placeholder="Optional Tagalog translation"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Icon (Emoji or Number)</label>
-                    <input type="text" id="lessonIcon" class="form-input" placeholder="e.g., 📖 or 6" maxlength="2" required>
+                    <input type="text" id="lessonIcon" class="form-input" placeholder="e.g., 📖 or 6" maxlength="2"
+                        required>
                 </div>
-                
+
                 <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeLessonModal()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                    <button type="button" onclick="closeLessonModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
@@ -915,7 +1049,7 @@
         // Supabase config - standalone
         const SUPABASE_URL = 'https://bthyqczptljdhmioagpl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0aHlxY3pwdGxqZGhtaW9hZ3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzOTY2NzAsImV4cCI6MjA4Mzk3MjY3MH0.QKFZapzgWYcCtuw3eEvqg6U6qi06QNpvIRNBw7ABf9I';
-        
+
         let sb = null;
         function getClient() {
             if (sb) return sb;
@@ -926,7 +1060,7 @@
             }
             return null;
         }
-        
+
         // Helper functions
         function showToast(message, type = 'info') {
             const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
@@ -942,12 +1076,12 @@
             document.body.appendChild(toast);
             setTimeout(() => { toast.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
-        
+
         function formatDate(dateStr) {
             if (!dateStr) return '-';
             return new Date(dateStr).toLocaleDateString();
         }
-        
+
         let allClasses = [];
         let allStudents = [];
         let allQuestions = [];
@@ -958,7 +1092,7 @@
         let currentQuestionType = 'system'; // 'system' or 'custom'
         let currentLessonType = 'system'; // 'system' or 'custom'
         let currentEraFilter = 'all';
-        
+
         // Pagination state for Add Student Modal
         let allAvailableStudents = [];
         let filteredStudentsForModal = [];
@@ -966,26 +1100,26 @@
         const studentsPerPage = 10;
         let isSearchMode = false;
         let searchDebounceTimer = null;
-        
+
         // Pagination state for Questions
         let filteredQuestions = [];
         let currentQuestionsPage = 1;
         const questionsPerPage = 10;
         let questionsSearchTerm = '';
-        
+
         // Pagination state for Lessons
         let filteredLessons = [];
         let currentLessonsPage = 1;
         const lessonsPerPage = 10;
         let lessonsSearchTerm = '';
-        
+
         const eraNames = {
             'early-spanish': 'Early Spanish Era',
             'late-spanish': 'Late Spanish Era',
             'american-colonial': 'American Colonial Era',
             'ww2': 'WW2 Era'
         };
-        
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', async () => {
             sb = getClient();
@@ -993,30 +1127,30 @@
                 alert('Failed to initialize Supabase client');
                 return;
             }
-            
+
             // Check if logged in
             const { data: { session } } = await sb.auth.getSession();
             if (!session) {
                 window.location.href = 'login.html';
                 return;
             }
-            
+
             // Get profile
             const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
-            
+
             console.log('Profile loaded:', profile, 'Error:', profileError);
-            
+
             // If profile fetch failed, try to get role from user metadata
             let userRole = profile?.role;
             if (!profile && session.user.user_metadata?.role) {
                 userRole = session.user.user_metadata.role;
                 console.log('Using role from user metadata:', userRole);
             }
-            
+
             if (!profile) {
                 console.error('Could not load profile. Creating one...');
                 // Try to create the profile if it doesn't exist
@@ -1031,11 +1165,11 @@
                     })
                     .select()
                     .single();
-                
+
                 if (createError) {
                     console.error('Failed to create profile:', createError);
                 }
-                
+
                 if (newProfile) {
                     currentProfile = newProfile;
                     userRole = newProfile.role;
@@ -1043,7 +1177,7 @@
             } else {
                 currentProfile = profile;
             }
-            
+
             // Check role - allow teacher or admin
             if (userRole !== 'teacher' && userRole !== 'admin') {
                 console.error('User role is:', userRole, 'Expected: teacher or admin');
@@ -1051,7 +1185,7 @@
                 window.location.href = 'login.html';
                 return;
             }
-            
+
             // Ensure currentProfile is set
             if (!currentProfile) {
                 currentProfile = {
@@ -1061,17 +1195,17 @@
                     role: userRole
                 };
             }
-            
+
             document.getElementById('userName').textContent = currentProfile.full_name;
-            
+
             // Show verification warning if not verified
             if (!currentProfile.is_verified) {
                 document.getElementById('verificationWarning').classList.remove('hidden');
             }
-            
+
             // Load system questions from questions.js
             loadSystemQuestions();
-            
+
             // Load data
             await Promise.all([
                 loadClasses(),
@@ -1081,14 +1215,14 @@
                 loadStats()
             ]);
         });
-        
+
         // Load statistics
         async function loadStats() {
             document.getElementById('totalStudents').textContent = allStudents.length;
             document.getElementById('totalClasses').textContent = allClasses.length;
             document.getElementById('totalQuestions').textContent = allSystemQuestions.length + allQuestions.length;
             document.getElementById('totalLessons').textContent = allSystemLessons.length + allLessons.length;
-            
+
             // Calculate average progress
             if (allStudents.length > 0) {
                 let totalProgress = 0;
@@ -1097,11 +1231,11 @@
                     const completed = progress.filter(p => p.boss_defeated).length;
                     totalProgress += (completed / 4) * 100;
                 });
-                document.getElementById('avgProgress').textContent = 
+                document.getElementById('avgProgress').textContent =
                     Math.round(totalProgress / allStudents.length) + '%';
             }
         }
-        
+
         // Load classes
         async function loadClasses() {
             try {
@@ -1113,27 +1247,27 @@
                     `)
                     .eq('teacher_id', currentProfile.id)
                     .order('created_at', { ascending: false });
-                
+
                 if (error) throw error;
-                
+
                 allClasses = data || [];
                 renderClasses(allClasses);
             } catch (error) {
                 console.error('Error loading classes:', error);
             }
         }
-        
+
         // Render classes
         function renderClasses(classes) {
             const container = document.getElementById('classesList');
             const emptyState = document.getElementById('classesEmpty');
-            
+
             if (classes.length === 0) {
                 container.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
             container.innerHTML = classes.map(cls => `
                 <div class="class-code-box mb-4">
@@ -1168,14 +1302,14 @@
                 </div>
             `).join('');
         }
-        
+
         // Copy class code
         function copyClassCode(code) {
             navigator.clipboard.writeText(code).then(() => {
                 showToast('Class code copied!', 'success');
             });
         }
-        
+
         // Toggle class status
         async function toggleClassStatus(classId, isActive) {
             try {
@@ -1183,9 +1317,9 @@
                     .from('classes')
                     .update({ is_active: isActive })
                     .eq('id', classId);
-                
+
                 if (error) throw error;
-                
+
                 showToast(`Class ${isActive ? 'activated' : 'deactivated'}!`, 'success');
                 loadClasses();
             } catch (error) {
@@ -1193,19 +1327,19 @@
                 showToast('Failed to update class', 'error');
             }
         }
-        
+
         // Delete class
         async function deleteClass(classId) {
             if (!confirm('Are you sure you want to delete this class? Students will be unenrolled.')) return;
-            
+
             try {
                 const { error } = await sb
                     .from('classes')
                     .delete()
                     .eq('id', classId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('Class deleted!', 'success');
                 loadClasses();
                 loadStudents();
@@ -1214,34 +1348,34 @@
                 showToast('Failed to delete class', 'error');
             }
         }
-        
+
         // Show create class modal
         function showCreateClassModal() {
             document.getElementById('createClassModal').classList.remove('hidden');
         }
-        
+
         // Close create class modal
         function closeCreateClassModal() {
             document.getElementById('createClassModal').classList.add('hidden');
             document.getElementById('createClassForm').reset();
         }
-        
+
         // Handle create class
         async function handleCreateClass(event) {
             event.preventDefault();
-            
+
             const name = document.getElementById('className').value.trim();
             const description = document.getElementById('classDescription').value.trim();
             const grade = document.getElementById('classGrade').value.trim();
             const section = document.getElementById('classSection').value.trim();
-            
+
             try {
                 // Generate class code
                 const { data: codeData, error: codeError } = await sb
                     .rpc('generate_class_code');
-                
+
                 if (codeError) throw codeError;
-                
+
                 const { error } = await sb
                     .from('classes')
                     .insert({
@@ -1252,9 +1386,9 @@
                         grade_level: grade || null,
                         section: section || null
                     });
-                
+
                 if (error) throw error;
-                
+
                 showToast('Class created successfully!', 'success');
                 closeCreateClassModal();
                 loadClasses();
@@ -1264,12 +1398,12 @@
                 showToast('Failed to create class', 'error');
             }
         }
-        
+
         // Load students
         async function loadStudents() {
             try {
                 console.log('Loading students for teacher:', currentProfile.id);
-                
+
                 // First try: Get students by teacher_id
                 let { data, error } = await sb
                     .from('profiles')
@@ -1285,17 +1419,17 @@
                     `)
                     .eq('teacher_id', currentProfile.id)
                     .eq('role', 'student');
-                
+
                 if (error) {
                     console.error('Error loading students by teacher_id:', error);
                 }
-                
+
                 console.log('Students by teacher_id:', data?.length || 0);
-                
+
                 // Also get students from class_enrollments (in case teacher_id wasn't set)
                 if (allClasses.length > 0) {
                     const classIds = allClasses.map(c => c.id);
-                    
+
                     const { data: enrolledData, error: enrollError } = await sb
                         .from('class_enrollments')
                         .select(`
@@ -1314,16 +1448,16 @@
                         `)
                         .in('class_id', classIds)
                         .eq('status', 'active');
-                    
+
                     if (enrollError) {
                         console.error('Error loading enrolled students:', enrollError);
                     } else {
                         console.log('Students from enrollments:', enrolledData?.length || 0);
-                        
+
                         // Merge enrolled students with those found by teacher_id
                         if (enrolledData && enrolledData.length > 0) {
                             const existingIds = new Set((data || []).map(s => s.id));
-                            
+
                             enrolledData.forEach(enrollment => {
                                 if (enrollment.profiles && !existingIds.has(enrollment.profiles.id)) {
                                     // Get class name for this student
@@ -1340,29 +1474,29 @@
                         }
                     }
                 }
-                
+
                 console.log('Total students loaded:', data?.length || 0, data);
-                
+
                 allStudents = data || [];
                 renderStudents(allStudents);
             } catch (error) {
                 console.error('Error loading students:', error);
             }
         }
-        
+
         // Render students table
         function renderStudents(students) {
             const tbody = document.getElementById('studentsTableBody');
             const emptyState = document.getElementById('studentsEmpty');
-            
+
             if (students.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
-            
+
             tbody.innerHTML = students.map(student => {
                 const progress = student.progress || [];
                 const eraProgress = {
@@ -1371,7 +1505,7 @@
                     'american-colonial': progress.find(p => p.era_key === 'american-colonial'),
                     'ww2': progress.find(p => p.era_key === 'ww2')
                 };
-                
+
                 const getEraStatus = (era) => {
                     const p = eraProgress[era];
                     if (!p) return '<span class="era-badge era-notstarted">Not Started</span>';
@@ -1382,15 +1516,15 @@
                     if (lessonsCount > 0) return `<span class="era-badge era-incomplete">${lessonsCount} Lessons</span>`;
                     return '<span class="era-badge era-incomplete">In Progress</span>';
                 };
-                
+
                 const completedEras = progress.filter(p => p.boss_defeated).length;
                 const overallProgress = Math.round((completedEras / 4) * 100);
-                
+
                 const lastPlayed = progress.reduce((latest, p) => {
                     if (!latest) return p.last_played_at;
                     return new Date(p.last_played_at) > new Date(latest) ? p.last_played_at : latest;
                 }, null);
-                
+
                 return `
                     <tr>
                         <td><strong>${student.full_name}</strong></td>
@@ -1416,23 +1550,23 @@
                 `;
             }).join('');
         }
-        
+
         // Filter students
         function filterStudents(query) {
-            const filtered = allStudents.filter(s => 
+            const filtered = allStudents.filter(s =>
                 s.full_name.toLowerCase().includes(query.toLowerCase()) ||
                 s.email?.toLowerCase().includes(query.toLowerCase())
             );
             renderStudents(filtered);
         }
-        
+
         // View student details
         function viewStudentDetails(studentId) {
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return;
-            
+
             document.getElementById('studentDetailName').textContent = student.full_name;
-            
+
             const progress = student.progress || [];
             const eraProgress = {
                 'early-spanish': progress.find(p => p.era_key === 'early-spanish'),
@@ -1440,7 +1574,7 @@
                 'american-colonial': progress.find(p => p.era_key === 'american-colonial'),
                 'ww2': progress.find(p => p.era_key === 'ww2')
             };
-            
+
             const content = document.getElementById('studentDetailContent');
             content.innerHTML = `
                 <div class="student-detail-card">
@@ -1452,10 +1586,10 @@
                 <h3 class="card-title mt-6 mb-2">Era Progress</h3>
                 <div class="era-progress-grid">
                     ${Object.entries(eraNames).map(([key, name]) => {
-                        const p = eraProgress[key];
-                        const lessonsCompleted = Array.isArray(p?.lessons_completed) ? p.lessons_completed : [];
-                        const currentLesson = (p?.current_lesson_index || 0) + 1;
-                        return `
+                const p = eraProgress[key];
+                const lessonsCompleted = Array.isArray(p?.lessons_completed) ? p.lessons_completed : [];
+                const currentLesson = (p?.current_lesson_index || 0) + 1;
+                return `
                             <div class="era-progress-card">
                                 <div class="era-progress-title">${name}</div>
                                 <div class="mt-2">
@@ -1481,30 +1615,30 @@
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             `;
-            
+
             document.getElementById('studentDetailModal').classList.remove('hidden');
         }
-        
+
         // Close student detail modal
         function closeStudentDetailModal() {
             document.getElementById('studentDetailModal').classList.add('hidden');
         }
-        
+
         // Remove student from class
         async function removeStudent(studentId) {
             if (!confirm('Remove this student from your class?')) return;
-            
+
             try {
                 const { error } = await sb
                     .from('profiles')
                     .update({ teacher_id: null, class_id: null })
                     .eq('id', studentId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('Student removed from class', 'success');
                 loadStudents();
                 loadStats();
@@ -1513,53 +1647,53 @@
                 showToast('Failed to remove student', 'error');
             }
         }
-        
+
         // Show add student modal
         function showAddStudentModal() {
             // Populate class dropdown
             const classSelect = document.getElementById('addStudentClassSelect');
-            classSelect.innerHTML = '<option value="">Choose a class...</option>' + 
+            classSelect.innerHTML = '<option value="">Choose a class...</option>' +
                 allClasses.map(cls => `<option value="${cls.id}">${cls.class_name}</option>`).join('');
-            
+
             // Clear search
             document.getElementById('studentSearchInput').value = '';
             document.getElementById('studentSearchResults').innerHTML = '<p class="text-amber-700 text-center py-4">Loading all students...</p>';
             document.getElementById('paginationControls').innerHTML = '';
-            
+
             // Reset pagination state
             currentStudentPage = 1;
             isSearchMode = false;
-            
+
             document.getElementById('addStudentModal').classList.remove('hidden');
-            
+
             // Load all students with pagination
             loadAllStudentsForModal();
         }
-        
+
         // Show add student modal with a specific class pre-selected
         function showAddStudentToSpecificClass(classId, className) {
             // Populate class dropdown
             const classSelect = document.getElementById('addStudentClassSelect');
-            classSelect.innerHTML = '<option value="">Choose a class...</option>' + 
+            classSelect.innerHTML = '<option value="">Choose a class...</option>' +
                 allClasses.map(cls => `<option value="${cls.id}" ${cls.id === classId ? 'selected' : ''}>${cls.class_name}</option>`).join('');
-            
+
             // Clear search
             document.getElementById('studentSearchInput').value = '';
             document.getElementById('studentSearchResults').innerHTML = '<p class="text-amber-700 text-center py-4">Loading all students...</p>';
             document.getElementById('paginationControls').innerHTML = '';
-            
+
             // Reset pagination state
             currentStudentPage = 1;
             isSearchMode = false;
-            
+
             document.getElementById('addStudentModal').classList.remove('hidden');
-            
+
             // Load all students with pagination
             loadAllStudentsForModal();
-            
+
             showToast(`Adding students to: ${className}`, 'info');
         }
-        
+
         // Close add student modal
         function closeAddStudentModal() {
             document.getElementById('addStudentModal').classList.add('hidden');
@@ -1569,29 +1703,29 @@
             currentStudentPage = 1;
             isSearchMode = false;
         }
-        
+
         // Load all available students for the modal with pagination
         async function loadAllStudentsForModal() {
             const resultsDiv = document.getElementById('studentSearchResults');
             const countLabel = document.getElementById('studentCountLabel');
-            
+
             try {
                 console.log('Loading all students for modal...');
-                
+
                 // Get all students - query ALL student accounts regardless of teacher assignment
                 const { data, error } = await sb
                     .from('profiles')
                     .select('id, full_name, email, class_id, teacher_id, created_at, role')
                     .eq('role', 'student')
                     .order('created_at', { ascending: false });
-                
+
                 if (error) {
                     console.error('Error loading students:', error);
                     throw error;
                 }
-                
+
                 console.log('All students found:', data?.length || 0, data);
-                
+
                 // If no students found, also try without role filter to debug
                 if (!data || data.length === 0) {
                     console.log('No students with role=student found, checking all profiles...');
@@ -1599,13 +1733,13 @@
                         .from('profiles')
                         .select('id, full_name, email, role, teacher_id')
                         .limit(50);
-                    
+
                     if (allError) {
                         console.error('Error fetching all profiles:', allError);
                     } else {
                         console.log('All profiles in database:', allProfiles);
                         console.log('Roles found:', [...new Set(allProfiles?.map(p => p.role))]);
-                        
+
                         // Show helpful message if there are profiles but none with student role visible
                         if (allProfiles && allProfiles.length > 0) {
                             const studentProfiles = allProfiles.filter(p => p.role === 'student');
@@ -1622,7 +1756,7 @@
                             }
                         }
                     }
-                    
+
                     // Truly no students exist
                     resultsDiv.innerHTML = `
                         <div class="text-center py-6">
@@ -1636,33 +1770,33 @@
                     document.getElementById('paginationControls').innerHTML = '';
                     return;
                 }
-                
+
                 // Store all students
                 allAvailableStudents = data || [];
-                
+
                 // Separate students by status
                 const notAssigned = allAvailableStudents.filter(s => !s.teacher_id);
                 const assignedToOther = allAvailableStudents.filter(s => s.teacher_id && s.teacher_id !== currentProfile.id);
                 const assignedToMe = allAvailableStudents.filter(s => s.teacher_id === currentProfile.id);
-                
+
                 console.log('Not assigned:', notAssigned.length);
                 console.log('Assigned to other:', assignedToOther.length);
                 console.log('Assigned to me:', assignedToMe.length);
-                
+
                 // For display, show unassigned first, then assigned to others (mine are excluded from adding)
                 filteredStudentsForModal = [...notAssigned, ...assignedToOther];
-                
+
                 const totalAvailable = filteredStudentsForModal.length;
                 countLabel.innerHTML = `
                     📊 <strong>${totalAvailable}</strong> student(s) available to add 
                     <span class="text-sm">(${assignedToMe.length} already in your classes)</span>
                 `;
-                
+
                 // Reset to page 1 and render
                 currentStudentPage = 1;
                 isSearchMode = false;
                 renderStudentList();
-                
+
             } catch (error) {
                 console.error('Error loading students:', error);
                 resultsDiv.innerHTML = `
@@ -1676,7 +1810,7 @@
                 countLabel.textContent = 'Error loading students';
             }
         }
-        
+
         // Handle search input with debounce
         function handleStudentSearchInput(value) {
             clearTimeout(searchDebounceTimer);
@@ -1688,43 +1822,43 @@
                 }
             }, 300);
         }
-        
+
         // Clear search and show all students
         function clearStudentSearch() {
             document.getElementById('studentSearchInput').value = '';
             isSearchMode = false;
             currentStudentPage = 1;
-            
+
             // Re-filter from all available (exclude those already in my classes)
             const notAssigned = allAvailableStudents.filter(s => !s.teacher_id);
             const assignedToOther = allAvailableStudents.filter(s => s.teacher_id && s.teacher_id !== currentProfile.id);
             filteredStudentsForModal = [...notAssigned, ...assignedToOther];
-            
+
             document.getElementById('studentCountLabel').innerHTML = `
                 📊 <strong>${filteredStudentsForModal.length}</strong> student(s) available to add
             `;
-            
+
             renderStudentList();
         }
-        
+
         // Search for students to add
         async function searchStudents() {
             const searchQuery = document.getElementById('studentSearchInput').value.trim();
             const resultsDiv = document.getElementById('studentSearchResults');
             const countLabel = document.getElementById('studentCountLabel');
-            
+
             if (!searchQuery || searchQuery.length < 2) {
                 countLabel.textContent = 'Please enter at least 2 characters to search.';
                 return;
             }
-            
+
             resultsDiv.innerHTML = '<p class="text-amber-700 text-center py-4">🔍 Searching...</p>';
             isSearchMode = true;
-            
+
             try {
                 // Search for students by email or name
                 const searchPattern = `%${searchQuery}%`;
-                
+
                 const { data, error } = await sb
                     .from('profiles')
                     .select('id, full_name, email, class_id, teacher_id, created_at')
@@ -1732,14 +1866,14 @@
                     .or(`email.ilike.${searchPattern},full_name.ilike.${searchPattern}`)
                     .order('full_name', { ascending: true })
                     .limit(100);
-                
+
                 if (error) {
                     console.error('Search error:', error);
                     throw error;
                 }
-                
+
                 console.log('Search results:', data);
-                
+
                 if (!data || data.length === 0) {
                     resultsDiv.innerHTML = `
                         <div class="text-center py-4">
@@ -1752,52 +1886,52 @@
                     countLabel.textContent = '0 results found';
                     return;
                 }
-                
+
                 // Filter out students already in my classes for adding
                 const availableInSearch = data.filter(s => s.teacher_id !== currentProfile.id);
                 const alreadyMine = data.filter(s => s.teacher_id === currentProfile.id);
-                
+
                 filteredStudentsForModal = availableInSearch;
-                
+
                 countLabel.innerHTML = `
                     🔍 Found <strong>${data.length}</strong> result(s) for "${searchQuery}"
                     ${alreadyMine.length > 0 ? `<span class="text-sm">(${alreadyMine.length} already in your classes)</span>` : ''}
                 `;
-                
+
                 currentStudentPage = 1;
                 renderStudentList();
-                
+
             } catch (error) {
                 console.error('Error searching students:', error);
                 resultsDiv.innerHTML = '<p class="text-red-600 text-center">Error searching for students. Please try again.</p>';
             }
         }
-        
+
         // Render student list with pagination
         function renderStudentList() {
             const resultsDiv = document.getElementById('studentSearchResults');
             const paginationDiv = document.getElementById('paginationControls');
             const paginationInfo = document.getElementById('paginationInfo');
-            
+
             const totalStudents = filteredStudentsForModal.length;
             const totalPages = Math.ceil(totalStudents / studentsPerPage);
-            
+
             // Ensure current page is valid
             if (currentStudentPage > totalPages) currentStudentPage = totalPages || 1;
             if (currentStudentPage < 1) currentStudentPage = 1;
-            
+
             // Calculate slice indices
             const startIdx = (currentStudentPage - 1) * studentsPerPage;
             const endIdx = Math.min(startIdx + studentsPerPage, totalStudents);
             const studentsOnPage = filteredStudentsForModal.slice(startIdx, endIdx);
-            
+
             // Update pagination info
             if (totalStudents > 0) {
                 paginationInfo.textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalStudents}`;
             } else {
                 paginationInfo.textContent = '';
             }
-            
+
             // Render students
             if (studentsOnPage.length === 0) {
                 resultsDiv.innerHTML = `
@@ -1809,12 +1943,12 @@
                 paginationDiv.innerHTML = '';
                 return;
             }
-            
+
             let html = '<div class="space-y-2">';
             studentsOnPage.forEach(student => {
                 const hasOtherTeacher = student.teacher_id && student.teacher_id !== currentProfile.id;
                 const joinDate = student.created_at ? new Date(student.created_at).toLocaleDateString() : 'N/A';
-                
+
                 html += `
                     <div class="flex items-center justify-between p-3 bg-white rounded-lg border-2 border-amber-200 hover:border-amber-400 transition-colors">
                         <div class="flex-1">
@@ -1832,24 +1966,24 @@
                 `;
             });
             html += '</div>';
-            
+
             resultsDiv.innerHTML = html;
-            
+
             // Render pagination controls
             renderPaginationControls(totalPages);
         }
-        
+
         // Render pagination controls
         function renderPaginationControls(totalPages) {
             const paginationDiv = document.getElementById('paginationControls');
-            
+
             if (totalPages <= 1) {
                 paginationDiv.innerHTML = '';
                 return;
             }
-            
+
             let html = '';
-            
+
             // Previous button
             html += `
                 <button onclick="changeStudentPage(${currentStudentPage - 1})" 
@@ -1858,17 +1992,17 @@
                     ← Prev
                 </button>
             `;
-            
+
             // Page numbers
             const maxVisiblePages = 5;
             let startPage = Math.max(1, currentStudentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
+
             // Adjust start if we're near the end
             if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-            
+
             // First page + ellipsis
             if (startPage > 1) {
                 html += `
@@ -1878,7 +2012,7 @@
                     html += '<span class="px-2 text-amber-600">...</span>';
                 }
             }
-            
+
             // Page buttons
             for (let i = startPage; i <= endPage; i++) {
                 const isActive = i === currentStudentPage;
@@ -1889,7 +2023,7 @@
                     </button>
                 `;
             }
-            
+
             // Last page + ellipsis
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
@@ -1899,7 +2033,7 @@
                     <button onclick="changeStudentPage(${totalPages})" class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200">${totalPages}</button>
                 `;
             }
-            
+
             // Next button
             html += `
                 <button onclick="changeStudentPage(${currentStudentPage + 1})" 
@@ -1908,38 +2042,38 @@
                     Next →
                 </button>
             `;
-            
+
             paginationDiv.innerHTML = html;
         }
-        
+
         // Change page
         function changeStudentPage(page) {
             const totalPages = Math.ceil(filteredStudentsForModal.length / studentsPerPage);
             if (page < 1 || page > totalPages) return;
-            
+
             currentStudentPage = page;
             renderStudentList();
-            
+
             // Scroll to top of results
             document.getElementById('studentSearchResults').scrollTop = 0;
         }
-        
+
         // Add student to selected class
         async function addStudentToClass(studentId, studentName) {
             const classId = document.getElementById('addStudentClassSelect').value;
             const addButton = document.getElementById(`addBtn-${studentId}`);
-            
+
             if (!classId) {
                 showToast('Please select a class first', 'error');
                 return;
             }
-            
+
             // Disable button to prevent double-clicks
             if (addButton) {
                 addButton.disabled = true;
                 addButton.innerHTML = '⏳ Adding...';
             }
-            
+
             try {
                 // Get the class details to get teacher_id
                 const selectedClass = allClasses.find(c => c.id === classId);
@@ -1951,27 +2085,27 @@
                     }
                     return;
                 }
-                
+
                 console.log(`Adding student ${studentId} to class ${classId} (teacher: ${currentProfile.id})`);
-                
+
                 // Update the student's profile with teacher_id and class_id
                 const { data: profileData, error: profileError } = await sb
                     .from('profiles')
-                    .update({ 
+                    .update({
                         teacher_id: currentProfile.id,
                         class_id: classId,
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', studentId)
                     .select();
-                
+
                 if (profileError) {
                     console.error('Profile update error:', profileError);
                     throw profileError;
                 }
-                
+
                 console.log('Profile updated:', profileData);
-                
+
                 // Check if update actually happened (RLS might silently block it)
                 if (!profileData || profileData.length === 0) {
                     console.error('Profile update returned no data - RLS policy may be blocking the update');
@@ -1982,7 +2116,7 @@
                     }
                     return;
                 }
-                
+
                 // Also add to class_enrollments table for tracking
                 const { data: enrollData, error: enrollError } = await sb
                     .from('class_enrollments')
@@ -1995,26 +2129,26 @@
                         onConflict: 'class_id,student_id'
                     })
                     .select();
-                
+
                 if (enrollError) {
                     console.warn('Enrollment table update failed:', enrollError);
                     // Continue anyway since profile was updated
                 } else {
                     console.log('Enrollment record:', enrollData);
                 }
-                
+
                 // Verify the update was successful by fetching the profile again
                 const { data: verifyData, error: verifyError } = await sb
                     .from('profiles')
                     .select('id, full_name, teacher_id, class_id')
                     .eq('id', studentId)
                     .single();
-                
+
                 if (verifyError) {
                     console.error('Verification error:', verifyError);
                 } else {
                     console.log('Verified student profile:', verifyData);
-                    
+
                     if (verifyData.teacher_id !== currentProfile.id || verifyData.class_id !== classId) {
                         console.warn('Warning: Profile may not have been updated correctly');
                         showToast('Warning: Student may not have been added correctly. Please check.', 'error');
@@ -2025,15 +2159,15 @@
                         return;
                     }
                 }
-                
+
                 showToast(`✓ ${studentName} added to ${selectedClass.class_name}!`, 'success');
-                
+
                 // Remove this student from the available list and update display
                 filteredStudentsForModal = filteredStudentsForModal.filter(s => s.id !== studentId);
-                allAvailableStudents = allAvailableStudents.map(s => 
+                allAvailableStudents = allAvailableStudents.map(s =>
                     s.id === studentId ? { ...s, teacher_id: currentProfile.id, class_id: classId } : s
                 );
-                
+
                 // Update the count label
                 const countLabel = document.getElementById('studentCountLabel');
                 const remaining = filteredStudentsForModal.length;
@@ -2042,15 +2176,15 @@
                     📊 <strong>${remaining}</strong> student(s) available to add 
                     <span class="text-sm">(${mine} already in your classes)</span>
                 `;
-                
+
                 // Re-render the current page
                 renderStudentList();
-                
+
                 // Reload students list and stats in the background
                 loadStudents();
                 loadClasses();
                 loadStats();
-                
+
             } catch (error) {
                 console.error('Error adding student to class:', error);
                 showToast('Failed to add student to class: ' + (error.message || 'Unknown error'), 'error');
@@ -2060,11 +2194,11 @@
                 }
             }
         }
-        
+
         // Load system questions from questions.js
         function loadSystemQuestions() {
             allSystemQuestions = [];
-            
+
             // questionsData is loaded from questions.js
             if (typeof questionsData !== 'undefined') {
                 for (const [eraKey, eraData] of Object.entries(questionsData)) {
@@ -2084,7 +2218,7 @@
                 }
             }
         }
-        
+
         // Load custom questions from database
         async function loadCustomQuestions() {
             try {
@@ -2092,16 +2226,16 @@
                     .from('custom_questions')
                     .select('*')
                     .order('created_at', { ascending: false });
-                
+
                 if (error) throw error;
-                
+
                 allQuestions = data || [];
                 renderQuestions('system'); // Default to system questions view
             } catch (error) {
                 console.error('Error loading questions:', error);
             }
         }
-        
+
         // Render questions
         function renderQuestions(type = 'system') {
             currentQuestionType = type;
@@ -2109,7 +2243,7 @@
             questionsSearchTerm = '';
             currentEraFilter = 'all';
             document.getElementById('questionsSearchInput').value = '';
-            
+
             // Update type tab styling
             document.querySelectorAll('#questionTypeTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -2118,96 +2252,96 @@
                     btn.classList.add('active');
                 }
             });
-            
+
             // Reset era filter to "All" when switching types
             document.querySelectorAll('#questionEraTabs .tab-btn').forEach((btn, idx) => {
                 btn.classList.toggle('active', idx === 0);
             });
-            
+
             const questions = type === 'system' ? allSystemQuestions : allQuestions;
-            
+
             // Update era counts
             updateEraCounts(questions);
-            
+
             // Apply filters and render
             applyQuestionsFilters();
         }
-        
+
         // Handle questions search
         function handleQuestionsSearch(value) {
             questionsSearchTerm = value.toLowerCase().trim();
             currentQuestionsPage = 1;
             applyQuestionsFilters();
         }
-        
+
         // Apply all filters to questions and render with pagination
         function applyQuestionsFilters() {
             const questions = currentQuestionType === 'system' ? allSystemQuestions : allQuestions;
             const tbody = document.getElementById('questionsTableBody');
             const emptyState = document.getElementById('questionsEmpty');
-            
+
             // Filter by era
             let filtered = currentEraFilter === 'all' ? questions : questions.filter(q => q.era_key === currentEraFilter);
-            
+
             // Filter by search term
             if (questionsSearchTerm) {
-                filtered = filtered.filter(q => 
+                filtered = filtered.filter(q =>
                     (q.question_text_en || '').toLowerCase().includes(questionsSearchTerm) ||
                     (q.correct_answer_en || '').toLowerCase().includes(questionsSearchTerm) ||
                     (q.question_text_tl || '').toLowerCase().includes(questionsSearchTerm)
                 );
             }
-            
+
             filteredQuestions = filtered;
-            
+
             if (filtered.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
-                emptyState.querySelector('p').textContent = questionsSearchTerm 
-                    ? 'No questions match your search' 
+                emptyState.querySelector('p').textContent = questionsSearchTerm
+                    ? 'No questions match your search'
                     : `No ${currentQuestionType} questions for this era`;
                 document.getElementById('questionsPagination').style.display = 'none';
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
-            
+
             // Calculate pagination
             const totalPages = Math.ceil(filtered.length / questionsPerPage);
             if (currentQuestionsPage > totalPages) currentQuestionsPage = totalPages;
-            
+
             const start = (currentQuestionsPage - 1) * questionsPerPage;
             const end = start + questionsPerPage;
             const pageQuestions = filtered.slice(start, end);
-            
+
             renderQuestionRows(pageQuestions);
             updateQuestionsPagination(filtered.length, totalPages);
         }
-        
+
         // Update questions pagination controls
         function updateQuestionsPagination(total, totalPages) {
             const paginationDiv = document.getElementById('questionsPagination');
             const pageInfo = document.getElementById('questionsPageInfo');
             const prevBtn = document.getElementById('questionsPrevBtn');
             const nextBtn = document.getElementById('questionsNextBtn');
-            
+
             if (total <= questionsPerPage) {
                 paginationDiv.style.display = 'none';
                 return;
             }
-            
+
             paginationDiv.style.display = 'flex';
             pageInfo.textContent = `Page ${currentQuestionsPage} of ${totalPages} (${total} total)`;
             prevBtn.disabled = currentQuestionsPage <= 1;
             nextBtn.disabled = currentQuestionsPage >= totalPages;
         }
-        
+
         // Change questions page
         function changeQuestionsPage(delta) {
             currentQuestionsPage += delta;
             applyQuestionsFilters();
         }
-        
+
         // Update era filter counts
         function updateEraCounts(questions) {
             const counts = {
@@ -2217,7 +2351,7 @@
                 'american-colonial': questions.filter(q => q.era_key === 'american-colonial').length,
                 'ww2': questions.filter(q => q.era_key === 'ww2').length
             };
-            
+
             document.querySelectorAll('#questionEraTabs .tab-btn').forEach(btn => {
                 const text = btn.textContent.split('(')[0].trim();
                 let eraKey = 'all';
@@ -2225,11 +2359,11 @@
                 else if (text.includes('Late')) eraKey = 'late-spanish';
                 else if (text.includes('American')) eraKey = 'american-colonial';
                 else if (text.includes('WW2')) eraKey = 'ww2';
-                
+
                 btn.textContent = `${text} (${counts[eraKey]})`;
             });
         }
-        
+
         // Render question table rows
         function renderQuestionRows(questions) {
             const tbody = document.getElementById('questionsTableBody');
@@ -2254,12 +2388,12 @@
             `;
             }).join('');
         }
-        
+
         // Filter questions by era or type
         function filterQuestionsByEra(filter) {
             currentEraFilter = filter;
             currentQuestionsPage = 1;
-            
+
             // Update era tab styling
             document.querySelectorAll('#questionEraTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -2272,15 +2406,15 @@
                     btn.classList.add('active');
                 }
             });
-            
+
             applyQuestionsFilters();
         }
-        
+
         // View system question (read-only)
         function viewSystemQuestion(questionId) {
             const question = allSystemQuestions.find(q => q.id === questionId);
             if (!question) return;
-            
+
             document.getElementById('questionModalTitle').textContent = 'View System Question';
             document.getElementById('editQuestionId').value = '';
             document.getElementById('questionEra').value = question.era_key;
@@ -2289,41 +2423,41 @@
             document.getElementById('correctAnswerEn').value = question.correct_answer_en;
             document.getElementById('wrongAnswersEn').value = question.wrong_answers_en.join('\n');
             document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
-            
+
             // Make fields read-only for system questions
             document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
                 el.setAttribute('readonly', true);
                 el.setAttribute('disabled', true);
             });
-            
+
             document.getElementById('questionModal').classList.remove('hidden');
         }
-        
+
         // Show question modal
         function showQuestionModal() {
             document.getElementById('questionModalTitle').textContent = 'Add New Question';
             document.getElementById('editQuestionId').value = '';
             document.getElementById('questionForm').reset();
-            
+
             // Remove read-only
             document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
                 el.removeAttribute('readonly');
                 el.removeAttribute('disabled');
             });
-            
+
             document.getElementById('questionModal').classList.remove('hidden');
         }
-        
+
         // Close question modal
         function closeQuestionModal() {
             document.getElementById('questionModal').classList.add('hidden');
         }
-        
+
         // Edit question
         function editQuestion(questionId) {
             const question = allQuestions.find(q => q.id === questionId);
             if (!question) return;
-            
+
             document.getElementById('questionModalTitle').textContent = 'Edit Question';
             document.getElementById('editQuestionId').value = questionId;
             document.getElementById('questionEra').value = question.era_key;
@@ -2332,20 +2466,20 @@
             document.getElementById('correctAnswerEn').value = question.correct_answer_en;
             document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
             document.getElementById('questionDifficulty').value = question.difficulty;
-            
+
             // Remove read-only
             document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
                 el.removeAttribute('readonly');
                 el.removeAttribute('disabled');
             });
-            
+
             document.getElementById('questionModal').classList.remove('hidden');
         }
-        
+
         // Handle save question
         async function handleSaveQuestion(event) {
             event.preventDefault();
-            
+
             const questionId = document.getElementById('editQuestionId').value;
             const era = document.getElementById('questionEra').value;
             const questionEn = document.getElementById('questionTextEn').value.trim();
@@ -2353,12 +2487,12 @@
             const correctEn = document.getElementById('correctAnswerEn').value.trim();
             const wrongEn = document.getElementById('wrongAnswersEn').value.trim().split('\n').filter(a => a.trim());
             const difficulty = document.getElementById('questionDifficulty').value;
-            
+
             if (wrongEn.length < 2) {
                 showToast('Please provide at least 2 wrong answers', 'error');
                 return;
             }
-            
+
             try {
                 const questionData = {
                     era_key: era,
@@ -2368,29 +2502,29 @@
                     wrong_answers_en: wrongEn,
                     difficulty: difficulty
                 };
-                
+
                 if (questionId) {
                     // Update existing
                     const { error } = await sb
                         .from('custom_questions')
                         .update(questionData)
                         .eq('id', questionId);
-                    
+
                     if (error) throw error;
                     showToast('Question updated!', 'success');
                 } else {
                     // Create new
                     questionData.created_by = currentProfile.id;
                     questionData.is_approved = currentProfile.role === 'admin'; // Auto-approve for admins
-                    
+
                     const { error } = await sb
                         .from('custom_questions')
                         .insert(questionData);
-                    
+
                     if (error) throw error;
                     showToast(currentProfile.role === 'admin' ? 'Question added!' : 'Question added! Awaiting admin approval.', 'success');
                 }
-                
+
                 closeQuestionModal();
                 loadCustomQuestions();
                 loadStats();
@@ -2399,19 +2533,19 @@
                 showToast('Failed to save question', 'error');
             }
         }
-        
+
         // Delete question
         async function deleteQuestion(questionId) {
             if (!confirm('Delete this question?')) return;
-            
+
             try {
                 const { error } = await sb
                     .from('custom_questions')
                     .delete()
                     .eq('id', questionId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('Question deleted!', 'success');
                 loadCustomQuestions();
                 loadStats();
@@ -2420,11 +2554,11 @@
                 showToast('Failed to delete question', 'error');
             }
         }
-        
+
         // ============================================
         // LESSON MANAGEMENT FUNCTIONS
         // ============================================
-        
+
         // Load custom lessons from database
         async function loadCustomLessons() {
             try {
@@ -2433,14 +2567,14 @@
                     .select('*')
                     .order('era_key', { ascending: true })
                     .order('lesson_order', { ascending: true });
-                
+
                 if (error) throw error;
-                
+
                 allLessons = data || [];
-                
+
                 // Load system lessons from learningData.js if available
                 console.log('learningData available:', !!window.learningData);
-                
+
                 if (window.learningData) {
                     allSystemLessons = [];
                     Object.entries(window.learningData).forEach(([eraKey, eraData]) => {
@@ -2462,13 +2596,13 @@
                     console.warn('learningData not found - system lessons will not be available');
                     allSystemLessons = [];
                 }
-                
+
                 renderLessons('system'); // Default to system lessons view
             } catch (error) {
                 console.error('Error loading lessons:', error);
             }
         }
-        
+
         // Render lessons
         function renderLessons(type = 'system') {
             currentLessonType = type;
@@ -2476,7 +2610,7 @@
             lessonsSearchTerm = '';
             currentEraFilter = 'all';
             document.getElementById('lessonsSearchInput').value = '';
-            
+
             // Update type tab styling
             document.querySelectorAll('#lessonTypeTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -2485,99 +2619,99 @@
                     btn.classList.add('active');
                 }
             });
-            
+
             // Reset era filter to "All" when switching types
             document.querySelectorAll('#lessonEraTabs .tab-btn').forEach((btn, idx) => {
                 btn.classList.toggle('active', idx === 0);
             });
-            
+
             applyLessonsFilters();
         }
-        
+
         // Handle lessons search
         function handleLessonsSearch(value) {
             lessonsSearchTerm = value.toLowerCase().trim();
             currentLessonsPage = 1;
             applyLessonsFilters();
         }
-        
+
         // Apply all filters to lessons and render with pagination
         function applyLessonsFilters() {
             const lessons = currentLessonType === 'system' ? allSystemLessons : allLessons;
             const tbody = document.getElementById('lessonsTableBody');
             const emptyState = document.getElementById('lessonsEmpty');
-            
+
             // Filter by era
             let filtered = currentEraFilter === 'all' ? lessons : lessons.filter(l => l.era_key === currentEraFilter);
-            
+
             // Filter by search term
             if (lessonsSearchTerm) {
-                filtered = filtered.filter(l => 
+                filtered = filtered.filter(l =>
                     (l.title_en || '').toLowerCase().includes(lessonsSearchTerm) ||
                     (l.title_tl || '').toLowerCase().includes(lessonsSearchTerm) ||
                     (l.content_en || '').toLowerCase().includes(lessonsSearchTerm)
                 );
             }
-            
+
             filteredLessons = filtered;
-            
+
             if (filtered.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
-                emptyState.querySelector('p').textContent = lessonsSearchTerm 
-                    ? 'No lessons match your search' 
+                emptyState.querySelector('p').textContent = lessonsSearchTerm
+                    ? 'No lessons match your search'
                     : `No ${currentLessonType} lessons for this era`;
                 document.getElementById('lessonsPagination').style.display = 'none';
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
-            
+
             // Calculate pagination
             const totalPages = Math.ceil(filtered.length / lessonsPerPage);
             if (currentLessonsPage > totalPages) currentLessonsPage = totalPages;
-            
+
             const start = (currentLessonsPage - 1) * lessonsPerPage;
             const end = start + lessonsPerPage;
             const pageLessons = filtered.slice(start, end);
-            
+
             renderLessonRows(pageLessons);
             updateLessonsPagination(filtered.length, totalPages);
         }
-        
+
         // Update lessons pagination controls
         function updateLessonsPagination(total, totalPages) {
             const paginationDiv = document.getElementById('lessonsPagination');
             const pageInfo = document.getElementById('lessonsPageInfo');
             const prevBtn = document.getElementById('lessonsPrevBtn');
             const nextBtn = document.getElementById('lessonsNextBtn');
-            
+
             if (total <= lessonsPerPage) {
                 paginationDiv.style.display = 'none';
                 return;
             }
-            
+
             paginationDiv.style.display = 'flex';
             pageInfo.textContent = `Page ${currentLessonsPage} of ${totalPages} (${total} total)`;
             prevBtn.disabled = currentLessonsPage <= 1;
             nextBtn.disabled = currentLessonsPage >= totalPages;
         }
-        
+
         // Change lessons page
         function changeLessonsPage(delta) {
             currentLessonsPage += delta;
             applyLessonsFilters();
         }
-        
+
         // Render lesson rows (just the table body, no filtering)
         function renderLessonRows(lessons) {
             const tbody = document.getElementById('lessonsTableBody');
-            
+
             if (lessons.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-amber-700">No lessons found</td></tr>';
                 return;
             }
-            
+
             tbody.innerHTML = lessons.map(lesson => `
                 <tr>
                     <td>${eraNames[lesson.era_key] || lesson.era_key}</td>
@@ -2585,29 +2719,29 @@
                     <td>${lesson.title_en}</td>
                     <td class="text-center text-2xl">${lesson.icon}</td>
                     <td>
-                        ${lesson.is_system ? 
-                            '<span class="era-badge era-complete">System</span>' :
-                            (lesson.is_approved ? 
-                                '<span class="era-badge era-complete">Approved</span>' : 
-                                '<span class="era-badge era-incomplete">Pending</span>')
-                        }
+                        ${lesson.is_system ?
+                    '<span class="era-badge era-complete">System</span>' :
+                    (lesson.is_approved ?
+                        '<span class="era-badge era-complete">Approved</span>' :
+                        '<span class="era-badge era-incomplete">Pending</span>')
+                }
                     </td>
                     <td>
-                        ${lesson.is_system ? 
-                            `<button class="btn-action btn-view" onclick="viewLesson('${lesson.id}')">View</button>` :
-                            `<button class="btn-action btn-view" onclick="editLesson('${lesson.id}')">Edit</button>
+                        ${lesson.is_system ?
+                    `<button class="btn-action btn-view" onclick="viewLesson('${lesson.id}')">View</button>` :
+                    `<button class="btn-action btn-view" onclick="editLesson('${lesson.id}')">Edit</button>
                              <button class="btn-action btn-remove" onclick="deleteLesson('${lesson.id}')">Delete</button>`
-                        }
+                }
                     </td>
                 </tr>
             `).join('');
         }
-        
+
         // Filter lessons by era
         function filterLessonsByEra(era) {
             currentEraFilter = era;
             currentLessonsPage = 1;
-            
+
             // Update era tab styling
             document.querySelectorAll('#lessonEraTabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -2616,37 +2750,37 @@
                     btn.classList.add('active');
                 }
             });
-            
+
             applyLessonsFilters();
         }
-        
+
         // Show lesson modal
         function showLessonModal() {
             document.getElementById('lessonModalTitle').textContent = 'Add New Lesson';
             document.getElementById('editLessonId').value = '';
             document.getElementById('lessonForm').reset();
-            
+
             document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
                 el.removeAttribute('readonly');
                 el.removeAttribute('disabled');
             });
-            
+
             document.getElementById('lessonModal').classList.remove('hidden');
         }
-        
+
         // Close lesson modal
         function closeLessonModal() {
             document.getElementById('lessonModal').classList.add('hidden');
         }
-        
+
         // View system lesson (read-only)
         function viewLesson(lessonId) {
             const [, eraKey, lessonOrder] = lessonId.split('-');
             const eraData = window.learningData?.[eraKey];
             const lesson = eraData?.en?.lessons?.find(l => l.id === parseInt(lessonOrder));
-            
+
             if (!lesson) return;
-            
+
             document.getElementById('lessonModalTitle').textContent = 'View System Lesson (Read-Only)';
             document.getElementById('editLessonId').value = '';
             document.getElementById('lessonEra').value = eraKey;
@@ -2656,24 +2790,24 @@
             document.getElementById('lessonContentEn').value = lesson.content?.replace(/<[^>]*>/g, ' ').substring(0, 500) + '...';
             document.getElementById('lessonContentTl').value = '';
             document.getElementById('lessonIcon').value = lesson.icon;
-            
+
             // Make read-only
             document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
                 el.setAttribute('readonly', 'readonly');
                 el.setAttribute('disabled', 'disabled');
             });
-            
+
             // Hide save button
             document.querySelector('#lessonForm button[type="submit"]').style.display = 'none';
-            
+
             document.getElementById('lessonModal').classList.remove('hidden');
         }
-        
+
         // Edit lesson
         function editLesson(lessonId) {
             const lesson = allLessons.find(l => l.id === lessonId);
             if (!lesson) return;
-            
+
             document.getElementById('lessonModalTitle').textContent = 'Edit Lesson';
             document.getElementById('editLessonId').value = lessonId;
             document.getElementById('lessonEra').value = lesson.era_key;
@@ -2683,22 +2817,22 @@
             document.getElementById('lessonContentEn').value = lesson.content_en;
             document.getElementById('lessonContentTl').value = lesson.content_tl || '';
             document.getElementById('lessonIcon').value = lesson.icon;
-            
+
             document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
                 el.removeAttribute('readonly');
                 el.removeAttribute('disabled');
             });
-            
+
             // Show save button
             document.querySelector('#lessonForm button[type="submit"]').style.display = '';
-            
+
             document.getElementById('lessonModal').classList.remove('hidden');
         }
-        
+
         // Handle save lesson
         async function handleSaveLesson(event) {
             event.preventDefault();
-            
+
             const lessonId = document.getElementById('editLessonId').value;
             const era = document.getElementById('lessonEra').value;
             const order = parseInt(document.getElementById('lessonOrder').value);
@@ -2707,7 +2841,7 @@
             const contentEn = document.getElementById('lessonContentEn').value.trim();
             const contentTl = document.getElementById('lessonContentTl').value.trim();
             const icon = document.getElementById('lessonIcon').value.trim();
-            
+
             const lessonData = {
                 era_key: era,
                 lesson_order: order,
@@ -2719,7 +2853,7 @@
                 is_active: true,
                 is_approved: currentProfile?.role === 'admin' // Auto-approve for admins
             };
-            
+
             try {
                 if (lessonId) {
                     // Update existing lesson
@@ -2727,21 +2861,21 @@
                         .from('custom_lessons')
                         .update(lessonData)
                         .eq('id', lessonId);
-                    
+
                     if (error) throw error;
                     showToast('Lesson updated!', 'success');
                 } else {
                     // Add new lesson
                     lessonData.created_by = currentProfile.id;
-                    
+
                     const { error } = await sb
                         .from('custom_lessons')
                         .insert([lessonData]);
-                    
+
                     if (error) throw error;
                     showToast(currentProfile.role === 'admin' ? 'Lesson added!' : 'Lesson added! Awaiting admin approval.', 'success');
                 }
-                
+
                 closeLessonModal();
                 loadCustomLessons();
                 loadStats();
@@ -2750,19 +2884,19 @@
                 showToast('Failed to save lesson', 'error');
             }
         }
-        
+
         // Delete lesson
         async function deleteLesson(lessonId) {
             if (!confirm('Delete this lesson? This cannot be undone.')) return;
-            
+
             try {
                 const { error } = await sb
                     .from('custom_lessons')
                     .delete()
                     .eq('id', lessonId);
-                
+
                 if (error) throw error;
-                
+
                 showToast('Lesson deleted!', 'success');
                 loadCustomLessons();
                 loadStats();
@@ -2771,7 +2905,7 @@
                 showToast('Failed to delete lesson', 'error');
             }
         }
-        
+
         // Switch tabs
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -2780,24 +2914,23 @@
             document.querySelectorAll('.tabs > .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             document.getElementById(`${tabName}Tab`).classList.add('active');
             event.target.classList.add('active');
         }
-        
+
         // Handle logout
         async function handleLogout() {
             if (window.isButtonLocked && window.isButtonLocked('logout')) return;
             if (window.lockButton) window.lockButton('logout', 3000);
-            
+
             await sb.auth.signOut();
             if (window.showPageLoading) window.showPageLoading('Logging out');
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 150);
         }
-        
-        // Close modals on outside click
+
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
@@ -2805,6 +2938,372 @@
                 }
             });
         });
+
+        // =============================================
+        // BACKUP & RESTORE FUNCTIONS
+        // =============================================
+
+        let pendingImportData = null;
+
+        // Export teacher's custom questions
+        async function exportTeacherQuestions() {
+            try {
+                showExportStatus('Exporting questions...', 'info');
+
+                const { data: questions, error } = await sb
+                    .from('custom_questions')
+                    .select('*')
+                    .eq('created_by', currentProfile.id)
+                    .eq('is_system', false);
+
+                if (error) throw error;
+
+                if (!questions || questions.length === 0) {
+                    showExportStatus('No custom questions to export.', 'error');
+                    return;
+                }
+
+                const exportData = {
+                    type: 'teacher_questions',
+                    version: '1.0',
+                    exportedAt: new Date().toISOString(),
+                    exportedBy: currentProfile.email,
+                    count: questions.length,
+                    data: questions.map(q => ({
+                        era_key: q.era_key,
+                        question_text_en: q.question_text_en,
+                        question_text_tl: q.question_text_tl,
+                        correct_answer_en: q.correct_answer_en,
+                        correct_answer_tl: q.correct_answer_tl,
+                        wrong_answers_en: q.wrong_answers_en,
+                        wrong_answers_tl: q.wrong_answers_tl,
+                        difficulty: q.difficulty
+                    }))
+                };
+
+                downloadJSON(exportData, `teacher_questions_${formatDateForFile()}.json`);
+                saveBackupHistory('questions', questions.length);
+                showExportStatus(`Successfully exported ${questions.length} questions!`, 'success');
+                loadBackupHistory();
+            } catch (error) {
+                console.error('Export error:', error);
+                showExportStatus('Failed to export questions: ' + error.message, 'error');
+            }
+        }
+
+        // Export teacher's custom lessons
+        async function exportTeacherLessons() {
+            try {
+                showExportStatus('Exporting lessons...', 'info');
+
+                const { data: lessons, error } = await sb
+                    .from('custom_lessons')
+                    .select('*')
+                    .eq('created_by', currentProfile.id)
+                    .eq('is_system', false);
+
+                if (error) throw error;
+
+                if (!lessons || lessons.length === 0) {
+                    showExportStatus('No custom lessons to export.', 'error');
+                    return;
+                }
+
+                const exportData = {
+                    type: 'teacher_lessons',
+                    version: '1.0',
+                    exportedAt: new Date().toISOString(),
+                    exportedBy: currentProfile.email,
+                    count: lessons.length,
+                    data: lessons.map(l => ({
+                        era_key: l.era_key,
+                        lesson_order: l.lesson_order,
+                        title_en: l.title_en,
+                        title_tl: l.title_tl,
+                        content_en: l.content_en,
+                        content_tl: l.content_tl,
+                        icon: l.icon
+                    }))
+                };
+
+                downloadJSON(exportData, `teacher_lessons_${formatDateForFile()}.json`);
+                saveBackupHistory('lessons', lessons.length);
+                showExportStatus(`Successfully exported ${lessons.length} lessons!`, 'success');
+                loadBackupHistory();
+            } catch (error) {
+                console.error('Export error:', error);
+                showExportStatus('Failed to export lessons: ' + error.message, 'error');
+            }
+        }
+
+        // Export all teacher content
+        async function exportAllTeacherContent() {
+            try {
+                showExportStatus('Exporting all content...', 'info');
+
+                const [questionsResult, lessonsResult] = await Promise.all([
+                    sb.from('custom_questions').select('*').eq('created_by', currentProfile.id).eq('is_system', false),
+                    sb.from('custom_lessons').select('*').eq('created_by', currentProfile.id).eq('is_system', false)
+                ]);
+
+                if (questionsResult.error) throw questionsResult.error;
+                if (lessonsResult.error) throw lessonsResult.error;
+
+                const questions = questionsResult.data || [];
+                const lessons = lessonsResult.data || [];
+
+                if (questions.length === 0 && lessons.length === 0) {
+                    showExportStatus('No custom content to export.', 'error');
+                    return;
+                }
+
+                const exportData = {
+                    type: 'teacher_full_backup',
+                    version: '1.0',
+                    exportedAt: new Date().toISOString(),
+                    exportedBy: currentProfile.email,
+                    summary: {
+                        questions: questions.length,
+                        lessons: lessons.length
+                    },
+                    questions: questions.map(q => ({
+                        era_key: q.era_key,
+                        question_text_en: q.question_text_en,
+                        question_text_tl: q.question_text_tl,
+                        correct_answer_en: q.correct_answer_en,
+                        correct_answer_tl: q.correct_answer_tl,
+                        wrong_answers_en: q.wrong_answers_en,
+                        wrong_answers_tl: q.wrong_answers_tl,
+                        difficulty: q.difficulty
+                    })),
+                    lessons: lessons.map(l => ({
+                        era_key: l.era_key,
+                        lesson_order: l.lesson_order,
+                        title_en: l.title_en,
+                        title_tl: l.title_tl,
+                        content_en: l.content_en,
+                        content_tl: l.content_tl,
+                        icon: l.icon
+                    }))
+                };
+
+                downloadJSON(exportData, `teacher_full_backup_${formatDateForFile()}.json`);
+                saveBackupHistory('full', questions.length + lessons.length);
+                showExportStatus(`Successfully exported ${questions.length} questions and ${lessons.length} lessons!`, 'success');
+                loadBackupHistory();
+            } catch (error) {
+                console.error('Export error:', error);
+                showExportStatus('Failed to export content: ' + error.message, 'error');
+            }
+        }
+
+        // Handle file upload for import
+        function handleTeacherImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    previewImportData(data);
+                } catch (error) {
+                    showImportStatus('Invalid JSON file. Please upload a valid backup file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        }
+
+        // Preview import data before confirming
+        function previewImportData(data) {
+            if (!data.type || !data.version) {
+                showImportStatus('Invalid backup format. Missing type or version.', 'error');
+                return;
+            }
+
+            pendingImportData = data;
+
+            let previewHTML = `
+                <div class="mb-3">
+                    <span class="font-semibold">Backup Type:</span> ${data.type.replace(/_/g, ' ')}
+                </div>
+                <div class="mb-3">
+                    <span class="font-semibold">Exported At:</span> ${new Date(data.exportedAt).toLocaleString()}
+                </div>
+                <div class="mb-3">
+                    <span class="font-semibold">Exported By:</span> ${data.exportedBy || 'Unknown'}
+                </div>
+            `;
+
+            if (data.type === 'teacher_questions' || data.type === 'teacher_full_backup') {
+                const questions = data.data || data.questions || [];
+                previewHTML += `<div class="mb-2"><span class="font-semibold">Questions:</span> ${questions.length}</div>`;
+            }
+
+            if (data.type === 'teacher_lessons' || data.type === 'teacher_full_backup') {
+                const lessons = data.data || data.lessons || [];
+                previewHTML += `<div class="mb-2"><span class="font-semibold">Lessons:</span> ${lessons.length}</div>`;
+            }
+
+            previewHTML += `<div class="mt-3 p-2 bg-amber-100 rounded text-amber-800 text-sm">
+                ⚠️ This will add new items to your content. Existing items will not be affected.
+            </div>`;
+
+            document.getElementById('importPreviewContent').innerHTML = previewHTML;
+            document.getElementById('importPreview').classList.remove('hidden');
+            hideImportStatus();
+        }
+
+        // Cancel import
+        function cancelImport() {
+            pendingImportData = null;
+            document.getElementById('importPreview').classList.add('hidden');
+        }
+
+        // Confirm and execute import
+        async function confirmTeacherImport() {
+            if (!pendingImportData) {
+                showImportStatus('No data to import.', 'error');
+                return;
+            }
+
+            try {
+                showImportStatus('Importing...', 'info');
+                let questionsImported = 0;
+                let lessonsImported = 0;
+
+                // Import questions
+                if (pendingImportData.type === 'teacher_questions' || pendingImportData.type === 'teacher_full_backup') {
+                    const questions = pendingImportData.data || pendingImportData.questions || [];
+                    for (const q of questions) {
+                        const { error } = await sb.from('custom_questions').insert({
+                            created_by: currentProfile.id,
+                            era_key: q.era_key,
+                            question_text_en: q.question_text_en,
+                            question_text_tl: q.question_text_tl,
+                            correct_answer_en: q.correct_answer_en,
+                            correct_answer_tl: q.correct_answer_tl,
+                            wrong_answers_en: q.wrong_answers_en || [],
+                            wrong_answers_tl: q.wrong_answers_tl || [],
+                            difficulty: q.difficulty || 'medium',
+                            is_active: true,
+                            is_approved: false,
+                            is_system: false
+                        });
+                        if (!error) questionsImported++;
+                    }
+                }
+
+                // Import lessons
+                if (pendingImportData.type === 'teacher_lessons' || pendingImportData.type === 'teacher_full_backup') {
+                    const lessons = pendingImportData.data || pendingImportData.lessons || [];
+                    for (const l of lessons) {
+                        const { error } = await sb.from('custom_lessons').insert({
+                            created_by: currentProfile.id,
+                            era_key: l.era_key,
+                            lesson_order: l.lesson_order,
+                            title_en: l.title_en,
+                            title_tl: l.title_tl,
+                            content_en: l.content_en,
+                            content_tl: l.content_tl,
+                            icon: l.icon || '📖',
+                            is_active: true,
+                            is_approved: false,
+                            is_system: false
+                        });
+                        if (!error) lessonsImported++;
+                    }
+                }
+
+                cancelImport();
+                showImportStatus(`Successfully imported ${questionsImported} questions and ${lessonsImported} lessons!`, 'success');
+
+                // Reload data
+                loadCustomQuestions();
+                loadCustomLessons();
+                loadStats();
+            } catch (error) {
+                console.error('Import error:', error);
+                showImportStatus('Failed to import: ' + error.message, 'error');
+            }
+        }
+
+        // Helper functions
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function formatDateForFile() {
+            return new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        }
+
+        function showExportStatus(message, type) {
+            const el = document.getElementById('exportStatus');
+            el.textContent = message;
+            el.className = `mt-3 p-3 rounded-lg text-sm ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        function showImportStatus(message, type) {
+            const el = document.getElementById('importStatus');
+            el.textContent = message;
+            el.className = `mt-3 p-3 rounded-lg text-sm ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        function hideImportStatus() {
+            document.getElementById('importStatus').classList.add('hidden');
+        }
+
+        function saveBackupHistory(type, count) {
+            const history = JSON.parse(localStorage.getItem('teacherBackupHistory') || '[]');
+            history.unshift({
+                type,
+                count,
+                date: new Date().toISOString()
+            });
+            // Keep only last 10 entries
+            localStorage.setItem('teacherBackupHistory', JSON.stringify(history.slice(0, 10)));
+        }
+
+        function loadBackupHistory() {
+            const history = JSON.parse(localStorage.getItem('teacherBackupHistory') || '[]');
+            const container = document.getElementById('backupHistory');
+            const noHistory = document.getElementById('noBackupHistory');
+
+            if (history.length === 0) {
+                container.innerHTML = '';
+                noHistory.classList.remove('hidden');
+                return;
+            }
+
+            noHistory.classList.add('hidden');
+            container.innerHTML = history.map(h => `
+                <div class="flex justify-between items-center p-2 bg-white rounded-lg border border-amber-200 text-sm">
+                    <span>
+                        ${h.type === 'full' ? '📦 Full backup' : h.type === 'questions' ? '📝 Questions' : '📚 Lessons'}
+                        <span class="text-amber-600">(${h.count} items)</span>
+                    </span>
+                    <span class="text-amber-500">${new Date(h.date).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+
+        // Load backup history on page load
+        if (document.getElementById('backupHistory')) {
+            loadBackupHistory();
+        }
     </script>
+
 </body>
+
 </html>
