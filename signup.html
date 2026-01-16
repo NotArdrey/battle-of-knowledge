@@ -498,6 +498,9 @@
                             class="form-input" 
                             placeholder="Create a password"
                             required
+                            minlength="12"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}"
+                            title="At least 12 characters, including uppercase, lowercase, number, and special character"
                             autocomplete="new-password"
                             style="padding-right: 45px;"
                             oninput="checkPasswordStrength()"
@@ -510,10 +513,11 @@
                         <div id="strengthBar" class="password-strength-bar"></div>
                     </div>
                     <div id="passwordRequirements" class="password-requirements">
-                        <div class="requirement" id="reqLength">✗ At least 8 characters</div>
+                        <div class="requirement" id="reqLength">✗ At least 12 characters</div>
                         <div class="requirement" id="reqUpper">✗ One uppercase letter</div>
                         <div class="requirement" id="reqLower">✗ One lowercase letter</div>
                         <div class="requirement" id="reqNumber">✗ One number</div>
+                        <div class="requirement" id="reqSpecial">✗ One special character</div>
                     </div>
                 </div>
                 
@@ -526,6 +530,7 @@
                             class="form-input" 
                             placeholder="Confirm your password"
                             required
+                            minlength="12"
                             autocomplete="new-password"
                             style="padding-right: 45px;"
                             oninput="checkPasswordMatch()"
@@ -686,22 +691,23 @@
             const strengthBar = document.getElementById('strengthBar');
             
             // Check requirements
-            const hasLength = password.length >= 8;
+            const hasLength = password.length >= 12;
             const hasUpper = /[A-Z]/.test(password);
             const hasLower = /[a-z]/.test(password);
             const hasNumber = /\d/.test(password);
+            const hasSpecial = /[^A-Za-z0-9]/.test(password);
             
             // Calculate strength
             let strength = 0;
-            if (password.length > 0) strength++;
             if (hasLength) strength++;
             if (hasUpper) strength++;
             if (hasLower) strength++;
             if (hasNumber) strength++;
+            if (hasSpecial) strength++;
             
             // Update requirements
             document.getElementById('reqLength').className = `requirement ${hasLength ? 'met' : ''}`;
-            document.getElementById('reqLength').innerHTML = `${hasLength ? '✓' : '✗'} At least 8 characters`;
+            document.getElementById('reqLength').innerHTML = `${hasLength ? '✓' : '✗'} At least 12 characters`;
                 
             document.getElementById('reqUpper').className = `requirement ${hasUpper ? 'met' : ''}`;
             document.getElementById('reqUpper').innerHTML = `${hasUpper ? '✓' : '✗'} One uppercase letter`;
@@ -711,6 +717,9 @@
                 
             document.getElementById('reqNumber').className = `requirement ${hasNumber ? 'met' : ''}`;
             document.getElementById('reqNumber').innerHTML = `${hasNumber ? '✓' : '✗'} One number`;
+
+            document.getElementById('reqSpecial').className = `requirement ${hasSpecial ? 'met' : ''}`;
+            document.getElementById('reqSpecial').innerHTML = `${hasSpecial ? '✓' : '✗'} One special character`;
             
             // Update strength bar
             const strengthClasses = ['', 'strength-weak', 'strength-fair', 'strength-good', 'strength-strong', 'strength-excellent'];
@@ -798,8 +807,13 @@
             }
             
             // Password validation
-            if (password.length < 8) {
-                showError('Password must be at least 8 characters.');
+            const hasLength = password.length >= 12;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[^A-Za-z0-9]/.test(password);
+            if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                showError('Password must be at least 12 characters and include uppercase, lowercase, a number, and a special character.');
                 return;
             }
             

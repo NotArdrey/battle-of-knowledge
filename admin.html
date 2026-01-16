@@ -727,12 +727,12 @@
                 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" id="newTeacherPassword" class="form-input" required minlength="6" placeholder="Minimum 6 characters">
+                    <input type="password" id="newTeacherPassword" class="form-input" required minlength="12" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}" placeholder="Min 12 chars with upper/lower/number/special">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Confirm Password</label>
-                    <input type="password" id="newTeacherPasswordConfirm" class="form-input" required minlength="6" placeholder="Confirm password">
+                    <input type="password" id="newTeacherPasswordConfirm" class="form-input" required minlength="12" placeholder="Confirm password">
                 </div>
                 
                 <div id="teacherFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mb-4"></div>
@@ -1458,8 +1458,13 @@
             }
             
             // Validate password length
-            if (password.length < 6) {
-                errorDiv.textContent = 'Password must be at least 6 characters';
+            const hasLength = password.length >= 12;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[^A-Za-z0-9]/.test(password);
+            if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                errorDiv.textContent = 'Password must be at least 12 characters and include uppercase, lowercase, a number, and a special character';
                 errorDiv.classList.remove('hidden');
                 return;
             }

@@ -404,13 +404,13 @@
                     
                     <div class="mb-4">
                         <label for="newPassword" class="form-label">New Password</label>
-                        <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" required minlength="6">
-                        <p class="text-xs text-amber-600 mt-1">At least 6 characters</p>
+                        <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" required minlength="12" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}" title="At least 12 characters, including uppercase, lowercase, number, and special character">
+                        <p class="text-xs text-amber-600 mt-1">At least 12 characters with uppercase, lowercase, number, and special character</p>
                     </div>
                     
                     <div class="mb-6">
                         <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-                        <input type="password" id="confirmNewPassword" class="form-input" placeholder="Confirm new password" required>
+                        <input type="password" id="confirmNewPassword" class="form-input" placeholder="Confirm new password" required minlength="12">
                     </div>
                     
                     <button type="submit" class="btn-primary w-full">Update Password</button>
@@ -624,6 +624,16 @@
             
             if (newPassword !== confirmPassword) {
                 showMessage('New passwords do not match', 'error');
+                return;
+            }
+
+            const hasLength = newPassword.length >= 12;
+            const hasUpper = /[A-Z]/.test(newPassword);
+            const hasLower = /[a-z]/.test(newPassword);
+            const hasNumber = /\d/.test(newPassword);
+            const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
+            if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                showMessage('Password must be at least 12 characters and include uppercase, lowercase, a number, and a special character.', 'error');
                 return;
             }
             
