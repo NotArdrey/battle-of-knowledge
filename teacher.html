@@ -1144,11 +1144,11 @@
                 return;
             }
 
-            // Get profile
+            // Get profile using auth_id
             const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('*')
-                .eq('id', session.user.id)
+                .eq('auth_id', session.user.id)
                 .single();
 
             console.log('Profile loaded:', profile, 'Error:', profileError);
@@ -1166,12 +1166,13 @@
                 const { data: newProfile, error: createError } = await sb
                     .from('profiles')
                     .upsert({
-                        id: session.user.id,
+                        auth_id: session.user.id,
                         email: session.user.email,
                         full_name: session.user.user_metadata?.full_name || 'Teacher',
                         role: session.user.user_metadata?.role || 'teacher',
-                        is_verified: true
-                    })
+                        is_verified: true,
+                        is_registered: true
+                    }, { onConflict: 'auth_id' })
                     .select()
                     .single();
 
@@ -1413,7 +1414,7 @@
             try {
                 console.log('Loading students for teacher:', currentProfile.id);
 
-                // First try: Get students by teacher_id
+                // First try: Get students by teacher_id (only registered students)
                 let { data, error } = await sb
                     .from('profiles')
                     .select(`
@@ -1423,11 +1424,15 @@
                         class_id,
                         created_at,
                         teacher_id,
+                        student_id_number,
+                        grade_level,
+                        section,
                         classes!profiles_class_id_fkey(class_name),
                         progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
                     `)
                     .eq('teacher_id', currentProfile.id)
-                    .eq('role', 'student');
+                    .eq('role', 'student')
+                    .eq('is_registered', true);
 
                 if (error) {
                     console.error('Error loading students by teacher_id:', error);
@@ -1641,19 +1646,24 @@
             if (!confirm('Remove this student from your class?')) return;
 
             try {
+                // Remove student association
                 const { error } = await sb
                     .from('profiles')
                     .update({ teacher_id: null, class_id: null })
                     .eq('id', studentId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase remove student error:', error);
+                    throw error;
+                }
 
+                console.log('Student removed successfully');
                 showToast('Student removed from class', 'success');
                 loadStudents();
                 loadStats();
             } catch (error) {
                 console.error('Error removing student:', error);
-                showToast('Failed to remove student', 'error');
+                showToast('Failed to remove student: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
@@ -1721,11 +1731,12 @@
             try {
                 console.log('Loading all students for modal...');
 
-                // Get all students - query ALL student accounts regardless of teacher assignment
+                // Get all registered students - query ALL student accounts regardless of teacher assignment
                 const { data, error } = await sb
                     .from('profiles')
-                    .select('id, full_name, email, class_id, teacher_id, created_at, role')
+                    .select('id, full_name, email, class_id, teacher_id, created_at, role, student_id_number, grade_level, section')
                     .eq('role', 'student')
+                    .eq('is_registered', true)
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -1735,12 +1746,12 @@
 
                 console.log('All students found:', data?.length || 0, data);
 
-                // If no students found, also try without role filter to debug
+                // If no students found, also try without filters to debug
                 if (!data || data.length === 0) {
-                    console.log('No students with role=student found, checking all profiles...');
+                    console.log('No registered students found, checking all profiles...');
                     const { data: allProfiles, error: allError } = await sb
                         .from('profiles')
-                        .select('id, full_name, email, role, teacher_id')
+                        .select('id, full_name, email, role, teacher_id, is_registered')
                         .limit(50);
 
                     if (allError) {
@@ -1751,7 +1762,7 @@
 
                         // Show helpful message if there are profiles but none with student role visible
                         if (allProfiles && allProfiles.length > 0) {
-                            const studentProfiles = allProfiles.filter(p => p.role === 'student');
+                            const studentProfiles = allProfiles.filter(p => p.role === 'student' && p.is_registered);
                             if (studentProfiles.length > 0) {
                                 resultsDiv.innerHTML = `
                                     <div class="text-center py-6">
@@ -2553,14 +2564,18 @@
                     .delete()
                     .eq('id', questionId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase delete question error:', error);
+                    throw error;
+                }
 
+                console.log('Question deleted successfully');
                 showToast('Question deleted!', 'success');
                 loadCustomQuestions();
                 loadStats();
             } catch (error) {
                 console.error('Error deleting question:', error);
-                showToast('Failed to delete question', 'error');
+                showToast('Failed to delete question: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
@@ -2904,14 +2919,18 @@
                     .delete()
                     .eq('id', lessonId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase delete lesson error:', error);
+                    throw error;
+                }
 
+                console.log('Lesson deleted successfully');
                 showToast('Lesson deleted!', 'success');
                 loadCustomLessons();
                 loadStats();
             } catch (error) {
                 console.error('Error deleting lesson:', error);
-                showToast('Failed to delete lesson', 'error');
+                showToast('Failed to delete lesson: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
