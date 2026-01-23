@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -12,12 +13,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Baloo 2', cursive; 
+        body {
+            font-family: 'Baloo 2', cursive;
             background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
             min-height: 100vh;
         }
-        
+
         .main-container {
             position: relative;
             width: 100%;
@@ -28,11 +29,11 @@
             overflow: auto;
             padding: 20px;
         }
-        
+
         .signup-bg-overlay {
             position: fixed;
             inset: 0;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
                 url('assets/Background/Start Menu/Start Menu.png');
             background-size: cover;
@@ -41,7 +42,7 @@
             opacity: 0.6;
             z-index: 1;
         }
-        
+
         .signup-card {
             position: relative;
             z-index: 10;
@@ -55,7 +56,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             margin: 20px 0;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -67,21 +68,21 @@
             color: #7c2d12;
             transition: all 0.3s ease;
         }
-        
+
         .form-input:focus {
             outline: none;
             border-color: #b45309;
             box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.2);
         }
-        
+
         .form-input::placeholder {
             color: #9ca3af;
         }
-        
+
         .form-input.error {
             border-color: #ef4444;
         }
-        
+
         .form-label {
             display: block;
             font-weight: 700;
@@ -89,7 +90,7 @@
             margin-bottom: 0.5rem;
             font-size: 1rem;
         }
-        
+
         .btn-primary {
             width: 100%;
             padding: 1rem;
@@ -103,18 +104,18 @@
             transition: all 0.3s ease;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(180, 83, 9, 0.4);
         }
-        
+
         .btn-primary:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 2px solid rgba(239, 68, 68, 0.3);
@@ -125,11 +126,11 @@
             margin-bottom: 1rem;
             display: none;
         }
-        
+
         .error-message.show {
             display: block;
         }
-        
+
         .success-message {
             background: rgba(16, 185, 129, 0.1);
             border: 2px solid rgba(16, 185, 129, 0.3);
@@ -140,17 +141,17 @@
             margin-bottom: 1rem;
             display: none;
         }
-        
+
         .success-message.show {
             display: block;
         }
-        
+
         .role-selector {
             display: flex;
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .role-btn {
             flex: 1;
             padding: 1rem;
@@ -161,41 +162,43 @@
             transition: all 0.3s ease;
             text-align: center;
         }
-        
+
         .role-btn:hover {
             border-color: #b45309;
         }
-        
+
         .role-btn.active {
             border-color: #b45309;
             background: linear-gradient(to bottom, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.3));
             box-shadow: 0 4px 12px rgba(180, 83, 9, 0.2);
         }
-        
+
         .role-icon {
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .role-title {
             font-weight: 700;
             color: #7c2d12;
             font-size: 1rem;
         }
-        
+
         .role-desc {
             font-size: 0.8rem;
             color: #92400e;
         }
-        
-        .student-fields, .teacher-fields {
+
+        .student-fields,
+        .teacher-fields {
             display: none;
         }
-        
-        .student-fields.show, .teacher-fields.show {
+
+        .student-fields.show,
+        .teacher-fields.show {
             display: block;
         }
-        
+
         .password-strength {
             margin-top: 0.5rem;
             height: 4px;
@@ -203,47 +206,66 @@
             border-radius: 2px;
             overflow: hidden;
         }
-        
+
         .password-strength-bar {
             height: 100%;
             transition: all 0.3s ease;
             border-radius: 2px;
         }
-        
-        .strength-weak { width: 20%; background: #ef4444; }
-        .strength-fair { width: 40%; background: #f97316; }
-        .strength-good { width: 60%; background: #eab308; }
-        .strength-strong { width: 80%; background: #22c55e; }
-        .strength-excellent { width: 100%; background: #10b981; }
-        
+
+        .strength-weak {
+            width: 20%;
+            background: #ef4444;
+        }
+
+        .strength-fair {
+            width: 40%;
+            background: #f97316;
+        }
+
+        .strength-good {
+            width: 60%;
+            background: #eab308;
+        }
+
+        .strength-strong {
+            width: 80%;
+            background: #22c55e;
+        }
+
+        .strength-excellent {
+            width: 100%;
+            background: #10b981;
+        }
+
         .password-requirements {
             margin-top: 0.5rem;
             font-size: 0.8rem;
             color: #6b7280;
         }
-        
+
         .requirement {
             display: flex;
             align-items: center;
             gap: 0.25rem;
         }
-        
+
         .requirement.met {
             color: #10b981;
         }
-        
+
         .link-text {
             color: #b45309;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s;
         }
-        
+
         .link-text:hover {
             color: #92400e;
             text-decoration: underline;
         }
-        
+
         .title-image {
             max-width: 180px;
             height: auto;
@@ -271,7 +293,7 @@
             background: rgba(120, 53, 15, 0.2);
             color: #78350f;
         }
-        
+
         .field-hint {
             font-size: 0.8rem;
             color: #6b7280;
@@ -285,15 +307,15 @@
             margin-top: 0.5rem;
             font-size: 0.85rem;
         }
-        
+
         .validation-status.checking {
             color: #6b7280;
         }
-        
+
         .validation-status.valid {
             color: #10b981;
         }
-        
+
         .validation-status.invalid {
             color: #ef4444;
         }
@@ -349,9 +371,17 @@
         }
 
         @keyframes bounceIn {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .modal-icon svg {
@@ -397,7 +427,7 @@
             font-size: 0.9rem;
             color: #6b7280;
         }
-        
+
         .lang-toggle {
             position: fixed;
             top: 20px;
@@ -406,106 +436,81 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
+
         .lang-toggle:hover {
             transform: scale(1.1);
         }
-        
+
         .lang-toggle img {
             height: 40px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
     </style>
 </head>
+
 <body>
     <!-- Language Toggle -->
     <button id="langToggle" class="lang-toggle" aria-label="Toggle Language">
         <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog">
     </button>
-    
+
     <div class="main-container">
         <div class="signup-bg-overlay"></div>
-        
+
         <div class="signup-card">
-            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-1" data-translate="Create Account">Create Account</h1>
-            <p class="text-center text-amber-700 mb-4" data-translate="Join the adventure">Join the adventure of learning history!</p>
-            
+            <h1 class="text-2xl font-extrabold text-center text-amber-900 mb-1" data-translate="Create Account">Create
+                Account</h1>
+            <p class="text-center text-amber-700 mb-4" data-translate="Join the adventure">Join the adventure of
+                learning history!</p>
+
             <!-- Error/Success Messages -->
             <div id="errorMessage" class="error-message"></div>
             <div id="successMessage" class="success-message"></div>
-            
+
             <!-- Signup Form -->
             <form id="signupForm" onsubmit="handleSignup(event)">
-                
+
                 <div class="mb-4">
                     <label for="fullName" class="form-label">Full Name</label>
-                    <input 
-                        type="text" 
-                        id="fullName" 
-                        class="form-input" 
-                        placeholder="Enter your full name"
-                        required
-                        autocomplete="name"
-                    >
+                    <input type="text" id="fullName" class="form-input" placeholder="Enter your full name" required
+                        autocomplete="name">
                 </div>
-                
+
                 <div class="mb-4">
                     <label for="email" class="form-label">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        class="form-input" 
-                        placeholder="Enter your email"
-                        required
-                        autocomplete="email"
-                    >
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required
+                        autocomplete="email">
                 </div>
-                
+
                 <!-- Student-specific fields -->
                 <div id="studentFields">
                     <div class="mb-4">
                         <label for="studentId" class="form-label">Student ID Number</label>
-                        <input 
-                            type="text" 
-                            id="studentId" 
-                            class="form-input" 
-                            placeholder="Enter your student ID"
-                            oninput="validateStudentIdField()"
-                        >
+                        <input type="text" id="studentId" class="form-input" placeholder="Enter your student ID"
+                            oninput="validateStudentIdField()">
                         <div id="studentIdStatus" class="validation-status"></div>
                         <p class="field-hint">Your student ID must be registered by your school administrator</p>
                     </div>
-                    
+
                     <div class="mb-4">
-                        <label for="classCode" class="form-label">Class Code (Optional)</label>
-                        <input 
-                            type="text" 
-                            id="classCode" 
-                            class="form-input" 
-                            placeholder="Enter class code from your teacher"
-                            style="text-transform: uppercase;"
-                        >
+                        <label for="classCode" class="form-label">Class Code</label>
+                        <input type="text" id="classCode" class="form-input"
+                            placeholder="Enter class code from your teacher" style="text-transform: uppercase;"
+                            oninput="validateClassCodeField()">
+                        <div id="classCodeStatus" class="validation-status"></div>
                         <p class="field-hint">Ask your teacher for the class code to join their class</p>
                     </div>
                 </div>
-                
+
                 <div class="mb-4">
                     <label for="password" class="form-label">Password</label>
                     <div style="position: relative;">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            class="form-input" 
-                            placeholder="Create a password"
-                            required
-                            minlength="12"
-                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}"
+                        <input type="password" id="password" class="form-input" placeholder="Create a password" required
+                            minlength="12" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}"
                             title="At least 12 characters, including uppercase, lowercase, number, and special character"
-                            autocomplete="new-password"
-                            style="padding-right: 45px;"
-                            oninput="checkPasswordStrength()"
-                        >
-                        <button type="button" class="password-toggle" onclick="togglePassword('password')" id="passwordToggleBtn">
+                            autocomplete="new-password" style="padding-right: 45px;" oninput="checkPasswordStrength()">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')"
+                            id="passwordToggleBtn">
                             Show
                         </button>
                     </div>
@@ -520,52 +525,41 @@
                         <div class="requirement" id="reqSpecial">✗ One special character</div>
                     </div>
                 </div>
-                
+
                 <div class="mb-4">
                     <label for="confirmPassword" class="form-label">Confirm Password</label>
                     <div style="position: relative;">
-                        <input 
-                            type="password" 
-                            id="confirmPassword" 
-                            class="form-input" 
-                            placeholder="Confirm your password"
-                            required
-                            minlength="12"
-                            autocomplete="new-password"
-                            style="padding-right: 45px;"
-                            oninput="checkPasswordMatch()"
-                        >
-                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')" id="confirmPasswordToggleBtn">
+                        <input type="password" id="confirmPassword" class="form-input"
+                            placeholder="Confirm your password" required minlength="12" autocomplete="new-password"
+                            style="padding-right: 45px;" oninput="checkPasswordMatch()">
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')"
+                            id="confirmPasswordToggleBtn">
                             Show
                         </button>
                     </div>
                     <p id="passwordMatchStatus" class="field-hint"></p>
                 </div>
-                
+
                 <div class="mb-6">
                     <label class="flex items-start gap-2 cursor-pointer">
                         <input type="checkbox" id="agreeTerms" required class="mt-1 accent-amber-600">
                         <span class="text-sm text-amber-800">
-                            I agree to the <a href="#" class="link-text">Terms of Service</a> 
+                            I agree to the <a href="#" class="link-text">Terms of Service</a>
                             and <a href="#" class="link-text">Privacy Policy</a>
                         </span>
                     </label>
                 </div>
-                
+
                 <button type="submit" id="signupBtn" class="btn-primary">
                     <span id="signupBtnText">Create Account</span>
                     <span id="signupSpinner" style="display: none;">⏳ Creating account...</span>
                 </button>
             </form>
-            
+
             <p class="text-center text-amber-800 mt-6">
-                Already have an account? 
+                Already have an account?
                 <a href="login.html" class="link-text">Sign in here</a>
             </p>
-            
-            <div class="mt-4 text-center">
-                <a href="index.html" class="link-text text-sm">← Back to Home</a>
-            </div>
         </div>
     </div>
 
@@ -575,8 +569,10 @@
         // Use Supabase client from supabase-config.js
         let supabaseClient = null;
         let studentIdValid = false;
+        let classCodeValid = false;
         let studentIdCheckTimeout = null;
-        
+        let classCodeCheckTimeout = null;
+
         // Toggle password visibility - defined early for onclick handlers
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
@@ -589,7 +585,7 @@
                 if (btn) btn.textContent = 'Show';
             }
         }
-        
+
         // Get Supabase client (use shared-auth helper to avoid double init)
         function getClient() {
             if (supabaseClient) return supabaseClient;
@@ -601,7 +597,7 @@
                 return null;
             }
         }
-        
+
         // Check if already logged in
         document.addEventListener('DOMContentLoaded', async () => {
             supabaseClient = getClient();
@@ -609,24 +605,24 @@
                 console.error('Supabase not available');
                 return;
             }
-            
+
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 window.location.href = 'index.html';
             }
         });
-        
+
         // Validate student ID in real-time
         async function validateStudentIdField() {
             const studentId = document.getElementById('studentId').value.trim();
             const statusDiv = document.getElementById('studentIdStatus');
-            
+
             if (!studentId) {
                 statusDiv.innerHTML = '';
                 studentIdValid = false;
                 return;
             }
-            
+
             // Check if supabase is available
             if (!supabaseClient) {
                 supabaseClient = getClient();
@@ -637,35 +633,32 @@
                     return;
                 }
             }
-            
+
             // Debounce the validation
             clearTimeout(studentIdCheckTimeout);
             studentIdCheckTimeout = setTimeout(async () => {
                 statusDiv.innerHTML = '<span class="checking">⏳ Checking...</span>';
                 statusDiv.className = 'validation-status checking';
-                
+
                 try {
                     console.log('Validating student ID:', studentId);
-                    
+
                     const { data, error } = await supabaseClient
                         .from('registered_students')
                         .select('*')
                         .eq('student_id_number', studentId)
                         .eq('is_claimed', false)
                         .single();
-                    
+
                     console.log('Validation response:', { data, error });
-                    
+
                     if (data && !error) {
                         statusDiv.innerHTML = `<span>✓ Valid: ${data.full_name}</span>`;
                         statusDiv.className = 'validation-status valid';
                         studentIdValid = true;
-                        
-                        // Auto-fill name if empty
-                        const nameField = document.getElementById('fullName');
-                        if (!nameField.value) {
-                            nameField.value = data.full_name;
-                        }
+
+                        // Name is auto-fetched on backend during signup
+                        // We can display it for confirmation if needed, but field is removed
                     } else if (error && error.code === 'PGRST116') {
                         // No rows returned - ID not found or already claimed
                         statusDiv.innerHTML = '<span>✗ Student ID not found or already registered</span>';
@@ -684,19 +677,66 @@
                 }
             }, 500);
         }
-        
+
+        // Validate Class Code in real-time
+        async function validateClassCodeField() {
+            const classCode = document.getElementById('classCode').value.trim();
+            const statusDiv = document.getElementById('classCodeStatus');
+
+            if (!classCode) {
+                statusDiv.innerHTML = '';
+                classCodeValid = false;
+                return;
+            }
+
+            // Check if supabase is available
+            if (!supabaseClient) {
+                supabaseClient = getClient();
+                if (!supabaseClient) {
+                    return; // Fail silently or show error
+                }
+            }
+
+            // Debounce
+            clearTimeout(classCodeCheckTimeout);
+            classCodeCheckTimeout = setTimeout(async () => {
+                statusDiv.innerHTML = '<span class="checking">⏳ Checking...</span>';
+                statusDiv.className = 'validation-status checking';
+
+                try {
+                    // Use shared-auth helper
+                    const data = await SharedAuth.validateClassCode(classCode);
+
+                    if (data) {
+                        statusDiv.innerHTML = `<span>✓ Valid: ${data.class_name} (Grade ${data.grade_level})</span>`;
+                        statusDiv.className = 'validation-status valid';
+                        classCodeValid = true;
+                    } else {
+                        statusDiv.innerHTML = '<span>✗ Invalid Class Code</span>';
+                        statusDiv.className = 'validation-status invalid';
+                        classCodeValid = false;
+                    }
+                } catch (e) {
+                    console.error('Class code validation error:', e);
+                    statusDiv.innerHTML = '<span>✗ Error checking class code</span>';
+                    statusDiv.className = 'validation-status invalid';
+                    classCodeValid = false;
+                }
+            }, 500);
+        }
+
         // Check password strength
         function checkPasswordStrength() {
             const password = document.getElementById('password').value;
             const strengthBar = document.getElementById('strengthBar');
-            
+
             // Check requirements
             const hasLength = password.length >= 12;
             const hasUpper = /[A-Z]/.test(password);
             const hasLower = /[a-z]/.test(password);
             const hasNumber = /\d/.test(password);
             const hasSpecial = /[^A-Za-z0-9]/.test(password);
-            
+
             // Calculate strength
             let strength = 0;
             if (hasLength) strength++;
@@ -704,41 +744,41 @@
             if (hasLower) strength++;
             if (hasNumber) strength++;
             if (hasSpecial) strength++;
-            
+
             // Update requirements
             document.getElementById('reqLength').className = `requirement ${hasLength ? 'met' : ''}`;
             document.getElementById('reqLength').innerHTML = `${hasLength ? '✓' : '✗'} At least 12 characters`;
-                
+
             document.getElementById('reqUpper').className = `requirement ${hasUpper ? 'met' : ''}`;
             document.getElementById('reqUpper').innerHTML = `${hasUpper ? '✓' : '✗'} One uppercase letter`;
-                
+
             document.getElementById('reqLower').className = `requirement ${hasLower ? 'met' : ''}`;
             document.getElementById('reqLower').innerHTML = `${hasLower ? '✓' : '✗'} One lowercase letter`;
-                
+
             document.getElementById('reqNumber').className = `requirement ${hasNumber ? 'met' : ''}`;
             document.getElementById('reqNumber').innerHTML = `${hasNumber ? '✓' : '✗'} One number`;
 
             document.getElementById('reqSpecial').className = `requirement ${hasSpecial ? 'met' : ''}`;
             document.getElementById('reqSpecial').innerHTML = `${hasSpecial ? '✓' : '✗'} One special character`;
-            
+
             // Update strength bar
             const strengthClasses = ['', 'strength-weak', 'strength-fair', 'strength-good', 'strength-strong', 'strength-excellent'];
             strengthBar.className = `password-strength-bar ${strengthClasses[strength] || ''}`;
-            
+
             checkPasswordMatch();
         }
-        
+
         // Check password match
         function checkPasswordMatch() {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const statusP = document.getElementById('passwordMatchStatus');
-            
+
             if (!confirmPassword) {
                 statusP.textContent = '';
                 return;
             }
-            
+
             if (password === confirmPassword) {
                 statusP.textContent = '✓ Passwords match';
                 statusP.style.color = '#10b981';
@@ -747,7 +787,7 @@
                 statusP.style.color = '#ef4444';
             }
         }
-        
+
         // Show error message
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
@@ -755,57 +795,72 @@
             errorDiv.classList.add('show');
             errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        
+
         // Handle signup form submission
         async function handleSignup(event) {
             event.preventDefault();
-            
+
             // Prevent double submission
             if (window.isButtonLocked && window.isButtonLocked('signup')) return;
             if (window.lockButton) window.lockButton('signup', 5000);
-            
-            const fullName = document.getElementById('fullName').value.trim();
+
+            if (window.lockButton) window.lockButton('signup', 5000);
+
+            // Full name fetched from registry
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const studentId = document.getElementById('studentId')?.value.trim();
             const classCode = document.getElementById('classCode')?.value.trim().toUpperCase();
-            
+
             const signupBtn = document.getElementById('signupBtn');
             const signupBtnText = document.getElementById('signupBtnText');
             const signupSpinner = document.getElementById('signupSpinner');
             const errorDiv = document.getElementById('errorMessage');
             const successDiv = document.getElementById('successMessage');
-            
+
             // Reset messages
             errorDiv.classList.remove('show');
             successDiv.classList.remove('show');
-            
+
             // Validations
             if (!fullName || fullName.length < 2) {
                 showError('Please enter your full name.');
                 return;
             }
-            
+
             // Basic email validation
             if (!email || !email.includes('@') || !email.includes('.')) {
                 showError('Please enter a valid email address.');
                 return;
             }
-            
+
             // Student ID validation - only require if field is visible and has a value
             const studentIdField = document.getElementById('studentId');
-            if (studentIdField && studentId) {
-                if (!studentIdValid) {
-                    showError('The student ID you entered is not valid or has already been claimed. Please check your ID or contact your administrator.');
-                    return;
+            const classCodeField = document.getElementById('classCode');
+
+            if (studentIdField && studentId) { // Check if student field is visible (it is for student role)
+                const isStudent = studentIdField.closest('.student-fields').classList.contains('show');
+
+                if (isStudent) {
+                    // Start of Student Validation
+                    if (!studentIdValid) {
+                        showError('The student ID you entered is not valid or has already been claimed. Please check your ID or contact your administrator.');
+                        return;
+                    }
+
+                    // Class Code Mandatory Check
+                    if (!classCode || !classCodeValid) {
+                        showError('A valid Class Code is now required for registration. Please ask your teacher for the code.');
+                        return;
+                    }
                 }
             } else if (studentIdField && !studentId) {
                 // If student ID field exists but is empty, show a warning
                 showError('Please enter your student ID to register. If you don\'t have one, contact your school administrator.');
                 return;
             }
-            
+
             // Password validation
             const hasLength = password.length >= 12;
             const hasUpper = /[A-Z]/.test(password);
@@ -816,22 +871,22 @@
                 showError('Password must be at least 12 characters and include uppercase, lowercase, a number, and a special character.');
                 return;
             }
-            
+
             if (password !== confirmPassword) {
                 showError('Passwords do not match.');
                 return;
             }
-            
+
             if (!document.getElementById('agreeTerms').checked) {
                 showError('Please agree to the Terms of Service and Privacy Policy.');
                 return;
             }
-            
+
             // Show loading state
             signupBtn.disabled = true;
             signupBtnText.style.display = 'none';
             signupSpinner.style.display = 'inline';
-            
+
             try {
                 // Create the user account
                 const { data, error } = await supabaseClient.auth.signUp({
@@ -839,18 +894,18 @@
                     password: password,
                     options: {
                         data: {
-                            full_name: fullName,
+                            full_name: '', // Will be updated by shared-auth logic if empty
                             role: 'student',
                             student_id_number: studentId
                         }
                     }
                 });
-                
+
                 if (error) throw error;
-                
+
                 // Wait a moment for the database trigger to create the profile
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                
+
                 // Update profile with student ID
                 if (studentId && data.user) {
                     await supabaseClient
@@ -858,18 +913,18 @@
                         .update({ student_id_number: studentId })
                         .eq('id', data.user.id);
                 }
-                
+
                 // Mark student ID as claimed
                 if (studentId) {
                     await supabaseClient
                         .from('registered_students')
-                        .update({ 
-                            is_claimed: true, 
-                            claimed_by: data.user.id 
+                        .update({
+                            is_claimed: true,
+                            claimed_by: data.user.id
                         })
                         .eq('student_id_number', studentId);
                 }
-                
+
                 // Enroll in class if code provided
                 if (classCode && data.user) {
                     const { data: classData } = await supabaseClient
@@ -878,37 +933,37 @@
                         .eq('class_code', classCode)
                         .eq('is_active', true)
                         .single();
-                    
+
                     if (classData) {
                         // Insert enrollment
                         await supabaseClient.from('class_enrollments').insert({
                             class_id: classData.id,
                             student_id: data.user.id
                         });
-                        
+
                         // Update profile with teacher and class
                         await supabaseClient
                             .from('profiles')
-                            .update({ 
+                            .update({
                                 teacher_id: classData.teacher_id,
                                 class_id: classData.id
                             })
                             .eq('id', data.user.id);
                     }
                 }
-                
+
                 successDiv.innerHTML = `
                     <strong>Account created successfully!</strong><br>
                     You can now log in with your credentials.
                 `;
                 successDiv.classList.add('show');
-                
+
                 // Clear form
                 document.getElementById('signupForm').reset();
-                
+
                 // Show success modal
                 showSuccessModal();
-                
+
             } catch (error) {
                 console.error('Signup error:', error);
                 if (error.message.includes('already registered')) {
@@ -929,10 +984,10 @@
             const modal = document.getElementById('successModal');
             const countdownEl = document.getElementById('modalCountdown');
             modal.classList.add('show');
-            
+
             let countdown = 5;
             countdownEl.textContent = `Redirecting to login in ${countdown} seconds...`;
-            
+
             const countdownInterval = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
@@ -954,13 +1009,14 @@
     <div id="successModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
             <h2 class="modal-title">Registration Successful!</h2>
             <p class="modal-message">
-                Your account has been created successfully. 
+                Your account has been created successfully.
                 You can now log in with your email and password to start your journey!
             </p>
             <button class="modal-btn" onclick="closeModalAndRedirect()">
@@ -971,4 +1027,5 @@
     </div>
     <script src="js/language.js"></script>
 </body>
+
 </html>
