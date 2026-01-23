@@ -417,7 +417,7 @@
             const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('role')
-                .eq('auth_id', userId)
+                .eq('id', userId)
                 .single();
 
             // Heuristic fallbacks in case profile row is missing (common for legacy accounts)

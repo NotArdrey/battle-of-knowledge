@@ -1148,7 +1148,7 @@
             const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('*')
-                .eq('auth_id', session.user.id)
+                .eq('id', session.user.id)
                 .single();
 
             console.log('Profile loaded:', profile, 'Error:', profileError);

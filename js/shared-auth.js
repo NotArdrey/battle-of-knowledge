@@ -271,7 +271,7 @@ async function signUpUser(userData) {
         const { data: profileData } = await client
             .from('profiles')
             .select('id')
-            .eq('auth_id', authData.user.id)
+            .eq('id', authData.user.id)
             .single();
 
         const profileId = profileData?.id;
@@ -322,7 +322,7 @@ async function signInUser(email, password) {
         const { data: profile, error: profileError } = await client
             .from('profiles')
             .select('*')
-            .eq('auth_id', data.user.id)
+            .eq('id', data.user.id)
             .single();
 
         if (profileError) {

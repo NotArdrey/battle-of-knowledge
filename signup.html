@@ -919,7 +919,7 @@
                 const { data: profileData } = await supabaseClient
                     .from('profiles')
                     .select('id')
-                    .eq('auth_id', data.user.id)
+                    .eq('id', data.user.id)
                     .single();
 
                 const profileId = profileData?.id;

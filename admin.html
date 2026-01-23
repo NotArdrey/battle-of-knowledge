@@ -1140,7 +1140,7 @@
             const { data: profile } = await sb
                 .from('profiles')
                 .select('*')
-                .eq('auth_id', session.user.id)
+                .eq('id', session.user.id)
                 .single();
 
             // Allow access even without profile (for new admins)
@@ -1710,7 +1710,7 @@
                             is_verified: true,
                             full_name: name
                         })
-                        .eq('auth_id', authData.user.id);
+                        .eq('id', authData.user.id);
 
                     if (updateError) {
                         console.warn('Could not update profile, may need manual verification:', updateError);

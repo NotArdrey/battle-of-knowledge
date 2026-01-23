@@ -54,7 +54,7 @@ const ProgressSync = {
             const { data: profile, error: profileError } = await client
                 .from('profiles')
                 .select('id')
-                .eq('auth_id', session.user.id)
+                .eq('id', session.user.id)
                 .single();
 
             if (profileError || !profile) {
@@ -214,7 +214,7 @@ const ProgressSync = {
     async resetEraLessons(eraKey) {
         // Clear completed lessons for this era
         this.progress.completedLessons[eraKey] = [];
-        
+
         // Reset era progress to initial state (keep unlocked heroes)
         this.progress.eras[eraKey] = {
             lessonsComplete: false,
@@ -225,7 +225,7 @@ const ProgressSync = {
             highestStreak: 0,
             lastPlayedAt: null
         };
-        
+
         // Save to server if logged in
         if (this.userId && this.isOnline) {
             await this.saveToServer(eraKey, this.progress.eras[eraKey]);
