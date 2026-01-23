@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -14,189 +14,285 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #b45309, #d97706);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --card-radius: 24px;
+        }
+
         body {
             font-family: 'Baloo 2', cursive;
-            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             min-height: 100vh;
+            color: #451a03;
         }
 
         .main-container {
-            padding: 20px;
+            padding: 2rem;
             max-width: 1400px;
             margin: 0 auto;
         }
 
+        /* Glassmorphism Components */
+        .dashboard-header,
+        .stat-card,
+        .content-card,
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Header */
         .dashboard-header {
-            background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
-            border: 4px solid rgba(120, 53, 15, 0.3);
-            border-radius: 20px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
+            padding: 1.5rem 2.5rem;
+            margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .dashboard-title {
-            color: #7c2d12;
-            font-size: 1.75rem;
+            color: #78350f;
+            font-size: 2rem;
             font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .user-badge {
-            background: linear-gradient(to right, #dc2626, #b91c1c);
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.35rem 1rem;
             border-radius: 20px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
         .btn-logout {
-            background: rgba(239, 68, 68, 0.2);
+            background: transparent;
             color: #dc2626;
             border: 2px solid #dc2626;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            font-weight: 600;
+            padding: 0.4rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-logout:hover {
             background: #dc2626;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
         }
 
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
-            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
-            border: 3px solid rgba(120, 53, 15, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
+            padding: 2rem;
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            color: #7c2d12;
+            color: #78350f;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .stat-label {
             color: #92400e;
             font-weight: 600;
+            font-size: 1.1rem;
+            opacity: 0.8;
         }
 
+        /* Content Area */
         .content-card {
-            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
-            border: 3px solid rgba(120, 53, 15, 0.3);
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(120, 53, 15, 0.1);
         }
 
         .card-title {
-            color: #7c2d12;
-            font-size: 1.3rem;
-            font-weight: 700;
+            color: #78350f;
+            font-size: 1.5rem;
+            font-weight: 800;
+            position: relative;
         }
 
+        /* Tabs */
         .tabs {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
         }
 
         .tab-btn {
-            padding: 0.75rem 1.5rem;
-            border: 2px solid rgba(120, 53, 15, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            color: #7c2d12;
-            font-weight: 600;
+            padding: 0.85rem 1.75rem;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #78350f;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .tab-btn:hover {
-            border-color: #b45309;
+            background: rgba(255, 255, 255, 0.6);
+            color: #b45309;
         }
 
         .tab-btn.active {
-            background: linear-gradient(to right, #b45309, #d97706);
-            color: white;
-            border-color: #b45309;
+            background: white;
+            color: #b45309;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            background: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(120, 53, 15, 0.1);
+        }
+
         .data-table {
             width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         .data-table th {
-            background: rgba(180, 83, 9, 0.2);
-            color: #7c2d12;
-            font-weight: 700;
-            padding: 1rem;
+            background: #fffbeb;
+            color: #78350f;
+            font-weight: 800;
+            padding: 1.25rem 1.5rem;
             text-align: left;
+            border-bottom: 2px solid rgba(120, 53, 15, 0.1);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .data-table td {
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid rgba(120, 53, 15, 0.1);
-            color: #7c2d12;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(120, 53, 15, 0.05);
+            color: #451a03;
+            font-weight: 500;
+            vertical-align: middle;
         }
 
-        .data-table tr:hover {
-            background: rgba(251, 191, 36, 0.1);
+        .data-table tr:last-child td {
+            border-bottom: none;
         }
 
-        .role-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+        .data-table tr:hover td {
+            background: #fffbeb;
+        }
+
+        /* Badges & Buttons */
+        .role-badge,
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
+            line-height: 1;
         }
 
         .role-admin {
-            background: #fecaca;
+            background: #fee2e2;
             color: #991b1b;
         }
 
@@ -206,16 +302,8 @@
         }
 
         .role-student {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            background: #dcfce7;
+            color: #166534;
         }
 
         .status-verified {
@@ -228,57 +316,85 @@
             color: #92400e;
         }
 
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(180, 83, 9, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(180, 83, 9, 0.4);
+        }
+
         .btn-action {
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             transition: all 0.2s ease;
-            margin-right: 0.25rem;
+            margin-right: 0.5rem;
         }
 
         .btn-verify {
             background: #10b981;
             color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
         .btn-verify:hover {
             background: #059669;
+            transform: translateY(-1px);
         }
 
         .btn-delete {
             background: #ef4444;
             color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
         }
 
         .btn-delete:hover {
             background: #dc2626;
+            transform: translateY(-1px);
         }
 
-        .btn-primary {
-            background: linear-gradient(to right, #b45309, #d97706);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
+        /* Forms */
+        .search-input {
+            padding: 0.85rem 1.25rem;
+            border: 2px solid rgba(120, 53, 15, 0.2);
+            border-radius: 12px;
+            background: white;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #78350f;
+            min-width: 300px;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+        .search-input:focus {
+            outline: none;
+            border-color: #b45309;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
         }
 
         .upload-area {
-            border: 3px dashed rgba(120, 53, 15, 0.3);
-            border-radius: 16px;
-            padding: 2rem;
+            border: 3px dashed rgba(120, 53, 15, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
             text-align: center;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -287,137 +403,60 @@
         .upload-area.dragover {
             border-color: #b45309;
             background: rgba(251, 191, 36, 0.1);
+            transform: scale(1.01);
         }
 
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-input {
-            padding: 0.75rem 1rem;
-            border: 2px solid rgba(120, 53, 15, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            font-family: 'Baloo 2', cursive;
-            font-size: 1rem;
-            color: #7c2d12;
-            min-width: 250px;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #b45309;
-        }
-
-        /* Hidden utility class */
-        .hidden {
-            display: none !important;
-        }
-
+        /* Modals */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 1rem;
-        }
-
-        .modal-overlay.hidden {
-            display: none !important;
+            background: rgba(55, 65, 81, 0.6);
+            backdrop-filter: blur(8px);
         }
 
         .modal-content {
-            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
-            border: 4px solid rgba(120, 53, 15, 0.4);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-title {
-            color: #7c2d12;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            color: #7c2d12;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            background: white;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 550px;
+            width: 95%;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid rgba(120, 53, 15, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            font-family: 'Baloo 2', cursive;
-            color: #7c2d12;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+            font-family: inherit;
+            color: #374151;
+            transition: all 0.3s ease;
         }
 
-        .table-container {
-            overflow-x: auto;
+        .form-input:focus {
+            outline: none;
+            border-color: #b45309;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #92400e;
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            color: #b45309;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover {
-            background: rgba(180, 83, 9, 0.1);
+        .form-label {
+            color: #374151;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
         }
 
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
                 text-align: center;
+                gap: 1rem;
+                padding: 1.5rem;
             }
 
             .data-table th,
             .data-table td {
-                padding: 0.5rem;
-                font-size: 0.85rem;
-            }
-
-            .btn-action {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.75rem;
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -428,7 +467,7 @@
         <!-- Header -->
         <div class="dashboard-header">
             <div>
-                <h1 class="dashboard-title">🛡️ Admin Dashboard</h1>
+                <h1 class="dashboard-title">≡ƒ¢í∩╕Å Admin Dashboard</h1>
             </div>
             <div class="user-info">
                 <span id="userName" class="text-amber-800 font-semibold"></span>
@@ -459,11 +498,11 @@
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('users')">👥 User Management</button>
-            <button class="tab-btn" onclick="switchTab('students')">📚 Student Registry</button>
-            <button class="tab-btn" onclick="switchTab('content')">📝 Content Management</button>
-            <button class="tab-btn" onclick="switchTab('settings')">⚙️ Guest Settings</button>
-            <button class="tab-btn" onclick="switchTab('backup')">📦 Backup & Restore</button>
+            <button class="tab-btn active" onclick="switchTab('users')">≡ƒæÑ User Management</button>
+            <button class="tab-btn" onclick="switchTab('students')">≡ƒôÜ Student Registry</button>
+            <button class="tab-btn" onclick="switchTab('content')">≡ƒô¥ Content Management</button>
+            <button class="tab-btn" onclick="switchTab('settings')">ΓÜÖ∩╕Å Guest Settings</button>
+            <button class="tab-btn" onclick="switchTab('backup')">≡ƒôª Backup & Restore</button>
         </div>
 
 
@@ -473,8 +512,8 @@
                 <div class="card-header">
                     <h2 class="card-title">All Users</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-                        <button class="btn-primary" onclick="showTeacherModal()">➕ Add Teacher</button>
-                        <input type="text" class="search-input" placeholder="🔍 Search users..."
+                        <button class="btn-primary" onclick="showTeacherModal()">Γ₧ò Add Teacher</button>
+                        <input type="text" class="search-input" placeholder="≡ƒöì Search users..."
                             oninput="filterUsers(this.value)">
                     </div>
                 </div>
@@ -498,7 +537,7 @@
                 </div>
 
                 <div id="usersEmpty" class="empty-state hidden">
-                    <div class="empty-icon">👥</div>
+                    <div class="empty-icon">≡ƒæÑ</div>
                     <p>No users found</p>
                 </div>
             </div>
@@ -510,14 +549,14 @@
                 <div class="card-header">
                     <h2 class="card-title">Registered Students Database</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button class="btn-primary" onclick="showStudentModal()">➕ Add Student</button>
+                        <button class="btn-primary" onclick="showStudentModal()">Γ₧ò Add Student</button>
                         <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
-                            onclick="document.getElementById('excelFile').click()">📤 Upload Excel</button>
+                            onclick="document.getElementById('excelFile').click()">≡ƒôñ Upload Excel</button>
                     </div>
                 </div>
 
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('excelFile').click()">
-                    <div class="upload-icon">📊</div>
+                    <div class="upload-icon">≡ƒôè</div>
                     <p class="text-amber-800 font-semibold mb-2">Upload Student List (Excel)</p>
                     <p class="text-amber-600 text-sm">Click or drag & drop an Excel file (.xlsx, .xls)</p>
                     <p class="text-amber-500 text-xs mt-2">Required columns: student_id_number, full_name, email
@@ -528,7 +567,7 @@
 
                 <div class="card-header mt-6">
                     <h3 class="card-title">Student List</h3>
-                    <input type="text" class="search-input" placeholder="🔍 Search students..."
+                    <input type="text" class="search-input" placeholder="≡ƒöì Search students..."
                         oninput="filterStudents(this.value)">
                 </div>
 
@@ -551,7 +590,7 @@
                 </div>
 
                 <div id="studentsEmpty" class="empty-state hidden">
-                    <div class="empty-icon">📚</div>
+                    <div class="empty-icon">≡ƒôÜ</div>
                     <p>No registered students yet</p>
                     <p class="text-sm">Click "Add Student" or upload an Excel file to add students</p>
                 </div>
@@ -562,17 +601,17 @@
         <div id="contentTab" class="tab-content">
             <div class="content-card">
                 <div class="card-header">
-                    <h2 class="card-title">📝 Questions & Lessons Management</h2>
+                    <h2 class="card-title">≡ƒô¥ Questions & Lessons Management</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button class="btn-primary" onclick="showQuestionModal()">➕ Add Question</button>
+                        <button class="btn-primary" onclick="showQuestionModal()">Γ₧ò Add Question</button>
                         <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
-                            onclick="showLessonModal()">➕ Add Lesson</button>
+                            onclick="showLessonModal()">Γ₧ò Add Lesson</button>
                     </div>
                 </div>
 
                 <!-- Questions Section -->
                 <div class="p-6 border-b-2 border-amber-200">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📚 Questions</h3>
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">≡ƒôÜ Questions</h3>
 
                     <div class="flex flex-wrap gap-2 mb-4">
                         <select id="questionsEraFilter" class="search-input" style="min-width: 150px;"
@@ -589,7 +628,7 @@
                             <option value="system">System Questions</option>
                             <option value="custom">Custom Questions</option>
                         </select>
-                        <input type="text" class="search-input" placeholder="🔍 Search questions..."
+                        <input type="text" class="search-input" placeholder="≡ƒöì Search questions..."
                             id="questionsSearch" oninput="filterQuestionsList(this.value)">
                     </div>
 
@@ -612,14 +651,14 @@
                     </div>
 
                     <div id="questionsEmpty" class="empty-state hidden">
-                        <div class="empty-icon">❓</div>
+                        <div class="empty-icon">Γ¥ô</div>
                         <p>No questions found</p>
                     </div>
                 </div>
 
                 <!-- Lessons Section -->
                 <div class="p-6">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📖 Lessons</h3>
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">≡ƒôû Lessons</h3>
 
                     <div class="flex flex-wrap gap-2 mb-4">
                         <select id="lessonsEraFilter" class="search-input" style="min-width: 150px;"
@@ -636,7 +675,7 @@
                             <option value="system">System Lessons</option>
                             <option value="custom">Custom Lessons</option>
                         </select>
-                        <input type="text" class="search-input" placeholder="🔍 Search lessons..." id="lessonsSearch"
+                        <input type="text" class="search-input" placeholder="≡ƒöì Search lessons..." id="lessonsSearch"
                             oninput="filterLessonsList(this.value)">
                     </div>
 
@@ -659,7 +698,7 @@
                     </div>
 
                     <div id="lessonsEmpty" class="empty-state hidden">
-                        <div class="empty-icon">📖</div>
+                        <div class="empty-icon">≡ƒôû</div>
                         <p>No lessons found</p>
                     </div>
                 </div>
@@ -681,7 +720,7 @@
                     <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-4">
                         <div class="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                                <h3 class="text-lg font-bold text-amber-900">🎮 Unlock All Progress & Collections (Guest
+                                <h3 class="text-lg font-bold text-amber-900">≡ƒÄ« Unlock All Progress & Collections (Guest
                                     Only)</h3>
                                 <p class="text-amber-700 text-sm mt-1">Allow <strong>guest users only</strong> (not
                                     logged-in accounts) to access all eras, lessons, and character collections without
@@ -701,14 +740,14 @@
                     <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-4">
                         <div class="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                                <h3 class="text-lg font-bold text-red-900">🗑️ Reset All Progress (Logged-in Users)</h3>
+                                <h3 class="text-lg font-bold text-red-900">≡ƒùæ∩╕Å Reset All Progress (Logged-in Users)</h3>
                                 <p class="text-red-700 text-sm mt-1">Reset all progress for all logged-in user accounts.
                                     This will clear all eras, lessons, achievements, and unlocked characters from the
                                     database.</p>
                             </div>
                             <button onclick="resetAllUsersProgress()"
                                 class="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors">
-                                ⚠️ Reset All Users
+                                ΓÜá∩╕Å Reset All Users
                             </button>
                         </div>
                     </div>
@@ -717,7 +756,7 @@
                     <div class="mt-6 flex gap-4">
                         <button onclick="resetGuestSettings()"
                             class="px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
-                            🔄 Reset Guest Settings to Defaults
+                            ≡ƒöä Reset Guest Settings to Defaults
                         </button>
                     </div>
                 </div>
@@ -728,12 +767,12 @@
         <div id="backupTab" class="tab-content">
             <div class="content-card">
                 <div class="card-header">
-                    <h2 class="card-title">📦 Full System Backup & Restore</h2>
+                    <h2 class="card-title">≡ƒôª Full System Backup & Restore</h2>
                 </div>
 
                 <!-- Export Section -->
                 <div class="p-6 border-b-2 border-amber-200">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📤 Export System Data</h3>
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">≡ƒôñ Export System Data</h3>
                     <p class="text-amber-700 mb-4">Select the tables you want to include in your backup. The exported
                         JSON file can be used to restore data.</p>
 
@@ -742,46 +781,46 @@
                         <label
                             class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
                             <input type="checkbox" id="exportQuestions" checked class="w-5 h-5 text-amber-600">
-                            <span class="font-semibold text-amber-800">📝 Questions</span>
+                            <span class="font-semibold text-amber-800">≡ƒô¥ Questions</span>
                         </label>
                         <label
                             class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
                             <input type="checkbox" id="exportLessons" checked class="w-5 h-5 text-amber-600">
-                            <span class="font-semibold text-amber-800">📚 Lessons</span>
+                            <span class="font-semibold text-amber-800">≡ƒôÜ Lessons</span>
                         </label>
                         <label
                             class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
                             <input type="checkbox" id="exportClasses" checked class="w-5 h-5 text-amber-600">
-                            <span class="font-semibold text-amber-800">🏫 Classes</span>
+                            <span class="font-semibold text-amber-800">≡ƒÅ½ Classes</span>
                         </label>
                         <label
                             class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
                             <input type="checkbox" id="exportStudents" checked class="w-5 h-5 text-amber-600">
-                            <span class="font-semibold text-amber-800">👥 Registered Students</span>
+                            <span class="font-semibold text-amber-800">≡ƒæÑ Registered Students</span>
                         </label>
                         <label
                             class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
                             <input type="checkbox" id="exportProfiles" class="w-5 h-5 text-amber-600">
-                            <span class="font-semibold text-amber-800">👤 User Profiles</span>
+                            <span class="font-semibold text-amber-800">≡ƒæñ User Profiles</span>
                         </label>
                         <label
                             class="flex items-center gap-2 p-3 bg-white rounded-lg border-2 border-amber-200 cursor-pointer hover:border-amber-400">
                             <input type="checkbox" id="exportProgress" class="w-5 h-5 text-amber-600">
-                            <span class="font-semibold text-amber-800">📊 Progress Data</span>
+                            <span class="font-semibold text-amber-800">≡ƒôè Progress Data</span>
                         </label>
                     </div>
 
                     <div class="flex flex-wrap gap-3 mb-4">
                         <button class="btn-primary" onclick="exportFullBackup()">
-                            📦 Export Selected Tables
+                            ≡ƒôª Export Selected Tables
                         </button>
                         <button class="btn-primary" style="background: linear-gradient(to right, #7c3aed, #8b5cf6);"
                             onclick="selectAllTables(true)">
-                            ✅ Select All
+                            Γ£à Select All
                         </button>
                         <button class="btn-action" style="background: #9ca3af; color: white;"
                             onclick="selectAllTables(false)">
-                            ❌ Deselect All
+                            Γ¥î Deselect All
                         </button>
                     </div>
 
@@ -790,7 +829,7 @@
 
                 <!-- Import Section -->
                 <div class="p-6 border-b-2 border-amber-200">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📥 Import / Restore Data</h3>
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">≡ƒôÑ Import / Restore Data</h3>
                     <p class="text-amber-700 mb-4">Upload a backup JSON file to restore data. Choose how to handle
                         conflicts.</p>
 
@@ -806,7 +845,7 @@
 
                     <div class="upload-area" id="adminBackupUploadArea"
                         onclick="document.getElementById('adminBackupFile').click()">
-                        <div class="upload-icon">📁</div>
+                        <div class="upload-icon">≡ƒôü</div>
                         <p class="text-amber-800 font-semibold mb-2">Click or drag & drop a backup file</p>
                         <p class="text-amber-600 text-sm">Accepts JSON files from admin or teacher exports</p>
                         <input type="file" id="adminBackupFile" accept=".json" class="hidden"
@@ -814,14 +853,14 @@
                     </div>
 
                     <div id="adminImportPreview" class="hidden mt-4">
-                        <h4 class="font-bold text-amber-900 mb-2">📋 Import Preview</h4>
+                        <h4 class="font-bold text-amber-900 mb-2">≡ƒôï Import Preview</h4>
                         <div id="adminImportPreviewContent"
                             class="bg-white rounded-lg p-4 border-2 border-amber-200 max-h-60 overflow-y-auto">
                             <!-- Preview will be shown here -->
                         </div>
                         <div class="flex gap-3 mt-4">
                             <button class="btn-secondary flex-1" onclick="cancelAdminImport()">Cancel</button>
-                            <button class="btn-primary flex-1" onclick="confirmAdminImport()">✅ Import Data</button>
+                            <button class="btn-primary flex-1" onclick="confirmAdminImport()">Γ£à Import Data</button>
                         </div>
                     </div>
 
@@ -830,7 +869,7 @@
 
                 <!-- Recent Backups -->
                 <div class="p-6">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📜 Recent Export History</h3>
+                    <h3 class="text-lg font-bold text-amber-900 mb-4">≡ƒô£ Recent Export History</h3>
                     <div id="adminBackupHistory" class="space-y-2">
                         <!-- Backup history will be loaded here -->
                     </div>
@@ -858,15 +897,12 @@
                     <input type="text" id="newStudentName" class="form-input" required>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Email (Optional)</label>
-                    <input type="email" id="newStudentEmail" class="form-input">
-                </div>
+                <!-- Email removed as per requirement -->
 
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Grade Level</label>
-                        <input type="text" id="newStudentGrade" class="form-input" placeholder="e.g., Grade 7">
+                        <input type="number" id="newStudentGrade" class="form-input" placeholder="e.g., 7">
                     </div>
 
                     <div class="form-group flex-1">
@@ -1069,7 +1105,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Icon (emoji or number)</label>
-                    <input type="text" id="lessonIcon" class="form-input" placeholder="1, 2, 📚, etc." value="1">
+                    <input type="text" id="lessonIcon" class="form-input" placeholder="1, 2, ≡ƒôÜ, etc." value="1">
                 </div>
 
                 <div class="flex items-center gap-4 mt-4">
@@ -1449,7 +1485,7 @@
                     if (invalidRows.length > 0) {
                         errorMsg += 'Errors found:\n';
                         invalidRows.slice(0, 5).forEach(r => {
-                            errorMsg += `• Row ${r.row}: ${r.errors}\n`;
+                            errorMsg += `ΓÇó Row ${r.row}: ${r.errors}\n`;
                         });
                         if (invalidRows.length > 5) {
                             errorMsg += `... and ${invalidRows.length - 5} more errors`;
@@ -1482,7 +1518,7 @@
                     setTimeout(() => {
                         let warningMsg = `${invalidRows.length} rows were skipped:\n`;
                         invalidRows.slice(0, 3).forEach(r => {
-                            warningMsg += `• Row ${r.row}: ${r.errors}\n`;
+                            warningMsg += `ΓÇó Row ${r.row}: ${r.errors}\n`;
                         });
                         if (invalidRows.length > 3) {
                             warningMsg += `Check console for full list.`;
@@ -1586,7 +1622,7 @@
 
             const studentId = document.getElementById('newStudentId').value.trim();
             const name = document.getElementById('newStudentName').value.trim();
-            const email = document.getElementById('newStudentEmail').value.trim();
+            // Email removed
             const grade = document.getElementById('newStudentGrade').value.trim();
             const section = document.getElementById('newStudentSection').value.trim();
 
@@ -1596,7 +1632,7 @@
                     .insert({
                         student_id_number: studentId,
                         full_name: name,
-                        email: email || null,
+                        email: null,
                         grade_level: grade || null,
                         section: section || null,
                         uploaded_by: currentProfile.id
@@ -1873,7 +1909,7 @@
 
         // Reset all users progress (admin function)
         async function resetAllUsersProgress() {
-            if (!confirm('⚠️ WARNING: This will DELETE all progress for ALL logged-in users!\n\nThis includes:\n- All era progress\n- All completed lessons\n- All achievements\n- All unlocked characters\n\nThis action CANNOT be undone. Are you sure?')) {
+            if (!confirm('ΓÜá∩╕Å WARNING: This will DELETE all progress for ALL logged-in users!\n\nThis includes:\n- All era progress\n- All completed lessons\n- All achievements\n- All unlocked characters\n\nThis action CANNOT be undone. Are you sure?')) {
                 return;
             }
 
@@ -1937,21 +1973,7 @@
             }
         }
 
-        // Toast notification helper
-        function showToast(message, type = 'info') {
-            const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed; bottom: 20px; right: 20px;
-                background: ${colors[type] || colors.info}; color: white;
-                padding: 1rem 1.5rem; border-radius: 0.5rem;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
-                font-weight: 600; animation: slideIn 0.3s ease;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+        // Toast and Loading handled by ui-utils.js
 
         // Show loading indicator
         function showLoading(show) {
@@ -2039,11 +2061,11 @@
                     <td>${eraNames[q.era_key] || q.era_key}</td>
                     <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${q.question_text_en}">${q.question_text_en}</td>
                     <td>${q.correct_answer_en}</td>
-                    <td><span class="status-badge ${q.is_system ? 'status-verified' : 'status-pending'}">${q.is_system ? '🔒 System' : '📝 Custom'}</span></td>
-                    <td><span class="status-badge ${q.is_active && q.is_approved ? 'status-verified' : 'status-pending'}">${q.is_active && q.is_approved ? '✓ Active' : '⏸ Inactive'}</span></td>
+                    <td><span class="status-badge ${q.is_system ? 'status-verified' : 'status-pending'}">${q.is_system ? '≡ƒöÆ System' : '≡ƒô¥ Custom'}</span></td>
+                    <td><span class="status-badge ${q.is_active && q.is_approved ? 'status-verified' : 'status-pending'}">${q.is_active && q.is_approved ? 'Γ£ô Active' : 'ΓÅ╕ Inactive'}</span></td>
                     <td>
-                        <button class="btn-action btn-verify" onclick="editQuestion('${q.id}')">✏️ Edit</button>
-                        <button class="btn-action btn-delete" onclick="deleteQuestion('${q.id}', ${q.is_system})">🗑️</button>
+                        <button class="btn-action btn-verify" onclick="editQuestion('${q.id}')">Γ£Å∩╕Å Edit</button>
+                        <button class="btn-action btn-delete" onclick="deleteQuestion('${q.id}', ${q.is_system})">≡ƒùæ∩╕Å</button>
                     </td>
                 </tr>
             `).join('');
@@ -2145,7 +2167,7 @@
 
         async function deleteQuestion(id, isSystem) {
             if (isSystem) {
-                if (!confirm('⚠️ This is a SYSTEM question used by the game. Are you sure you want to delete it? This may break the game for some eras.')) {
+                if (!confirm('ΓÜá∩╕Å This is a SYSTEM question used by the game. Are you sure you want to delete it? This may break the game for some eras.')) {
                     return;
                 }
             } else {
@@ -2225,11 +2247,11 @@
                     <td>${eraNames[l.era_key] || l.era_key}</td>
                     <td>${l.lesson_order}</td>
                     <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.title_en}">${l.title_en}</td>
-                    <td><span class="status-badge ${l.is_system ? 'status-verified' : 'status-pending'}">${l.is_system ? '🔒 System' : '📝 Custom'}</span></td>
-                    <td><span class="status-badge ${l.is_active && l.is_approved ? 'status-verified' : 'status-pending'}">${l.is_active && l.is_approved ? '✓ Active' : '⏸ Inactive'}</span></td>
+                    <td><span class="status-badge ${l.is_system ? 'status-verified' : 'status-pending'}">${l.is_system ? '≡ƒöÆ System' : '≡ƒô¥ Custom'}</span></td>
+                    <td><span class="status-badge ${l.is_active && l.is_approved ? 'status-verified' : 'status-pending'}">${l.is_active && l.is_approved ? 'Γ£ô Active' : 'ΓÅ╕ Inactive'}</span></td>
                     <td>
-                        <button class="btn-action btn-verify" onclick="editLesson('${l.id}')">✏️ Edit</button>
-                        <button class="btn-action btn-delete" onclick="deleteLesson('${l.id}', ${l.is_system})">🗑️</button>
+                        <button class="btn-action btn-verify" onclick="editLesson('${l.id}')">Γ£Å∩╕Å Edit</button>
+                        <button class="btn-action btn-delete" onclick="deleteLesson('${l.id}', ${l.is_system})">≡ƒùæ∩╕Å</button>
                     </td>
                 </tr>
             `).join('');
@@ -2317,7 +2339,7 @@
 
         async function deleteLesson(id, isSystem) {
             if (isSystem) {
-                if (!confirm('⚠️ This is a SYSTEM lesson used by the game. Are you sure you want to delete it? This may break the learning module for some eras.')) {
+                if (!confirm('ΓÜá∩╕Å This is a SYSTEM lesson used by the game. Are you sure you want to delete it? This may break the learning module for some eras.')) {
                     return;
                 }
             } else {
@@ -2667,7 +2689,7 @@
             if (noHistory) noHistory.classList.add('hidden');
             container.innerHTML = history.map(h => `
                 <div class="flex justify-between items-center p-2 bg-white rounded-lg border border-amber-200 text-sm">
-                    <span>📦 ${h.tables.join(', ')} <span class="text-amber-600">(${h.count} items)</span></span>
+                    <span>≡ƒôª ${h.tables.join(', ')} <span class="text-amber-600">(${h.count} items)</span></span>
                     <span class="text-amber-500">${new Date(h.date).toLocaleDateString()}</span>
                 </div>
             `).join('');

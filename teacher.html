@@ -319,6 +319,11 @@
             border-color: #b45309;
         }
 
+        /* Hidden utility class */
+        .hidden {
+            display: none !important;
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -328,6 +333,10 @@
             justify-content: center;
             z-index: 100;
             padding: 1rem;
+        }
+
+        .modal-overlay.hidden {
+            display: none !important;
         }
 
         .modal-content {
