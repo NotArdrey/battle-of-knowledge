@@ -1143,8 +1143,40 @@
                 .eq('id', session.user.id)
                 .single();
 
-            // Allow access even without profile (for new admins)
-            currentProfile = profile || { id: session.user.id, full_name: session.user.email, role: 'admin' };
+            // Setup current profile
+            if (profile) {
+                currentProfile = profile;
+            } else {
+                // Profile missing! Auto-create it (Self-repair)
+                console.warn('Profile missing for admin user. Attempting to create...');
+                try {
+                    const newProfile = {
+                        id: session.user.id,
+                        email: session.user.email,
+                        full_name: session.user.user_metadata?.full_name || 'Admin User',
+                        role: 'admin',
+                        is_verified: true,
+                        is_registered: true
+                    };
+
+                    const { error: insertError } = await sb
+                        .from('profiles')
+                        .insert(newProfile);
+
+                    if (insertError) {
+                        console.error('Failed to auto-create profile:', insertError);
+                        // Fallback but warn
+                        currentProfile = newProfile;
+                        alert('Warning: unique profile could not be created. Some actions may fail. Please contact support.');
+                    } else {
+                        console.log('Profile auto-created successfully');
+                        currentProfile = newProfile;
+                    }
+                } catch (e) {
+                    console.error('Error during profile auto-creation:', e);
+                    currentProfile = { id: session.user.id, full_name: session.user.email, role: 'admin' };
+                }
+            }
             document.getElementById('userName').textContent = currentProfile.full_name;
 
             // Load data
