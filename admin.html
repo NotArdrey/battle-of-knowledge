@@ -793,15 +793,10 @@
                     <input type="text" id="newStudentName" class="form-input" required>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Email (Optional)</label>
-                    <input type="email" id="newStudentEmail" class="form-input">
-                </div>
-
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Grade Level</label>
-                        <input type="text" id="newStudentGrade" class="form-input" placeholder="e.g., Grade 7">
+                        <input type="number" id="newStudentGrade" class="form-input" placeholder="e.g., 7" min="1" max="12">
                     </div>
 
                     <div class="form-group flex-1">
@@ -841,15 +836,10 @@
                     <input type="text" id="editStudentName" class="form-input" required>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Email (Optional)</label>
-                    <input type="email" id="editStudentEmail" class="form-input">
-                </div>
-
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Grade Level</label>
-                        <input type="text" id="editStudentGrade" class="form-input" placeholder="e.g., Grade 7">
+                        <input type="number" id="editStudentGrade" class="form-input" placeholder="e.g., 7" min="1" max="12">
                     </div>
 
                     <div class="form-group flex-1">
@@ -1536,7 +1526,6 @@
             document.getElementById('editStudentOrigId').value = student.student_id_number;
             document.getElementById('editStudentIdNumber').value = student.student_id_number;
             document.getElementById('editStudentName').value = student.full_name;
-            document.getElementById('editStudentEmail').value = student.email || '';
             document.getElementById('editStudentGrade').value = student.grade_level || '';
             document.getElementById('editStudentSection').value = student.section || '';
 
@@ -1557,13 +1546,41 @@
             const updates = {
                 student_id_number: document.getElementById('editStudentIdNumber').value,
                 full_name: document.getElementById('editStudentName').value,
-                email: document.getElementById('editStudentEmail').value || null,
+                email: null,
                 grade_level: document.getElementById('editStudentGrade').value || null,
                 section: document.getElementById('editStudentSection').value || null,
                 updated_at: new Date().toISOString()
             };
 
             try {
+                // Check for duplicate student ID (excluding current student)
+                const { data: existingId, error: idError } = await sb
+                    .from('registered_students')
+                    .select('id, student_id_number')
+                    .eq('student_id_number', updates.student_id_number)
+                    .neq('id', id)
+                    .maybeSingle();
+
+                if (idError) throw idError;
+                if (existingId) {
+                    showToast('Student ID already exists', 'error');
+                    return;
+                }
+
+                // Check for duplicate name (excluding current student)
+                const { data: existingName, error: nameError } = await sb
+                    .from('registered_students')
+                    .select('id, full_name')
+                    .eq('full_name', updates.full_name)
+                    .neq('id', id)
+                    .maybeSingle();
+
+                if (nameError) throw nameError;
+                if (existingName) {
+                    showToast('A student with this exact name already exists', 'error');
+                    return;
+                }
+
                 const { error } = await sb
                     .from('registered_students')
                     .update(updates)
@@ -1601,7 +1618,6 @@
 
             const studentId = document.getElementById('newStudentId').value.trim();
             const name = document.getElementById('newStudentName').value.trim();
-            const email = document.getElementById('newStudentEmail').value.trim();
             const grade = document.getElementById('newStudentGrade').value.trim();
             const section = document.getElementById('newStudentSection').value.trim();
 
@@ -1617,14 +1633,41 @@
                     }
                 }
 
+                // Check for duplicate student ID
+                const { data: existingId, error: idError } = await sb
+                    .from('registered_students')
+                    .select('student_id_number')
+                    .eq('student_id_number', studentId)
+                    .maybeSingle();
+
+                if (idError) throw idError;
+                if (existingId) {
+                    showToast('Student ID already exists', 'error');
+                    return;
+                }
+
+                // Check for duplicate name
+                const { data: existingName, error: nameError } = await sb
+                    .from('registered_students')
+                    .select('full_name')
+                    .eq('full_name', name)
+                    .maybeSingle();
+
+                if (nameError) throw nameError;
+                if (existingName) {
+                    showToast('A student with this exact name already exists', 'error');
+                    return;
+                }
+
                 const { error } = await sb
                     .from('registered_students')
                     .insert({
                         student_id_number: studentId,
                         full_name: name,
-                        email: email || null,
+                        email: null,
                         grade_level: grade || null,
                         section: section || null,
+                        is_claimed: false,
                         uploaded_by: currentProfile.id // Ensure this matches RLS policy
                     });
 

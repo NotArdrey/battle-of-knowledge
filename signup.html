@@ -647,11 +647,16 @@
                         .select('*')
                         .eq('student_id_number', studentId)
                         .eq('is_claimed', false)
-                        .single();
+                        .maybeSingle();
 
                     console.log('Validation response:', { data, error });
 
-                    if (data && !error) {
+                    if (error) {
+                        console.error('Database query error:', error);
+                        throw error;
+                    }
+
+                    if (data) {
                         statusDiv.innerHTML = `<span>✓ Valid: ${data.full_name}</span>`;
                         statusDiv.className = 'validation-status valid';
                         studentIdValid = true;
@@ -659,16 +664,12 @@
 
                         // Auto-fill name if empty
                         const nameField = document.getElementById('fullName');
-                        if (!nameField.value) {
+                        if (nameField && !nameField.value) {
                             nameField.value = data.full_name;
                         }
-                    } else if (error && error.code === 'PGRST116') {
-                        // No rows returned - ID not found or already claimed
-                        statusDiv.innerHTML = '<span>✗ Student ID not found or already registered</span>';
-                        statusDiv.className = 'validation-status invalid';
-                        studentIdValid = false;
                     } else {
-                        statusDiv.innerHTML = `<span>✗ ${error?.message || 'Student ID not found or already registered'}</span>`;
+                        // No data found - ID not found or already claimed
+                        statusDiv.innerHTML = '<span>✗ Student ID not found or already registered</span>';
                         statusDiv.className = 'validation-status invalid';
                         studentIdValid = false;
                     }
@@ -707,8 +708,18 @@
                 statusDiv.className = 'validation-status checking';
 
                 try {
-                    // Use shared-auth helper
-                    const data = await SharedAuth.validateClassCode(classCode);
+                    // Query classes table directly
+                    const { data, error } = await supabaseClient
+                        .from('classes')
+                        .select('class_name, grade_level')
+                        .eq('class_code', classCode)
+                        .eq('is_active', true)
+                        .maybeSingle();
+
+                    if (error) {
+                        console.error('Class code query error:', error);
+                        throw error;
+                    }
 
                     if (data) {
                         statusDiv.innerHTML = `<span>✓ Valid: ${data.class_name} (Grade ${data.grade_level})</span>`;
@@ -819,6 +830,7 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const studentId = document.getElementById('studentId')?.value.trim();
             const classCode = document.getElementById('classCode')?.value.trim().toUpperCase();
+            const fullName = verifiedStudentName; // Use the verified name from student ID validation
 
             const signupBtn = document.getElementById('signupBtn');
             const signupBtnText = document.getElementById('signupBtnText');
@@ -845,9 +857,10 @@
             // Student ID validation - only require if field is visible and has a value
             const studentIdField = document.getElementById('studentId');
             const classCodeField = document.getElementById('classCode');
+            const studentFieldsContainer = document.getElementById('studentFields');
 
             if (studentIdField && studentId) { // Check if student field is visible (it is for student role)
-                const isStudent = studentIdField.closest('.student-fields').classList.contains('show');
+                const isStudent = studentFieldsContainer && !studentFieldsContainer.classList.contains('hidden');
 
                 if (isStudent) {
                     // Start of Student Validation
@@ -903,6 +916,7 @@
                     email: email,
                     password: password,
                     options: {
+                        emailRedirectTo: window.location.origin + '/index.html',
                         data: {
                             full_name: finalFullName || 'User', // Fallback
                             role: 'student',
@@ -912,6 +926,13 @@
                 });
 
                 if (error) throw error;
+
+                console.log('Signup response:', data);
+
+                // Check if email confirmation is required
+                if (data.user && !data.user.email_confirmed_at) {
+                    console.log('Email confirmation required - verification email should be sent');
+                }
 
                 // Wait a moment for the database trigger to process
                 await new Promise(resolve => setTimeout(resolve, 1000));
