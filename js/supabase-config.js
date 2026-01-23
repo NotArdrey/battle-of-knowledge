@@ -111,7 +111,7 @@ async function getCurrentProfile() {
             .from('profiles')
             .select('*')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
         if (error) throw error;
         return profile;
