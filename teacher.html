@@ -1071,7 +1071,7 @@
                 return;
             }
 
-            // Get profile
+            // Get profile using auth_id
             const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('*')
@@ -1094,7 +1094,7 @@
                 const { data: newProfile, error: createError } = await sb
                     .from('profiles')
                     .upsert({
-                        id: session.user.id,
+                        auth_id: session.user.id,
                         email: session.user.email,
                         full_name: session.user.user_metadata?.full_name || 'Teacher',
                         role: session.user.user_metadata?.role || 'teacher',
@@ -1596,12 +1596,13 @@
 
                 if (profileError) throw profileError;
 
+                console.log('Student removed successfully');
                 showToast('Student removed from class', 'success');
                 loadStudents();
                 loadStats();
             } catch (error) {
                 console.error('Error removing student:', error);
-                showToast('Failed to remove student', 'error');
+                showToast('Failed to remove student: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
@@ -1669,11 +1670,12 @@
             try {
                 console.log('Loading all students for modal...');
 
-                // Get all students - query ALL student accounts regardless of teacher assignment
+                // Get all registered students - query ALL student accounts regardless of teacher assignment
                 const { data, error } = await sb
                     .from('profiles')
                     .select('id, full_name, email, teacher_id, created_at, role')
                     .eq('role', 'student')
+                    .eq('is_registered', true)
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -1683,12 +1685,12 @@
 
                 console.log('All students found:', data?.length || 0, data);
 
-                // If no students found, also try without role filter to debug
+                // If no students found, also try without filters to debug
                 if (!data || data.length === 0) {
-                    console.log('No students with role=student found, checking all profiles...');
+                    console.log('No registered students found, checking all profiles...');
                     const { data: allProfiles, error: allError } = await sb
                         .from('profiles')
-                        .select('id, full_name, email, role, teacher_id')
+                        .select('id, full_name, email, role, teacher_id, is_registered')
                         .limit(50);
 
                     if (allError) {
@@ -1699,7 +1701,7 @@
 
                         // Show helpful message if there are profiles but none with student role visible
                         if (allProfiles && allProfiles.length > 0) {
-                            const studentProfiles = allProfiles.filter(p => p.role === 'student');
+                            const studentProfiles = allProfiles.filter(p => p.role === 'student' && p.is_registered);
                             if (studentProfiles.length > 0) {
                                 resultsDiv.innerHTML = `
                                     <div class="text-center py-6">
@@ -2790,7 +2792,10 @@
                     .delete()
                     .eq('id', questionId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase delete question error:', error);
+                    throw error;
+                }
 
                 // Verify deletion
                 const { data: verifyData } = await sb
@@ -3385,7 +3390,10 @@
                     .delete()
                     .eq('id', lessonId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase delete lesson error:', error);
+                    throw error;
+                }
 
                 console.log('Lesson deleted successfully from database');
                 showToast('Lesson deleted from database!', 'success');

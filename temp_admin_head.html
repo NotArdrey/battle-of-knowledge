@@ -1172,15 +1172,15 @@
                 return;
             }
 
-            // Get profile
+            // Get profile using auth_id (not id)
             const { data: profile } = await sb
                 .from('profiles')
                 .select('*')
-                .eq('id', session.user.id)
+                .eq('auth_id', session.user.id)
                 .single();
 
             // Allow access even without profile (for new admins)
-            currentProfile = profile || { id: session.user.id, full_name: session.user.email, role: 'admin' };
+            currentProfile = profile || { auth_id: session.user.id, full_name: session.user.email, role: 'admin' };
             document.getElementById('userName').textContent = currentProfile.full_name;
 
             // Load data
@@ -1722,7 +1722,7 @@
                     // Wait a moment for the trigger to run
                     await new Promise(resolve => setTimeout(resolve, 1000));
 
-                    // Update the profile to ensure it has teacher role and is verified
+                    // Update the profile to ensure it has teacher role and is verified (use auth_id)
                     const { error: updateError } = await sb
                         .from('profiles')
                         .update({
@@ -1730,7 +1730,7 @@
                             is_verified: true,
                             full_name: name
                         })
-                        .eq('id', authData.user.id);
+                        .eq('auth_id', authData.user.id);
 
                     if (updateError) {
                         console.warn('Could not update profile, may need manual verification:', updateError);

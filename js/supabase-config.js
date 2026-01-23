@@ -110,7 +110,7 @@ async function getCurrentProfile() {
         const { data: profile, error } = await client
             .from('profiles')
             .select('*')
-            .eq('id', user.id)
+            .eq('auth_id', user.id)
             .single();
 
         if (error) throw error;

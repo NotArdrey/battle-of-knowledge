@@ -1136,15 +1136,47 @@
                 return;
             }
 
-            // Get profile
+            // Get profile using auth_id
             const { data: profile } = await sb
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
 
-            // Allow access even without profile (for new admins)
-            currentProfile = profile || { id: session.user.id, full_name: session.user.email, role: 'admin' };
+            // Setup current profile
+            if (profile) {
+                currentProfile = profile;
+            } else {
+                // Profile missing! Auto-create it (Self-repair)
+                console.warn('Profile missing for admin user. Attempting to create...');
+                try {
+                    const newProfile = {
+                        id: session.user.id,
+                        email: session.user.email,
+                        full_name: session.user.user_metadata?.full_name || 'Admin User',
+                        role: 'admin',
+                        is_verified: true,
+                        is_registered: true
+                    };
+
+                    const { error: insertError } = await sb
+                        .from('profiles')
+                        .insert(newProfile);
+
+                    if (insertError) {
+                        console.error('Failed to auto-create profile:', insertError);
+                        // Fallback but warn
+                        currentProfile = newProfile;
+                        alert('Warning: unique profile could not be created. Some actions may fail. Please contact support.');
+                    } else {
+                        console.log('Profile auto-created successfully');
+                        currentProfile = newProfile;
+                    }
+                } catch (e) {
+                    console.error('Error during profile auto-creation:', e);
+                    currentProfile = { id: session.user.id, full_name: session.user.email, role: 'admin' };
+                }
+            }
             document.getElementById('userName').textContent = currentProfile.full_name;
 
             // Load data
@@ -1169,6 +1201,7 @@
 
                 if (error) throw error;
 
+                // Profiles = Active Users
                 const total = users.length;
                 const teachers = users.filter(u => u.role === 'teacher').length;
                 const students = users.filter(u => u.role === 'student').length;
@@ -1183,7 +1216,7 @@
             }
         }
 
-        // Load all users
+        // Load all users (only registered users)
         async function loadUsers() {
             try {
                 const { data, error } = await sb
@@ -1215,7 +1248,7 @@
             tbody.innerHTML = users.map(user => `
                 <tr>
                     <td>${user.full_name}</td>
-                    <td>${user.email}</td>
+                    <td>${user.email || '-'}</td>
                     <td><span class="role-badge role-${user.role}">${user.role.toUpperCase()}</span></td>
                     <td><span class="status-badge ${user.is_verified ? 'status-verified' : 'status-pending'}">${user.is_verified ? 'Verified' : 'Pending'}</span></td>
                     <td>${formatDate(user.created_at)}</td>
@@ -1271,23 +1304,31 @@
             if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
 
             try {
+                // First delete from profiles table
                 const { error } = await sb
                     .from('profiles')
                     .delete()
                     .eq('id', userId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase delete error:', error);
+                    throw error;
+                }
 
+                console.log('User deleted successfully from profiles');
                 showToast('User deleted successfully!', 'success');
                 loadUsers();
                 loadStats();
+
+                // Note: We can't delete from auth.users via client library securely without service role
+                // The profile deletion is enough for UI, and triggers usually handle cascading
             } catch (error) {
                 console.error('Error deleting user:', error);
-                showToast('Failed to delete user', 'error');
+                showToast('Failed to delete user: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
-        // Load registered students
+        // Load registered students (pre-registered students who haven't signed up yet)
         async function loadRegisteredStudents() {
             try {
                 const { data, error } = await sb
@@ -1304,7 +1345,7 @@
             }
         }
 
-        // Render students table
+        // Render students table (pre-registered students)
         function renderStudents(students) {
             const tbody = document.getElementById('studentsTableBody');
             const emptyState = document.getElementById('studentsEmpty');
@@ -1318,11 +1359,11 @@
             emptyState.classList.add('hidden');
             tbody.innerHTML = students.map(student => `
                 <tr>
-                    <td>${student.student_id_number}</td>
+                    <td>${student.student_id_number || '-'}</td>
                     <td>${student.full_name}</td>
                     <td>${student.email || '-'}</td>
                     <td>${student.grade_level || '-'} / ${student.section || '-'}</td>
-                    <td><span class="status-badge ${student.is_claimed ? 'status-verified' : 'status-pending'}">${student.is_claimed ? 'Registered' : 'Available'}</span></td>
+                    <td><span class="status-badge status-pending">Available</span></td>
                     <td>
                         <button class="btn-action btn-delete" onclick="deleteStudent('${student.id}')">Delete</button>
                     </td>
@@ -1334,7 +1375,7 @@
         function filterStudents(query) {
             const filtered = allStudents.filter(s =>
                 s.full_name.toLowerCase().includes(query.toLowerCase()) ||
-                s.student_id_number.toLowerCase().includes(query.toLowerCase()) ||
+                (s.student_id_number && s.student_id_number.toLowerCase().includes(query.toLowerCase())) ||
                 (s.email && s.email.toLowerCase().includes(query.toLowerCase()))
             );
             renderStudents(filtered);
@@ -1428,6 +1469,8 @@
                             email: email,
                             grade_level: gradeLevel ? String(gradeLevel) : null,
                             section: section ? String(section) : null,
+                            grade_level: gradeLevel ? String(gradeLevel) : null,
+                            section: section ? String(section) : null,
                             uploaded_by: currentProfile.id
                         });
                     }
@@ -1458,7 +1501,7 @@
                     throw new Error(errorMsg);
                 }
 
-                // Upsert to database
+                // Upsert to registered_students table
                 const { error } = await sb
                     .from('registered_students')
                     .upsert(validStudents, {
@@ -1549,23 +1592,28 @@
             });
         }
 
-        // Delete student from registry
+        // Delete student from registry (pre-registered student profile)
         async function deleteStudent(studentId) {
             if (!confirm('Are you sure you want to delete this student from the registry?')) return;
 
             try {
+                // Delete from registered_students
                 const { error } = await sb
                     .from('registered_students')
                     .delete()
                     .eq('id', studentId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase delete error:', error);
+                    throw error;
+                }
 
+                console.log('Student deleted successfully');
                 showToast('Student deleted successfully!', 'success');
                 loadRegisteredStudents();
             } catch (error) {
                 console.error('Error deleting student:', error);
-                showToast('Failed to delete student', 'error');
+                showToast('Failed to delete student: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
@@ -1580,7 +1628,7 @@
             document.getElementById('studentForm').reset();
         }
 
-        // Handle add student
+        // Handle add student (pre-register a student)
         async function handleAddStudent(event) {
             event.preventDefault();
 
@@ -1710,6 +1758,10 @@
                 console.error('Error creating teacher:', error);
                 if (error.message.includes('already registered')) {
                     errorDiv.textContent = 'This email is already registered';
+                } else if (error.message.includes('rate limit') || error.message.includes('email') && error.message.includes('limit')) {
+                    errorDiv.textContent = 'Email rate limit exceeded. Please disable "Confirm email" in Supabase Dashboard → Authentication → Providers → Email, then try again.';
+                } else if (error.message.includes('email')) {
+                    errorDiv.textContent = 'Email error. Try disabling "Confirm email" in Supabase Dashboard → Authentication → Providers → Email.';
                 } else {
                     errorDiv.textContent = error.message || 'Failed to create teacher account';
                 }
@@ -2141,6 +2193,8 @@
         }
 
         async function deleteQuestion(id, isSystem) {
+            console.log(`Attempting to delete question ${id} (System: ${isSystem})`);
+
             if (isSystem) {
                 if (!confirm('⚠️ This is a SYSTEM question used by the game. Are you sure you want to delete it? This may break the game for some eras.')) {
                     return;
@@ -2153,13 +2207,19 @@
 
             try {
                 const { error } = await sb.from('custom_questions').delete().eq('id', id);
-                if (error) throw error;
 
+                if (error) {
+                    console.error('Supabase delete error:', error);
+                    throw error;
+                }
+
+                console.log('Question deleted successfully');
                 showToast('Question deleted', 'success');
                 await loadQuestions();
+                await loadStats(); // Refresh stats
             } catch (error) {
                 console.error('Error deleting question:', error);
-                showToast('Error deleting question: ' + error.message, 'error');
+                showToast('Error deleting question: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
@@ -2313,6 +2373,8 @@
         }
 
         async function deleteLesson(id, isSystem) {
+            console.log(`Attempting to delete lesson ${id} (System: ${isSystem})`);
+
             if (isSystem) {
                 if (!confirm('⚠️ This is a SYSTEM lesson used by the game. Are you sure you want to delete it? This may break the learning module for some eras.')) {
                     return;
@@ -2325,13 +2387,19 @@
 
             try {
                 const { error } = await sb.from('custom_lessons').delete().eq('id', id);
-                if (error) throw error;
 
+                if (error) {
+                    console.error('Supabase delete error:', error);
+                    throw error;
+                }
+
+                console.log('Lesson deleted successfully');
                 showToast('Lesson deleted', 'success');
                 await loadLessons();
+                await loadStats(); // Refresh stats
             } catch (error) {
                 console.error('Error deleting lesson:', error);
-                showToast('Error deleting lesson: ' + error.message, 'error');
+                showToast('Error deleting lesson: ' + (error.message || error.details || 'Unknown error'), 'error');
             }
         }
 
@@ -2406,17 +2474,22 @@
                 }
 
                 if (include.students) {
-                    showAdminExportStatus('Exporting registered students...', 'info');
-                    const { data, error } = await sb.from('registered_students').select('*');
+                    showAdminExportStatus('Exporting pre-registered students...', 'info');
+                    const { data, error } = await sb.from('profiles')
+                        .select('*')
+                        .eq('role', 'student')
+                        .eq('is_registered', false);
                     if (!error && data) {
-                        exportData.tables.registered_students = data;
+                        exportData.tables.pre_registered_students = data;
                         totalItems += data.length;
                     }
                 }
 
                 if (include.profiles) {
                     showAdminExportStatus('Exporting profiles...', 'info');
-                    const { data, error } = await sb.from('profiles').select('id, email, full_name, role, teacher_id, is_verified, student_id_number, class_id, created_at');
+                    const { data, error } = await sb.from('profiles')
+                        .select('id, auth_id, email, full_name, role, teacher_id, is_verified, is_registered, student_id_number, grade_level, section, class_id, created_at')
+                        .eq('is_registered', true);
                     if (!error && data) {
                         exportData.tables.profiles = data;
                         totalItems += data.length;

@@ -50,7 +50,21 @@ const ProgressSync = {
                 return;
             }
 
-            this.userId = session.user.id;
+            // Get the profile ID (not auth user ID) since progress table references profiles.id
+            const { data: profile, error: profileError } = await client
+                .from('profiles')
+                .select('id')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profileError || !profile) {
+                console.error('Could not find profile for user:', profileError);
+                this.userId = null;
+                this.isOnline = false;
+                return;
+            }
+
+            this.userId = profile.id;
             this.isOnline = true;
             await this.loadFromServer();
 
@@ -200,7 +214,7 @@ const ProgressSync = {
     async resetEraLessons(eraKey) {
         // Clear completed lessons for this era
         this.progress.completedLessons[eraKey] = [];
-        
+
         // Reset era progress to initial state (keep unlocked heroes)
         this.progress.eras[eraKey] = {
             lessonsComplete: false,
@@ -211,7 +225,7 @@ const ProgressSync = {
             highestStreak: 0,
             lastPlayedAt: null
         };
-        
+
         // Save to server if logged in
         if (this.userId && this.isOnline) {
             await this.saveToServer(eraKey, this.progress.eras[eraKey]);

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -11,23 +12,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Baloo 2', cursive; 
+        body {
+            font-family: 'Baloo 2', cursive;
             background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
             overflow-x: hidden;
         }
-        
+
         /* Hide scrollbar for main page but allow scrolling */
-        html, body {
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+        html,
+        body {
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
         }
-        html::-webkit-scrollbar, body::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari, Opera */
         }
-        
-        button { min-height: 44px; min-width: 44px; }
-        
+
+        button {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
         /* Main container with learning module background */
         .main-container {
             position: relative;
@@ -38,14 +48,14 @@
             justify-content: center;
             overflow-y: auto;
         }
-        
+
         .lm-bg-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
                 url('assets/Background/Learning Module BG.png');
             background-size: cover;
@@ -55,26 +65,24 @@
             opacity: 0.5;
             z-index: 1;
         }
-        
+
         .pattern-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(254, 243, 199, 0.2), rgba(254, 243, 199, 0.2)),
-                repeating-linear-gradient(
-                    0deg,
+                repeating-linear-gradient(0deg,
                     transparent,
                     transparent 2px,
                     rgba(120, 53, 15, 0.05) 2px,
-                    rgba(120, 53, 15, 0.05) 4px
-                );
+                    rgba(120, 53, 15, 0.05) 4px);
             z-index: 2;
             mix-blend-mode: multiply;
         }
-        
+
         .content-wrapper {
             position: relative;
             z-index: 10;
@@ -83,7 +91,7 @@
             margin: 20px auto;
             padding: 0 1rem;
         }
-        
+
         /* Content area */
         .content-backdrop {
             position: relative;
@@ -93,7 +101,7 @@
             box-shadow: 0 8px 32px rgba(120, 53, 15, 0.3);
             margin-bottom: 20px;
         }
-        
+
         /* Page title */
         .page-title {
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
@@ -107,7 +115,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             margin-bottom: 1.5rem;
         }
-        
+
         /* Current Lesson Display */
         .current-lesson-container {
             background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.9), rgba(253, 230, 138, 0.9));
@@ -117,14 +125,14 @@
             margin-bottom: 2rem;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
-        
+
         .current-lesson-header {
             display: flex;
             align-items: center;
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .current-lesson-icon {
             width: 70px;
             height: 70px;
@@ -136,7 +144,7 @@
             font-size: 2.5rem;
             border: 3px solid rgba(120, 53, 15, 0.3);
         }
-        
+
         .current-lesson-title {
             font-size: 1.8rem;
             font-weight: 800;
@@ -144,7 +152,7 @@
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
             flex-grow: 1;
         }
-        
+
         .lesson-number-badge {
             background: linear-gradient(to right, rgba(251, 191, 36, 0.9), rgba(245, 158, 11, 0.9));
             border: 3px solid rgba(180, 83, 9, 0.6);
@@ -156,7 +164,7 @@
             min-width: 90px;
             text-align: center;
         }
-        
+
         .current-lesson-content {
             color: #7c2d12;
             line-height: 1.7;
@@ -165,21 +173,21 @@
             overflow-y: auto;
             padding-right: 10px;
         }
-        
+
         .current-lesson-content::-webkit-scrollbar {
             width: 8px;
         }
-        
+
         .current-lesson-content::-webkit-scrollbar-track {
             background: rgba(254, 243, 199, 0.5);
             border-radius: 4px;
         }
-        
+
         .current-lesson-content::-webkit-scrollbar-thumb {
             background: rgba(120, 53, 15, 0.3);
             border-radius: 4px;
         }
-        
+
         /* Navigation */
         .navigation-buttons {
             display: flex;
@@ -187,7 +195,7 @@
             gap: 1rem;
             margin-top: 2rem;
         }
-        
+
         .nav-button {
             padding: 1rem 2rem;
             font-size: 1.2rem;
@@ -196,35 +204,35 @@
             transition: all 0.3s ease;
             min-width: 140px;
         }
-        
+
         .prev-button {
             background: linear-gradient(to right, rgba(209, 213, 219, 0.9), rgba(156, 163, 175, 0.9));
             border: 3px solid rgba(75, 85, 99, 0.4);
             color: #4b5563;
         }
-        
+
         .next-button {
             background: linear-gradient(to right, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9));
             border: 3px solid rgba(21, 128, 61, 0.6);
             color: white;
         }
-        
+
         .complete-button {
             background: linear-gradient(to right, rgba(251, 191, 36, 0.9), rgba(245, 158, 11, 0.9));
             border: 3px solid rgba(180, 83, 9, 0.6);
             color: #7c2d12;
         }
-        
+
         .nav-button:hover:not(:disabled) {
             transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         }
-        
+
         .nav-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         /* Progress Bar */
         .progress-container {
             background: rgba(254, 243, 199, 0.9);
@@ -235,7 +243,7 @@
             margin-bottom: 2rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        
+
         .progress-bar {
             transition: width 0.5s ease;
             background: linear-gradient(to right, #f59e0b, #fbbf24);
@@ -243,7 +251,7 @@
             border-radius: 10px;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .progress-track {
             background: rgba(120, 53, 15, 0.15);
             height: 20px;
@@ -252,7 +260,7 @@
             border: 2px solid rgba(120, 53, 15, 0.2);
             margin: 1rem 0;
         }
-        
+
         /* Lesson Indicators */
         .lesson-indicators {
             display: flex;
@@ -261,7 +269,7 @@
             margin: 1.5rem 0;
             flex-wrap: wrap;
         }
-        
+
         .lesson-indicator {
             width: 50px;
             height: 50px;
@@ -274,31 +282,31 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        
+
         .lesson-indicator.current {
             background: linear-gradient(to bottom right, #f59e0b, #d97706);
             border: 3px solid #92400e;
             color: white;
             transform: scale(1.1);
         }
-        
+
         .lesson-indicator.completed {
             background: linear-gradient(to bottom right, #34d399, #10b981);
             border: 3px solid #065f46;
             color: white;
         }
-        
+
         .lesson-indicator.upcoming {
             background: rgba(254, 243, 199, 0.6);
             border: 3px solid rgba(120, 53, 15, 0.3);
             color: #92400e;
         }
-        
+
         .lesson-indicator:hover:not(.current) {
             transform: translateY(-3px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Start Battle Button */
         .start-battle-container {
             text-align: center;
@@ -306,7 +314,7 @@
             padding-top: 2rem;
             border-top: 3px dashed rgba(120, 53, 15, 0.2);
         }
-        
+
         .start-battle-button {
             background: linear-gradient(to right, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
             border: 4px solid rgba(185, 28, 28, 0.6);
@@ -319,95 +327,95 @@
             transition: all 0.3s ease;
             margin-bottom: 1rem;
         }
-        
+
         .start-battle-button:hover:not(:disabled) {
             transform: translateY(-8px) scale(1.05);
             box-shadow: 0 16px 32px rgba(185, 28, 28, 0.3);
         }
-        
+
         .start-battle-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
         }
-        
+
         /* Media Queries */
         @media (max-width: 768px) {
             .content-wrapper {
                 padding: 0 0.5rem;
                 margin: 10px auto;
             }
-            
+
             .content-backdrop {
                 padding: 1.5rem;
             }
-            
+
             .current-lesson-container {
                 padding: 1.5rem;
             }
-            
+
             .current-lesson-header {
                 flex-direction: column;
                 text-align: center;
                 gap: 0.75rem;
             }
-            
+
             .current-lesson-title {
                 font-size: 1.5rem;
             }
-            
+
             .navigation-buttons {
                 flex-direction: column;
             }
-            
+
             .nav-button {
                 width: 100%;
             }
-            
+
             .lesson-indicator {
                 width: 40px;
                 height: 40px;
                 font-size: 1rem;
             }
-            
+
             .start-battle-button {
                 font-size: 1.3rem;
                 padding: 1rem 2rem;
             }
         }
-        
+
         @media (max-width: 480px) {
             .content-backdrop {
                 padding: 1rem;
             }
-            
+
             .page-title {
                 padding: 1rem 2rem;
                 font-size: 1.5rem;
             }
-            
+
             .current-lesson-container {
                 padding: 1rem;
             }
-            
+
             .current-lesson-icon {
                 width: 60px;
                 height: 60px;
                 font-size: 2rem;
             }
-            
+
             .current-lesson-content {
                 font-size: 1rem;
                 max-height: 40vh;
             }
-            
+
             .lesson-indicator {
                 width: 35px;
                 height: 35px;
                 font-size: 0.9rem;
             }
         }
-        
+
         /* Video Container Styles */
         .video-container {
             position: relative;
@@ -419,23 +427,24 @@
             background: #000;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
-        
+
         .video-container video {
             width: 100%;
             display: block;
             border-radius: 16px;
         }
-        
+
         /* YouTube Container - Responsive 16:9 */
         .youtube-container {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            padding-bottom: 56.25%;
+            /* 16:9 aspect ratio */
             height: 0;
             overflow: hidden;
             border-radius: 16px;
         }
-        
+
         .youtube-container iframe {
             position: absolute;
             top: 0;
@@ -445,7 +454,7 @@
             border: none;
             border-radius: 16px;
         }
-        
+
         .video-placeholder {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -457,17 +466,17 @@
             color: #9ca3af;
             border-radius: 16px;
         }
-        
+
         .video-placeholder-icon {
             font-size: 3rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .video-placeholder-text {
             font-size: 1rem;
             font-weight: 600;
         }
-        
+
         .caption-container {
             position: absolute;
             bottom: 0;
@@ -477,14 +486,14 @@
             padding: 0.75rem 1rem;
             text-align: center;
         }
-        
+
         .caption-text {
             color: white;
             font-size: 1rem;
             line-height: 1.4;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-        
+
         .video-toolbar {
             display: flex;
             justify-content: flex-end;
@@ -514,46 +523,48 @@
             background: rgba(0, 0, 0, 0.9);
             border-color: rgba(255, 255, 255, 0.6);
         }
-        
+
         .caption-text {
             transition: opacity 0.3s ease;
         }
-        
+
         @media (max-width: 480px) {
             .caption-text {
                 font-size: 0.85rem;
             }
-            
+
             .video-placeholder-icon {
                 font-size: 2rem;
             }
-            
+
             .video-placeholder-text {
                 font-size: 0.85rem;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <!-- Learning Module Background -->
         <div class="lm-bg-overlay"></div>
-        
+
         <!-- Pattern overlay -->
         <div class="pattern-overlay"></div>
-        
+
         <!-- Language Toggle -->
-        <button id="langToggle" class="fixed top-4 right-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0">
-            <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog" class="w-[100px] md:w-[120px] h-auto drop-shadow-lg">
+        <button id="langToggle"
+            class="fixed top-4 right-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0">
+            <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog"
+                class="w-[100px] md:w-[120px] h-auto drop-shadow-lg">
         </button>
 
         <!-- Back Button -->
-        <button onclick="navigateTo('era-selection.html', this)" class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0" data-protect="back" data-protect-duration="2000">
-            <img
-                src="assets/Buttons/era-selection/back.png"
-                data-lang-img-en="assets/Buttons/era-selection/back.png"
-                data-lang-img-tl="assets/Buttons/era-selection/back-tl.png"
-                alt="Back"
+        <button onclick="navigateTo('era-selection.html', this)"
+            class="fixed top-4 left-4 hover:-translate-y-1 hover:scale-105 transition-all duration-300 z-50 bg-transparent border-none p-0"
+            data-protect="back" data-protect-duration="2000">
+            <img src="assets/Buttons/era-selection/back.png" data-lang-img-en="assets/Buttons/era-selection/back.png"
+                data-lang-img-tl="assets/Buttons/era-selection/back-tl.png" alt="Back"
                 class="h-10 md:h-14 w-auto drop-shadow-lg lang-img-switch">
         </button>
 
@@ -570,7 +581,7 @@
                     <p class="text-amber-700 font-semibold text-lg">
                         <span data-translate="completeInOrder">Complete lessons in order to unlock battle!</span>
                     </p>
-                    
+
                     <!-- Progress Bar Container -->
                     <div class="progress-container">
                         <div class="flex justify-between items-center mb-2">
@@ -578,7 +589,8 @@
                                 <span data-translate="yourProgress">Your Progress</span>
                             </p>
                             <p class="text-amber-900 font-semibold text-base">
-                                <span id="lessonProgress">0 / 5</span> <span data-translate="lessonsCompleted">lessons completed</span>
+                                <span id="lessonProgress">0 / 5</span> <span data-translate="lessonsCompleted">lessons
+                                    completed</span>
                             </p>
                         </div>
                         <div class="progress-track">
@@ -597,11 +609,10 @@
 
                     <div class="video-toolbar">
                         <button id="bgmToggleBtn" class="caption-toggle" onclick="toggleModuleBGM()">🔊 BGM</button>
-                        <div class="caption-controls">
-                            <button id="captionLangToggle" class="caption-toggle" onclick="toggleCaptionLanguage()">CC: EN</button>
+                        <div class="caption-controls" style="display: none;">
                         </div>
                     </div>
-                    
+
                     <!-- Video Container - Shows video with captions for each lesson -->
                     <div id="lessonVideoContainer" class="video-container">
                         <div class="video-placeholder">
@@ -612,25 +623,27 @@
                             <p id="captionText" class="caption-text"></p>
                         </div>
                     </div>
-                    
+
                     <div id="currentLessonContent" class="current-lesson-content">
                         <!-- Lesson content will be loaded here -->
                     </div>
-                    
+
                     <!-- Navigation Buttons -->
                     <div class="navigation-buttons">
-                        <button id="prevLessonBtn" onclick="previousLesson()" 
-                                class="nav-button prev-button hover:-translate-y-1 transition-all duration-300 shadow-lg" disabled>
+                        <button id="prevLessonBtn" onclick="previousLesson()"
+                            class="nav-button prev-button hover:-translate-y-1 transition-all duration-300 shadow-lg"
+                            disabled>
                             <span data-translate="Previous">Previous</span>
                         </button>
-                        
-                        <button id="completeLessonBtn" onclick="completeCurrentLesson()" 
-                                class="nav-button complete-button hover:-translate-y-1 transition-all duration-300 shadow-lg">
+
+                        <button id="completeLessonBtn" onclick="completeCurrentLesson()"
+                            class="nav-button complete-button hover:-translate-y-1 transition-all duration-300 shadow-lg">
                             <span data-translate="markComplete">Mark as Complete</span>
                         </button>
-                        
-                        <button id="nextLessonBtn" onclick="nextLesson()" 
-                                class="nav-button next-button hover:-translate-y-1 transition-all duration-300 shadow-lg" disabled>
+
+                        <button id="nextLessonBtn" onclick="nextLesson()"
+                            class="nav-button next-button hover:-translate-y-1 transition-all duration-300 shadow-lg"
+                            disabled>
                             <span data-translate="Next">Next</span>
                         </button>
                     </div>
@@ -643,19 +656,18 @@
 
                 <!-- Start Battle Button -->
                 <div class="start-battle-container">
-                    <button id="startBattleBtn" 
-                            class="start-battle-button hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100"
-                            disabled>
+                    <button id="startBattleBtn"
+                        class="start-battle-button hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100"
+                        disabled>
                         <span data-translate="startBattle">Start Battle!</span>
                     </button>
                     <p id="completionHint" class="text-amber-700 font-semibold">
                         <span data-translate="completeAllLessons">Complete all lessons to unlock the battle!</span>
                     </p>
-                    
+
                     <!-- Reset Progress Button -->
-                    <button id="resetProgressBtn" 
-                            onclick="showResetConfirmation()"
-                            class="mt-4 bg-gradient-to-r from-red-400 to-red-500 border-3 border-red-700 rounded-xl px-6 py-2 text-base font-bold text-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg">
+                    <button id="resetProgressBtn" onclick="showResetConfirmation()"
+                        class="mt-4 bg-gradient-to-r from-red-400 to-red-500 border-3 border-red-700 rounded-xl px-6 py-2 text-base font-bold text-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-lg">
                         <span data-translate="resetProgress">Reset Progress</span>
                     </button>
                 </div>
@@ -667,7 +679,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/progress-sync.js"></script>
-    
+
     <script src="js/eraData.js"></script>
     <script src="js/learningData.js"></script>
     <script src="js/dbContent.js"></script>
@@ -683,7 +695,7 @@
             buttonLocks.set(buttonId, true);
             setTimeout(() => buttonLocks.set(buttonId, false), duration);
         }
-        
+
         // Era-specific Background Music for Learning Module
         const moduleBackgroundMusic = {
             'early-spanish': new Audio('assets/Game-BGM/modulePartBGM/Early Spanish Whole Menu BGM.mp3'),
@@ -706,23 +718,23 @@
         // Play era-specific background music
         function playModuleBackgroundMusic(eraKey) {
             if (!eraKey || !moduleBackgroundMusic[eraKey]) return;
-            
+
             try {
                 // Stop any currently playing music
                 stopModuleBackgroundMusic();
-                
+
                 // Play the current era's music
                 currentModuleBGM = moduleBackgroundMusic[eraKey];
                 currentModuleBGM.currentTime = 0;
                 currentModuleBGM.volume = 0.2;
-                
+
                 // Try to play automatically
                 currentModuleBGM.play().catch(e => {
                     console.log('Module BGM autoplay blocked:', e);
                     // Add click handler to start music on user interaction
                     document.addEventListener('click', function startBGM() {
                         if (currentModuleBGM) {
-                            currentModuleBGM.play().catch(() => {});
+                            currentModuleBGM.play().catch(() => { });
                         }
                         document.removeEventListener('click', startBGM);
                     }, { once: true });
@@ -758,7 +770,7 @@
         function resumeModuleBGMAfterVideo() {
             if (moduleBGMMuted) return; // User has BGM muted, don't resume
             if (resumeModuleBGMOnPause && currentModuleBGM) {
-                currentModuleBGM.play().catch(() => {});
+                currentModuleBGM.play().catch(() => { });
                 resumeModuleBGMOnPause = false;
             }
         }
@@ -768,7 +780,7 @@
             const btn = document.getElementById('bgmToggleBtn');
             if (currentModuleBGM) {
                 if (currentModuleBGM.paused) {
-                    currentModuleBGM.play().catch(() => {});
+                    currentModuleBGM.play().catch(() => { });
                     moduleBGMMuted = false;
                     if (btn) btn.textContent = '🔊 BGM';
                 } else {
@@ -801,11 +813,11 @@
             const videoContainer = document.getElementById('lessonVideoContainer');
             const captionContainer = document.getElementById('captionContainer');
             const captionText = document.getElementById('captionText');
-            
+
             // Get video data from moduleVideos.js
             if (typeof moduleVideos !== 'undefined' && moduleVideos[currentEraKey]) {
                 const lessonData = moduleVideos[currentEraKey].lessons.find(l => l.lessonId === lessonId);
-                
+
                 if (lessonData) {
                     // Load captions (handle missing captions gracefully)
                     if (lessonData.captions) {
@@ -813,7 +825,7 @@
                     } else {
                         currentCaptions = [];
                     }
-                    
+
                     // Check if YouTube video exists
                     if (lessonData.youtubeId) {
                         // Show YouTube iframe
@@ -832,13 +844,13 @@
                                 <p id="captionText" class="caption-text">Captions are embedded in the YouTube video</p>
                             </div>
                         `;
-                        
+
                         // Hide custom captions for YouTube (use YouTube's built-in captions)
                         const liveCaptionContainer = document.getElementById('captionContainer');
                         if (liveCaptionContainer) {
                             liveCaptionContainer.style.display = 'none';
                         }
-                        
+
                         // Mute BGM when YouTube video is displayed
                         muteModuleBGMForVideo();
                     } else if (lessonData.videoFile) {
@@ -852,7 +864,7 @@
                                 <p id="captionText" class="caption-text"></p>
                             </div>
                         `;
-                        
+
                         // Set up video caption sync
                         const video = document.getElementById('lessonVideo');
                         video.addEventListener('timeupdate', syncCaptions);
@@ -877,7 +889,7 @@
                                 <p id="captionText" class="caption-text"></p>
                             </div>
                         `;
-                        
+
                         // Start caption slideshow
                         const placeholderCaptionContainer = document.getElementById('captionContainer');
                         if (placeholderCaptionContainer) {
@@ -898,7 +910,7 @@
                 showVideoPlaceholder();
             }
         }
-        
+
         // Show video placeholder
         function showVideoPlaceholder() {
             const videoContainer = document.getElementById('lessonVideoContainer');
@@ -909,13 +921,13 @@
                 </div>
             `;
         }
-        
+
         // Sync captions with video time
         function syncCaptions() {
             const video = document.getElementById('lessonVideo');
             const captionText = document.getElementById('captionText');
             const captionContainer = document.getElementById('captionContainer');
-            
+
             if (!captionsVisible) {
                 if (captionContainer) {
                     captionContainer.style.display = 'none';
@@ -924,10 +936,10 @@
             }
 
             if (!video || !captionText || currentCaptions.length === 0) return;
-            
+
             const currentTime = video.currentTime;
             let activeCaption = null;
-            
+
             // Find the appropriate caption for the current time
             for (let i = currentCaptions.length - 1; i >= 0; i--) {
                 if (currentTime >= currentCaptions[i].time) {
@@ -935,7 +947,7 @@
                     break;
                 }
             }
-            
+
             if (activeCaption) {
                 captionText.textContent = activeCaption.text;
                 captionContainer.style.display = 'block';
@@ -943,29 +955,29 @@
                 captionContainer.style.display = 'none';
             }
         }
-        
+
         // Start caption slideshow for placeholder
         function startCaptionSlideshow() {
             // Clear any existing interval
             if (captionInterval) {
                 clearInterval(captionInterval);
             }
-            
+
             const captionText = document.getElementById('captionText');
             const captionContainer = document.getElementById('captionContainer');
             if (!captionsVisible || !captionText || currentCaptions.length === 0) return;
-            
+
             currentCaptionIndex = 0;
             captionText.textContent = currentCaptions[0].text;
             if (captionContainer) {
                 captionContainer.style.display = 'block';
             }
-            
+
             // Auto-advance captions every 5 seconds
             captionInterval = setInterval(() => {
                 currentCaptionIndex = (currentCaptionIndex + 1) % currentCaptions.length;
                 captionText.textContent = currentCaptions[currentCaptionIndex].text;
-                
+
                 // Add fade animation
                 captionText.style.opacity = '0';
                 setTimeout(() => {
@@ -973,11 +985,11 @@
                 }, 100);
             }, 5000);
         }
-        
+
         // Toggle caption language
         function toggleCaptionLanguage() {
             captionLanguage = captionLanguage === 'en' ? 'tl' : 'en';
-            
+
             // Reload the current lesson video with new language
             const lesson = currentEraLessons[currentLessonIndex];
             if (lesson) {
@@ -1024,7 +1036,7 @@
 
             refreshCaptionControls();
         }
-        
+
         // Stop caption slideshow when leaving page
         window.addEventListener('beforeunload', () => {
             if (captionInterval) {
@@ -1062,10 +1074,10 @@
             try {
                 currentEraKey = localStorage.getItem('selectedEra') || 'early-spanish';
                 currentLang = localStorage.getItem('selectedLanguage') || 'en';
-                
+
                 // Start era-specific background music
                 playModuleBackgroundMusic(currentEraKey);
-                
+
                 // Load completed lessons from ProgressSync (database) first, fallback to localStorage
                 if (window.ProgressSync) {
                     const lessonList = window.ProgressSync.getCompletedLessons(currentEraKey);
@@ -1082,7 +1094,7 @@
                         completedLessons = new Set(JSON.parse(savedProgress));
                     }
                 }
-                
+
                 loadEraContent();
                 setupLessonNavigation();
                 updateProgress();
@@ -1099,25 +1111,25 @@
                     console.error('learningData is not defined!');
                     return;
                 }
-                
+
                 if (!learningData[currentEraKey]) {
                     console.error('No data for era:', currentEraKey);
                     return;
                 }
-                
+
                 const eraContent = learningData[currentEraKey][currentLang];
-                
+
                 if (!eraContent) {
                     console.error('No content found for era:', currentEraKey, 'language:', currentLang);
                     return;
                 }
-                
+
                 // Update title
                 document.getElementById('eraTitle').textContent = eraContent.title;
-                
+
                 // Store lessons
                 currentEraLessons = eraContent.lessons;
-                
+
                 // Create lesson indicators
                 createLessonIndicators();
             } catch (error) {
@@ -1129,16 +1141,16 @@
         function createLessonIndicators() {
             const container = document.getElementById('lessonIndicators');
             container.innerHTML = '';
-            
+
             currentEraLessons.forEach((lesson, index) => {
                 const isCompleted = completedLessons.has(lesson.id);
                 const isCurrent = index === currentLessonIndex;
-                
+
                 const indicator = document.createElement('div');
                 indicator.className = `lesson-indicator ${isCurrent ? 'current' : isCompleted ? 'completed' : 'upcoming'}`;
                 indicator.textContent = index + 1;
                 indicator.title = lesson.title;
-                
+
                 if (!isCurrent) {
                     indicator.onclick = () => {
                         // Only allow clicking on completed lessons or the next uncompleted lesson
@@ -1148,7 +1160,7 @@
                             createLessonIndicators();
                         }
                     };
-                    
+
                     // Add pointer cursor only if clickable
                     if (isCompleted || index === getNextUncompletedIndex()) {
                         indicator.style.cursor = 'pointer';
@@ -1159,7 +1171,7 @@
                 } else {
                     indicator.style.cursor = 'default';
                 }
-                
+
                 container.appendChild(indicator);
             });
         }
@@ -1181,33 +1193,33 @@
                     console.error('No lessons found in currentEraLessons array');
                     return;
                 }
-                
+
                 const lesson = currentEraLessons[currentLessonIndex];
-                
+
                 if (!lesson) {
                     console.error('Lesson not found at index:', currentLessonIndex);
                     return;
                 }
-                
+
                 const isCompleted = completedLessons.has(lesson.id);
-                
+
                 // Update lesson display
                 document.getElementById('currentLessonIcon').textContent = lesson.icon;
                 document.getElementById('currentLessonTitle').textContent = lesson.title;
                 document.getElementById('currentLessonContent').innerHTML = lesson.content;
                 document.getElementById('currentLessonNumber').textContent = `${currentLessonIndex + 1} / ${currentEraLessons.length}`;
-                
+
                 // Load video and captions for this lesson
                 loadLessonVideo(lesson.id);
-                
+
                 // Update navigation buttons
                 updateNavigationButtons();
-                
+
                 // Update complete button
                 const completeBtn = document.getElementById('completeLessonBtn');
                 const completeText = translations[currentLanguage]['markComplete'] || 'Mark as Complete';
                 const completedText = translations[currentLanguage]['Completed'] || 'Completed';
-                
+
                 if (isCompleted) {
                     completeBtn.disabled = true;
                     completeBtn.classList.remove('complete-button');
@@ -1219,7 +1231,7 @@
                     completeBtn.classList.add('complete-button');
                     completeBtn.querySelector('span').textContent = completeText;
                 }
-                
+
                 // Auto-scroll to top of lesson content
                 document.getElementById('currentLessonContent').scrollTop = 0;
             } catch (error) {
@@ -1231,14 +1243,14 @@
         function updateNavigationButtons() {
             const prevBtn = document.getElementById('prevLessonBtn');
             const nextBtn = document.getElementById('nextLessonBtn');
-            
+
             // Previous button
             prevBtn.disabled = currentLessonIndex === 0;
-            
+
             // Next button - only enabled if current lesson is completed
             const isCurrentCompleted = completedLessons.has(currentEraLessons[currentLessonIndex].id);
             nextBtn.disabled = !isCurrentCompleted || currentLessonIndex === currentEraLessons.length - 1;
-            
+
             // Update battle button
             checkBattleUnlock();
         }
@@ -1248,36 +1260,36 @@
             // Prevent spam clicks
             if (isButtonLocked('complete')) return;
             lockButton('complete', 1500);
-            
+
             if (currentEraLessons.length === 0) return;
-            
+
             const lesson = currentEraLessons[currentLessonIndex];
-            
+
             // Already completed - skip
             if (completedLessons.has(lesson.id)) return;
-            
+
             // Mark as complete
             completedLessons.add(lesson.id);
-            
+
             // Save progress to localStorage (for offline/fallback)
             localStorage.setItem(
-                `learning_${currentEraKey}`, 
+                `learning_${currentEraKey}`,
                 JSON.stringify([...completedLessons])
             );
-            
+
             // Sync to database via ProgressSync
             if (window.ProgressSync) {
                 await window.ProgressSync.markLessonComplete(currentEraKey, lesson.id);
             }
-            
+
             // Show completion animation
             showLessonCompletion();
-            
+
             // Update UI
             updateProgress();
             updateNavigationButtons();
             createLessonIndicators();
-            
+
             // If all lessons completed, mark era lessons as complete and show celebration
             if (completedLessons.size === currentEraLessons.length) {
                 if (window.ProgressSync) {
@@ -1285,7 +1297,7 @@
                 }
                 setTimeout(showAllLessonsCompleted, 500);
             }
-            
+
             // If this wasn't the last lesson, automatically move to next after a delay
             if (currentLessonIndex < currentEraLessons.length - 1) {
                 setTimeout(() => {
@@ -1300,21 +1312,21 @@
         function showLessonCompletion() {
             const completeBtn = document.getElementById('completeLessonBtn');
             const originalText = completeBtn.querySelector('span').textContent;
-            
+
             // Change button text briefly
             completeBtn.querySelector('span').textContent = 'Done!';
             completeBtn.style.background = 'linear-gradient(to right, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9))';
             completeBtn.style.borderColor = 'rgba(21, 128, 61, 0.6)';
             completeBtn.style.color = 'white';
-            
+
             // Create confetti effect
             createConfetti();
-            
+
             // Revert button after delay
             setTimeout(() => {
                 const lesson = currentEraLessons[currentLessonIndex];
                 const isCompleted = completedLessons.has(lesson.id);
-                
+
                 if (isCompleted) {
                     completeBtn.disabled = true;
                     completeBtn.classList.remove('complete-button');
@@ -1327,7 +1339,7 @@
         // Create confetti effect
         function createConfetti() {
             const colors = ['#fbbf24', '#f59e0b', '#10b981', '#34d399', '#3b82f6', '#6366f1'];
-            
+
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
                 confetti.style.position = 'fixed';
@@ -1339,9 +1351,9 @@
                 confetti.style.top = '-20px';
                 confetti.style.zIndex = '9999';
                 confetti.style.pointerEvents = 'none';
-                
+
                 document.body.appendChild(confetti);
-                
+
                 // Animation
                 const animation = confetti.animate([
                     { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
@@ -1350,7 +1362,7 @@
                     duration: 1000 + Math.random() * 1000,
                     easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
                 });
-                
+
                 animation.onfinish = () => confetti.remove();
             }
         }
@@ -1367,9 +1379,9 @@
                     <p class="text-base md:text-lg mt-2">You can now start the battle!</p>
                 </div>
             `;
-            
+
             document.body.appendChild(celebration);
-            
+
             // Remove after 3 seconds
             setTimeout(() => {
                 celebration.remove();
@@ -1380,7 +1392,7 @@
         function previousLesson() {
             if (isButtonLocked('prev')) return;
             lockButton('prev', 500);
-            
+
             if (currentLessonIndex > 0) {
                 currentLessonIndex--;
                 loadCurrentLesson();
@@ -1392,10 +1404,10 @@
         function nextLesson() {
             if (isButtonLocked('next')) return;
             lockButton('next', 500);
-            
+
             const lesson = currentEraLessons[currentLessonIndex];
             const isCompleted = completedLessons.has(lesson.id);
-            
+
             if (isCompleted && currentLessonIndex < currentEraLessons.length - 1) {
                 currentLessonIndex++;
                 loadCurrentLesson();
@@ -1408,7 +1420,7 @@
             const totalLessons = currentEraLessons.length;
             const completed = completedLessons.size;
             const percentage = (completed / totalLessons) * 100;
-            
+
             document.getElementById('progressBar').style.width = `${percentage}%`;
             document.getElementById('lessonProgress').textContent = `${completed} / ${totalLessons}`;
         }
@@ -1419,7 +1431,7 @@
             const completed = completedLessons.size;
             const startButton = document.getElementById('startBattleBtn');
             const hint = document.getElementById('completionHint');
-            
+
             if (completed >= totalLessons) {
                 startButton.disabled = false;
                 startButton.onclick = startBattle;
@@ -1455,9 +1467,9 @@
         function startBattle() {
             if (isButtonLocked('startBattle')) return;
             lockButton('startBattle', 2000);
-            
+
             const selectedEra = localStorage.getItem('selectedEra');
-            
+
             // Always show character selection for eras with multiple heroes
             if (eraData[selectedEra] && eraData[selectedEra].heroes.length > 1) {
                 // Show character selection modal
@@ -1479,14 +1491,14 @@
             const modal = document.createElement('div');
             modal.id = 'characterSelectModal';
             modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
-            
+
             const heroes = eraData[era].heroes;
             const unlockedIndices = getUnlockedHeroesForEra(era);
             let heroesHTML = '';
-            
+
             heroes.forEach((hero, index) => {
                 const isUnlocked = unlockedIndices.includes(index);
-                
+
                 if (isUnlocked) {
                     heroesHTML += `
                         <div class="bg-gradient-to-br from-blue-400 to-cyan-400 border-3 md:border-4 border-blue-600 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-pointer hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl" onclick="selectCharacter(${index})">
@@ -1511,7 +1523,7 @@
                     `;
                 }
             });
-            
+
             modal.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl md:rounded-3xl border-4 md:border-8 border-amber-800 max-w-4xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
                     <div class="p-6 md:p-8">
@@ -1529,7 +1541,7 @@
                     </div>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
         }
 
@@ -1538,11 +1550,11 @@
             // Prevent double clicks
             if (isButtonLocked('selectCharacter')) return;
             lockButton('selectCharacter', 2000);
-            
+
             // Clear any previous battle progress to start a fresh session
             localStorage.removeItem('battleProgress');
             localStorage.setItem('selectedHero', heroIndex);
-            
+
             // Show loading and navigate
             if (window.showPageLoading) window.showPageLoading('Preparing Battle');
             setTimeout(() => {
@@ -1584,7 +1596,7 @@
             const modal = document.createElement('div');
             modal.id = 'resetConfirmModal';
             modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
-            
+
             modal.innerHTML = `
                 <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl md:rounded-3xl border-4 md:border-8 border-amber-800 max-w-md w-full shadow-2xl">
                     <div class="p-6 md:p-8 text-center">
@@ -1606,16 +1618,16 @@
                     </div>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
         }
-        
+
         // Confirm and execute reset
         async function confirmResetProgress() {
             // Clear completed lessons for current era
             completedLessons.clear();
             localStorage.removeItem(`learning_${currentEraKey}`);
-            
+
             // Sync reset to database via ProgressSync
             if (window.ProgressSync && window.ProgressSync.userId) {
                 try {
@@ -1624,7 +1636,7 @@
                         lessonsComplete: false,
                         currentLessonIndex: 0
                     });
-                    
+
                     // Clear completed lessons in database
                     const client = window.ProgressSync.getClient();
                     if (client) {
@@ -1639,10 +1651,10 @@
                     console.error('Error syncing progress reset to database:', error);
                 }
             }
-            
+
             // Reset to first lesson
             currentLessonIndex = 0;
-            
+
             // Reset progress in database
             if (window.ProgressSync) {
                 await window.ProgressSync.updateEraProgress(currentEraKey, {
@@ -1658,20 +1670,20 @@
                 // Re-save to server with empty lessons
                 await window.ProgressSync.saveToServer(currentEraKey, window.ProgressSync.getEraProgress(currentEraKey));
             }
-            
+
             // Update UI
             await loadCurrentLesson();
             createLessonIndicators();
             updateProgress();
             checkBattleUnlock();
-            
+
             // Close modal
             closeResetModal();
-            
+
             // Show confirmation message
             showResetConfirmationMessage();
         }
-        
+
         // Close reset modal
         function closeResetModal() {
             const modal = document.getElementById('resetConfirmModal');
@@ -1679,15 +1691,15 @@
                 modal.remove();
             }
         }
-        
+
         // Show reset confirmation message
         function showResetConfirmationMessage() {
             const message = document.createElement('div');
             message.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-xl shadow-2xl z-50 font-bold text-lg';
             message.textContent = 'Progress has been reset!';
-            
+
             document.body.appendChild(message);
-            
+
             setTimeout(() => {
                 message.style.transition = 'opacity 0.5s';
                 message.style.opacity = '0';
@@ -1698,7 +1710,7 @@
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('DOMContentLoaded fired');
-            
+
             // Initialize ProgressSync (works for both logged-in users and guests)
             if (window.ProgressSync) {
                 try {
@@ -1708,19 +1720,19 @@
                     console.warn('ProgressSync init failed:', e);
                 }
             }
-            
+
             // Load lessons from database (with fallback to local files)
             if (window.dbContent) {
                 await window.dbContent.init();
             }
-            
+
             // Initialize learning module after ProgressSync is ready
             try {
                 await initLearningModule();
             } catch (error) {
                 console.error('Error in initLearningModule:', error);
             }
-            
+
             // Setup language toggle
             const langToggle = document.getElementById('langToggle');
             if (langToggle) {
@@ -1731,4 +1743,5 @@
         });
     </script>
 </body>
+
 </html>
