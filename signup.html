@@ -640,13 +640,12 @@
                 try {
                     console.log('Validating student ID:', studentId);
 
-                    // Check profiles table for pre-registered students
+                    // Check registered_students table for pre-registered students
                     const { data, error } = await supabaseClient
-                        .from('profiles')
+                        .from('registered_students')
                         .select('*')
                         .eq('student_id_number', studentId)
-                        .eq('is_registered', false)
-                        .eq('role', 'student')
+                        .eq('is_claimed', false)
                         .single();
 
                     console.log('Validation response:', { data, error });
@@ -945,11 +944,22 @@
                         await supabaseClient
                             .from('profiles')
                             .update({
-                                teacher_id: classData.teacher_id,
-                                class_id: classData.id
+                                teacher_id: classData.teacher_id
                             })
                             .eq('id', profileId);
+
                     }
+                }
+
+                // Mark registered student as claimed (if student ID was provided)
+                if (studentId && profileId) {
+                    await supabaseClient
+                        .from('registered_students')
+                        .update({
+                            is_claimed: true,
+                            claimed_by: profileId
+                        })
+                        .eq('student_id_number', studentId);
                 }
 
                 successDiv.innerHTML = `

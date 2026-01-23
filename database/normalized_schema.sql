@@ -1,5 +1,5 @@
 -- ============================================
--- BATTLE OF KNOWLEDGE - NORMALIZED 3NF SCHEMA
+-- BATTLE OF KNOWLEDGE - NORMALIZED 3NF SCHEMA (v2)
 -- Run this ENTIRE script in Supabase SQL Editor
 -- ============================================
 
@@ -45,8 +45,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================
 
 CREATE TABLE eras (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    era_key TEXT UNIQUE NOT NULL, -- e.g., 'early-spanish'
+    era_key TEXT PRIMARY KEY, -- Natural Key (e.g., 'early-spanish')
     title_en TEXT NOT NULL,
     title_tl TEXT,
     description_en TEXT,
@@ -137,7 +136,7 @@ CREATE INDEX idx_enrollments_student ON class_enrollments(student_id);
 
 CREATE TABLE custom_questions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    era_key TEXT NOT NULL REFERENCES eras(era_key) ON DELETE CASCADE,
     created_by UUID REFERENCES profiles(id) ON DELETE SET NULL, -- Null for system questions
     question_text_en TEXT NOT NULL,
     question_text_tl TEXT,
@@ -150,7 +149,7 @@ CREATE TABLE custom_questions (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_questions_era ON custom_questions(era_id);
+CREATE INDEX idx_questions_era ON custom_questions(era_key);
 CREATE INDEX idx_questions_creator ON custom_questions(created_by);
 
 CREATE TABLE question_choices (
@@ -166,7 +165,7 @@ CREATE INDEX idx_choices_question ON question_choices(question_id);
 
 CREATE TABLE custom_lessons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    era_key TEXT NOT NULL REFERENCES eras(era_key) ON DELETE CASCADE,
     created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
     lesson_order INTEGER NOT NULL,
     title_en TEXT NOT NULL,
@@ -182,7 +181,7 @@ CREATE TABLE custom_lessons (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_lessons_era ON custom_lessons(era_id);
+CREATE INDEX idx_lessons_era ON custom_lessons(era_key);
 
 -- ============================================
 -- STEP 6: PROGRESS & GAMEPLAY
@@ -191,7 +190,7 @@ CREATE INDEX idx_lessons_era ON custom_lessons(era_id);
 CREATE TABLE progress (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    era_key TEXT NOT NULL REFERENCES eras(era_key) ON DELETE CASCADE,
     is_era_completed BOOLEAN DEFAULT FALSE,
     boss_defeated BOOLEAN DEFAULT FALSE,
     current_lesson_index INTEGER DEFAULT 0,
@@ -202,11 +201,11 @@ CREATE TABLE progress (
     last_played_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, era_id)
+    UNIQUE(user_id, era_key)
 );
 
 CREATE INDEX idx_progress_user ON progress(user_id);
-CREATE INDEX idx_progress_era ON progress(era_id);
+CREATE INDEX idx_progress_era ON progress(era_key);
 
 -- Normalized Lesson Progress
 CREATE TABLE student_lesson_progress (
@@ -217,14 +216,11 @@ CREATE TABLE student_lesson_progress (
     UNIQUE(user_id, lesson_id)
 );
 
--- Normalized Unlocked Heroes (assuming heroes are associated with eras or simple IDs)
--- Since heroes were JSONB indices often, we might strictly define them later.
--- For now, we will track them by a simple integer ID or text key if we had a proper heroes table.
--- Given previous schema used JSON 'unlocked_heroes', we will create a simple table.
+-- Normalized Unlocked Heroes
 CREATE TABLE student_unlocked_heroes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    hero_index INTEGER NOT NULL, -- Corresponds to client-side hero array index or ID
+    hero_index INTEGER NOT NULL,
     unlocked_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(user_id, hero_index)
 );
@@ -240,7 +236,7 @@ CREATE TABLE achievements (
 CREATE TABLE game_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    era_key TEXT NOT NULL REFERENCES eras(era_key) ON DELETE CASCADE,
     session_type TEXT NOT NULL CHECK (session_type IN ('learning', 'battle')),
     started_at TIMESTAMPTZ DEFAULT NOW(),
     ended_at TIMESTAMPTZ,
@@ -418,20 +414,11 @@ INSERT INTO eras (era_key, title_en, title_tl, sort_order) VALUES
 -- Seed System Questions (Linked to Eras)
 DO $$
 DECLARE
-    era_early UUID;
-    era_late UUID;
-    era_american UUID;
-    era_ww2 UUID;
     q_id UUID;
 BEGIN
-    SELECT id INTO era_early FROM eras WHERE era_key = 'early-spanish';
-    SELECT id INTO era_late FROM eras WHERE era_key = 'late-spanish';
-    SELECT id INTO era_american FROM eras WHERE era_key = 'american-colonial';
-    SELECT id INTO era_ww2 FROM eras WHERE era_key = 'ww2';
-
     -- Early Spanish Question 1
-    INSERT INTO custom_questions (era_id, question_text_en, question_text_tl, is_system, is_approved, difficulty) 
-    VALUES (era_early, 'Who was the first Filipino hero to resist Spanish colonization?', 'Sino ang unang bayaning Pilipino na lumaban sa pananakop ng Espanya?', true, true, 'easy')
+    INSERT INTO custom_questions (era_key, question_text_en, question_text_tl, is_system, is_approved, difficulty) 
+    VALUES ('early-spanish', 'Who was the first Filipino hero to resist Spanish colonization?', 'Sino ang unang bayaning Pilipino na lumaban sa pananakop ng Espanya?', true, true, 'easy')
     RETURNING id INTO q_id;
 
     INSERT INTO question_choices (question_id, content_en, content_tl, is_correct) VALUES
@@ -441,8 +428,8 @@ BEGIN
     (q_id, 'Emilio Aguinaldo', 'Emilio Aguinaldo', false);
 
      -- Early Spanish Question 2
-    INSERT INTO custom_questions (era_id, question_text_en, question_text_tl, is_system, is_approved, difficulty) 
-    VALUES (era_early, 'In what year did Ferdinand Magellan arrive in the Philippines?', 'Anong taon dumating si Ferdinand Magellan sa Pilipinas?', true, true, 'easy')
+    INSERT INTO custom_questions (era_key, question_text_en, question_text_tl, is_system, is_approved, difficulty) 
+    VALUES ('early-spanish', 'In what year did Ferdinand Magellan arrive in the Philippines?', 'Anong taon dumating si Ferdinand Magellan sa Pilipinas?', true, true, 'easy')
     RETURNING id INTO q_id;
 
     INSERT INTO question_choices (question_id, content_en, content_tl, is_correct) VALUES

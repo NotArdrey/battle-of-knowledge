@@ -201,11 +201,10 @@ async function validateStudentId(studentIdNumber) {
     try {
         const client = getSupabaseClient();
         const { data, error } = await client
-            .from('profiles')
+            .from('registered_students')
             .select('*')
             .eq('student_id_number', studentIdNumber)
-            .eq('is_registered', false)
-            .eq('role', 'student')
+            .eq('is_claimed', false)
             .single();
 
         if (error) {
@@ -394,8 +393,7 @@ async function enrollInClass(studentId, classCode) {
         await client
             .from('profiles')
             .update({
-                teacher_id: classData.teacher_id,
-                class_id: classData.id
+                teacher_id: classData.teacher_id
             })
             .eq('id', studentId);
 
