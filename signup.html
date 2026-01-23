@@ -939,15 +939,22 @@
                     user: data.user,
                     session: data.session,
                     emailConfirmed: data.user?.email_confirmed_at,
+                    confirmedAt: data.user?.confirmed_at,
                     identities: data.user?.identities
                 });
 
                 // Check if email confirmation is required
-                if (data.user && !data.user.confirmed_at) {
-                    console.log('✉️ Email confirmation required - verification email should have been sent to:', email);
-                    console.log('Check your email inbox and spam folder');
-                } else if (data.session) {
-                    console.log('⚠️ User was auto-confirmed (email confirmation disabled in Supabase)');
+                if (data.session) {
+                    // If there's a session immediately, email confirmation is DISABLED
+                    console.error('⚠️ EMAIL CONFIRMATION IS DISABLED IN SUPABASE!');
+                    console.error('Go to Supabase Dashboard → Authentication → Providers → Email');
+                    console.error('Enable "Confirm email" toggle and save');
+                    alert('⚠️ WARNING: Email confirmation is DISABLED in your Supabase settings!\n\nTo enable:\n1. Go to Supabase Dashboard\n2. Authentication → Providers → Email\n3. Enable "Confirm email"\n4. Save changes');
+                } else if (data.user && !data.user.confirmed_at) {
+                    console.log('✅ Email confirmation ENABLED - verification email sent to:', email);
+                    console.log('📧 Check email inbox and spam folder');
+                } else {
+                    console.warn('Unexpected signup state:', data);
                 }
 
                 // Wait a moment for the database trigger to process
