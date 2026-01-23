@@ -556,10 +556,6 @@
                 Already have an account?
                 <a href="login.html" class="link-text">Sign in here</a>
             </p>
-
-            <div class="mt-4 text-center">
-                <a href="index.html" class="link-text text-sm">← Back to Home</a>
-            </div>
         </div>
     </div>
 
@@ -644,11 +640,13 @@
                 try {
                     console.log('Validating student ID:', studentId);
 
+                    // Check profiles table for pre-registered students
                     const { data, error } = await supabaseClient
-                        .from('registered_students')
+                        .from('profiles')
                         .select('*')
                         .eq('student_id_number', studentId)
-                        .eq('is_claimed', false)
+                        .eq('is_registered', false)
+                        .eq('role', 'student')
                         .single();
 
                     console.log('Validation response:', { data, error });
@@ -657,6 +655,7 @@
                         statusDiv.innerHTML = `<span>✓ Valid: ${data.full_name}</span>`;
                         statusDiv.className = 'validation-status valid';
                         studentIdValid = true;
+                        verifiedStudentName = data.full_name;
 
                         // Auto-fill name if empty
                         const nameField = document.getElementById('fullName');
@@ -899,6 +898,7 @@
 
             try {
                 // Create the user account
+                // The database trigger will handle linking to pre-registered profile
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
@@ -913,30 +913,20 @@
 
                 if (error) throw error;
 
-                // Wait a moment for the database trigger to create the profile
+                // Wait a moment for the database trigger to process
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // Update profile with student ID
-                if (studentId && data.user) {
-                    await supabaseClient
-                        .from('profiles')
-                        .update({ student_id_number: studentId })
-                        .eq('id', data.user.id);
-                }
+                // Get the profile ID for this auth user
+                const { data: profileData } = await supabaseClient
+                    .from('profiles')
+                    .select('id')
+                    .eq('auth_id', data.user.id)
+                    .single();
 
-                // Mark student ID as claimed
-                if (studentId) {
-                    await supabaseClient
-                        .from('registered_students')
-                        .update({
-                            is_claimed: true,
-                            claimed_by: data.user.id
-                        })
-                        .eq('student_id_number', studentId);
-                }
+                const profileId = profileData?.id;
 
                 // Enroll in class if code provided
-                if (classCode && data.user) {
+                if (classCode && profileId) {
                     const { data: classData } = await supabaseClient
                         .from('classes')
                         .select('id, teacher_id')
@@ -948,7 +938,7 @@
                         // Insert enrollment
                         await supabaseClient.from('class_enrollments').insert({
                             class_id: classData.id,
-                            student_id: data.user.id
+                            student_id: profileId
                         });
 
                         // Update profile with teacher and class
@@ -958,7 +948,7 @@
                                 teacher_id: classData.teacher_id,
                                 class_id: classData.id
                             })
-                            .eq('id', data.user.id);
+                            .eq('id', profileId);
                     }
                 }
 

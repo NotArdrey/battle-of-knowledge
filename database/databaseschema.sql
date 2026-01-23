@@ -32,36 +32,33 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- STEP 2: CREATE TABLES
 -- ============================================
 
+-- Unified profiles table that handles both pre-registered students and active users
+-- Pre-registered students have is_registered = FALSE and no auth.users reference
+-- When a pre-registered student signs up, their profile is linked to auth.users
 CREATE TABLE profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT UNIQUE NOT NULL,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    auth_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT,
     full_name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('admin', 'teacher', 'student')),
     teacher_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
     is_verified BOOLEAN DEFAULT FALSE,
-    student_id_number TEXT,
+    is_registered BOOLEAN DEFAULT FALSE,
+    student_id_number TEXT UNIQUE,
+    grade_level TEXT,
+    section TEXT,
     class_id UUID,
     avatar_url TEXT,
+    uploaded_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_profiles_role ON profiles(role);
 CREATE INDEX idx_profiles_teacher_id ON profiles(teacher_id);
-
-CREATE TABLE registered_students (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_id_number TEXT UNIQUE NOT NULL,
-    full_name TEXT NOT NULL,
-    email TEXT,
-    grade_level TEXT,
-    section TEXT,
-    is_claimed BOOLEAN DEFAULT FALSE,
-    claimed_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
-    uploaded_by UUID REFERENCES profiles(id),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+CREATE INDEX idx_profiles_student_id ON profiles(student_id_number);
+CREATE INDEX idx_profiles_auth_id ON profiles(auth_id);
+CREATE INDEX idx_profiles_registered ON profiles(is_registered);
 
 CREATE TABLE classes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -184,7 +181,6 @@ CREATE INDEX idx_sessions_user ON game_sessions(user_id);
 -- ============================================
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE registered_students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE classes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE class_enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE progress ENABLE ROW LEVEL SECURITY;
@@ -202,7 +198,7 @@ RETURNS TEXT AS $$
 DECLARE
     user_role TEXT;
 BEGIN
-    SELECT role INTO user_role FROM profiles WHERE id = auth.uid();
+    SELECT role INTO user_role FROM profiles WHERE auth_id = auth.uid();
     RETURN COALESCE(user_role, 'student');
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
@@ -221,24 +217,35 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
+-- Get the profile ID for the current auth user
+CREATE OR REPLACE FUNCTION get_profile_id()
+RETURNS UUID AS $$
+DECLARE
+    profile_uuid UUID;
+BEGIN
+    SELECT id INTO profile_uuid FROM profiles WHERE auth_id = auth.uid();
+    RETURN profile_uuid;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
 -- ============================================
 -- STEP 5: RLS POLICIES
 -- ============================================
 
 -- PROFILES
-CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth_id = auth.uid());
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth_id = auth.uid());
 CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (is_admin());
 CREATE POLICY "Admins can update any profile" ON profiles FOR UPDATE USING (is_admin());
-CREATE POLICY "Teachers can view direct students" ON profiles FOR SELECT USING (is_teacher() AND teacher_id = auth.uid());
-CREATE POLICY "Enable insert for signup" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Admins can insert profiles" ON profiles FOR INSERT WITH CHECK (is_admin());
+CREATE POLICY "Admins can delete profiles" ON profiles FOR DELETE USING (is_admin());
+CREATE POLICY "Teachers can view direct students" ON profiles FOR SELECT USING (is_teacher() AND teacher_id = get_profile_id());
+CREATE POLICY "Enable insert for signup" ON profiles FOR INSERT WITH CHECK (auth_id = auth.uid());
 CREATE POLICY "Teachers can view all student profiles" ON profiles FOR SELECT USING (is_teacher() AND role = 'student');
 CREATE POLICY "Teachers can update student assignments" ON profiles FOR UPDATE USING (is_teacher() AND role = 'student');
--- REGISTERED STUDENTS
-CREATE POLICY "Admins can manage registered students" ON registered_students FOR ALL USING (is_admin());
-CREATE POLICY "Anyone can validate student ID" ON registered_students FOR SELECT USING (true);
-
-
+CREATE POLICY "Teachers can insert pre-registered students" ON profiles FOR INSERT WITH CHECK (is_teacher() AND role = 'student' AND is_registered = FALSE);
+-- Anyone can validate student ID for registration
+CREATE POLICY "Anyone can validate student ID" ON profiles FOR SELECT USING (role = 'student' AND is_registered = FALSE);
 
 DROP POLICY IF EXISTS "Teachers can view all student profiles" ON profiles;
 DROP POLICY IF EXISTS "Teachers can update student assignments" ON profiles;
@@ -284,39 +291,39 @@ CREATE POLICY "Teachers can update student assignments" ON profiles
 FOR UPDATE USING (is_teacher() AND role = 'student');
 
 -- CLASSES
-CREATE POLICY "Teachers can manage own classes" ON classes FOR ALL USING (teacher_id = auth.uid());
+CREATE POLICY "Teachers can manage own classes" ON classes FOR ALL USING (teacher_id = get_profile_id());
 CREATE POLICY "Admins can view all classes" ON classes FOR SELECT USING (is_admin());
 CREATE POLICY "Students can view active classes" ON classes FOR SELECT USING (is_active = true);
 
 -- CLASS ENROLLMENTS
 CREATE POLICY "Teachers can manage class enrollments" ON class_enrollments FOR ALL 
-    USING (EXISTS (SELECT 1 FROM classes WHERE classes.id = class_enrollments.class_id AND classes.teacher_id = auth.uid()));
-CREATE POLICY "Students can view own enrollments" ON class_enrollments FOR SELECT USING (student_id = auth.uid());
-CREATE POLICY "Students can enroll themselves" ON class_enrollments FOR INSERT WITH CHECK (student_id = auth.uid());
+    USING (EXISTS (SELECT 1 FROM classes WHERE classes.id = class_enrollments.class_id AND classes.teacher_id = get_profile_id()));
+CREATE POLICY "Students can view own enrollments" ON class_enrollments FOR SELECT USING (student_id = get_profile_id());
+CREATE POLICY "Students can enroll themselves" ON class_enrollments FOR INSERT WITH CHECK (student_id = get_profile_id());
 CREATE POLICY "Admins can manage all enrollments" ON class_enrollments FOR ALL USING (is_admin());
 
 -- PROGRESS
-CREATE POLICY "Users can manage own progress" ON progress FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Users can manage own progress" ON progress FOR ALL USING (user_id = get_profile_id());
 CREATE POLICY "Admins can view all progress" ON progress FOR SELECT USING (is_admin());
 CREATE POLICY "Teachers can view student progress" ON progress FOR SELECT 
-    USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = progress.user_id AND profiles.teacher_id = auth.uid()));
+    USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = progress.user_id AND profiles.teacher_id = get_profile_id()));
 
 -- ACHIEVEMENTS
-CREATE POLICY "Users can manage own achievements" ON achievements FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Users can manage own achievements" ON achievements FOR ALL USING (user_id = get_profile_id());
 CREATE POLICY "Admins can view all achievements" ON achievements FOR SELECT USING (is_admin());
 
 -- CUSTOM QUESTIONS
-CREATE POLICY "Teachers can manage own questions" ON custom_questions FOR ALL USING (created_by = auth.uid());
+CREATE POLICY "Teachers can manage own questions" ON custom_questions FOR ALL USING (created_by = get_profile_id());
 CREATE POLICY "Admins can manage all questions" ON custom_questions FOR ALL USING (is_admin());
 CREATE POLICY "Anyone can view approved questions" ON custom_questions FOR SELECT USING (is_active = true AND is_approved = true);
 
 -- CUSTOM LESSONS
-CREATE POLICY "Teachers can manage own lessons" ON custom_lessons FOR ALL USING (created_by = auth.uid());
+CREATE POLICY "Teachers can manage own lessons" ON custom_lessons FOR ALL USING (created_by = get_profile_id());
 CREATE POLICY "Admins can manage all lessons" ON custom_lessons FOR ALL USING (is_admin());
 CREATE POLICY "Anyone can view approved lessons" ON custom_lessons FOR SELECT USING (is_active = true AND is_approved = true);
 
 -- GAME SESSIONS
-CREATE POLICY "Users can manage own sessions" ON game_sessions FOR ALL USING (user_id = auth.uid());
+CREATE POLICY "Users can manage own sessions" ON game_sessions FOR ALL USING (user_id = get_profile_id());
 CREATE POLICY "Admins can view all sessions" ON game_sessions FOR SELECT USING (is_admin());
 
 -- ============================================
@@ -352,18 +359,49 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Auth trigger to create profile on signup
+-- Auth trigger to handle new user signup
+-- If a pre-registered profile exists with matching student_id_number, link it
+-- Otherwise create a new profile
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    student_id TEXT;
+    existing_profile_id UUID;
 BEGIN
-    INSERT INTO public.profiles (id, email, full_name, role, student_id_number, is_verified)
+    student_id := NEW.raw_user_meta_data->>'student_id_number';
+    
+    -- Check if there's a pre-registered profile with this student ID
+    IF student_id IS NOT NULL AND student_id != '' THEN
+        SELECT id INTO existing_profile_id 
+        FROM public.profiles 
+        WHERE student_id_number = student_id 
+          AND is_registered = FALSE 
+          AND role = 'student';
+        
+        IF existing_profile_id IS NOT NULL THEN
+            -- Link the existing pre-registered profile to this auth user
+            UPDATE public.profiles 
+            SET auth_id = NEW.id,
+                email = NEW.email,
+                full_name = COALESCE(NEW.raw_user_meta_data->>'full_name', full_name),
+                is_registered = TRUE,
+                is_verified = TRUE,
+                updated_at = NOW()
+            WHERE id = existing_profile_id;
+            RETURN NEW;
+        END IF;
+    END IF;
+    
+    -- No pre-registered profile found, create a new one
+    INSERT INTO public.profiles (auth_id, email, full_name, role, student_id_number, is_verified, is_registered)
     VALUES (
         NEW.id,
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
         COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
-        NEW.raw_user_meta_data->>'student_id_number',
-        true
+        student_id,
+        TRUE,
+        TRUE
     );
     RETURN NEW;
 END;
@@ -383,6 +421,10 @@ SELECT
     p.full_name AS student_name,
     p.email AS student_email,
     p.teacher_id,
+    p.is_registered,
+    p.student_id_number,
+    p.grade_level,
+    p.section,
     pr.era_key,
     pr.lessons_complete,
     pr.boss_defeated,
@@ -392,11 +434,27 @@ FROM profiles p
 LEFT JOIN progress pr ON p.id = pr.user_id
 WHERE p.role = 'student';
 
+-- View for pre-registered students (not yet signed up)
+CREATE OR REPLACE VIEW pre_registered_students AS
+SELECT 
+    id,
+    student_id_number,
+    full_name,
+    email,
+    grade_level,
+    section,
+    uploaded_by,
+    created_at,
+    updated_at
+FROM profiles
+WHERE role = 'student' AND is_registered = FALSE;
+
 CREATE OR REPLACE VIEW admin_user_stats AS
 SELECT
     role,
-    COUNT(*) AS user_count,
-    COUNT(*) FILTER (WHERE is_verified = true) AS verified_count
+    COUNT(*) FILTER (WHERE is_registered = true) AS user_count,
+    COUNT(*) FILTER (WHERE is_verified = true AND is_registered = true) AS verified_count,
+    COUNT(*) FILTER (WHERE is_registered = false) AS pre_registered_count
 FROM profiles
 GROUP BY role;
 
@@ -420,28 +478,29 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON ROUTINES TO anon, aut
 -- STEP 9: CREATE PROFILES FOR EXISTING AUTH USERS
 -- ============================================
 
-INSERT INTO profiles (id, email, full_name, role, is_verified)
+INSERT INTO profiles (auth_id, email, full_name, role, is_verified, is_registered)
 SELECT 
     id,
     email,
     COALESCE(raw_user_meta_data->>'full_name', 'User'),
     COALESCE(raw_user_meta_data->>'role', 'student'),
+    true,
     true
 FROM auth.users
-WHERE id NOT IN (SELECT id FROM profiles)
-ON CONFLICT (id) DO NOTHING;
+WHERE id NOT IN (SELECT auth_id FROM profiles WHERE auth_id IS NOT NULL)
+ON CONFLICT (auth_id) DO NOTHING;
 
 -- ============================================
 -- STEP 10: SET CORRECT ROLES
 -- ============================================
 
-UPDATE profiles SET role = 'admin', is_verified = true WHERE email = 'admin@battleofknowledge.com';
-UPDATE profiles SET role = 'teacher', is_verified = true WHERE email IN ('teacher1@school.edu', 'teacher2@school.edu');
-UPDATE profiles SET role = 'student', is_verified = true WHERE email LIKE 'student%@school.edu';
+UPDATE profiles SET role = 'admin', is_verified = true, is_registered = true WHERE email = 'admin@battleofknowledge.com';
+UPDATE profiles SET role = 'teacher', is_verified = true, is_registered = true WHERE email IN ('teacher1@school.edu', 'teacher2@school.edu');
+UPDATE profiles SET role = 'student', is_verified = true, is_registered = true WHERE email LIKE 'student%@school.edu';
 
 -- ============================================
 -- DONE! Verify with:
--- SELECT email, role, is_verified FROM profiles ORDER BY role, email;
+-- SELECT email, role, is_verified, is_registered FROM profiles ORDER BY role, email;
 -- ============================================
 UPDATE auth.users SET email_confirmed_at = NOW() WHERE email_confirmed_at IS NULL;
 

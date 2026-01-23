@@ -413,11 +413,11 @@
             const emailFromContext = userContext?.email || '';
             const metaRole = userContext?.metaRole;
 
-            // Try to load profile role first (ignore errors)
+            // Try to load profile role first using auth_id (ignore errors)
             const { data: profile, error: profileError } = await sb
                 .from('profiles')
                 .select('role')
-                .eq('id', userId)
+                .eq('auth_id', userId)
                 .single();
 
             // Heuristic fallbacks in case profile row is missing (common for legacy accounts)

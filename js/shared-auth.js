@@ -193,22 +193,23 @@ function getSupabaseClient() {
 }
 
 /**
- * Validate student ID against registered students database
+ * Validate student ID against profiles table (pre-registered students)
  * @param {string} studentIdNumber - Student ID to validate
- * @returns {Promise<Object|null>} Registered student data or null
+ * @returns {Promise<Object|null>} Pre-registered student data or null
  */
 async function validateStudentId(studentIdNumber) {
     try {
         const client = getSupabaseClient();
         const { data, error } = await client
-            .from('registered_students')
+            .from('profiles')
             .select('*')
             .eq('student_id_number', studentIdNumber)
-            .eq('is_claimed', false)
+            .eq('is_registered', false)
+            .eq('role', 'student')
             .single();
 
         if (error) {
-            console.log('Student ID not found or already claimed');
+            console.log('Student ID not found or already registered');
             return null;
         }
 
@@ -264,35 +265,21 @@ async function signUpUser(userData) {
             return { success: false, error: 'Registration failed. Please try again.' };
         }
 
-        // Update profile with additional data
-        const { error: profileError } = await client
+        // Wait for trigger to process the profile
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Get the profile ID for this auth user
+        const { data: profileData } = await client
             .from('profiles')
-            .update({
-                full_name: fullName,
-                role: role,
-                student_id_number: studentIdNumber || null,
-                is_verified: role === 'student' // Students are auto-verified if ID matches
-            })
-            .eq('id', authData.user.id);
+            .select('id')
+            .eq('auth_id', authData.user.id)
+            .single();
 
-        if (profileError) {
-            console.warn('Profile update warning:', profileError);
-        }
-
-        // If student, mark student ID as claimed
-        if (role === 'student' && studentIdNumber) {
-            await client
-                .from('registered_students')
-                .update({
-                    is_claimed: true,
-                    claimed_by: authData.user.id
-                })
-                .eq('student_id_number', studentIdNumber);
-        }
+        const profileId = profileData?.id;
 
         // If student provided class code, enroll in class
-        if (role === 'student' && classCode) {
-            const enrollResult = await enrollInClass(authData.user.id, classCode);
+        if (role === 'student' && classCode && profileId) {
+            const enrollResult = await enrollInClass(profileId, classCode);
             if (!enrollResult.success) {
                 console.warn('Class enrollment warning:', enrollResult.error);
             }
@@ -332,11 +319,11 @@ async function signInUser(email, password) {
 
         if (error) throw error;
 
-        // Get user profile to check role
+        // Get user profile to check role (using auth_id now)
         const { data: profile, error: profileError } = await client
             .from('profiles')
             .select('*')
-            .eq('id', data.user.id)
+            .eq('auth_id', data.user.id)
             .single();
 
         if (profileError) {
@@ -368,7 +355,7 @@ async function signInUser(email, password) {
 
 /**
  * Enroll student in a class using class code
- * @param {string} studentId - Student's user ID
+ * @param {string} studentId - Student's profile ID
  * @param {string} classCode - Class code to enroll in
  * @returns {Promise<Object>} Result object
  */

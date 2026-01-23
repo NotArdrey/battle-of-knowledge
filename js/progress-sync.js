@@ -50,7 +50,21 @@ const ProgressSync = {
                 return;
             }
 
-            this.userId = session.user.id;
+            // Get the profile ID (not auth user ID) since progress table references profiles.id
+            const { data: profile, error: profileError } = await client
+                .from('profiles')
+                .select('id')
+                .eq('auth_id', session.user.id)
+                .single();
+
+            if (profileError || !profile) {
+                console.error('Could not find profile for user:', profileError);
+                this.userId = null;
+                this.isOnline = false;
+                return;
+            }
+
+            this.userId = profile.id;
             this.isOnline = true;
             await this.loadFromServer();
 
