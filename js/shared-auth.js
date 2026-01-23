@@ -220,34 +220,6 @@ async function validateStudentId(studentIdNumber) {
 }
 
 /**
- * Validate class code
- * @param {string} classCode - Class code to validate
- * @returns {Promise<Object|null>} Class data if valid, null if invalid
- */
-async function validateClassCode(classCode) {
-    if (!classCode) return null;
-
-    try {
-        const client = getSupabaseClient();
-        const { data, error } = await client
-            .from('classes')
-            .select('id, teacher_id, class_name, section, grade_level')
-            .eq('class_code', classCode.toUpperCase())
-            .eq('is_active', true)
-            .single();
-
-        if (error || !data) {
-            return null;
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error validating class code:', error);
-        return null;
-    }
-}
-
-/**
  * Sign up a new user
  * @param {Object} userData - User registration data
  * @returns {Promise<Object>} Result object with success/error
@@ -269,19 +241,6 @@ async function signUpUser(userData) {
                 return {
                     success: false,
                     error: 'Invalid Student ID. Please check your ID number or contact the administrator if you believe this is an error.'
-                };
-            }
-
-            // Validate class code (Now MANDATORY)
-            if (!classCode) {
-                return { success: false, error: 'Class Code is required based on new security policy.' };
-            }
-
-            const validClass = await validateClassCode(classCode);
-            if (!validClass) {
-                return {
-                    success: false,
-                    error: 'Invalid Class Code. Please ask your teacher for the correct code.'
                 };
             }
         }
@@ -612,7 +571,5 @@ window.SharedAuth = {
     redirectByRole,
     getRoleDisplayName,
     validatePassword,
-    validatePassword,
-    validateEmail,
-    validateClassCode
+    validateEmail
 };
