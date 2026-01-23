@@ -287,22 +287,12 @@ async function signUpUser(userData) {
         }
 
         // Create auth user
-        let userFullName = fullName;
-
-        // If student, fetch name from registry to ensure it matches
-        if (role === 'student' && studentIdNumber) {
-            const validStudent = await validateStudentId(studentIdNumber);
-            if (validStudent) {
-                userFullName = validStudent.full_name;
-            }
-        }
-
         const { data: authData, error: authError } = await client.auth.signUp({
             email,
             password,
             options: {
                 data: {
-                    full_name: userFullName,
+                    full_name: fullName,
                     role: role,
                     student_id_number: studentIdNumber || null
                 }

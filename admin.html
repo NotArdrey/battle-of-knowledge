@@ -14,189 +14,285 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #b45309, #d97706);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --card-radius: 24px;
+        }
+
         body {
             font-family: 'Baloo 2', cursive;
-            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             min-height: 100vh;
+            color: #451a03;
         }
 
         .main-container {
-            padding: 20px;
+            padding: 2rem;
             max-width: 1400px;
             margin: 0 auto;
         }
 
+        /* Glassmorphism Components */
+        .dashboard-header,
+        .stat-card,
+        .content-card,
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Header */
         .dashboard-header {
-            background: linear-gradient(to right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
-            border: 4px solid rgba(120, 53, 15, 0.3);
-            border-radius: 20px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
+            padding: 1.5rem 2.5rem;
+            margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .dashboard-title {
-            color: #7c2d12;
-            font-size: 1.75rem;
+            color: #78350f;
+            font-size: 2rem;
             font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .user-badge {
-            background: linear-gradient(to right, #dc2626, #b91c1c);
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.35rem 1rem;
             border-radius: 20px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
         .btn-logout {
-            background: rgba(239, 68, 68, 0.2);
+            background: transparent;
             color: #dc2626;
             border: 2px solid #dc2626;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            font-weight: 600;
+            padding: 0.4rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-logout:hover {
             background: #dc2626;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
         }
 
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
-            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
-            border: 3px solid rgba(120, 53, 15, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
+            padding: 2rem;
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            color: #7c2d12;
+            color: #78350f;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .stat-label {
             color: #92400e;
             font-weight: 600;
+            font-size: 1.1rem;
+            opacity: 0.8;
         }
 
+        /* Content Area */
         .content-card {
-            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.95), rgba(253, 230, 138, 0.95));
-            border: 3px solid rgba(120, 53, 15, 0.3);
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(120, 53, 15, 0.1);
         }
 
         .card-title {
-            color: #7c2d12;
-            font-size: 1.3rem;
-            font-weight: 700;
+            color: #78350f;
+            font-size: 1.5rem;
+            font-weight: 800;
+            position: relative;
         }
 
+        /* Tabs */
         .tabs {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
         }
 
         .tab-btn {
-            padding: 0.75rem 1.5rem;
-            border: 2px solid rgba(120, 53, 15, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            color: #7c2d12;
-            font-weight: 600;
+            padding: 0.85rem 1.75rem;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #78350f;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .tab-btn:hover {
-            border-color: #b45309;
+            background: rgba(255, 255, 255, 0.6);
+            color: #b45309;
         }
 
         .tab-btn.active {
-            background: linear-gradient(to right, #b45309, #d97706);
-            color: white;
-            border-color: #b45309;
+            background: white;
+            color: #b45309;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            background: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(120, 53, 15, 0.1);
+        }
+
         .data-table {
             width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         .data-table th {
-            background: rgba(180, 83, 9, 0.2);
-            color: #7c2d12;
-            font-weight: 700;
-            padding: 1rem;
+            background: #fffbeb;
+            color: #78350f;
+            font-weight: 800;
+            padding: 1.25rem 1.5rem;
             text-align: left;
+            border-bottom: 2px solid rgba(120, 53, 15, 0.1);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .data-table td {
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid rgba(120, 53, 15, 0.1);
-            color: #7c2d12;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(120, 53, 15, 0.05);
+            color: #451a03;
+            font-weight: 500;
+            vertical-align: middle;
         }
 
-        .data-table tr:hover {
-            background: rgba(251, 191, 36, 0.1);
+        .data-table tr:last-child td {
+            border-bottom: none;
         }
 
-        .role-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+        .data-table tr:hover td {
+            background: #fffbeb;
+        }
+
+        /* Badges & Buttons */
+        .role-badge,
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
+            line-height: 1;
         }
 
         .role-admin {
-            background: #fecaca;
+            background: #fee2e2;
             color: #991b1b;
         }
 
@@ -206,16 +302,8 @@
         }
 
         .role-student {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            background: #dcfce7;
+            color: #166534;
         }
 
         .status-verified {
@@ -228,57 +316,85 @@
             color: #92400e;
         }
 
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(180, 83, 9, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(180, 83, 9, 0.4);
+        }
+
         .btn-action {
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             transition: all 0.2s ease;
-            margin-right: 0.25rem;
+            margin-right: 0.5rem;
         }
 
         .btn-verify {
             background: #10b981;
             color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
         .btn-verify:hover {
             background: #059669;
+            transform: translateY(-1px);
         }
 
         .btn-delete {
             background: #ef4444;
             color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
         }
 
         .btn-delete:hover {
             background: #dc2626;
+            transform: translateY(-1px);
         }
 
-        .btn-primary {
-            background: linear-gradient(to right, #b45309, #d97706);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
+        /* Forms */
+        .search-input {
+            padding: 0.85rem 1.25rem;
+            border: 2px solid rgba(120, 53, 15, 0.2);
+            border-radius: 12px;
+            background: white;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #78350f;
+            min-width: 300px;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+        .search-input:focus {
+            outline: none;
+            border-color: #b45309;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
         }
 
         .upload-area {
-            border: 3px dashed rgba(120, 53, 15, 0.3);
-            border-radius: 16px;
-            padding: 2rem;
+            border: 3px dashed rgba(120, 53, 15, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
             text-align: center;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -287,128 +403,60 @@
         .upload-area.dragover {
             border-color: #b45309;
             background: rgba(251, 191, 36, 0.1);
+            transform: scale(1.01);
         }
 
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-input {
-            padding: 0.75rem 1rem;
-            border: 2px solid rgba(120, 53, 15, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            font-family: 'Baloo 2', cursive;
-            font-size: 1rem;
-            color: #7c2d12;
-            min-width: 250px;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #b45309;
-        }
-
+        /* Modals */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 1rem;
+            background: rgba(55, 65, 81, 0.6);
+            backdrop-filter: blur(8px);
         }
 
         .modal-content {
-            background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.98), rgba(253, 230, 138, 0.98));
-            border: 4px solid rgba(120, 53, 15, 0.4);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-title {
-            color: #7c2d12;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            color: #7c2d12;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            background: white;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 550px;
+            width: 95%;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid rgba(120, 53, 15, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            font-family: 'Baloo 2', cursive;
-            color: #7c2d12;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+            font-family: inherit;
+            color: #374151;
+            transition: all 0.3s ease;
         }
 
-        .table-container {
-            overflow-x: auto;
+        .form-input:focus {
+            outline: none;
+            border-color: #b45309;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #92400e;
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            color: #b45309;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover {
-            background: rgba(180, 83, 9, 0.1);
+        .form-label {
+            color: #374151;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
         }
 
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
                 text-align: center;
+                gap: 1rem;
+                padding: 1.5rem;
             }
 
             .data-table th,
             .data-table td {
-                padding: 0.5rem;
-                font-size: 0.85rem;
-            }
-
-            .btn-action {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.75rem;
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -849,15 +897,12 @@
                     <input type="text" id="newStudentName" class="form-input" required>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Email (Optional)</label>
-                    <input type="email" id="newStudentEmail" class="form-input">
-                </div>
+                <!-- Email removed as per requirement -->
 
                 <div class="flex gap-3">
                     <div class="form-group flex-1">
                         <label class="form-label">Grade Level</label>
-                        <input type="text" id="newStudentGrade" class="form-input" placeholder="e.g., Grade 7">
+                        <input type="number" id="newStudentGrade" class="form-input" placeholder="e.g., 7">
                     </div>
 
                     <div class="form-group flex-1">
@@ -1408,10 +1453,7 @@
                     if (!fullName) errors.push('missing full_name');
                     if (studentId && studentId.length < 3) errors.push('student_id_number too short');
                     if (fullName && fullName.length < 2) errors.push('full_name too short');
-                    if (email && !email.includes('@')) {
-                        // Email is optional now, but if provided, must be valid
-                        errors.push('invalid email format');
-                    }
+                    if (email && !email.includes('@')) errors.push('invalid email format');
 
                     if (errors.length > 0) {
                         invalidRows.push({ row: rowNumber, errors: errors.join(', ') });
@@ -1580,8 +1622,7 @@
 
             const studentId = document.getElementById('newStudentId').value.trim();
             const name = document.getElementById('newStudentName').value.trim();
-            // Email removed as per requirement
-            const email = null;
+            // Email removed
             const grade = document.getElementById('newStudentGrade').value.trim();
             const section = document.getElementById('newStudentSection').value.trim();
 
@@ -1591,7 +1632,7 @@
                     .insert({
                         student_id_number: studentId,
                         full_name: name,
-                        email: email || null,
+                        email: null,
                         grade_level: grade || null,
                         section: section || null,
                         uploaded_by: currentProfile.id
@@ -1932,21 +1973,7 @@
             }
         }
 
-        // Toast notification helper
-        function showToast(message, type = 'info') {
-            const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed; bottom: 20px; right: 20px;
-                background: ${colors[type] || colors.info}; color: white;
-                padding: 1rem 1.5rem; border-radius: 0.5rem;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
-                font-weight: 600; animation: slideIn 0.3s ease;
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+        // Toast and Loading handled by ui-utils.js
 
         // Show loading indicator
         function showLoading(show) {
@@ -2674,219 +2701,6 @@
         }
     </script>
 
-</body>
-
-<div class="form-group">
-    <label class="form-label">Full Name</label>
-    <input type="text" id="newStudentName" class="form-input" required>
-</div>
-<!-- Email field removed -->
-<div class="grid grid-cols-2 gap-4">
-    <div class="form-group">
-        <label class="form-label">Grade Level</label>
-        <input type="text" id="newStudentGrade" class="form-input" placeholder="e.g. 10">
-    </div>
-    <div class="form-group">
-        <label class="form-label">Section</label>
-        <input type="text" id="newStudentSection" class="form-input" placeholder="e.g. Rizal">
-    </div>
-</div>
-</form>
-<div class="flex justify-end gap-3 mt-6">
-    <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-        onclick="closeStudentModal()">Cancel</button>
-    <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-        onclick="handleAddStudent(event)">Add Student</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Question Modal -->
-<div id="questionModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <h3 class="modal-title" id="questionModalTitle">Add/Edit Question</h3>
-        <form id="questionForm">
-            <input type="hidden" id="editQuestionId">
-
-            <div class="form-group">
-                <label class="form-label">Historical Era</label>
-                <select id="questionEra" class="form-input">
-                    <option value="early-spanish">Early Spanish Era</option>
-                    <option value="late-spanish">Late Spanish Era</option>
-                    <option value="american-colonial">American Colonial Era</option>
-                    <option value="ww2">WW2 & Independence</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Question Text (English)</label>
-                <textarea id="questionTextEn" class="form-input" rows="2" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Question Text (Tagalog) - Optional</label>
-                <textarea id="questionTextTl" class="form-input" rows="2"></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Correct Answer (English)</label>
-                    <input type="text" id="correctAnswerEn" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Correct Answer (Tagalog) - Optional</label>
-                    <input type="text" id="correctAnswerTl" class="form-input">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Wrong Answers (comma separated)</label>
-                <input type="text" id="wrongAnswersEn" class="form-input" placeholder="Option 1, Option 2, Option 3"
-                    required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Wrong Answers (Tagalog) - Optional</label>
-                <input type="text" id="wrongAnswersTl" class="form-input" placeholder="Option 1, Option 2, Option 3">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Difficulty</label>
-                    <select id="questionDifficulty" class="form-input">
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <div class="flex flex-col gap-2 mt-2">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="questionActive" checked class="w-5 h-5 text-amber-600">
-                            <span class="text-amber-900">Active</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="questionApproved" class="w-5 h-5 text-amber-600">
-                            <span class="text-amber-900">Approved</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <p id="questionFormError" class="text-red-500 text-sm mb-4 hidden"></p>
-
-            <div class="flex justify-end gap-3 mt-4">
-                <button type="button"
-                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                    onclick="closeQuestionModal()">Cancel</button>
-                <button type="button"
-                    class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-                    onclick="handleSaveQuestion(event)">Save Question</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Lesson Modal -->
-<div id="lessonModal" class="modal-overlay hidden">
-    <div class="modal-content" style="max-width: 800px;">
-        <h3 class="modal-title" id="lessonModalTitle">Add/Edit Lesson</h3>
-        <form id="lessonForm">
-            <input type="hidden" id="editLessonId">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Historical Era</label>
-                    <select id="lessonEra" class="form-input">
-                        <option value="early-spanish">Early Spanish Era</option>
-                        <option value="late-spanish">Late Spanish Era</option>
-                        <option value="american-colonial">American Colonial Era</option>
-                        <option value="ww2">WW2 & Independence</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Order</label>
-                    <input type="number" id="lessonOrder" class="form-input" min="1" value="1" required>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Title (English)</label>
-                    <input type="text" id="lessonTitleEn" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Title (Tagalog) - Optional</label>
-                    <input type="text" id="lessonTitleTl" class="form-input">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Content (English) - Supports HTML</label>
-                <textarea id="lessonContentEn" class="form-input" rows="6" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Content (Tagalog) - Optional</label>
-                <textarea id="lessonContentTl" class="form-input" rows="6"></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Icon (Emoji)</label>
-                    <input type="text" id="lessonIcon" class="form-input" value="📖">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <div class="flex flex-col gap-2 mt-2">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="lessonActive" checked class="w-5 h-5 text-amber-600">
-                            <span class="text-amber-900">Active</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="lessonApproved" class="w-5 h-5 text-amber-600">
-                            <span class="text-amber-900">Approved</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <p id="lessonFormError" class="text-red-500 text-sm mb-4 hidden"></p>
-
-            <div class="flex justify-end gap-3 mt-4">
-                <button type="button"
-                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                    onclick="closeLessonModal()">Cancel</button>
-                <button type="button"
-                    class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-                    onclick="handleSaveLesson(event)">Save Lesson</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Admin Import Preview Modal -->
-<div id="adminImportPreview" class="modal-overlay hidden">
-    <div class="modal-content bg-white">
-        <h3 class="modal-title">📦 Import Preview</h3>
-        <div id="adminImportPreviewContent"
-            class="mb-4 text-gray-700 border p-3 rounded bg-gray-50 max-h-60 overflow-y-auto"></div>
-
-        <div id="adminImportStatus" class="hidden my-2"></div>
-
-        <div class="flex justify-end gap-3 mt-4">
-            <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
-                onclick="cancelAdminImport()">Cancel</button>
-            <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                onclick="confirmAdminImport()">Confirm Import</button>
-        </div>
-    </div>
-</div>
-
-<script src="js/supabase-config.js"></script>
-<script src="js/admin-dashboard.js"></script>
 </body>
 
 </html>

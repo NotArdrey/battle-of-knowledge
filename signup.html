@@ -470,11 +470,7 @@
             <!-- Signup Form -->
             <form id="signupForm" onsubmit="handleSignup(event)">
 
-                <div class="mb-4">
-                    <label for="fullName" class="form-label">Full Name</label>
-                    <input type="text" id="fullName" class="form-input" placeholder="Enter your full name" required
-                        autocomplete="name">
-                </div>
+                <!-- Full Name Removed - Auto-filled from Student ID -->
 
                 <div class="mb-4">
                     <label for="email" class="form-label">Email Address</label>
@@ -560,6 +556,10 @@
                 Already have an account?
                 <a href="login.html" class="link-text">Sign in here</a>
             </p>
+
+            <div class="mt-4 text-center">
+                <a href="index.html" class="link-text text-sm">← Back to Home</a>
+            </div>
         </div>
     </div>
 
@@ -569,6 +569,7 @@
         // Use Supabase client from supabase-config.js
         let supabaseClient = null;
         let studentIdValid = false;
+        let verifiedStudentName = ''; // Store verified name here
         let classCodeValid = false;
         let studentIdCheckTimeout = null;
         let classCodeCheckTimeout = null;
@@ -657,8 +658,11 @@
                         statusDiv.className = 'validation-status valid';
                         studentIdValid = true;
 
-                        // Name is auto-fetched on backend during signup
-                        // We can display it for confirmation if needed, but field is removed
+                        // Auto-fill name if empty
+                        const nameField = document.getElementById('fullName');
+                        if (!nameField.value) {
+                            nameField.value = data.full_name;
+                        }
                     } else if (error && error.code === 'PGRST116') {
                         // No rows returned - ID not found or already claimed
                         statusDiv.innerHTML = '<span>✗ Student ID not found or already registered</span>';
@@ -806,7 +810,11 @@
 
             if (window.lockButton) window.lockButton('signup', 5000);
 
-            // Full name fetched from registry
+            // Full Name is now auto-filled for students, or manual for others (if we kept non-student signup enabled)
+            // But requirements say "remove full name", implying trusted data source.
+            // For now, if student, use verifiedStudentName. If not student (e.g. teacher signup enabled?), we might need it?
+            // User request implies focusing on student flow. We'll handle logic below.
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -854,6 +862,8 @@
                         showError('A valid Class Code is now required for registration. Please ask your teacher for the code.');
                         return;
                     }
+
+                    finalFullName = verifiedStudentName;
                 }
             } else if (studentIdField && !studentId) {
                 // If student ID field exists but is empty, show a warning
@@ -894,7 +904,7 @@
                     password: password,
                     options: {
                         data: {
-                            full_name: '', // Will be updated by shared-auth logic if empty
+                            full_name: finalFullName || 'User', // Fallback
                             role: 'student',
                             student_id_number: studentId
                         }
@@ -954,7 +964,7 @@
 
                 successDiv.innerHTML = `
                     <strong>Account created successfully!</strong><br>
-                    You can now log in with your credentials.
+                    Please check your email to verify your account before logging in.
                 `;
                 successDiv.classList.add('show');
 
@@ -985,18 +995,7 @@
             const countdownEl = document.getElementById('modalCountdown');
             modal.classList.add('show');
 
-            let countdown = 5;
-            countdownEl.textContent = `Redirecting to login in ${countdown} seconds...`;
-
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    countdownEl.textContent = `Redirecting to login in ${countdown} seconds...`;
-                } else {
-                    clearInterval(countdownInterval);
-                    window.location.href = 'login.html';
-                }
-            }, 1000);
+            countdownEl.textContent = 'Please check your email to activate your account.';
         }
 
         // Close modal and redirect
@@ -1016,8 +1015,13 @@
             </div>
             <h2 class="modal-title">Registration Successful!</h2>
             <p class="modal-message">
-                Your account has been created successfully.
-                You can now log in with your email and password to start your journey!
+                Your account has been created successfully!
+                <br><br>
+                <strong>We have sent a verification link to your email.</strong>
+                <br>
+                Please check your inbox (and spam folder) and click the link to activate your account.
+                <br><br>
+                You won't be able to log in until you verify your email.
             </p>
             <button class="modal-btn" onclick="closeModalAndRedirect()">
                 Go to Login

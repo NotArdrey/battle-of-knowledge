@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -12,12 +13,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Baloo 2', cursive; 
+        body {
+            font-family: 'Baloo 2', cursive;
             background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
             min-height: 100vh;
         }
-        
+
         .main-container {
             position: relative;
             width: 100%;
@@ -29,11 +30,11 @@
             overflow: auto;
             padding: 20px;
         }
-        
+
         .login-bg-overlay {
             position: fixed;
             inset: 0;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
                 url('assets/Background/Start Menu/Start Menu.png');
             background-size: cover;
@@ -42,7 +43,7 @@
             opacity: 0.6;
             z-index: 1;
         }
-        
+
         .game-logo {
             position: relative;
             z-index: 10;
@@ -53,12 +54,19 @@
             filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
             animation: floatLogo 3s ease-in-out infinite;
         }
-        
+
         @keyframes floatLogo {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
-        
+
         .login-card {
             position: relative;
             z-index: 10;
@@ -71,7 +79,7 @@
             max-width: 420px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
+
         .form-input {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -83,17 +91,17 @@
             color: #7c2d12;
             transition: all 0.3s ease;
         }
-        
+
         .form-input:focus {
             outline: none;
             border-color: #b45309;
             box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.2);
         }
-        
+
         .form-input::placeholder {
             color: #9ca3af;
         }
-        
+
         .form-label {
             display: block;
             font-weight: 700;
@@ -101,7 +109,7 @@
             margin-bottom: 0.5rem;
             font-size: 1rem;
         }
-        
+
         .btn-primary {
             width: 100%;
             padding: 1rem;
@@ -115,18 +123,18 @@
             transition: all 0.3s ease;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(180, 83, 9, 0.4);
         }
-        
+
         .btn-primary:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 2px solid rgba(239, 68, 68, 0.3);
@@ -137,11 +145,11 @@
             margin-bottom: 1rem;
             display: none;
         }
-        
+
         .error-message.show {
             display: block;
         }
-        
+
         .success-message {
             background: rgba(16, 185, 129, 0.1);
             border: 2px solid rgba(16, 185, 129, 0.3);
@@ -152,37 +160,38 @@
             margin-bottom: 1rem;
             display: none;
         }
-        
+
         .success-message.show {
             display: block;
         }
-        
+
         .divider {
             display: flex;
             align-items: center;
             margin: 1.25rem 0;
         }
-        
-        .divider::before, .divider::after {
+
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
             height: 2px;
             background: rgba(120, 53, 15, 0.2);
         }
-        
+
         .divider span {
             padding: 0 1rem;
             color: #92400e;
             font-weight: 600;
         }
-        
+
         .link-text {
             color: #b45309;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s;
         }
-        
+
         .link-text:hover {
             color: #92400e;
             text-decoration: underline;
@@ -236,7 +245,7 @@
             margin-top: -0.25rem;
             margin-bottom: 1rem;
         }
-        
+
         .lang-toggle {
             position: fixed;
             top: 20px;
@@ -245,102 +254,85 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
+
         .lang-toggle:hover {
             transform: scale(1.1);
         }
-        
+
         .lang-toggle img {
             height: 40px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
-        
+
         @media (max-width: 480px) {
             .game-logo {
                 max-width: 260px;
                 margin-bottom: 1rem;
             }
-            
+
             .login-card {
                 padding: 1.5rem;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Language Toggle -->
     <button id="langToggle" class="lang-toggle" aria-label="Toggle Language">
         <img id="langToggleImg" src="assets/Buttons/TAGALOG BUTTON.png" alt="Switch to Tagalog">
     </button>
-    
+
     <div class="main-container">
         <div class="login-bg-overlay"></div>
-        
+
         <!-- Game Logo -->
-        <img 
-            id="gameLogo" 
-            class="game-logo" 
-            src="assets/Background/Title/Game-English-Title.png" 
-            alt="Battle of Knowledge"
-            data-lang-img-en="assets/Background/Title/Game-English-Title.png"
-            data-lang-img-tl="assets/Background/Title/Game-Tagalog-Title.png"
-        >
-        
+        <img id="gameLogo" class="game-logo" src="assets/Background/Title/Game-English-Title.png"
+            alt="Battle of Knowledge" data-lang-img-en="assets/Background/Title/Game-English-Title.png"
+            data-lang-img-tl="assets/Background/Title/Game-Tagalog-Title.png">
+
         <div class="login-card">
             <!-- Error/Success Messages -->
             <div id="errorMessage" class="error-message"></div>
             <div id="successMessage" class="success-message"></div>
-            
+
             <!-- Login Form -->
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label for="email" class="form-label" data-translate="Email Address">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        class="form-input" 
-                        placeholder="Enter your email"
-                        data-placeholder-key="Enter your email"
-                        required
-                        autocomplete="email"
-                    >
+                    <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email"
+                        data-placeholder-key="Enter your email" required autocomplete="email">
                 </div>
-                
+
                 <div class="mb-4">
                     <label for="password" class="form-label" data-translate="Password">Password</label>
                     <div style="position: relative;">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            class="form-input" 
-                            placeholder="Enter your password"
-                            data-placeholder-key="Enter your password"
-                            required
-                            autocomplete="current-password"
-                            style="padding-right: 45px;"
-                        >
-                        <button type="button" class="password-toggle" onclick="togglePassword('password')" id="passwordToggleBtn">
+                        <input type="password" id="password" name="password" class="form-input"
+                            placeholder="Enter your password" data-placeholder-key="Enter your password" required
+                            autocomplete="current-password" style="padding-right: 45px;">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')"
+                            id="passwordToggleBtn">
                             Show
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="flex justify-between items-center mb-5">
                     <label class="flex items-center cursor-pointer">
                         <input type="checkbox" id="rememberMe" class="mr-2 accent-amber-600">
                         <span class="text-sm text-amber-800" data-translate="Remember me">Remember me</span>
                     </label>
-                    <a href="#" onclick="showForgotPassword()" class="link-text text-sm" data-translate="Forgot password?">Forgot password?</a>
+                    <a href="#" onclick="showForgotPassword()" class="link-text text-sm"
+                        data-translate="Forgot password?">Forgot password?</a>
                 </div>
-                
+
                 <button type="submit" id="loginBtn" class="btn-primary">
                     <span id="loginBtnText" data-translate="Sign In">Sign In</span>
-                    <span id="loginSpinner" style="display: none;">⏳ <span data-translate="Signing in...">Signing in...</span></span>
+                    <span id="loginSpinner" style="display: none;">⏳ <span data-translate="Signing in...">Signing
+                            in...</span></span>
                 </button>
             </form>
-            
+
             <div class="divider">
                 <span data-translate="OR">OR</span>
             </div>
@@ -348,39 +340,37 @@
             <button type="button" class="btn-guest" onclick="playAsGuest()">
                 🎮 <span data-translate="Play as Guest">Play as Guest</span>
             </button>
-            <p class="guest-note">⚠️ <span data-translate="Progress won't be saved online">Progress won't be saved online</span></p>
-        
+            <p class="guest-note">⚠️ <span data-translate="Progress won't be saved online">Progress won't be saved
+                    online</span></p>
+
             <p class="text-center text-amber-800 text-sm">
-                <span data-translate="Don't have an account?">Don't have an account?</span> 
+                <span data-translate="Don't have an account?">Don't have an account?</span>
                 <a href="signup.html" class="link-text" data-translate="Sign up here">Sign up here</a>
             </p>
         </div>
     </div>
-    
+
     <!-- Forgot Password Modal -->
     <div id="forgotPasswordModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
         <div class="login-card max-w-md">
             <h2 class="text-xl font-bold text-amber-900 mb-4" data-translate="Reset Password">Reset Password</h2>
-            <p class="text-amber-700 mb-4" data-translate="Enter your email to receive a password reset link">Enter your email address and we'll send you a link to reset your password.</p>
-            
+            <p class="text-amber-700 mb-4" data-translate="Enter your email to receive a password reset link">Enter your
+                email address and we'll send you a link to reset your password.</p>
+
             <div id="resetError" class="error-message"></div>
             <div id="resetSuccess" class="success-message"></div>
-            
+
             <form onsubmit="handleForgotPassword(event)">
                 <div class="mb-4">
                     <label for="resetEmail" class="form-label" data-translate="Email Address">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="resetEmail" 
-                        class="form-input" 
-                        placeholder="Enter your email"
-                        data-placeholder-key="Enter your email"
-                        required
-                    >
+                    <input type="email" id="resetEmail" class="form-input" placeholder="Enter your email"
+                        data-placeholder-key="Enter your email" required>
                 </div>
-                
+
                 <div class="flex gap-3">
-                    <button type="button" onclick="closeForgotPassword()" class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100 transition-colors" data-translate="Cancel">
+                    <button type="button" onclick="closeForgotPassword()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100 transition-colors"
+                        data-translate="Cancel">
                         Cancel
                     </button>
                     <button type="submit" class="flex-1 btn-primary" data-translate="Send Reset Link">
@@ -398,14 +388,14 @@
 
         // Keep the global from CDN untouched; use a local client to avoid name collisions
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
+
         // Check if already logged in - redirect to appropriate dashboard
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session }, error } = await sb.auth.getSession();
             if (session?.user) {
                 // Clear any stale guest session if real user is logged in
                 localStorage.removeItem('guestSession');
-                
+
                 redirectUser({
                     id: session.user.id,
                     email: session.user.email,
@@ -416,7 +406,7 @@
                 console.warn('Session lookup error:', error.message);
             }
         });
-        
+
         // Redirect based on user role (fallback to metadata/email if profile is missing)
         async function redirectUser(userContext) {
             const userId = userContext?.id;
@@ -445,22 +435,22 @@
                 teacher: 'teacher.html',
                 student: 'menu.html'
             };
-            
+
             // Show loading before redirect
             if (window.showPageLoading) window.showPageLoading('Redirecting');
             setTimeout(() => {
                 window.location.href = redirectMap[role] || 'menu.html';
             }, 150);
         }
-        
+
         // Handle login form submission
         async function handleLogin(event) {
             event.preventDefault();
-            
+
             // Prevent double submission
             if (window.isButtonLocked && window.isButtonLocked('login')) return;
             if (window.lockButton) window.lockButton('login', 5000);
-            
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
@@ -468,30 +458,29 @@
             const loginSpinner = document.getElementById('loginSpinner');
             const errorDiv = document.getElementById('errorMessage');
             const successDiv = document.getElementById('successMessage');
-            
+
             // Reset messages
             errorDiv.classList.remove('show');
             successDiv.classList.remove('show');
-            
+
             // Show loading state
             loginBtn.disabled = true;
             loginBtnText.style.display = 'none';
             loginSpinner.style.display = 'inline';
-            
+
             try {
                 const { data, error } = await sb.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
-                
+
                 if (error) throw error;
-                
+
                 // Clear any guest session when real user logs in
                 localStorage.removeItem('guestSession');
-                
-                successDiv.textContent = 'Login successful! Redirecting...';
-                successDiv.classList.add('show');
-                
+
+                showSuccess('Login successful! Redirecting...');
+
                 // Redirect based on role using the freshly returned session/user metadata
                 const userContext = {
                     id: data.user?.id,
@@ -501,20 +490,20 @@
                 setTimeout(() => {
                     redirectUser(userContext);
                 }, 600);
-                
+
             } catch (error) {
                 console.error('Login error:', error);
-                errorDiv.textContent = error.message === 'Invalid login credentials' 
+                const msg = error.message === 'Invalid login credentials'
                     ? 'Invalid email or password. Please try again.'
                     : error.message;
-                errorDiv.classList.add('show');
+                showError(msg);
             } finally {
                 loginBtn.disabled = false;
                 loginBtnText.style.display = 'inline';
                 loginSpinner.style.display = 'none';
             }
         }
-        
+
         // Toggle password visibility
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
@@ -527,45 +516,43 @@
                 btn.textContent = 'Show';
             }
         }
-        
+
         // Show forgot password modal
         function showForgotPassword() {
             document.getElementById('forgotPasswordModal').classList.remove('hidden');
             document.getElementById('resetError').classList.remove('show');
             document.getElementById('resetSuccess').classList.remove('show');
         }
-        
+
         // Close forgot password modal
         function closeForgotPassword() {
             document.getElementById('forgotPasswordModal').classList.add('hidden');
         }
-        
+
         // Handle forgot password
         async function handleForgotPassword(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('resetEmail').value.trim();
             const errorDiv = document.getElementById('resetError');
             const successDiv = document.getElementById('resetSuccess');
-            
+
             errorDiv.classList.remove('show');
             successDiv.classList.remove('show');
-            
+
             try {
                 const { error } = await sb.auth.resetPasswordForEmail(email, {
                     redirectTo: window.location.origin + '/reset-password.html'
                 });
-                
+
                 if (error) throw error;
-                
-                successDiv.textContent = 'Password reset link sent! Check your email.';
-                successDiv.classList.add('show');
+
+                showSuccess('Password reset link sent! Check your email.');
             } catch (error) {
-                errorDiv.textContent = error.message;
-                errorDiv.classList.add('show');
+                showError(error.message);
             }
         }
-        
+
         // Close modal on outside click
         document.getElementById('forgotPasswordModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('forgotPasswordModal')) {
@@ -578,10 +565,10 @@
             // Prevent double clicks
             if (window.isButtonLocked && window.isButtonLocked('playAsGuest')) return;
             if (window.lockButton) window.lockButton('playAsGuest', 3000);
-            
+
             // Clear any existing auth session first (wait for it to complete)
             await sb.auth.signOut();
-            
+
             // Set guest session in localStorage
             const guestSession = {
                 isGuest: true,
@@ -589,14 +576,14 @@
                 startedAt: new Date().toISOString()
             };
             localStorage.setItem('guestSession', JSON.stringify(guestSession));
-            
+
             // Show loading and redirect
             if (window.showPageLoading) window.showPageLoading('Starting Game');
             setTimeout(() => {
                 window.location.href = 'menu.html';
             }, 150);
         }
-        
+
         // Update placeholders based on language
         function updatePlaceholders() {
             const lang = localStorage.getItem('selectedLanguage') || 'en';
@@ -607,17 +594,18 @@
                 }
             });
         }
-        
+
         // Override toggle to also update placeholders
         const originalToggle = window.toggleLanguage;
-        window.toggleLanguage = function() {
+        window.toggleLanguage = function () {
             if (originalToggle) originalToggle();
             updatePlaceholders();
         };
-        
+
         // Update placeholders on load
         document.addEventListener('DOMContentLoaded', updatePlaceholders);
     </script>
     <script src="js/language.js"></script>
 </body>
+
 </html>
