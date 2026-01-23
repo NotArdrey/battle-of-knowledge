@@ -1947,20 +1947,6 @@
 
                 console.log(`Deleted ${achievementsCount} achievement records`);
 
-                // Also delete game_sessions if it exists
-                try {
-                    const { error: sessionsError } = await sb
-                        .from('game_sessions')
-                        .delete()
-                        .gte('created_at', '1970-01-01');
-
-                    if (sessionsError) {
-                        console.warn('Game sessions delete warning:', sessionsError);
-                    }
-                } catch (e) {
-                    console.warn('Game sessions table may not exist:', e);
-                }
-
                 showToast(`All user progress has been reset! (${progressCount || 0} progress, ${achievementsCount || 0} achievements deleted)`, 'success');
 
                 // Refresh stats

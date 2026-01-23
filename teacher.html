@@ -546,7 +546,7 @@
             <button class="tab-btn" onclick="switchTab('students')">👥 Student Progress</button>
             <button class="tab-btn" onclick="switchTab('questions')">❓ Questions</button>
             <button class="tab-btn" onclick="switchTab('lessons')">📚 Lessons</button>
-            <button class="tab-btn" onclick="switchTab('backup')">📦 Backup & Restore</button>
+
         </div>
 
 
@@ -738,78 +738,6 @@
             </div>
         </div>
 
-        <!-- Backup & Restore Tab -->
-        <div id="backupTab" class="tab-content">
-            <div class="content-card">
-                <div class="card-header">
-                    <h2 class="card-title">📦 Backup & Restore</h2>
-                </div>
-
-                <!-- Export Section -->
-                <div class="p-6 border-b-2 border-amber-200">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📤 Export Your Content</h3>
-                    <p class="text-amber-700 mb-4">Download your custom questions and lessons as JSON files. You can use
-                        these to restore your content or transfer to another account.</p>
-
-                    <div class="flex flex-wrap gap-3 mb-4">
-                        <button class="btn-primary" onclick="exportTeacherQuestions()">
-                            📝 Export My Questions
-                        </button>
-                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
-                            onclick="exportTeacherLessons()">
-                            📚 Export My Lessons
-                        </button>
-                        <button class="btn-primary" style="background: linear-gradient(to right, #7c3aed, #8b5cf6);"
-                            onclick="exportAllTeacherContent()">
-                            📦 Export All My Content
-                        </button>
-                    </div>
-
-                    <div id="exportStatus" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
-                </div>
-
-                <!-- Import Section -->
-                <div class="p-6">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📥 Import / Restore Content</h3>
-                    <p class="text-amber-700 mb-4">Upload a previously exported JSON file to restore your questions and
-                        lessons.</p>
-
-                    <div class="upload-area" id="backupUploadArea"
-                        onclick="document.getElementById('backupFile').click()">
-                        <div class="upload-icon">📁</div>
-                        <p class="text-amber-800 font-semibold mb-2">Click or drag & drop a backup file</p>
-                        <p class="text-amber-600 text-sm">Accepts JSON files exported from this dashboard</p>
-                        <input type="file" id="backupFile" accept=".json" class="hidden"
-                            onchange="handleTeacherImportFile(event)">
-                    </div>
-
-                    <div id="importPreview" class="hidden mt-4">
-                        <h4 class="font-bold text-amber-900 mb-2">📋 Import Preview</h4>
-                        <div id="importPreviewContent"
-                            class="bg-white rounded-lg p-4 border-2 border-amber-200 max-h-60 overflow-y-auto">
-                            <!-- Preview will be shown here -->
-                        </div>
-                        <div class="flex gap-3 mt-4">
-                            <button class="btn-secondary flex-1" onclick="cancelImport()">Cancel</button>
-                            <button class="btn-primary flex-1" onclick="confirmTeacherImport()">✅ Import
-                                Content</button>
-                        </div>
-                    </div>
-
-                    <div id="importStatus" class="hidden mt-3 p-3 rounded-lg text-sm"></div>
-                </div>
-
-                <!-- Recent Backups -->
-                <div class="p-6 border-t-2 border-amber-200">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📜 Recent Export History</h3>
-                    <div id="backupHistory" class="space-y-2">
-                        <!-- Backup history will be loaded here -->
-                    </div>
-                    <p id="noBackupHistory" class="text-amber-600 text-sm hidden">No recent exports recorded on this
-                        device.</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Create Class Modal -->
@@ -1019,12 +947,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Lesson Content (English) - HTML Supported</label>
+                    <label class="form-label">Lesson Content (English)</label>
                     <textarea id="lessonContentEn" class="form-input" rows="8"
-                        placeholder="<div class='space-y-4'>&#10;    <h3 class='text-xl font-bold mb-3'>Section Title</h3>&#10;    <p class='mb-3'>Content here...</p>&#10;</div>"
+                        placeholder="Write your lesson content here. Use plain text - simple paragraphs work best for students to read and understand."
                         required></textarea>
-                    <p class="text-sm text-amber-700 mt-1">You can use HTML for formatting. Include divs, paragraphs,
-                        headings, etc.</p>
+                    <p class="text-sm text-amber-700 mt-1">Write in plain text. Keep it simple and easy to understand for students.</p>
                 </div>
 
                 <div class="form-group">
@@ -1161,8 +1088,9 @@
             }
 
             if (!profile) {
-                console.error('Could not load profile. Creating one...');
+                console.warn('Profile not found. Creating one...');
                 // Try to create the profile if it doesn't exist
+                // Use upsert to handle race conditions where profile might already exist
                 const { data: newProfile, error: createError } = await sb
                     .from('profiles')
                     .upsert({
@@ -1171,17 +1099,38 @@
                         full_name: session.user.user_metadata?.full_name || 'Teacher',
                         role: session.user.user_metadata?.role || 'teacher',
                         is_verified: true
+                    }, {
+                        onConflict: 'id',
+                        ignoreDuplicates: false
                     })
                     .select()
                     .single();
 
                 if (createError) {
-                    console.error('Failed to create profile:', createError);
-                }
-
-                if (newProfile) {
+                    console.error('Failed to create/update profile:', createError);
+                    // Profile creation failed - try to fetch again (might have been created by trigger)
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Short delay for trigger
+                    const { data: retryProfile, error: retryError } = await sb
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
+                    
+                    if (retryProfile) {
+                        currentProfile = retryProfile;
+                        userRole = retryProfile.role;
+                        console.log('Profile fetched on retry:', currentProfile);
+                    } else {
+                        console.error('Failed to fetch profile on retry:', retryError);
+                        alert('Failed to load or create your profile. Please try logging in again.');
+                        await sb.auth.signOut();
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                } else if (newProfile) {
                     currentProfile = newProfile;
                     userRole = newProfile.role;
+                    console.log('Profile created/updated successfully:', currentProfile);
                 }
             } else {
                 currentProfile = profile;
@@ -1212,17 +1161,16 @@
                 document.getElementById('verificationWarning').classList.remove('hidden');
             }
 
-            // Load system questions from questions.js
-            loadSystemQuestions();
-
-            // Load data
+            // Load data (questions and lessons will be migrated and loaded from database)
             await Promise.all([
                 loadClasses(),
                 loadStudents(),
                 loadCustomQuestions(),
-                loadCustomLessons(),
-                loadStats()
+                loadCustomLessons()
             ]);
+            
+            // Update stats after all data is loaded
+            loadStats();
         });
 
         // Load statistics
@@ -1257,12 +1205,17 @@
                     .eq('teacher_id', currentProfile.id)
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
-
-                allClasses = data || [];
+                if (error) {
+                    console.error('Error loading classes:', error);
+                    allClasses = [];
+                } else {
+                    allClasses = data || [];
+                }
                 renderClasses(allClasses);
             } catch (error) {
                 console.error('Error loading classes:', error);
+                allClasses = [];
+                renderClasses(allClasses);
             }
         }
 
@@ -1413,83 +1366,68 @@
             try {
                 console.log('Loading students for teacher:', currentProfile.id);
 
-                // First try: Get students by teacher_id
-                let { data, error } = await sb
-                    .from('profiles')
+                if (!allClasses || allClasses.length === 0) {
+                    allStudents = [];
+                    renderStudents(allStudents);
+                    return;
+                }
+
+                const classIds = allClasses.map(c => c.id);
+
+                const { data: enrolledData, error } = await sb
+                    .from('class_enrollments')
                     .select(`
-                        id,
-                        full_name,
-                        email,
+                        student_id,
                         class_id,
-                        created_at,
-                        teacher_id,
-                        classes!profiles_class_id_fkey(class_name),
-                        progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
-                    `)
-                    .eq('teacher_id', currentProfile.id)
-                    .eq('role', 'student');
-
-                if (error) {
-                    console.error('Error loading students by teacher_id:', error);
-                }
-
-                console.log('Students by teacher_id:', data?.length || 0);
-
-                // Also get students from class_enrollments (in case teacher_id wasn't set)
-                if (allClasses.length > 0) {
-                    const classIds = allClasses.map(c => c.id);
-
-                    const { data: enrolledData, error: enrollError } = await sb
-                        .from('class_enrollments')
-                        .select(`
-                            student_id,
-                            class_id,
-                            status,
-                            profiles!class_enrollments_student_id_fkey(
-                                id,
-                                full_name,
-                                email,
-                                class_id,
-                                created_at,
-                                teacher_id,
-                                progress(era_key, lessons_completed, lessons_complete, boss_defeated, battle_score, current_lesson_index, last_played_at)
+                        status,
+                        profiles:profiles!class_enrollments_student_id_fkey(
+                            id,
+                            full_name,
+                            email,
+                            created_at,
+                            teacher_id,
+                            progress(
+                                era_id,
+                                boss_defeated,
+                                battle_score,
+                                current_lesson_index,
+                                last_played_at,
+                                eras!progress_era_id_fkey(era_key)
                             )
-                        `)
-                        .in('class_id', classIds)
-                        .eq('status', 'active');
+                        ),
+                        classes:classes!class_enrollments_class_id_fkey(
+                            class_name
+                        )
+                    `)
+                    .in('class_id', classIds)
+                    .eq('status', 'active');
 
-                    if (enrollError) {
-                        console.error('Error loading enrolled students:', enrollError);
-                    } else {
-                        console.log('Students from enrollments:', enrolledData?.length || 0);
+                if (error) throw error;
 
-                        // Merge enrolled students with those found by teacher_id
-                        if (enrolledData && enrolledData.length > 0) {
-                            const existingIds = new Set((data || []).map(s => s.id));
-
-                            enrolledData.forEach(enrollment => {
-                                if (enrollment.profiles && !existingIds.has(enrollment.profiles.id)) {
-                                    // Get class name for this student
-                                    const studentClass = allClasses.find(c => c.id === enrollment.class_id);
-                                    const studentData = {
-                                        ...enrollment.profiles,
-                                        classes: studentClass ? { class_name: studentClass.class_name } : null
-                                    };
-                                    data = data || [];
-                                    data.push(studentData);
-                                    existingIds.add(enrollment.profiles.id);
-                                }
-                            });
-                        }
+                const unique = new Map();
+                (enrolledData || []).forEach(enrollment => {
+                    if (!enrollment.profiles) return;
+                    if (!unique.has(enrollment.profiles.id)) {
+                        // Map progress to include era_key
+                        const profileWithProgress = {
+                            ...enrollment.profiles,
+                            progress: (enrollment.profiles.progress || []).map(p => ({
+                                ...p,
+                                era_key: p.eras?.era_key || 'unknown'
+                            })),
+                            classes: enrollment.classes ? { class_name: enrollment.classes.class_name } : null
+                        };
+                        unique.set(enrollment.profiles.id, profileWithProgress);
                     }
-                }
+                });
 
-                console.log('Total students loaded:', data?.length || 0, data);
-
-                allStudents = data || [];
+                allStudents = Array.from(unique.values());
+                console.log('Total students loaded:', allStudents.length, allStudents);
                 renderStudents(allStudents);
             } catch (error) {
                 console.error('Error loading students:', error);
+                allStudents = [];
+                renderStudents(allStudents);
             }
         }
 
@@ -1641,12 +1579,22 @@
             if (!confirm('Remove this student from your class?')) return;
 
             try {
-                const { error } = await sb
+                const classIds = allClasses.map(c => c.id);
+
+                const { error: enrollError } = await sb
+                    .from('class_enrollments')
+                    .delete()
+                    .eq('student_id', studentId)
+                    .in('class_id', classIds);
+
+                if (enrollError) throw enrollError;
+
+                const { error: profileError } = await sb
                     .from('profiles')
-                    .update({ teacher_id: null, class_id: null })
+                    .update({ teacher_id: null, updated_at: new Date().toISOString() })
                     .eq('id', studentId);
 
-                if (error) throw error;
+                if (profileError) throw profileError;
 
                 showToast('Student removed from class', 'success');
                 loadStudents();
@@ -1724,7 +1672,7 @@
                 // Get all students - query ALL student accounts regardless of teacher assignment
                 const { data, error } = await sb
                     .from('profiles')
-                    .select('id, full_name, email, class_id, teacher_id, created_at, role')
+                    .select('id, full_name, email, teacher_id, created_at, role')
                     .eq('role', 'student')
                     .order('created_at', { ascending: false });
 
@@ -1870,7 +1818,7 @@
 
                 const { data, error } = await sb
                     .from('profiles')
-                    .select('id, full_name, email, class_id, teacher_id, created_at')
+                    .select('id, full_name, email, teacher_id, created_at')
                     .eq('role', 'student')
                     .or(`email.ilike.${searchPattern},full_name.ilike.${searchPattern}`)
                     .order('full_name', { ascending: true })
@@ -2097,12 +2045,11 @@
 
                 console.log(`Adding student ${studentId} to class ${classId} (teacher: ${currentProfile.id})`);
 
-                // Update the student's profile with teacher_id and class_id
+                // Update the student's profile with teacher_id
                 const { data: profileData, error: profileError } = await sb
                     .from('profiles')
                     .update({
                         teacher_id: currentProfile.id,
-                        class_id: classId,
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', studentId)
@@ -2149,7 +2096,7 @@
                 // Verify the update was successful by fetching the profile again
                 const { data: verifyData, error: verifyError } = await sb
                     .from('profiles')
-                    .select('id, full_name, teacher_id, class_id')
+                    .select('id, full_name, teacher_id')
                     .eq('id', studentId)
                     .single();
 
@@ -2158,7 +2105,7 @@
                 } else {
                     console.log('Verified student profile:', verifyData);
 
-                    if (verifyData.teacher_id !== currentProfile.id || verifyData.class_id !== classId) {
+                    if (verifyData.teacher_id !== currentProfile.id) {
                         console.warn('Warning: Profile may not have been updated correctly');
                         showToast('Warning: Student may not have been added correctly. Please check.', 'error');
                         if (addButton) {
@@ -2174,7 +2121,7 @@
                 // Remove this student from the available list and update display
                 filteredStudentsForModal = filteredStudentsForModal.filter(s => s.id !== studentId);
                 allAvailableStudents = allAvailableStudents.map(s =>
-                    s.id === studentId ? { ...s, teacher_id: currentProfile.id, class_id: classId } : s
+                    s.id === studentId ? { ...s, teacher_id: currentProfile.id } : s
                 );
 
                 // Update the count label
@@ -2204,49 +2151,156 @@
             }
         }
 
-        // Load system questions from questions.js
-        function loadSystemQuestions() {
-            allSystemQuestions = [];
+        // Migrate system questions from questions.js to database
+        async function migrateSystemQuestions() {
+            if (typeof questionsData === 'undefined') {
+                console.log('No system questions to migrate');
+                return;
+            }
 
-            // questionsData is loaded from questions.js
-            if (typeof questionsData !== 'undefined') {
+            // Check if migration already done by checking if any system questions exist in database
+            const { data: existingSystem, error: checkError } = await sb
+                .from('custom_questions')
+                .select('id')
+                .eq('is_system', true)
+                .limit(1);
+            
+            if (checkError) {
+                console.error('Error checking for existing system questions:', checkError);
+                return;
+            }
+            
+            if (existingSystem && existingSystem.length > 0) {
+                console.log('System questions already migrated to database');
+                return; // Already migrated
+            }
+
+            console.log('Migrating system questions to database...');
+            
+            try {
+                // Get era IDs mapping
+                const { data: eras } = await sb.from('eras').select('id, era_key');
+                const eraMap = {};
+                eras.forEach(e => eraMap[e.era_key] = e.id);
+
                 for (const [eraKey, eraData] of Object.entries(questionsData)) {
                     const questions = eraData.en || [];
-                    questions.forEach((q, index) => {
-                        allSystemQuestions.push({
-                            id: `system-${eraKey}-${index}`,
-                            era_key: eraKey,
-                            question_text_en: q.question,
-                            correct_answer_en: q.correct,
-                            wrong_answers_en: q.answers.filter(a => a !== q.correct),
-                            difficulty: 'medium',
-                            is_system: true,
-                            is_approved: true
-                        });
-                    });
+                    
+                    for (let index = 0; index < questions.length; index++) {
+                        const q = questions[index];
+                        const systemId = `system-${eraKey}-${index}`;
+                        
+                        // Check if already exists
+                        const { data: existing } = await sb
+                            .from('custom_questions')
+                            .select('id')
+                            .eq('source_id', systemId)
+                            .single();
+                        
+                        if (existing) continue;
+                        
+                        // Insert question
+                        const { data: newQuestion, error: qError } = await sb
+                            .from('custom_questions')
+                            .insert({
+                                era_id: eraMap[eraKey],
+                                question_text_en: q.question,
+                                difficulty: 'medium',
+                                is_system: true,
+                                is_approved: true,
+                                source_id: systemId
+                            })
+                            .select()
+                            .single();
+                        
+                        if (qError) {
+                            console.error('Error inserting question:', qError);
+                            continue;
+                        }
+                        
+                        // Insert choices
+                        const choices = q.answers.map(answer => ({
+                            question_id: newQuestion.id,
+                            content_en: answer,
+                            is_correct: answer === q.correct
+                        }));
+                        
+                        const { error: cError } = await sb
+                            .from('question_choices')
+                            .insert(choices);
+                        
+                        if (cError) {
+                            console.error('Error inserting choices:', cError);
+                        }
+                    }
                 }
+                
+                console.log('System questions migration complete');
+            } catch (error) {
+                console.error('Error migrating system questions:', error);
             }
         }
 
         // Load custom questions from database
         async function loadCustomQuestions() {
             try {
+                console.log('=== RELOADING QUESTIONS FROM DATABASE ===');
+                
+                // First, migrate system questions to database if not already done
+                await migrateSystemQuestions();
+
+                // Load all questions from database (fresh query with cache bust)
                 const { data, error } = await sb
                     .from('custom_questions')
-                    .select('*')
+                    .select('*, eras!custom_questions_era_id_fkey(era_key), question_choices(content_en, is_correct)')
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
-
-                allQuestions = data || [];
-                renderQuestions('system'); // Default to system questions view
+                if (error) {
+                    console.error('Error loading questions:', error);
+                    allQuestions = [];
+                    allSystemQuestions = [];
+                } else {
+                    console.log('Raw data from database:', data?.length, 'records');
+                    console.log('Custom question IDs:', data?.filter(q => !q.is_system).map(q => q.id));
+                    
+                    const allData = (data || []).map(q => {
+                        const choices = q.question_choices || [];
+                        const correctChoice = choices.find(c => c.is_correct);
+                        const wrongChoices = choices.filter(c => !c.is_correct);
+                        
+                        return {
+                            ...q,
+                            era_key: q.eras?.era_key || 'unknown',
+                            correct_answer_en: correctChoice?.content_en || '',
+                            wrong_answers_en: wrongChoices.map(c => c.content_en)
+                        };
+                    });
+                    
+                    // Split into system and custom for display
+                    allSystemQuestions = allData.filter(q => q.is_system);
+                    allQuestions = allData.filter(q => !q.is_system);
+                    
+                    console.log('Questions loaded - System:', allSystemQuestions.length, 'Custom:', allQuestions.length);
+                    console.log('Sample custom question:', allQuestions[0]);
+                    console.log('Sample system question:', allSystemQuestions[0]);
+                }
+                
+                // Preserve current tab or default to system
+                const currentTab = currentQuestionType || 'system';
+                console.log('Rendering questions tab:', currentTab);
+                renderQuestions(currentTab);
             } catch (error) {
                 console.error('Error loading questions:', error);
+                allQuestions = [];
+                allSystemQuestions = [];
+                const currentTab = currentQuestionType || 'system';
+                renderQuestions(currentTab);
             }
         }
 
         // Render questions
         function renderQuestions(type = 'system') {
+            console.log('=== renderQuestions called with type:', type);
             currentQuestionType = type;
             currentQuestionsPage = 1;
             questionsSearchTerm = '';
@@ -2268,6 +2322,7 @@
             });
 
             const questions = type === 'system' ? allSystemQuestions : allQuestions;
+            console.log('Questions to render:', questions.length, 'questions for type:', type);
 
             // Update era counts
             updateEraCounts(questions);
@@ -2286,11 +2341,13 @@
         // Apply all filters to questions and render with pagination
         function applyQuestionsFilters() {
             const questions = currentQuestionType === 'system' ? allSystemQuestions : allQuestions;
+            console.log('applyQuestionsFilters - Processing', questions.length, 'questions of type:', currentQuestionType);
             const tbody = document.getElementById('questionsTableBody');
             const emptyState = document.getElementById('questionsEmpty');
 
             // Filter by era
             let filtered = currentEraFilter === 'all' ? questions : questions.filter(q => q.era_key === currentEraFilter);
+            console.log('After era filter:', filtered.length, 'questions (era:', currentEraFilter, ')');
 
             // Filter by search term
             if (questionsSearchTerm) {
@@ -2299,11 +2356,13 @@
                     (q.correct_answer_en || '').toLowerCase().includes(questionsSearchTerm) ||
                     (q.question_text_tl || '').toLowerCase().includes(questionsSearchTerm)
                 );
+                console.log('After search filter:', filtered.length, 'questions (search:', questionsSearchTerm, ')');
             }
 
             filteredQuestions = filtered;
 
             if (filtered.length === 0) {
+                console.log('No questions to display - showing empty state');
                 tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 emptyState.querySelector('p').textContent = questionsSearchTerm
@@ -2322,6 +2381,7 @@
             const start = (currentQuestionsPage - 1) * questionsPerPage;
             const end = start + questionsPerPage;
             const pageQuestions = filtered.slice(start, end);
+            console.log('Rendering page', currentQuestionsPage, '- showing', pageQuestions.length, 'questions');
 
             renderQuestionRows(pageQuestions);
             updateQuestionsPagination(filtered.length, totalPages);
@@ -2390,8 +2450,9 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn-action btn-view" onclick="${isSystem ? `viewSystemQuestion('${q.id}')` : `editQuestion('${q.id}')`}">${isSystem ? 'View' : 'Edit'}</button>
-                        ${!isSystem ? `<button class="btn-action btn-remove" onclick="deleteQuestion('${q.id}')">Delete</button>` : ''}
+                        <button class="btn-action btn-view" onclick="${isSystem ? `viewSystemQuestion('${q.id}')` : `viewQuestion('${q.id}')`}">View</button>
+                        <button class="btn-action btn-view" onclick="${isSystem ? `editSystemQuestion('${q.id}')` : `editQuestion('${q.id}')`}">Edit</button>
+                        <button class="btn-action btn-remove" onclick="deleteQuestion('${q.id}', ${isSystem})">Delete</button>
                     </td>
                 </tr>
             `;
@@ -2421,26 +2482,78 @@
 
         // View system question (read-only)
         function viewSystemQuestion(questionId) {
-            const question = allSystemQuestions.find(q => q.id === questionId);
-            if (!question) return;
+            try {
+                const question = allSystemQuestions.find(q => q.id === questionId);
+                if (!question) {
+                    console.error('System question not found:', questionId);
+                    showToast('System question not found', 'error');
+                    return;
+                }
 
-            document.getElementById('questionModalTitle').textContent = 'View System Question';
-            document.getElementById('editQuestionId').value = '';
-            document.getElementById('questionEra').value = question.era_key;
-            document.getElementById('questionTextEn').value = question.question_text_en;
-            document.getElementById('questionTextTl').value = '';
-            document.getElementById('correctAnswerEn').value = question.correct_answer_en;
-            document.getElementById('wrongAnswersEn').value = question.wrong_answers_en.join('\n');
-            document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
+                document.getElementById('questionModalTitle').textContent = 'View System Question (Read-Only)';
+                document.getElementById('editQuestionId').value = '';
+                document.getElementById('questionEra').value = question.era_key;
+                document.getElementById('questionTextEn').value = question.question_text_en || '';
+                document.getElementById('questionTextTl').value = question.question_text_tl || '';
+                document.getElementById('correctAnswerEn').value = question.correct_answer_en || '';
+                document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
+                document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
 
-            // Make fields read-only for system questions
-            document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
-                el.setAttribute('readonly', true);
-                el.setAttribute('disabled', true);
-            });
+                // Make fields read-only for system questions
+                document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('disabled', 'disabled');
+                });
 
-            document.getElementById('questionModal').classList.remove('hidden');
+                // Hide save button
+                const submitBtn = document.querySelector('#questionForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = 'none';
+
+                document.getElementById('questionModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing system question:', error);
+                showToast('Failed to load question details', 'error');
+            }
         }
+
+        // Edit system question (make editable)
+        function editSystemQuestion(questionId) {
+            try {
+                const question = allSystemQuestions.find(q => q.id === questionId);
+                if (!question) {
+                    console.error('System question not found:', questionId);
+                    showToast('System question not found', 'error');
+                    return;
+                }
+
+                document.getElementById('questionModalTitle').textContent = 'Edit Question';
+                document.getElementById('editQuestionId').value = question.id; // Keep ID to update
+                document.getElementById('questionEra').value = question.era_key;
+                document.getElementById('questionTextEn').value = question.question_text_en || '';
+                document.getElementById('questionTextTl').value = question.question_text_tl || '';
+                document.getElementById('correctAnswerEn').value = question.correct_answer_en || '';
+                document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
+                document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
+
+                // Make editable
+                document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('disabled');
+                });
+
+                // Show save button
+                const submitBtn = document.querySelector('#questionForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = '';
+
+                document.getElementById('questionModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error editing system question:', error);
+                showToast('Failed to load question for editing', 'error');
+            }
+        }
+
+        // Delete system question
+
 
         // Show question modal
         function showQuestionModal() {
@@ -2448,11 +2561,15 @@
             document.getElementById('editQuestionId').value = '';
             document.getElementById('questionForm').reset();
 
-            // Remove read-only
+            // Remove read-only and make editable
             document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
                 el.removeAttribute('readonly');
                 el.removeAttribute('disabled');
             });
+
+            // Show save button
+            const submitBtn = document.querySelector('#questionForm button[type="submit"]');
+            if (submitBtn) submitBtn.style.display = '';
 
             document.getElementById('questionModal').classList.remove('hidden');
         }
@@ -2463,26 +2580,76 @@
         }
 
         // Edit question
+        // View custom question (read-only)
+        function viewQuestion(questionId) {
+            try {
+                const question = allQuestions.find(q => q.id === questionId);
+                if (!question) {
+                    console.error('Question not found:', questionId);
+                    showToast('Question not found', 'error');
+                    return;
+                }
+
+                document.getElementById('questionModalTitle').textContent = 'View Question (Read-Only)';
+                document.getElementById('editQuestionId').value = '';
+                document.getElementById('questionEra').value = question.era_key;
+                document.getElementById('questionTextEn').value = question.question_text_en || '';
+                document.getElementById('questionTextTl').value = question.question_text_tl || '';
+                document.getElementById('correctAnswerEn').value = question.correct_answer_en || '';
+                document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
+                document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
+
+                // Make read-only
+                document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('disabled', 'disabled');
+                });
+
+                // Hide save button
+                const submitBtn = document.querySelector('#questionForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = 'none';
+
+                document.getElementById('questionModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing question:', error);
+                showToast('Failed to load question details', 'error');
+            }
+        }
+
+        // Edit custom question
         function editQuestion(questionId) {
-            const question = allQuestions.find(q => q.id === questionId);
-            if (!question) return;
+            try {
+                const question = allQuestions.find(q => q.id === questionId);
+                if (!question) {
+                    console.error('Question not found:', questionId);
+                    showToast('Question not found', 'error');
+                    return;
+                }
 
-            document.getElementById('questionModalTitle').textContent = 'Edit Question';
-            document.getElementById('editQuestionId').value = questionId;
-            document.getElementById('questionEra').value = question.era_key;
-            document.getElementById('questionTextEn').value = question.question_text_en;
-            document.getElementById('questionTextTl').value = question.question_text_tl || '';
-            document.getElementById('correctAnswerEn').value = question.correct_answer_en;
-            document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
-            document.getElementById('questionDifficulty').value = question.difficulty;
+                document.getElementById('questionModalTitle').textContent = 'Edit Question';
+                document.getElementById('editQuestionId').value = questionId;
+                document.getElementById('questionEra').value = question.era_key;
+                document.getElementById('questionTextEn').value = question.question_text_en || '';
+                document.getElementById('questionTextTl').value = question.question_text_tl || '';
+                document.getElementById('correctAnswerEn').value = question.correct_answer_en || '';
+                document.getElementById('wrongAnswersEn').value = (question.wrong_answers_en || []).join('\n');
+                document.getElementById('questionDifficulty').value = question.difficulty || 'medium';
 
-            // Remove read-only
-            document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
-                el.removeAttribute('readonly');
-                el.removeAttribute('disabled');
-            });
+                // Make editable
+                document.querySelectorAll('#questionForm input, #questionForm textarea, #questionForm select').forEach(el => {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('disabled');
+                });
 
-            document.getElementById('questionModal').classList.remove('hidden');
+                // Show save button
+                const submitBtn = document.querySelector('#questionForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = '';
+
+                document.getElementById('questionModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error editing question:', error);
+                showToast('Failed to load question for editing', 'error');
+            }
         }
 
         // Handle save question
@@ -2503,39 +2670,85 @@
             }
 
             try {
+                // Get era_id from era_key
+                const { data: eraData, error: eraError } = await sb
+                    .from('eras')
+                    .select('id')
+                    .eq('era_key', era)
+                    .single();
+
+                if (eraError || !eraData) {
+                    showToast('Invalid era selected', 'error');
+                    return;
+                }
+
                 const questionData = {
-                    era_key: era,
+                    era_id: eraData.id,
                     question_text_en: questionEn,
                     question_text_tl: questionTl || null,
-                    correct_answer_en: correctEn,
-                    wrong_answers_en: wrongEn,
                     difficulty: difficulty
                 };
 
+                let savedQuestionId = questionId;
+
                 if (questionId) {
-                    // Update existing
+                    // Update existing question
+                    console.log('Updating question in database:', questionId, questionData);
                     const { error } = await sb
                         .from('custom_questions')
                         .update(questionData)
                         .eq('id', questionId);
 
                     if (error) throw error;
-                    showToast('Question updated!', 'success');
-                } else {
-                    // Create new
-                    questionData.created_by = currentProfile.id;
-                    questionData.is_approved = currentProfile.role === 'admin'; // Auto-approve for admins
 
-                    const { error } = await sb
+                    // Delete existing choices
+                    console.log('Deleting old choices for question:', questionId);
+                    const { error: deleteError } = await sb
+                        .from('question_choices')
+                        .delete()
+                        .eq('question_id', questionId);
+
+                    if (deleteError) throw deleteError;
+
+                } else {
+                    // Create new question
+                    questionData.created_by = currentProfile.id;
+                    questionData.is_approved = currentProfile.role === 'admin';
+                    console.log('Inserting new question to database:', questionData);
+
+                    const { data: newQuestion, error } = await sb
                         .from('custom_questions')
-                        .insert(questionData);
+                        .insert(questionData)
+                        .select()
+                        .single();
 
                     if (error) throw error;
-                    showToast(currentProfile.role === 'admin' ? 'Question added!' : 'Question added! Awaiting admin approval.', 'success');
+                    savedQuestionId = newQuestion.id;
+                    console.log('Question inserted successfully:', newQuestion);
                 }
 
+                // Insert choices (1 correct + multiple wrong)
+                console.log('Inserting question choices for question:', savedQuestionId);
+                const choices = [
+                    { question_id: savedQuestionId, content_en: correctEn, is_correct: true },
+                    ...wrongEn.map(wrong => ({ question_id: savedQuestionId, content_en: wrong, is_correct: false }))
+                ];
+
+                const { error: choicesError } = await sb
+                    .from('question_choices')
+                    .insert(choices);
+
+                if (choicesError) throw choicesError;
+                console.log('Question choices saved successfully');
+
+                showToast(
+                    questionId ? 'Question updated in database!' : 
+                    (currentProfile.role === 'admin' ? 'Question added to database!' : 'Question added to database! Awaiting admin approval.'),
+                    'success'
+                );
+
                 closeQuestionModal();
-                loadCustomQuestions();
+                await loadCustomQuestions(); // Wait for reload
                 loadStats();
             } catch (error) {
                 console.error('Error saving question:', error);
@@ -2544,10 +2757,34 @@
         }
 
         // Delete question
-        async function deleteQuestion(questionId) {
-            if (!confirm('Delete this question?')) return;
+        async function deleteQuestion(questionId, isSystem = false) {
+            const confirmMsg = isSystem 
+                ? 'Delete this system question? This will permanently remove it from the database.'
+                : 'Delete this question? This cannot be undone.';
+            
+            if (!confirm(confirmMsg)) return;
+
+            // Disable all delete buttons to prevent double-click
+            const deleteButtons = document.querySelectorAll('.btn-remove');
+            deleteButtons.forEach(btn => btn.disabled = true);
 
             try {
+                console.log('Deleting question from database:', questionId);
+                
+                // First verify the question exists
+                const { data: checkData, error: checkError } = await sb
+                    .from('custom_questions')
+                    .select('id')
+                    .eq('id', questionId)
+                    .single();
+                
+                if (checkError || !checkData) {
+                    console.log('Question not found in database (may already be deleted):', questionId);
+                    showToast('Question not found in database', 'error');
+                    await loadCustomQuestions();
+                    return;
+                }
+                
                 const { error } = await sb
                     .from('custom_questions')
                     .delete()
@@ -2555,12 +2792,30 @@
 
                 if (error) throw error;
 
-                showToast('Question deleted!', 'success');
-                loadCustomQuestions();
+                // Verify deletion
+                const { data: verifyData } = await sb
+                    .from('custom_questions')
+                    .select('id')
+                    .eq('id', questionId)
+                    .single();
+                
+                if (verifyData) {
+                    console.error('DELETION FAILED - Question still exists in database!', questionId);
+                    showToast('Deletion failed - please try again', 'error');
+                } else {
+                    console.log('Question deleted and verified - not in database anymore');
+                }
+
+                console.log('Question deleted successfully from database (choices deleted via cascade)');
+                showToast('Question deleted from database!', 'success');
+                await loadCustomQuestions(); // Wait for reload
                 loadStats();
             } catch (error) {
                 console.error('Error deleting question:', error);
-                showToast('Failed to delete question', 'error');
+                showToast('Failed to delete question from database', 'error');
+            } finally {
+                // Re-enable all delete buttons
+                deleteButtons.forEach(btn => btn.disabled = false);
             }
         }
 
@@ -2571,44 +2826,124 @@
         // Load custom lessons from database
         async function loadCustomLessons() {
             try {
+                console.log('=== RELOADING LESSONS FROM DATABASE ===');
                 const { data, error } = await sb
                     .from('custom_lessons')
-                    .select('*')
-                    .order('era_key', { ascending: true })
+                    .select('*, eras!custom_lessons_era_id_fkey(era_key, sort_order)')
                     .order('lesson_order', { ascending: true });
 
-                if (error) throw error;
-
-                allLessons = data || [];
-
-                // Load system lessons from learningData.js if available
-                console.log('learningData available:', !!window.learningData);
-
-                if (window.learningData) {
-                    allSystemLessons = [];
-                    Object.entries(window.learningData).forEach(([eraKey, eraData]) => {
-                        const lessons = eraData.en?.lessons || [];
-                        console.log(`Era ${eraKey}: ${lessons.length} lessons`);
-                        lessons.forEach(lesson => {
-                            allSystemLessons.push({
-                                id: `system-${eraKey}-${lesson.id}`,
-                                era_key: eraKey,
-                                lesson_order: lesson.id,
-                                title_en: lesson.title,
-                                icon: lesson.icon,
-                                is_system: true
-                            });
-                        });
-                    });
-                    console.log('Total system lessons loaded:', allSystemLessons.length);
+                if (error) {
+                    console.error('Error loading lessons:', error);
+                    allLessons = [];
+                    // Continue to load system lessons even if custom lessons fail
                 } else {
-                    console.warn('learningData not found - system lessons will not be available');
-                    allSystemLessons = [];
+                    allLessons = (data || []).map(l => ({
+                        ...l,
+                        era_key: l.eras?.era_key || 'unknown',
+                        era_sort_order: l.eras?.sort_order || 999
+                    })).sort((a, b) => a.era_sort_order - b.era_sort_order || a.lesson_order - b.lesson_order);
                 }
 
-                renderLessons('system'); // Default to system lessons view
+                // Migrate system lessons from learningData.js to database
+                await migrateSystemLessons();
+                
+                // Reload lessons from database after migration
+                const { data: allLessonsData, error: reloadError } = await sb
+                    .from('custom_lessons')
+                    .select('*, eras!custom_lessons_era_id_fkey(era_key, sort_order)')
+                    .order('created_at', { ascending: false });
+                
+                if (reloadError) {
+                    console.error('Error reloading lessons:', reloadError);
+                } else {
+                    const mappedLessons = (allLessonsData || []).map(l => ({
+                        ...l,
+                        era_key: l.eras?.era_key || 'unknown',
+                        era_sort_order: l.eras?.sort_order || 999
+                    })).sort((a, b) => a.era_sort_order - b.era_sort_order || a.lesson_order - b.lesson_order);
+                    
+                    // Split into system and custom
+                    allSystemLessons = mappedLessons.filter(l => l.is_system);
+                    allLessons = mappedLessons.filter(l => !l.is_system);
+                }
+
+                // Preserve current tab or default to system
+                const currentTab = currentLessonType || 'system';
+                renderLessons(currentTab);
             } catch (error) {
                 console.error('Error loading lessons:', error);
+            }
+        }
+
+        // Migrate system lessons from learningData.js to database
+        async function migrateSystemLessons() {
+            if (!window.learningData) {
+                console.log('No system lessons to migrate');
+                return;
+            }
+
+            // Check if migration already done by checking if any system lessons exist in database
+            const { data: existingSystem, error: checkError } = await sb
+                .from('custom_lessons')
+                .select('id')
+                .eq('is_system', true)
+                .limit(1);
+            
+            if (checkError) {
+                console.error('Error checking for existing system lessons:', checkError);
+                return;
+            }
+            
+            if (existingSystem && existingSystem.length > 0) {
+                console.log('System lessons already migrated to database');
+                return; // Already migrated
+            }
+
+            console.log('Migrating system lessons to database...');
+            
+            try {
+                // Get era IDs mapping
+                const { data: eras } = await sb.from('eras').select('id, era_key');
+                const eraMap = {};
+                eras.forEach(e => eraMap[e.era_key] = e.id);
+
+                for (const [eraKey, eraData] of Object.entries(window.learningData)) {
+                    const lessons = eraData.en?.lessons || [];
+                    
+                    for (const lesson of lessons) {
+                        const systemId = `system-${eraKey}-${lesson.id}`;
+                        
+                        // Check if already exists
+                        const { data: existing } = await sb
+                            .from('custom_lessons')
+                            .select('id')
+                            .eq('source_id', systemId)
+                            .single();
+                        
+                        if (existing) continue;
+                        
+                        // Insert lesson
+                        const { error: lError } = await sb
+                            .from('custom_lessons')
+                            .insert({
+                                era_id: eraMap[eraKey],
+                                lesson_order: lesson.id,
+                                title_en: lesson.title,
+                                content_en: lesson.content || '',
+                                icon: lesson.icon,
+                                is_system: true,
+                                source_id: systemId
+                            });
+                        
+                        if (lError) {
+                            console.error('Error inserting lesson:', lError);
+                        }
+                    }
+                }
+                
+                console.log('System lessons migration complete');
+            } catch (error) {
+                console.error('Error migrating system lessons:', error);
             }
         }
 
@@ -2736,11 +3071,9 @@
                 }
                     </td>
                     <td>
-                        ${lesson.is_system ?
-                    `<button class="btn-action btn-view" onclick="viewLesson('${lesson.id}')">View</button>` :
-                    `<button class="btn-action btn-view" onclick="editLesson('${lesson.id}')">Edit</button>
-                             <button class="btn-action btn-remove" onclick="deleteLesson('${lesson.id}')">Delete</button>`
-                }
+                        <button class="btn-action btn-view" onclick="${lesson.is_system ? `viewLesson('${lesson.id}')` : `viewCustomLesson('${lesson.id}')`}">View</button>
+                        <button class="btn-action btn-view" onclick="${lesson.is_system ? `editSystemLesson('${lesson.id}')` : `editLesson('${lesson.id}')`}">Edit</button>
+                        <button class="btn-action btn-remove" onclick="deleteLesson('${lesson.id}', ${lesson.is_system})">Delete</button>
                     </td>
                 </tr>
             `).join('');
@@ -2774,6 +3107,10 @@
                 el.removeAttribute('disabled');
             });
 
+            // Show save button
+            const submitBtn = document.querySelector('#lessonForm button[type="submit"]');
+            if (submitBtn) submitBtn.style.display = '';
+
             document.getElementById('lessonModal').classList.remove('hidden');
         }
 
@@ -2784,58 +3121,160 @@
 
         // View system lesson (read-only)
         function viewLesson(lessonId) {
-            const [, eraKey, lessonOrder] = lessonId.split('-');
-            const eraData = window.learningData?.[eraKey];
-            const lesson = eraData?.en?.lessons?.find(l => l.id === parseInt(lessonOrder));
+            try {
+                // Find lesson in system lessons array (all data now in database)
+                const lesson = allSystemLessons.find(l => l.id === lessonId);
+                if (!lesson) {
+                    console.error('System lesson not found:', lessonId);
+                    showToast('System lesson not found', 'error');
+                    return;
+                }
 
-            if (!lesson) return;
+                document.getElementById('lessonModalTitle').textContent = 'View System Lesson (Read-Only)';
+                document.getElementById('editLessonId').value = '';
+                document.getElementById('lessonEra').value = lesson.era_key;
+                document.getElementById('lessonOrder').value = lesson.lesson_order;
+                document.getElementById('lessonTitleEn').value = lesson.title_en || '';
+                document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
+                
+                // Get content
+                let content = lesson.content_en || '';
+                if (content.length > 500) {
+                    content = content.substring(0, 500) + '...';
+                }
+                document.getElementById('lessonContentEn').value = content;
+                document.getElementById('lessonContentTl').value = lesson.content_tl || '';
+                document.getElementById('lessonIcon').value = lesson.icon || '📖';
 
-            document.getElementById('lessonModalTitle').textContent = 'View System Lesson (Read-Only)';
-            document.getElementById('editLessonId').value = '';
-            document.getElementById('lessonEra').value = eraKey;
-            document.getElementById('lessonOrder').value = lesson.id;
-            document.getElementById('lessonTitleEn').value = lesson.title;
-            document.getElementById('lessonTitleTl').value = eraData?.tl?.lessons?.[lesson.id - 1]?.title || '';
-            document.getElementById('lessonContentEn').value = lesson.content?.replace(/<[^>]*>/g, ' ').substring(0, 500) + '...';
-            document.getElementById('lessonContentTl').value = '';
-            document.getElementById('lessonIcon').value = lesson.icon;
+                // Make read-only
+                document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('disabled', 'disabled');
+                });
 
-            // Make read-only
-            document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
-                el.setAttribute('readonly', 'readonly');
-                el.setAttribute('disabled', 'disabled');
-            });
+                // Hide save button
+                const submitBtn = document.querySelector('#lessonForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = 'none';
 
-            // Hide save button
-            document.querySelector('#lessonForm button[type="submit"]').style.display = 'none';
+                document.getElementById('lessonModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing lesson:', error);
+                showToast('Failed to load lesson details', 'error');
+            }
+        }
 
-            document.getElementById('lessonModal').classList.remove('hidden');
+        // Edit system lesson
+        function editSystemLesson(lessonId) {
+            try {
+                const lesson = allSystemLessons.find(l => l.id === lessonId);
+                if (!lesson) {
+                    console.error('System lesson not found:', lessonId);
+                    showToast('System lesson not found', 'error');
+                    return;
+                }
+
+                document.getElementById('lessonModalTitle').textContent = 'Edit Lesson';
+                document.getElementById('editLessonId').value = lesson.id; // Keep ID to update
+                document.getElementById('lessonEra').value = lesson.era_key;
+                document.getElementById('lessonOrder').value = lesson.lesson_order;
+                document.getElementById('lessonTitleEn').value = lesson.title_en || '';
+                document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
+                document.getElementById('lessonContentEn').value = lesson.content_en || '';
+                document.getElementById('lessonContentTl').value = lesson.content_tl || '';
+                document.getElementById('lessonIcon').value = lesson.icon || '📖';
+
+                // Make editable
+                document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('disabled');
+                });
+
+                // Show save button
+                const submitBtn = document.querySelector('#lessonForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = '';
+
+                document.getElementById('lessonModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error editing system lesson:', error);
+                showToast('Failed to load lesson for editing', 'error');
+            }
+        }
+
+        // Delete system lesson
+
+
+        // View custom lesson (read-only)
+        function viewCustomLesson(lessonId) {
+            try {
+                const lesson = allLessons.find(l => l.id === lessonId);
+                if (!lesson) {
+                    console.error('Lesson not found:', lessonId);
+                    showToast('Lesson not found', 'error');
+                    return;
+                }
+
+                document.getElementById('lessonModalTitle').textContent = 'View Lesson (Read-Only)';
+                document.getElementById('editLessonId').value = '';
+                document.getElementById('lessonEra').value = lesson.era_key;
+                document.getElementById('lessonOrder').value = lesson.lesson_order;
+                document.getElementById('lessonTitleEn').value = lesson.title_en || '';
+                document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
+                document.getElementById('lessonContentEn').value = lesson.content_en || '';
+                document.getElementById('lessonContentTl').value = lesson.content_tl || '';
+                document.getElementById('lessonIcon').value = lesson.icon || '📖';
+
+                // Make read-only
+                document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                    el.setAttribute('readonly', 'readonly');
+                    el.setAttribute('disabled', 'disabled');
+                });
+
+                // Hide save button
+                const submitBtn = document.querySelector('#lessonForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = 'none';
+
+                document.getElementById('lessonModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing lesson:', error);
+                showToast('Failed to load lesson details', 'error');
+            }
         }
 
         // Edit lesson
         function editLesson(lessonId) {
-            const lesson = allLessons.find(l => l.id === lessonId);
-            if (!lesson) return;
+            try {
+                const lesson = allLessons.find(l => l.id === lessonId);
+                if (!lesson) {
+                    console.error('Lesson not found:', lessonId);
+                    showToast('Lesson not found', 'error');
+                    return;
+                }
 
-            document.getElementById('lessonModalTitle').textContent = 'Edit Lesson';
-            document.getElementById('editLessonId').value = lessonId;
-            document.getElementById('lessonEra').value = lesson.era_key;
-            document.getElementById('lessonOrder').value = lesson.lesson_order;
-            document.getElementById('lessonTitleEn').value = lesson.title_en;
-            document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
-            document.getElementById('lessonContentEn').value = lesson.content_en;
-            document.getElementById('lessonContentTl').value = lesson.content_tl || '';
-            document.getElementById('lessonIcon').value = lesson.icon;
+                document.getElementById('lessonModalTitle').textContent = 'Edit Lesson';
+                document.getElementById('editLessonId').value = lessonId;
+                document.getElementById('lessonEra').value = lesson.era_key;
+                document.getElementById('lessonOrder').value = lesson.lesson_order;
+                document.getElementById('lessonTitleEn').value = lesson.title_en || '';
+                document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
+                document.getElementById('lessonContentEn').value = lesson.content_en || '';
+                document.getElementById('lessonContentTl').value = lesson.content_tl || '';
+                document.getElementById('lessonIcon').value = lesson.icon || '📖';
 
-            document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
-                el.removeAttribute('readonly');
-                el.removeAttribute('disabled');
-            });
+                // Make editable
+                document.querySelectorAll('#lessonForm input, #lessonForm textarea, #lessonForm select').forEach(el => {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('disabled');
+                });
 
-            // Show save button
-            document.querySelector('#lessonForm button[type="submit"]').style.display = '';
+                // Show save button
+                const submitBtn = document.querySelector('#lessonForm button[type="submit"]');
+                if (submitBtn) submitBtn.style.display = '';
 
-            document.getElementById('lessonModal').classList.remove('hidden');
+                document.getElementById('lessonModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error editing lesson:', error);
+                showToast('Failed to load lesson for editing', 'error');
+            }
         }
 
         // Handle save lesson
@@ -2852,7 +3291,6 @@
             const icon = document.getElementById('lessonIcon').value.trim();
 
             const lessonData = {
-                era_key: era,
                 lesson_order: order,
                 title_en: titleEn,
                 title_tl: titleTl || null,
@@ -2864,29 +3302,48 @@
             };
 
             try {
+                // Get era_id from era_key
+                const { data: eraData, error: eraError } = await sb
+                    .from('eras')
+                    .select('id')
+                    .eq('era_key', era)
+                    .single();
+
+                if (eraError || !eraData) {
+                    showToast('Invalid era selected', 'error');
+                    return;
+                }
+
+                lessonData.era_id = eraData.id;
+
                 if (lessonId) {
                     // Update existing lesson
+                    console.log('Updating lesson in database:', lessonId, lessonData);
                     const { error } = await sb
                         .from('custom_lessons')
                         .update(lessonData)
                         .eq('id', lessonId);
 
                     if (error) throw error;
-                    showToast('Lesson updated!', 'success');
+                    console.log('Lesson updated successfully in database');
+                    showToast('Lesson updated in database!', 'success');
                 } else {
                     // Add new lesson
                     lessonData.created_by = currentProfile.id;
+                    console.log('Inserting new lesson to database:', lessonData);
 
-                    const { error } = await sb
+                    const { data: newLesson, error } = await sb
                         .from('custom_lessons')
-                        .insert([lessonData]);
+                        .insert([lessonData])
+                        .select();
 
                     if (error) throw error;
-                    showToast(currentProfile.role === 'admin' ? 'Lesson added!' : 'Lesson added! Awaiting admin approval.', 'success');
+                    console.log('Lesson inserted successfully:', newLesson);
+                    showToast(currentProfile.role === 'admin' ? 'Lesson added to database!' : 'Lesson added to database! Awaiting admin approval.', 'success');
                 }
 
                 closeLessonModal();
-                loadCustomLessons();
+                await loadCustomLessons(); // Wait for reload
                 loadStats();
             } catch (error) {
                 console.error('Error saving lesson:', error);
@@ -2895,10 +3352,34 @@
         }
 
         // Delete lesson
-        async function deleteLesson(lessonId) {
-            if (!confirm('Delete this lesson? This cannot be undone.')) return;
+        async function deleteLesson(lessonId, isSystem = false) {
+            const confirmMsg = isSystem 
+                ? 'Delete this system lesson? This will permanently remove it from the database.'
+                : 'Delete this lesson? This cannot be undone.';
+            
+            if (!confirm(confirmMsg)) return;
+
+            // Disable all delete buttons to prevent double-click
+            const deleteButtons = document.querySelectorAll('.btn-remove');
+            deleteButtons.forEach(btn => btn.disabled = true);
 
             try {
+                console.log('Deleting lesson from database:', lessonId);
+                
+                // First verify the lesson exists
+                const { data: checkData, error: checkError } = await sb
+                    .from('custom_lessons')
+                    .select('id')
+                    .eq('id', lessonId)
+                    .single();
+                
+                if (checkError || !checkData) {
+                    console.log('Lesson not found in database (may already be deleted):', lessonId);
+                    showToast('Lesson not found in database', 'error');
+                    await loadCustomLessons();
+                    return;
+                }
+                
                 const { error } = await sb
                     .from('custom_lessons')
                     .delete()
@@ -2906,12 +3387,16 @@
 
                 if (error) throw error;
 
-                showToast('Lesson deleted!', 'success');
-                loadCustomLessons();
+                console.log('Lesson deleted successfully from database');
+                showToast('Lesson deleted from database!', 'success');
+                await loadCustomLessons(); // Wait for reload
                 loadStats();
             } catch (error) {
                 console.error('Error deleting lesson:', error);
-                showToast('Failed to delete lesson', 'error');
+                showToast('Failed to delete lesson from database', 'error');
+            } finally {
+                // Re-enable all delete buttons
+                deleteButtons.forEach(btn => btn.disabled = false);
             }
         }
 
@@ -2933,11 +3418,23 @@
             if (window.isButtonLocked && window.isButtonLocked('logout')) return;
             if (window.lockButton) window.lockButton('logout', 3000);
 
-            await sb.auth.signOut();
             if (window.showPageLoading) window.showPageLoading('Logging out');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 150);
+            
+            // Sign out from Supabase
+            await sb.auth.signOut();
+            
+            // Clear any cached data
+            currentProfile = null;
+            allClasses = [];
+            allStudents = [];
+            allQuestions = [];
+            allSystemQuestions = [];
+            
+            // Wait a bit to ensure signOut completes
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Redirect to login page
+            window.location.replace('login.html');
         }
 
         document.querySelectorAll('.modal-overlay').forEach(modal => {
@@ -2949,368 +3446,6 @@
         });
 
         // =============================================
-        // BACKUP & RESTORE FUNCTIONS
-        // =============================================
-
-        let pendingImportData = null;
-
-        // Export teacher's custom questions
-        async function exportTeacherQuestions() {
-            try {
-                showExportStatus('Exporting questions...', 'info');
-
-                const { data: questions, error } = await sb
-                    .from('custom_questions')
-                    .select('*')
-                    .eq('created_by', currentProfile.id)
-                    .eq('is_system', false);
-
-                if (error) throw error;
-
-                if (!questions || questions.length === 0) {
-                    showExportStatus('No custom questions to export.', 'error');
-                    return;
-                }
-
-                const exportData = {
-                    type: 'teacher_questions',
-                    version: '1.0',
-                    exportedAt: new Date().toISOString(),
-                    exportedBy: currentProfile.email,
-                    count: questions.length,
-                    data: questions.map(q => ({
-                        era_key: q.era_key,
-                        question_text_en: q.question_text_en,
-                        question_text_tl: q.question_text_tl,
-                        correct_answer_en: q.correct_answer_en,
-                        correct_answer_tl: q.correct_answer_tl,
-                        wrong_answers_en: q.wrong_answers_en,
-                        wrong_answers_tl: q.wrong_answers_tl,
-                        difficulty: q.difficulty
-                    }))
-                };
-
-                downloadJSON(exportData, `teacher_questions_${formatDateForFile()}.json`);
-                saveBackupHistory('questions', questions.length);
-                showExportStatus(`Successfully exported ${questions.length} questions!`, 'success');
-                loadBackupHistory();
-            } catch (error) {
-                console.error('Export error:', error);
-                showExportStatus('Failed to export questions: ' + error.message, 'error');
-            }
-        }
-
-        // Export teacher's custom lessons
-        async function exportTeacherLessons() {
-            try {
-                showExportStatus('Exporting lessons...', 'info');
-
-                const { data: lessons, error } = await sb
-                    .from('custom_lessons')
-                    .select('*')
-                    .eq('created_by', currentProfile.id)
-                    .eq('is_system', false);
-
-                if (error) throw error;
-
-                if (!lessons || lessons.length === 0) {
-                    showExportStatus('No custom lessons to export.', 'error');
-                    return;
-                }
-
-                const exportData = {
-                    type: 'teacher_lessons',
-                    version: '1.0',
-                    exportedAt: new Date().toISOString(),
-                    exportedBy: currentProfile.email,
-                    count: lessons.length,
-                    data: lessons.map(l => ({
-                        era_key: l.era_key,
-                        lesson_order: l.lesson_order,
-                        title_en: l.title_en,
-                        title_tl: l.title_tl,
-                        content_en: l.content_en,
-                        content_tl: l.content_tl,
-                        icon: l.icon
-                    }))
-                };
-
-                downloadJSON(exportData, `teacher_lessons_${formatDateForFile()}.json`);
-                saveBackupHistory('lessons', lessons.length);
-                showExportStatus(`Successfully exported ${lessons.length} lessons!`, 'success');
-                loadBackupHistory();
-            } catch (error) {
-                console.error('Export error:', error);
-                showExportStatus('Failed to export lessons: ' + error.message, 'error');
-            }
-        }
-
-        // Export all teacher content
-        async function exportAllTeacherContent() {
-            try {
-                showExportStatus('Exporting all content...', 'info');
-
-                const [questionsResult, lessonsResult] = await Promise.all([
-                    sb.from('custom_questions').select('*').eq('created_by', currentProfile.id).eq('is_system', false),
-                    sb.from('custom_lessons').select('*').eq('created_by', currentProfile.id).eq('is_system', false)
-                ]);
-
-                if (questionsResult.error) throw questionsResult.error;
-                if (lessonsResult.error) throw lessonsResult.error;
-
-                const questions = questionsResult.data || [];
-                const lessons = lessonsResult.data || [];
-
-                if (questions.length === 0 && lessons.length === 0) {
-                    showExportStatus('No custom content to export.', 'error');
-                    return;
-                }
-
-                const exportData = {
-                    type: 'teacher_full_backup',
-                    version: '1.0',
-                    exportedAt: new Date().toISOString(),
-                    exportedBy: currentProfile.email,
-                    summary: {
-                        questions: questions.length,
-                        lessons: lessons.length
-                    },
-                    questions: questions.map(q => ({
-                        era_key: q.era_key,
-                        question_text_en: q.question_text_en,
-                        question_text_tl: q.question_text_tl,
-                        correct_answer_en: q.correct_answer_en,
-                        correct_answer_tl: q.correct_answer_tl,
-                        wrong_answers_en: q.wrong_answers_en,
-                        wrong_answers_tl: q.wrong_answers_tl,
-                        difficulty: q.difficulty
-                    })),
-                    lessons: lessons.map(l => ({
-                        era_key: l.era_key,
-                        lesson_order: l.lesson_order,
-                        title_en: l.title_en,
-                        title_tl: l.title_tl,
-                        content_en: l.content_en,
-                        content_tl: l.content_tl,
-                        icon: l.icon
-                    }))
-                };
-
-                downloadJSON(exportData, `teacher_full_backup_${formatDateForFile()}.json`);
-                saveBackupHistory('full', questions.length + lessons.length);
-                showExportStatus(`Successfully exported ${questions.length} questions and ${lessons.length} lessons!`, 'success');
-                loadBackupHistory();
-            } catch (error) {
-                console.error('Export error:', error);
-                showExportStatus('Failed to export content: ' + error.message, 'error');
-            }
-        }
-
-        // Handle file upload for import
-        function handleTeacherImportFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    previewImportData(data);
-                } catch (error) {
-                    showImportStatus('Invalid JSON file. Please upload a valid backup file.', 'error');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // Reset file input
-        }
-
-        // Preview import data before confirming
-        function previewImportData(data) {
-            if (!data.type || !data.version) {
-                showImportStatus('Invalid backup format. Missing type or version.', 'error');
-                return;
-            }
-
-            pendingImportData = data;
-
-            let previewHTML = `
-                <div class="mb-3">
-                    <span class="font-semibold">Backup Type:</span> ${data.type.replace(/_/g, ' ')}
-                </div>
-                <div class="mb-3">
-                    <span class="font-semibold">Exported At:</span> ${new Date(data.exportedAt).toLocaleString()}
-                </div>
-                <div class="mb-3">
-                    <span class="font-semibold">Exported By:</span> ${data.exportedBy || 'Unknown'}
-                </div>
-            `;
-
-            if (data.type === 'teacher_questions' || data.type === 'teacher_full_backup') {
-                const questions = data.data || data.questions || [];
-                previewHTML += `<div class="mb-2"><span class="font-semibold">Questions:</span> ${questions.length}</div>`;
-            }
-
-            if (data.type === 'teacher_lessons' || data.type === 'teacher_full_backup') {
-                const lessons = data.data || data.lessons || [];
-                previewHTML += `<div class="mb-2"><span class="font-semibold">Lessons:</span> ${lessons.length}</div>`;
-            }
-
-            previewHTML += `<div class="mt-3 p-2 bg-amber-100 rounded text-amber-800 text-sm">
-                ⚠️ This will add new items to your content. Existing items will not be affected.
-            </div>`;
-
-            document.getElementById('importPreviewContent').innerHTML = previewHTML;
-            document.getElementById('importPreview').classList.remove('hidden');
-            hideImportStatus();
-        }
-
-        // Cancel import
-        function cancelImport() {
-            pendingImportData = null;
-            document.getElementById('importPreview').classList.add('hidden');
-        }
-
-        // Confirm and execute import
-        async function confirmTeacherImport() {
-            if (!pendingImportData) {
-                showImportStatus('No data to import.', 'error');
-                return;
-            }
-
-            try {
-                showImportStatus('Importing...', 'info');
-                let questionsImported = 0;
-                let lessonsImported = 0;
-
-                // Import questions
-                if (pendingImportData.type === 'teacher_questions' || pendingImportData.type === 'teacher_full_backup') {
-                    const questions = pendingImportData.data || pendingImportData.questions || [];
-                    for (const q of questions) {
-                        const { error } = await sb.from('custom_questions').insert({
-                            created_by: currentProfile.id,
-                            era_key: q.era_key,
-                            question_text_en: q.question_text_en,
-                            question_text_tl: q.question_text_tl,
-                            correct_answer_en: q.correct_answer_en,
-                            correct_answer_tl: q.correct_answer_tl,
-                            wrong_answers_en: q.wrong_answers_en || [],
-                            wrong_answers_tl: q.wrong_answers_tl || [],
-                            difficulty: q.difficulty || 'medium',
-                            is_active: true,
-                            is_approved: false,
-                            is_system: false
-                        });
-                        if (!error) questionsImported++;
-                    }
-                }
-
-                // Import lessons
-                if (pendingImportData.type === 'teacher_lessons' || pendingImportData.type === 'teacher_full_backup') {
-                    const lessons = pendingImportData.data || pendingImportData.lessons || [];
-                    for (const l of lessons) {
-                        const { error } = await sb.from('custom_lessons').insert({
-                            created_by: currentProfile.id,
-                            era_key: l.era_key,
-                            lesson_order: l.lesson_order,
-                            title_en: l.title_en,
-                            title_tl: l.title_tl,
-                            content_en: l.content_en,
-                            content_tl: l.content_tl,
-                            icon: l.icon || '📖',
-                            is_active: true,
-                            is_approved: false,
-                            is_system: false
-                        });
-                        if (!error) lessonsImported++;
-                    }
-                }
-
-                cancelImport();
-                showImportStatus(`Successfully imported ${questionsImported} questions and ${lessonsImported} lessons!`, 'success');
-
-                // Reload data
-                loadCustomQuestions();
-                loadCustomLessons();
-                loadStats();
-            } catch (error) {
-                console.error('Import error:', error);
-                showImportStatus('Failed to import: ' + error.message, 'error');
-            }
-        }
-
-        // Helper functions
-        function downloadJSON(data, filename) {
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function formatDateForFile() {
-            return new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        }
-
-        function showExportStatus(message, type) {
-            const el = document.getElementById('exportStatus');
-            el.textContent = message;
-            el.className = `mt-3 p-3 rounded-lg text-sm ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
-            el.classList.remove('hidden');
-        }
-
-        function showImportStatus(message, type) {
-            const el = document.getElementById('importStatus');
-            el.textContent = message;
-            el.className = `mt-3 p-3 rounded-lg text-sm ${type === 'success' ? 'bg-green-100 text-green-800' : type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
-            el.classList.remove('hidden');
-        }
-
-        function hideImportStatus() {
-            document.getElementById('importStatus').classList.add('hidden');
-        }
-
-        function saveBackupHistory(type, count) {
-            const history = JSON.parse(localStorage.getItem('teacherBackupHistory') || '[]');
-            history.unshift({
-                type,
-                count,
-                date: new Date().toISOString()
-            });
-            // Keep only last 10 entries
-            localStorage.setItem('teacherBackupHistory', JSON.stringify(history.slice(0, 10)));
-        }
-
-        function loadBackupHistory() {
-            const history = JSON.parse(localStorage.getItem('teacherBackupHistory') || '[]');
-            const container = document.getElementById('backupHistory');
-            const noHistory = document.getElementById('noBackupHistory');
-
-            if (history.length === 0) {
-                container.innerHTML = '';
-                noHistory.classList.remove('hidden');
-                return;
-            }
-
-            noHistory.classList.add('hidden');
-            container.innerHTML = history.map(h => `
-                <div class="flex justify-between items-center p-2 bg-white rounded-lg border border-amber-200 text-sm">
-                    <span>
-                        ${h.type === 'full' ? '📦 Full backup' : h.type === 'questions' ? '📝 Questions' : '📚 Lessons'}
-                        <span class="text-amber-600">(${h.count} items)</span>
-                    </span>
-                    <span class="text-amber-500">${new Date(h.date).toLocaleDateString()}</span>
-                </div>
-            `).join('');
-        }
-
-        // Load backup history on page load
-        if (document.getElementById('backupHistory')) {
-            loadBackupHistory();
-        }
     </script>
 
 </body>

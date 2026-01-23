@@ -1911,20 +1911,6 @@
 
                 console.log(`Deleted ${achievementsCount} achievement records`);
 
-                // Also delete game_sessions if it exists
-                try {
-                    const { error: sessionsError } = await sb
-                        .from('game_sessions')
-                        .delete()
-                        .gte('created_at', '1970-01-01');
-
-                    if (sessionsError) {
-                        console.warn('Game sessions delete warning:', sessionsError);
-                    }
-                } catch (e) {
-                    console.warn('Game sessions table may not exist:', e);
-                }
-
                 showToast(`All user progress has been reset! (${progressCount || 0} progress, ${achievementsCount || 0} achievements deleted)`, 'success');
 
                 // Refresh stats
@@ -1964,11 +1950,22 @@
             if (window.isButtonLocked && window.isButtonLocked('logout')) return;
             if (window.lockButton) window.lockButton('logout', 3000);
 
-            await sb.auth.signOut();
             if (window.showPageLoading) window.showPageLoading('Logging out');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 150);
+            
+            // Sign out from Supabase
+            await sb.auth.signOut();
+            
+            // Clear any cached data
+            currentProfile = null;
+            allUsers = [];
+            allRegisteredStudents = [];
+            allQuestions = [];
+            
+            // Wait a bit to ensure signOut completes
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Redirect to login page
+            window.location.replace('login.html');
         }
 
         // Close modals on outside click
