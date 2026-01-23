@@ -115,6 +115,10 @@ const eraOrder = ['early-spanish', 'late-spanish', 'american-colonial', 'ww2'];
 
 // Check if admin has enabled unlock all for guests
 function isGuestUnlockEnabled() {
+    // MUST be a guest user first
+    if (typeof isGuestUser === 'function' && !isGuestUser()) {
+        return false;
+    }
     // Use shared function for cross-browser sync
     if (typeof getGuestModeSettings === 'function') {
         const settings = getGuestModeSettings();
