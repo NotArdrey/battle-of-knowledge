@@ -951,7 +951,8 @@
                     <textarea id="lessonContentEn" class="form-input" rows="8"
                         placeholder="Write your lesson content here. Use plain text - simple paragraphs work best for students to read and understand."
                         required></textarea>
-                    <p class="text-sm text-amber-700 mt-1">Write in plain text. Keep it simple and easy to understand for students.</p>
+                    <p class="text-sm text-amber-700 mt-1">Write in plain text. Keep it simple and easy to understand
+                        for students.</p>
                 </div>
 
                 <div class="form-group">
@@ -1115,7 +1116,7 @@
                         .select('*')
                         .eq('id', session.user.id)
                         .single();
-                    
+
                     if (retryProfile) {
                         currentProfile = retryProfile;
                         userRole = retryProfile.role;
@@ -1168,7 +1169,7 @@
                 loadCustomQuestions(),
                 loadCustomLessons()
             ]);
-            
+
             // Update stats after all data is loaded
             loadStats();
         });
@@ -1675,7 +1676,6 @@
                     .from('profiles')
                     .select('id, full_name, email, teacher_id, created_at, role')
                     .eq('role', 'student')
-                    .eq('is_registered', true)
                     .order('created_at', { ascending: false });
 
                 if (error) {
@@ -1690,7 +1690,7 @@
                     console.log('No registered students found, checking all profiles...');
                     const { data: allProfiles, error: allError } = await sb
                         .from('profiles')
-                        .select('id, full_name, email, role, teacher_id, is_registered')
+                        .select('id, full_name, email, role, teacher_id')
                         .limit(50);
 
                     if (allError) {
@@ -1701,7 +1701,7 @@
 
                         // Show helpful message if there are profiles but none with student role visible
                         if (allProfiles && allProfiles.length > 0) {
-                            const studentProfiles = allProfiles.filter(p => p.role === 'student' && p.is_registered);
+                            const studentProfiles = allProfiles.filter(p => p.role === 'student');
                             if (studentProfiles.length > 0) {
                                 resultsDiv.innerHTML = `
                                     <div class="text-center py-6">
@@ -2166,19 +2166,19 @@
                 .select('id')
                 .eq('is_system', true)
                 .limit(1);
-            
+
             if (checkError) {
                 console.error('Error checking for existing system questions:', checkError);
                 return;
             }
-            
+
             if (existingSystem && existingSystem.length > 0) {
                 console.log('System questions already migrated to database');
                 return; // Already migrated
             }
 
             console.log('Migrating system questions to database...');
-            
+
             try {
                 // Get era IDs mapping
                 const { data: eras } = await sb.from('eras').select('id, era_key');
@@ -2187,20 +2187,20 @@
 
                 for (const [eraKey, eraData] of Object.entries(questionsData)) {
                     const questions = eraData.en || [];
-                    
+
                     for (let index = 0; index < questions.length; index++) {
                         const q = questions[index];
                         const systemId = `system-${eraKey}-${index}`;
-                        
+
                         // Check if already exists
                         const { data: existing } = await sb
                             .from('custom_questions')
                             .select('id')
                             .eq('source_id', systemId)
                             .single();
-                        
+
                         if (existing) continue;
-                        
+
                         // Insert question
                         const { data: newQuestion, error: qError } = await sb
                             .from('custom_questions')
@@ -2214,29 +2214,29 @@
                             })
                             .select()
                             .single();
-                        
+
                         if (qError) {
                             console.error('Error inserting question:', qError);
                             continue;
                         }
-                        
+
                         // Insert choices
                         const choices = q.answers.map(answer => ({
                             question_id: newQuestion.id,
                             content_en: answer,
                             is_correct: answer === q.correct
                         }));
-                        
+
                         const { error: cError } = await sb
                             .from('question_choices')
                             .insert(choices);
-                        
+
                         if (cError) {
                             console.error('Error inserting choices:', cError);
                         }
                     }
                 }
-                
+
                 console.log('System questions migration complete');
             } catch (error) {
                 console.error('Error migrating system questions:', error);
@@ -2247,7 +2247,7 @@
         async function loadCustomQuestions() {
             try {
                 console.log('=== RELOADING QUESTIONS FROM DATABASE ===');
-                
+
                 // First, migrate system questions to database if not already done
                 await migrateSystemQuestions();
 
@@ -2264,12 +2264,12 @@
                 } else {
                     console.log('Raw data from database:', data?.length, 'records');
                     console.log('Custom question IDs:', data?.filter(q => !q.is_system).map(q => q.id));
-                    
+
                     const allData = (data || []).map(q => {
                         const choices = q.question_choices || [];
                         const correctChoice = choices.find(c => c.is_correct);
                         const wrongChoices = choices.filter(c => !c.is_correct);
-                        
+
                         return {
                             ...q,
                             era_key: q.eras?.era_key || 'unknown',
@@ -2277,16 +2277,16 @@
                             wrong_answers_en: wrongChoices.map(c => c.content_en)
                         };
                     });
-                    
+
                     // Split into system and custom for display
                     allSystemQuestions = allData.filter(q => q.is_system);
                     allQuestions = allData.filter(q => !q.is_system);
-                    
+
                     console.log('Questions loaded - System:', allSystemQuestions.length, 'Custom:', allQuestions.length);
                     console.log('Sample custom question:', allQuestions[0]);
                     console.log('Sample system question:', allSystemQuestions[0]);
                 }
-                
+
                 // Preserve current tab or default to system
                 const currentTab = currentQuestionType || 'system';
                 console.log('Rendering questions tab:', currentTab);
@@ -2715,7 +2715,7 @@
                 } else {
                     // Create new question
                     questionData.created_by = currentProfile.id;
-                    questionData.is_approved = currentProfile.role === 'admin';
+                    questionData.is_approved = true; // Auto-approve all questions
                     console.log('Inserting new question to database:', questionData);
 
                     const { data: newQuestion, error } = await sb
@@ -2744,8 +2744,7 @@
                 console.log('Question choices saved successfully');
 
                 showToast(
-                    questionId ? 'Question updated in database!' : 
-                    (currentProfile.role === 'admin' ? 'Question added to database!' : 'Question added to database! Awaiting admin approval.'),
+                    questionId ? 'Question updated in database!' : 'Question added to database!',
                     'success'
                 );
 
@@ -2760,10 +2759,10 @@
 
         // Delete question
         async function deleteQuestion(questionId, isSystem = false) {
-            const confirmMsg = isSystem 
+            const confirmMsg = isSystem
                 ? 'Delete this system question? This will permanently remove it from the database.'
                 : 'Delete this question? This cannot be undone.';
-            
+
             if (!confirm(confirmMsg)) return;
 
             // Disable all delete buttons to prevent double-click
@@ -2772,21 +2771,21 @@
 
             try {
                 console.log('Deleting question from database:', questionId);
-                
+
                 // First verify the question exists
                 const { data: checkData, error: checkError } = await sb
                     .from('custom_questions')
                     .select('id')
                     .eq('id', questionId)
                     .single();
-                
+
                 if (checkError || !checkData) {
                     console.log('Question not found in database (may already be deleted):', questionId);
                     showToast('Question not found in database', 'error');
                     await loadCustomQuestions();
                     return;
                 }
-                
+
                 const { error } = await sb
                     .from('custom_questions')
                     .delete()
@@ -2803,7 +2802,7 @@
                     .select('id')
                     .eq('id', questionId)
                     .single();
-                
+
                 if (verifyData) {
                     console.error('DELETION FAILED - Question still exists in database!', questionId);
                     showToast('Deletion failed - please try again', 'error');
@@ -2851,13 +2850,13 @@
 
                 // Migrate system lessons from learningData.js to database
                 await migrateSystemLessons();
-                
+
                 // Reload lessons from database after migration
                 const { data: allLessonsData, error: reloadError } = await sb
                     .from('custom_lessons')
                     .select('*, eras!custom_lessons_era_id_fkey(era_key, sort_order)')
                     .order('created_at', { ascending: false });
-                
+
                 if (reloadError) {
                     console.error('Error reloading lessons:', reloadError);
                 } else {
@@ -2866,7 +2865,7 @@
                         era_key: l.eras?.era_key || 'unknown',
                         era_sort_order: l.eras?.sort_order || 999
                     })).sort((a, b) => a.era_sort_order - b.era_sort_order || a.lesson_order - b.lesson_order);
-                    
+
                     // Split into system and custom
                     allSystemLessons = mappedLessons.filter(l => l.is_system);
                     allLessons = mappedLessons.filter(l => !l.is_system);
@@ -2893,19 +2892,19 @@
                 .select('id')
                 .eq('is_system', true)
                 .limit(1);
-            
+
             if (checkError) {
                 console.error('Error checking for existing system lessons:', checkError);
                 return;
             }
-            
+
             if (existingSystem && existingSystem.length > 0) {
                 console.log('System lessons already migrated to database');
                 return; // Already migrated
             }
 
             console.log('Migrating system lessons to database...');
-            
+
             try {
                 // Get era IDs mapping
                 const { data: eras } = await sb.from('eras').select('id, era_key');
@@ -2914,19 +2913,19 @@
 
                 for (const [eraKey, eraData] of Object.entries(window.learningData)) {
                     const lessons = eraData.en?.lessons || [];
-                    
+
                     for (const lesson of lessons) {
                         const systemId = `system-${eraKey}-${lesson.id}`;
-                        
+
                         // Check if already exists
                         const { data: existing } = await sb
                             .from('custom_lessons')
                             .select('id')
                             .eq('source_id', systemId)
                             .single();
-                        
+
                         if (existing) continue;
-                        
+
                         // Insert lesson
                         const { error: lError } = await sb
                             .from('custom_lessons')
@@ -2939,13 +2938,13 @@
                                 is_system: true,
                                 source_id: systemId
                             });
-                        
+
                         if (lError) {
                             console.error('Error inserting lesson:', lError);
                         }
                     }
                 }
-                
+
                 console.log('System lessons migration complete');
             } catch (error) {
                 console.error('Error migrating system lessons:', error);
@@ -3141,7 +3140,7 @@
                 document.getElementById('lessonOrder').value = lesson.lesson_order;
                 document.getElementById('lessonTitleEn').value = lesson.title_en || '';
                 document.getElementById('lessonTitleTl').value = lesson.title_tl || '';
-                
+
                 // Get content
                 let content = lesson.content_en || '';
                 if (content.length > 500) {
@@ -3303,7 +3302,7 @@
                 content_tl: contentTl || null,
                 icon: icon,
                 is_active: true,
-                is_approved: currentProfile?.role === 'admin' // Auto-approve for admins
+                is_approved: true // Auto-approve all lessons
             };
 
             try {
@@ -3344,7 +3343,7 @@
 
                     if (error) throw error;
                     console.log('Lesson inserted successfully:', newLesson);
-                    showToast(currentProfile.role === 'admin' ? 'Lesson added to database!' : 'Lesson added to database! Awaiting admin approval.', 'success');
+                    showToast('Lesson added to database!', 'success');
                 }
 
                 closeLessonModal();
@@ -3358,10 +3357,10 @@
 
         // Delete lesson
         async function deleteLesson(lessonId, isSystem = false) {
-            const confirmMsg = isSystem 
+            const confirmMsg = isSystem
                 ? 'Delete this system lesson? This will permanently remove it from the database.'
                 : 'Delete this lesson? This cannot be undone.';
-            
+
             if (!confirm(confirmMsg)) return;
 
             // Disable all delete buttons to prevent double-click
@@ -3370,21 +3369,21 @@
 
             try {
                 console.log('Deleting lesson from database:', lessonId);
-                
+
                 // First verify the lesson exists
                 const { data: checkData, error: checkError } = await sb
                     .from('custom_lessons')
                     .select('id')
                     .eq('id', lessonId)
                     .single();
-                
+
                 if (checkError || !checkData) {
                     console.log('Lesson not found in database (may already be deleted):', lessonId);
                     showToast('Lesson not found in database', 'error');
                     await loadCustomLessons();
                     return;
                 }
-                
+
                 const { error } = await sb
                     .from('custom_lessons')
                     .delete()
@@ -3427,20 +3426,20 @@
             if (window.lockButton) window.lockButton('logout', 3000);
 
             if (window.showPageLoading) window.showPageLoading('Logging out');
-            
+
             // Sign out from Supabase
             await sb.auth.signOut();
-            
+
             // Clear any cached data
             currentProfile = null;
             allClasses = [];
             allStudents = [];
             allQuestions = [];
             allSystemQuestions = [];
-            
+
             // Wait a bit to ensure signOut completes
             await new Promise(resolve => setTimeout(resolve, 200));
-            
+
             // Redirect to login page
             window.location.replace('login.html');
         }

@@ -461,7 +461,6 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('users')">👥 User Management</button>
             <button class="tab-btn" onclick="switchTab('students')">📚 Student Registry</button>
-            <button class="tab-btn" onclick="switchTab('content')">📝 Content Management</button>
             <button class="tab-btn" onclick="switchTab('settings')">⚙️ Guest Settings</button>
             <button class="tab-btn" onclick="switchTab('backup')">📦 Backup & Restore</button>
         </div>
@@ -558,113 +557,7 @@
             </div>
         </div>
 
-        <!-- Content Management Tab -->
-        <div id="contentTab" class="tab-content">
-            <div class="content-card">
-                <div class="card-header">
-                    <h2 class="card-title">📝 Questions & Lessons Management</h2>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button class="btn-primary" onclick="showQuestionModal()">➕ Add Question</button>
-                        <button class="btn-primary" style="background: linear-gradient(to right, #059669, #10b981);"
-                            onclick="showLessonModal()">➕ Add Lesson</button>
-                    </div>
-                </div>
 
-                <!-- Questions Section -->
-                <div class="p-6 border-b-2 border-amber-200">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📚 Questions</h3>
-
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <select id="questionsEraFilter" class="search-input" style="min-width: 150px;"
-                            onchange="loadQuestions()">
-                            <option value="">All Eras</option>
-                            <option value="early-spanish">Early Spanish Era</option>
-                            <option value="late-spanish">Late Spanish Era</option>
-                            <option value="american-colonial">American Colonial Era</option>
-                            <option value="ww2">WW2 Era</option>
-                        </select>
-                        <select id="questionsTypeFilter" class="search-input" style="min-width: 150px;"
-                            onchange="loadQuestions()">
-                            <option value="">All Types</option>
-                            <option value="system">System Questions</option>
-                            <option value="custom">Custom Questions</option>
-                        </select>
-                        <input type="text" class="search-input" placeholder="🔍 Search questions..."
-                            id="questionsSearch" oninput="filterQuestionsList(this.value)">
-                    </div>
-
-                    <div class="table-container" style="max-height: 400px; overflow-y: auto;">
-                        <table class="data-table" id="questionsTable">
-                            <thead>
-                                <tr>
-                                    <th>Era</th>
-                                    <th>Question (EN)</th>
-                                    <th>Correct Answer</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="questionsTableBody">
-                                <!-- Questions will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="questionsEmpty" class="empty-state hidden">
-                        <div class="empty-icon">❓</div>
-                        <p>No questions found</p>
-                    </div>
-                </div>
-
-                <!-- Lessons Section -->
-                <div class="p-6">
-                    <h3 class="text-lg font-bold text-amber-900 mb-4">📖 Lessons</h3>
-
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <select id="lessonsEraFilter" class="search-input" style="min-width: 150px;"
-                            onchange="loadLessons()">
-                            <option value="">All Eras</option>
-                            <option value="early-spanish">Early Spanish Era</option>
-                            <option value="late-spanish">Late Spanish Era</option>
-                            <option value="american-colonial">American Colonial Era</option>
-                            <option value="ww2">WW2 Era</option>
-                        </select>
-                        <select id="lessonsTypeFilter" class="search-input" style="min-width: 150px;"
-                            onchange="loadLessons()">
-                            <option value="">All Types</option>
-                            <option value="system">System Lessons</option>
-                            <option value="custom">Custom Lessons</option>
-                        </select>
-                        <input type="text" class="search-input" placeholder="🔍 Search lessons..." id="lessonsSearch"
-                            oninput="filterLessonsList(this.value)">
-                    </div>
-
-                    <div class="table-container" style="max-height: 400px; overflow-y: auto;">
-                        <table class="data-table" id="lessonsTable">
-                            <thead>
-                                <tr>
-                                    <th>Era</th>
-                                    <th>Order</th>
-                                    <th>Title (EN)</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lessonsTableBody">
-                                <!-- Lessons will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="lessonsEmpty" class="empty-state hidden">
-                        <div class="empty-icon">📖</div>
-                        <p>No lessons found</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Guest Settings Tab -->
         <div id="settingsTab" class="tab-content">
@@ -843,6 +736,48 @@
     </div>
 
 
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Edit User</h2>
+            <form id="editUserForm" onsubmit="handleEditUser(event)">
+                <input type="hidden" id="editUserId">
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="editUserFullName" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select id="editUserRole" class="form-input" required>
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="editUserVerified" class="w-5 h-5 text-amber-600">
+                        <span class="text-amber-800 font-semibold">Verified</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeEditUserModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Add Student Modal -->
     <div id="studentModal" class="modal-overlay hidden">
         <div class="modal-content">
@@ -882,6 +817,54 @@
                     </button>
                     <button type="submit" class="flex-1 btn-primary">
                         Add Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div id="editStudentModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Edit Student</h2>
+            <form id="editStudentForm" onsubmit="handleEditStudent(event)">
+                <input type="hidden" id="editStudentId">
+                <input type="hidden" id="editStudentOrigId">
+
+                <div class="form-group">
+                    <label class="form-label">Student ID Number</label>
+                    <input type="text" id="editStudentIdNumber" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="editStudentName" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email (Optional)</label>
+                    <input type="email" id="editStudentEmail" class="form-input">
+                </div>
+
+                <div class="flex gap-3">
+                    <div class="form-group flex-1">
+                        <label class="form-label">Grade Level</label>
+                        <input type="text" id="editStudentGrade" class="form-input" placeholder="e.g., Grade 7">
+                    </div>
+
+                    <div class="form-group flex-1">
+                        <label class="form-label">Section</label>
+                        <input type="text" id="editStudentSection" class="form-input" placeholder="e.g., Section A">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeEditStudentModal()"
+                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Save Changes
                     </button>
                 </div>
             </form>
@@ -933,170 +916,9 @@
         </div>
     </div>
 
-    <!-- Add/Edit Question Modal -->
-    <div id="questionModal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
-            <h2 class="modal-title" id="questionModalTitle">Add Question</h2>
-            <form id="questionForm" onsubmit="handleSaveQuestion(event)">
-                <input type="hidden" id="editQuestionId">
 
-                <div class="form-group">
-                    <label class="form-label">Era</label>
-                    <select id="questionEra" class="form-input" required>
-                        <option value="early-spanish">Early Spanish Era</option>
-                        <option value="late-spanish">Late Spanish Era</option>
-                        <option value="american-colonial">American Colonial Era</option>
-                        <option value="ww2">WW2 Era</option>
-                    </select>
-                </div>
 
-                <div class="form-group">
-                    <label class="form-label">Question (English)</label>
-                    <textarea id="questionTextEn" class="form-input" rows="2" required
-                        placeholder="Enter the question in English"></textarea>
-                </div>
 
-                <div class="form-group">
-                    <label class="form-label">Question (Tagalog)</label>
-                    <textarea id="questionTextTl" class="form-input" rows="2"
-                        placeholder="Enter the question in Tagalog"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Correct Answer (English)</label>
-                    <input type="text" id="correctAnswerEn" class="form-input" required
-                        placeholder="The correct answer">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Correct Answer (Tagalog)</label>
-                    <input type="text" id="correctAnswerTl" class="form-input"
-                        placeholder="The correct answer in Tagalog">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Wrong Answers (English) - comma separated</label>
-                    <input type="text" id="wrongAnswersEn" class="form-input" required
-                        placeholder="Wrong 1, Wrong 2, Wrong 3">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Wrong Answers (Tagalog) - comma separated</label>
-                    <input type="text" id="wrongAnswersTl" class="form-input" placeholder="Mali 1, Mali 2, Mali 3">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Difficulty</label>
-                    <select id="questionDifficulty" class="form-input">
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                    </select>
-                </div>
-
-                <div class="flex items-center gap-4 mt-4">
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="questionActive" checked>
-                        <span class="text-amber-800">Active</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="questionApproved" checked>
-                        <span class="text-amber-800">Approved</span>
-                    </label>
-                </div>
-
-                <div id="questionFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mt-4"></div>
-
-                <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeQuestionModal()"
-                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
-                        Cancel
-                    </button>
-                    <button type="submit" class="flex-1 btn-primary">
-                        Save Question
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Add/Edit Lesson Modal -->
-    <div id="lessonModal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
-            <h2 class="modal-title" id="lessonModalTitle">Add Lesson</h2>
-            <form id="lessonForm" onsubmit="handleSaveLesson(event)">
-                <input type="hidden" id="editLessonId">
-
-                <div class="flex gap-3">
-                    <div class="form-group flex-1">
-                        <label class="form-label">Era</label>
-                        <select id="lessonEra" class="form-input" required>
-                            <option value="early-spanish">Early Spanish Era</option>
-                            <option value="late-spanish">Late Spanish Era</option>
-                            <option value="american-colonial">American Colonial Era</option>
-                            <option value="ww2">WW2 Era</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" style="width: 100px;">
-                        <label class="form-label">Order</label>
-                        <input type="number" id="lessonOrder" class="form-input" required min="1" value="1">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Title (English)</label>
-                    <input type="text" id="lessonTitleEn" class="form-input" required
-                        placeholder="Lesson title in English">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Title (Tagalog)</label>
-                    <input type="text" id="lessonTitleTl" class="form-input" placeholder="Lesson title in Tagalog">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Content (English) - HTML supported</label>
-                    <textarea id="lessonContentEn" class="form-input" rows="6" required
-                        placeholder="Lesson content in English (HTML allowed)"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Content (Tagalog) - HTML supported</label>
-                    <textarea id="lessonContentTl" class="form-input" rows="6"
-                        placeholder="Lesson content in Tagalog (HTML allowed)"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Icon (emoji or number)</label>
-                    <input type="text" id="lessonIcon" class="form-input" placeholder="1, 2, 📚, etc." value="1">
-                </div>
-
-                <div class="flex items-center gap-4 mt-4">
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="lessonActive" checked>
-                        <span class="text-amber-800">Active</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="lessonApproved" checked>
-                        <span class="text-amber-800">Approved</span>
-                    </label>
-                </div>
-
-                <div id="lessonFormError" class="hidden text-red-600 bg-red-100 p-3 rounded-lg mt-4"></div>
-
-                <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeLessonModal()"
-                        class="flex-1 py-3 border-2 border-amber-600 text-amber-700 font-bold rounded-xl hover:bg-amber-100">
-                        Cancel
-                    </button>
-                    <button type="submit" class="flex-1 btn-primary">
-                        Save Lesson
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <script>
         // Supabase config - standalone, no external dependencies
@@ -1106,9 +928,9 @@
         let sb = null;
         let allUsers = [];
         let allStudents = [];
-        let allQuestions = [];
-        let allLessons = [];
         let currentProfile = null;
+        let eraMapping = {}; // { era_key: era_id }
+        let eraNames = {}; // { era_id: era_key }
 
         // Get Supabase client
         function getClient() {
@@ -1179,18 +1001,34 @@
             }
             document.getElementById('userName').textContent = currentProfile.full_name;
 
-            // Load data
+            // Load eras first, then load data
+            await loadEras();
             await Promise.all([
                 loadUsers(),
                 loadRegisteredStudents(),
-                loadStats(),
-                loadQuestions(),
-                loadLessons()
+                loadStats()
             ]);
 
             // Setup drag and drop
             setupDragAndDrop();
         });
+
+        // Load eras mapping
+        async function loadEras() {
+            try {
+                const { data: eras, error } = await sb.from('eras').select('*');
+                if (error) throw error;
+
+                eraMapping = {};
+                eraNames = {};
+                (eras || []).forEach(era => {
+                    eraMapping[era.era_key] = era.id;
+                    eraNames[era.id] = era.era_key;
+                });
+            } catch (error) {
+                console.error('Error loading eras:', error);
+            }
+        }
 
         // Load statistics
         async function loadStats() {
@@ -1216,12 +1054,13 @@
             }
         }
 
-        // Load all users (only registered users)
+        // Load all users (only teachers)
         async function loadUsers() {
             try {
                 const { data, error } = await sb
                     .from('profiles')
                     .select('*')
+                    .eq('role', 'teacher')
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
@@ -1253,6 +1092,7 @@
                     <td><span class="status-badge ${user.is_verified ? 'status-verified' : 'status-pending'}">${user.is_verified ? 'Verified' : 'Pending'}</span></td>
                     <td>${formatDate(user.created_at)}</td>
                     <td>
+                        <button class="btn-action btn-secondary" onclick='openEditUserModal(${JSON.stringify(user).replace(/'/g, "&#39;")})'>✏️ Edit</button>
                         ${!user.is_verified && user.role === 'teacher' ?
                     `<button class="btn-action btn-verify" onclick="verifyUser('${user.id}')">Verify</button>` : ''
                 }
@@ -1299,32 +1139,97 @@
             }
         }
 
-        // Delete user
-        async function deleteUser(userId) {
-            if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+        // Open Edit User Modal
+        function openEditUserModal(user) {
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUserFullName').value = user.full_name;
+            document.getElementById('editUserRole').value = user.role;
+            document.getElementById('editUserVerified').checked = user.is_verified;
+
+            document.getElementById('editUserModal').classList.remove('hidden');
+        }
+
+        // Close Edit User Modal
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.add('hidden');
+            document.getElementById('editUserForm').reset();
+        }
+
+        // Handle Edit User Submit
+        async function handleEditUser(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById('editUserId').value;
+            const updates = {
+                full_name: document.getElementById('editUserFullName').value,
+                role: document.getElementById('editUserRole').value,
+                is_verified: document.getElementById('editUserVerified').checked,
+                updated_at: new Date().toISOString()
+            };
 
             try {
-                // First delete from profiles table
                 const { error } = await sb
                     .from('profiles')
-                    .delete()
+                    .update(updates)
                     .eq('id', userId);
 
+                if (error) throw error;
+
+                showToast('User updated successfully!', 'success');
+                closeEditUserModal();
+                loadUsers(); // Refresh list
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showToast('Failed to update user: ' + error.message, 'error');
+            }
+        }
+
+        // Delete user
+        async function deleteUser(userId) {
+            // Verify current user is admin
+            if (!currentProfile || currentProfile.role !== 'admin') {
+                showToast('Only administrators can delete users', 'error');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this user? This will permanently remove them from both the authentication system and database.\n\nThis action cannot be undone!')) return;
+
+            showLoading(true);
+            try {
+                // Call the database function to delete user from auth.users
+                // This will cascade to profiles automatically
+                const { data, error } = await sb.rpc('delete_user_completely', {
+                    user_id_to_delete: userId
+                });
+
                 if (error) {
-                    console.error('Supabase delete error:', error);
-                    throw error;
+                    console.error('RPC error:', error);
+                    throw new Error(error.message || 'Failed to call delete function');
                 }
 
-                console.log('User deleted successfully from profiles');
-                showToast('User deleted successfully!', 'success');
-                loadUsers();
-                loadStats();
+                // Check the result
+                if (data && !data.success) {
+                    throw new Error(data.error || 'Delete operation failed');
+                }
 
-                // Note: We can't delete from auth.users via client library securely without service role
-                // The profile deletion is enough for UI, and triggers usually handle cascading
+                console.log('User deleted successfully:', data);
+                showToast('User deleted permanently!', 'success');
+
+                // Remove from local array and re-render
+                allUsers = allUsers.filter(u => u.id !== userId);
+                renderUsers(allUsers);
+
+                // Refresh data to ensure consistency
+                await loadUsers();
+                await loadStats();
+
             } catch (error) {
                 console.error('Error deleting user:', error);
-                showToast('Failed to delete user: ' + (error.message || error.details || 'Unknown error'), 'error');
+                showToast('Failed to delete user: ' + error.message, 'error');
+                // Reload to show current state
+                await loadUsers();
+            } finally {
+                showLoading(false);
             }
         }
 
@@ -1365,6 +1270,7 @@
                     <td>${student.grade_level || '-'} / ${student.section || '-'}</td>
                     <td><span class="status-badge status-pending">Available</span></td>
                     <td>
+                        <button class="btn-action btn-secondary" onclick='openEditStudentModal(${JSON.stringify(student).replace(/'/g, "&#39;")})'>✏️ Edit</button>
                         <button class="btn-action btn-delete" onclick="deleteStudent('${student.id}')">Delete</button>
                     </td>
                 </tr>
@@ -1596,6 +1502,7 @@
         async function deleteStudent(studentId) {
             if (!confirm('Are you sure you want to delete this student from the registry?')) return;
 
+            showLoading(true);
             try {
                 // Delete from registered_students
                 const { error } = await sb
@@ -1610,10 +1517,70 @@
 
                 console.log('Student deleted successfully');
                 showToast('Student deleted successfully!', 'success');
-                loadRegisteredStudents();
+
+                // UI Optimistic Update
+                allStudents = allStudents.filter(s => s.id !== studentId);
+                renderStudents(allStudents);
+
             } catch (error) {
                 console.error('Error deleting student:', error);
                 showToast('Failed to delete student: ' + (error.message || error.details || 'Unknown error'), 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Open Edit Student Modal
+        function openEditStudentModal(student) {
+            document.getElementById('editStudentId').value = student.id;
+            document.getElementById('editStudentOrigId').value = student.student_id_number;
+            document.getElementById('editStudentIdNumber').value = student.student_id_number;
+            document.getElementById('editStudentName').value = student.full_name;
+            document.getElementById('editStudentEmail').value = student.email || '';
+            document.getElementById('editStudentGrade').value = student.grade_level || '';
+            document.getElementById('editStudentSection').value = student.section || '';
+
+            document.getElementById('editStudentModal').classList.remove('hidden');
+        }
+
+        // Close Edit Student Modal
+        function closeEditStudentModal() {
+            document.getElementById('editStudentModal').classList.add('hidden');
+            document.getElementById('editStudentForm').reset();
+        }
+
+        // Handle Edit Student Submit
+        async function handleEditStudent(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('editStudentId').value;
+            const updates = {
+                student_id_number: document.getElementById('editStudentIdNumber').value,
+                full_name: document.getElementById('editStudentName').value,
+                email: document.getElementById('editStudentEmail').value || null,
+                grade_level: document.getElementById('editStudentGrade').value || null,
+                section: document.getElementById('editStudentSection').value || null,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const { error } = await sb
+                    .from('registered_students')
+                    .update(updates)
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showToast('Student updated successfully!', 'success');
+                closeEditStudentModal();
+                loadRegisteredStudents();
+            } catch (error) {
+                console.error('Error updating student:', error);
+                if (error.code === '23505') {
+                    showToast('Student ID already exists', 'error');
+                } else {
+                    showToast('Failed to update student: ' + error.message, 'error');
+                }
             }
         }
 
@@ -1639,6 +1606,17 @@
             const section = document.getElementById('newStudentSection').value.trim();
 
             try {
+                // Ensure profile is loaded
+                if (!currentProfile || !currentProfile.id) {
+                    // Try to reload profile
+                    const { data: { session } } = await sb.auth.getSession();
+                    if (session) {
+                        currentProfile = { id: session.user.id };
+                    } else {
+                        throw new Error('You must be logged in to add students');
+                    }
+                }
+
                 const { error } = await sb
                     .from('registered_students')
                     .insert({
@@ -1647,7 +1625,7 @@
                         email: email || null,
                         grade_level: grade || null,
                         section: section || null,
-                        uploaded_by: currentProfile.id
+                        uploaded_by: currentProfile.id // Ensure this matches RLS policy
                     });
 
                 if (error) throw error;
@@ -1659,8 +1637,10 @@
                 console.error('Error adding student:', error);
                 if (error.code === '23505') {
                     showToast('Student ID already exists', 'error');
+                } else if (error.code === '42501') {
+                    showToast('Permission denied. Please ask administrator to update Registered Students RLS policy.', 'error');
                 } else {
-                    showToast('Failed to add student', 'error');
+                    showToast('Failed to add student: ' + (error.message || 'Unknown error'), 'error');
                 }
             }
         }
@@ -1818,7 +1798,7 @@
                     .from(APP_SETTINGS_TABLE)
                     .select('setting_value')
                     .eq('setting_key', 'guest_settings')
-                    .single();
+                    .maybeSingle();
 
                 if (!error && data && data.setting_value) {
                     cachedGuestSettings = data.setting_value;
@@ -1875,11 +1855,11 @@
                     // Insert new record
                     const { error } = await sb
                         .from(APP_SETTINGS_TABLE)
-                        .insert({
+                        .insert([{
                             setting_key: 'guest_settings',
                             setting_value: settings,
                             updated_by: currentProfile?.id || null
-                        });
+                        }]);
 
                     if (error) {
                         console.error('Failed to insert settings in database:', error);
@@ -1937,11 +1917,11 @@
             showLoading(true);
 
             try {
-                // Delete all progress records - use gte on created_at to match all records
+                // Delete all progress records
                 const { error: progressError, count: progressCount } = await sb
                     .from('progress')
                     .delete({ count: 'exact' })
-                    .gte('created_at', '1970-01-01');
+                    .neq('id', 0); // Hack to match all but require a filter
 
                 if (progressError) {
                     console.error('Progress delete error:', progressError);
@@ -1954,7 +1934,7 @@
                 const { error: achievementsError, count: achievementsCount } = await sb
                     .from('achievements')
                     .delete({ count: 'exact' })
-                    .gte('created_at', '1970-01-01');
+                    .neq('id', 0);
 
                 if (achievementsError) {
                     console.error('Achievements delete error:', achievementsError);
@@ -2003,19 +1983,18 @@
             if (window.lockButton) window.lockButton('logout', 3000);
 
             if (window.showPageLoading) window.showPageLoading('Logging out');
-            
+
             // Sign out from Supabase
             await sb.auth.signOut();
-            
+
             // Clear any cached data
             currentProfile = null;
             allUsers = [];
             allRegisteredStudents = [];
-            allQuestions = [];
-            
+
             // Wait a bit to ensure signOut completes
             await new Promise(resolve => setTimeout(resolve, 200));
-            
+
             // Redirect to login page
             window.location.replace('login.html');
         }
@@ -2029,379 +2008,7 @@
             });
         });
 
-        // ============================================
-        // QUESTIONS MANAGEMENT
-        // ============================================
 
-        async function loadQuestions() {
-            try {
-                const eraFilter = document.getElementById('questionsEraFilter').value;
-                const typeFilter = document.getElementById('questionsTypeFilter').value;
-
-                let query = sb.from('custom_questions').select('*').order('era_key').order('created_at', { ascending: false });
-
-                if (eraFilter) {
-                    query = query.eq('era_key', eraFilter);
-                }
-
-                if (typeFilter === 'system') {
-                    query = query.eq('is_system', true);
-                } else if (typeFilter === 'custom') {
-                    query = query.eq('is_system', false);
-                }
-
-                const { data: questions, error } = await query;
-
-                if (error) {
-                    console.error('Error loading questions:', error);
-                    return;
-                }
-
-                allQuestions = questions || [];
-                renderQuestionsTable(allQuestions);
-            } catch (error) {
-                console.error('Error in loadQuestions:', error);
-            }
-        }
-
-        function renderQuestionsTable(questions) {
-            const tbody = document.getElementById('questionsTableBody');
-            const emptyState = document.getElementById('questionsEmpty');
-
-            if (!questions || questions.length === 0) {
-                tbody.innerHTML = '';
-                emptyState?.classList.remove('hidden');
-                return;
-            }
-
-            emptyState?.classList.add('hidden');
-
-            const eraNames = {
-                'early-spanish': 'Early Spanish',
-                'late-spanish': 'Late Spanish',
-                'american-colonial': 'American Colonial',
-                'ww2': 'WW2'
-            };
-
-            tbody.innerHTML = questions.map(q => `
-                <tr>
-                    <td>${eraNames[q.era_key] || q.era_key}</td>
-                    <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${q.question_text_en}">${q.question_text_en}</td>
-                    <td>${q.correct_answer_en}</td>
-                    <td><span class="status-badge ${q.is_system ? 'status-verified' : 'status-pending'}">${q.is_system ? '🔒 System' : '📝 Custom'}</span></td>
-                    <td><span class="status-badge ${q.is_active && q.is_approved ? 'status-verified' : 'status-pending'}">${q.is_active && q.is_approved ? '✓ Active' : '⏸ Inactive'}</span></td>
-                    <td>
-                        <button class="btn-action btn-verify" onclick="editQuestion('${q.id}')">✏️ Edit</button>
-                        <button class="btn-action btn-delete" onclick="deleteQuestion('${q.id}', ${q.is_system})">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function filterQuestionsList(searchValue) {
-            const filtered = allQuestions.filter(q =>
-                q.question_text_en.toLowerCase().includes(searchValue.toLowerCase()) ||
-                q.correct_answer_en.toLowerCase().includes(searchValue.toLowerCase()) ||
-                (q.question_text_tl && q.question_text_tl.toLowerCase().includes(searchValue.toLowerCase()))
-            );
-            renderQuestionsTable(filtered);
-        }
-
-        function showQuestionModal(question = null) {
-            document.getElementById('questionModalTitle').textContent = question ? 'Edit Question' : 'Add Question';
-            document.getElementById('editQuestionId').value = question?.id || '';
-            document.getElementById('questionEra').value = question?.era_key || 'early-spanish';
-            document.getElementById('questionTextEn').value = question?.question_text_en || '';
-            document.getElementById('questionTextTl').value = question?.question_text_tl || '';
-            document.getElementById('correctAnswerEn').value = question?.correct_answer_en || '';
-            document.getElementById('correctAnswerTl').value = question?.correct_answer_tl || '';
-
-            // Parse wrong answers
-            let wrongEn = question?.wrong_answers_en || [];
-            let wrongTl = question?.wrong_answers_tl || [];
-            if (typeof wrongEn === 'string') wrongEn = JSON.parse(wrongEn);
-            if (typeof wrongTl === 'string') wrongTl = JSON.parse(wrongTl);
-
-            document.getElementById('wrongAnswersEn').value = Array.isArray(wrongEn) ? wrongEn.join(', ') : '';
-            document.getElementById('wrongAnswersTl').value = Array.isArray(wrongTl) ? wrongTl.join(', ') : '';
-            document.getElementById('questionDifficulty').value = question?.difficulty || 'easy';
-            document.getElementById('questionActive').checked = question?.is_active !== false;
-            document.getElementById('questionApproved').checked = question?.is_approved !== false;
-            document.getElementById('questionFormError').classList.add('hidden');
-
-            document.getElementById('questionModal').classList.remove('hidden');
-        }
-
-        function closeQuestionModal() {
-            document.getElementById('questionModal').classList.add('hidden');
-            document.getElementById('questionForm').reset();
-        }
-
-        async function editQuestion(id) {
-            const question = allQuestions.find(q => q.id === id);
-            if (question) {
-                showQuestionModal(question);
-            }
-        }
-
-        async function handleSaveQuestion(event) {
-            event.preventDefault();
-            const errorEl = document.getElementById('questionFormError');
-
-            try {
-                const id = document.getElementById('editQuestionId').value;
-                const wrongAnswersEnStr = document.getElementById('wrongAnswersEn').value;
-                const wrongAnswersTlStr = document.getElementById('wrongAnswersTl').value;
-
-                const wrongAnswersEn = wrongAnswersEnStr.split(',').map(s => s.trim()).filter(s => s);
-                const wrongAnswersTl = wrongAnswersTlStr ? wrongAnswersTlStr.split(',').map(s => s.trim()).filter(s => s) : wrongAnswersEn;
-
-                const questionData = {
-                    era_key: document.getElementById('questionEra').value,
-                    question_text_en: document.getElementById('questionTextEn').value,
-                    question_text_tl: document.getElementById('questionTextTl').value || null,
-                    correct_answer_en: document.getElementById('correctAnswerEn').value,
-                    correct_answer_tl: document.getElementById('correctAnswerTl').value || null,
-                    wrong_answers_en: wrongAnswersEn,
-                    wrong_answers_tl: wrongAnswersTl,
-                    difficulty: document.getElementById('questionDifficulty').value,
-                    is_active: document.getElementById('questionActive').checked,
-                    is_approved: document.getElementById('questionApproved').checked
-                };
-
-                let result;
-                if (id) {
-                    // Update existing
-                    result = await sb.from('custom_questions').update(questionData).eq('id', id);
-                } else {
-                    // Insert new
-                    questionData.is_system = false;
-                    questionData.created_by = currentProfile?.id || null;
-                    result = await sb.from('custom_questions').insert(questionData);
-                }
-
-                if (result.error) throw result.error;
-
-                showToast(id ? 'Question updated!' : 'Question added!', 'success');
-                closeQuestionModal();
-                await loadQuestions();
-            } catch (error) {
-                console.error('Error saving question:', error);
-                errorEl.textContent = 'Error: ' + error.message;
-                errorEl.classList.remove('hidden');
-            }
-        }
-
-        async function deleteQuestion(id, isSystem) {
-            console.log(`Attempting to delete question ${id} (System: ${isSystem})`);
-
-            if (isSystem) {
-                if (!confirm('⚠️ This is a SYSTEM question used by the game. Are you sure you want to delete it? This may break the game for some eras.')) {
-                    return;
-                }
-            } else {
-                if (!confirm('Are you sure you want to delete this question?')) {
-                    return;
-                }
-            }
-
-            try {
-                const { error } = await sb.from('custom_questions').delete().eq('id', id);
-
-                if (error) {
-                    console.error('Supabase delete error:', error);
-                    throw error;
-                }
-
-                console.log('Question deleted successfully');
-                showToast('Question deleted', 'success');
-                await loadQuestions();
-                await loadStats(); // Refresh stats
-            } catch (error) {
-                console.error('Error deleting question:', error);
-                showToast('Error deleting question: ' + (error.message || error.details || 'Unknown error'), 'error');
-            }
-        }
-
-        // ============================================
-        // LESSONS MANAGEMENT
-        // ============================================
-
-        async function loadLessons() {
-            try {
-                const eraFilter = document.getElementById('lessonsEraFilter').value;
-                const typeFilter = document.getElementById('lessonsTypeFilter').value;
-
-                let query = sb.from('custom_lessons').select('*').order('era_key').order('lesson_order');
-
-                if (eraFilter) {
-                    query = query.eq('era_key', eraFilter);
-                }
-
-                if (typeFilter === 'system') {
-                    query = query.eq('is_system', true);
-                } else if (typeFilter === 'custom') {
-                    query = query.eq('is_system', false);
-                }
-
-                const { data: lessons, error } = await query;
-
-                if (error) {
-                    console.error('Error loading lessons:', error);
-                    return;
-                }
-
-                allLessons = lessons || [];
-                renderLessonsTable(allLessons);
-            } catch (error) {
-                console.error('Error in loadLessons:', error);
-            }
-        }
-
-        function renderLessonsTable(lessons) {
-            const tbody = document.getElementById('lessonsTableBody');
-            const emptyState = document.getElementById('lessonsEmpty');
-
-            if (!lessons || lessons.length === 0) {
-                tbody.innerHTML = '';
-                emptyState?.classList.remove('hidden');
-                return;
-            }
-
-            emptyState?.classList.add('hidden');
-
-            const eraNames = {
-                'early-spanish': 'Early Spanish',
-                'late-spanish': 'Late Spanish',
-                'american-colonial': 'American Colonial',
-                'ww2': 'WW2'
-            };
-
-            tbody.innerHTML = lessons.map(l => `
-                <tr>
-                    <td>${eraNames[l.era_key] || l.era_key}</td>
-                    <td>${l.lesson_order}</td>
-                    <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${l.title_en}">${l.title_en}</td>
-                    <td><span class="status-badge ${l.is_system ? 'status-verified' : 'status-pending'}">${l.is_system ? '🔒 System' : '📝 Custom'}</span></td>
-                    <td><span class="status-badge ${l.is_active && l.is_approved ? 'status-verified' : 'status-pending'}">${l.is_active && l.is_approved ? '✓ Active' : '⏸ Inactive'}</span></td>
-                    <td>
-                        <button class="btn-action btn-verify" onclick="editLesson('${l.id}')">✏️ Edit</button>
-                        <button class="btn-action btn-delete" onclick="deleteLesson('${l.id}', ${l.is_system})">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function filterLessonsList(searchValue) {
-            const filtered = allLessons.filter(l =>
-                l.title_en.toLowerCase().includes(searchValue.toLowerCase()) ||
-                (l.title_tl && l.title_tl.toLowerCase().includes(searchValue.toLowerCase())) ||
-                (l.content_en && l.content_en.toLowerCase().includes(searchValue.toLowerCase()))
-            );
-            renderLessonsTable(filtered);
-        }
-
-        function showLessonModal(lesson = null) {
-            document.getElementById('lessonModalTitle').textContent = lesson ? 'Edit Lesson' : 'Add Lesson';
-            document.getElementById('editLessonId').value = lesson?.id || '';
-            document.getElementById('lessonEra').value = lesson?.era_key || 'early-spanish';
-            document.getElementById('lessonOrder').value = lesson?.lesson_order || 1;
-            document.getElementById('lessonTitleEn').value = lesson?.title_en || '';
-            document.getElementById('lessonTitleTl').value = lesson?.title_tl || '';
-            document.getElementById('lessonContentEn').value = lesson?.content_en || '';
-            document.getElementById('lessonContentTl').value = lesson?.content_tl || '';
-            document.getElementById('lessonIcon').value = lesson?.icon || '1';
-            document.getElementById('lessonActive').checked = lesson?.is_active !== false;
-            document.getElementById('lessonApproved').checked = lesson?.is_approved !== false;
-            document.getElementById('lessonFormError').classList.add('hidden');
-
-            document.getElementById('lessonModal').classList.remove('hidden');
-        }
-
-        function closeLessonModal() {
-            document.getElementById('lessonModal').classList.add('hidden');
-            document.getElementById('lessonForm').reset();
-        }
-
-        async function editLesson(id) {
-            const lesson = allLessons.find(l => l.id === id);
-            if (lesson) {
-                showLessonModal(lesson);
-            }
-        }
-
-        async function handleSaveLesson(event) {
-            event.preventDefault();
-            const errorEl = document.getElementById('lessonFormError');
-
-            try {
-                const id = document.getElementById('editLessonId').value;
-
-                const lessonData = {
-                    era_key: document.getElementById('lessonEra').value,
-                    lesson_order: parseInt(document.getElementById('lessonOrder').value),
-                    title_en: document.getElementById('lessonTitleEn').value,
-                    title_tl: document.getElementById('lessonTitleTl').value || null,
-                    content_en: document.getElementById('lessonContentEn').value,
-                    content_tl: document.getElementById('lessonContentTl').value || null,
-                    icon: document.getElementById('lessonIcon').value || '1',
-                    is_active: document.getElementById('lessonActive').checked,
-                    is_approved: document.getElementById('lessonApproved').checked
-                };
-
-                let result;
-                if (id) {
-                    // Update existing
-                    result = await sb.from('custom_lessons').update(lessonData).eq('id', id);
-                } else {
-                    // Insert new
-                    lessonData.is_system = false;
-                    lessonData.created_by = currentProfile?.id || null;
-                    result = await sb.from('custom_lessons').insert(lessonData);
-                }
-
-                if (result.error) throw result.error;
-
-                showToast(id ? 'Lesson updated!' : 'Lesson added!', 'success');
-                closeLessonModal();
-                await loadLessons();
-            } catch (error) {
-                console.error('Error saving lesson:', error);
-                errorEl.textContent = 'Error: ' + error.message;
-                errorEl.classList.remove('hidden');
-            }
-        }
-
-        async function deleteLesson(id, isSystem) {
-            console.log(`Attempting to delete lesson ${id} (System: ${isSystem})`);
-
-            if (isSystem) {
-                if (!confirm('⚠️ This is a SYSTEM lesson used by the game. Are you sure you want to delete it? This may break the learning module for some eras.')) {
-                    return;
-                }
-            } else {
-                if (!confirm('Are you sure you want to delete this lesson?')) {
-                    return;
-                }
-            }
-
-            try {
-                const { error } = await sb.from('custom_lessons').delete().eq('id', id);
-
-                if (error) {
-                    console.error('Supabase delete error:', error);
-                    throw error;
-                }
-
-                console.log('Lesson deleted successfully');
-                showToast('Lesson deleted', 'success');
-                await loadLessons();
-                await loadStats(); // Refresh stats
-            } catch (error) {
-                console.error('Error deleting lesson:', error);
-                showToast('Error deleting lesson: ' + (error.message || error.details || 'Unknown error'), 'error');
-            }
-        }
 
         // =============================================
         // ADMIN BACKUP & RESTORE FUNCTIONS

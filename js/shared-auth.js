@@ -72,7 +72,7 @@ async function fetchGuestSettingsFromDB() {
             .from('app_settings')
             .select('setting_value')
             .eq('setting_key', 'guest_settings')
-            .single();
+            .maybeSingle();
 
         if (!error && data && data.setting_value) {
             // Cache the settings and update localStorage

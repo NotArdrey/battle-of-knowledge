@@ -1,10 +1,17 @@
 -- ============================================
--- BATTLE OF KNOWLEDGE - FRONTEND COMPATIBLE v4
+-- BATTLE OF KNOWLEDGE - NORMALIZED 3NF SCHEMA
+-- Run this ENTIRE script in Supabase SQL Editor
 -- ============================================
 
--- [Step 1: Cleanup]
+-- ============================================
+-- STEP 1: CLEANUP EVERYTHING
+-- ============================================
+
+-- Drop views
 DROP VIEW IF EXISTS teacher_student_progress CASCADE;
 DROP VIEW IF EXISTS admin_user_stats CASCADE;
+
+-- Drop tables (order matters due to foreign keys)
 DROP TABLE IF EXISTS student_lesson_progress CASCADE;
 DROP TABLE IF EXISTS student_unlocked_heroes CASCADE;
 DROP TABLE IF EXISTS question_choices CASCADE;
@@ -21,6 +28,7 @@ DROP TABLE IF EXISTS profiles CASCADE;
 DROP TABLE IF EXISTS eras CASCADE;
 DROP TABLE IF EXISTS app_settings CASCADE;
 
+-- Drop functions and triggers
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
 DROP FUNCTION IF EXISTS generate_class_code() CASCADE;
@@ -29,30 +37,52 @@ DROP FUNCTION IF EXISTS is_teacher() CASCADE;
 DROP FUNCTION IF EXISTS is_admin() CASCADE;
 DROP FUNCTION IF EXISTS get_user_role() CASCADE;
 
+-- Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- [Step 2: Lookup Tables]
+-- ============================================
+-- STEP 2: LOOKUP TABLES (Eras, Achievements)
+-- ============================================
+
 CREATE TABLE eras (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    era_key TEXT UNIQUE NOT NULL, -- Kept for reference
+    era_key TEXT UNIQUE NOT NULL, -- e.g., 'early-spanish'
     title_en TEXT NOT NULL,
     title_tl TEXT,
-    sort_order INTEGER NOT NULL
+    description_en TEXT,
+    description_tl TEXT,
+    sort_order INTEGER NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- [Step 3: Profiles - RESTORED class_id FOR TEACHER DASHBOARD COMPATIBILITY]
+CREATE TABLE achievement_definitions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    achievement_key TEXT UNIQUE NOT NULL,
+    title_en TEXT NOT NULL,
+    description_en TEXT NOT NULL,
+    icon TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- STEP 3: MAIN USER TABLES
+-- ============================================
+
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT UNIQUE NOT NULL,
     full_name TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'student',
-    teacher_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-    class_id UUID, -- Kept for frontend compatibility (even if redundant with enrollments)
+    role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('admin', 'teacher', 'student')),
+    teacher_id UUID REFERENCES profiles(id) ON DELETE SET NULL, -- specific to students
     is_verified BOOLEAN DEFAULT FALSE,
     student_id_number TEXT,
+    avatar_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_profiles_role ON profiles(role);
+CREATE INDEX idx_profiles_teacher_id ON profiles(teacher_id);
 
 CREATE TABLE registered_students (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -64,67 +94,89 @@ CREATE TABLE registered_students (
     is_claimed BOOLEAN DEFAULT FALSE,
     claimed_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
     uploaded_by UUID REFERENCES profiles(id),
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- [Step 4: Classes]
+-- ============================================
+-- STEP 4: CLASS MANAGEMENT
+-- ============================================
+
 CREATE TABLE classes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     teacher_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     class_name TEXT NOT NULL,
     class_code TEXT UNIQUE NOT NULL,
-    grade_level TEXT, 
-    section TEXT,
     description TEXT,
+    grade_level TEXT,
+    section TEXT,
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    max_students INTEGER DEFAULT 50,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_classes_teacher ON classes(teacher_id);
+CREATE INDEX idx_classes_code ON classes(class_code);
 
 CREATE TABLE class_enrollments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     class_id UUID NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
     student_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    status TEXT DEFAULT 'active',
     enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'removed')),
     UNIQUE(class_id, student_id)
 );
 
--- [Step 5: Content]
+CREATE INDEX idx_enrollments_class ON class_enrollments(class_id);
+CREATE INDEX idx_enrollments_student ON class_enrollments(student_id);
+
+-- ============================================
+-- STEP 5: CONTENT (Questions & Lessons)
+-- ============================================
+
 CREATE TABLE custom_questions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    era_id UUID REFERENCES eras(id), -- Optional
-    era_key TEXT, -- Added for frontend ease
-    created_by UUID REFERENCES profiles(id),
+    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL, -- Null for system questions
     question_text_en TEXT NOT NULL,
     question_text_tl TEXT,
-    difficulty TEXT DEFAULT 'medium',
+    difficulty TEXT DEFAULT 'medium' CHECK (difficulty IN ('easy', 'medium', 'hard')),
     is_active BOOLEAN DEFAULT TRUE,
     is_approved BOOLEAN DEFAULT FALSE,
     is_system BOOLEAN DEFAULT FALSE,
-    source_id TEXT UNIQUE, -- For tracking migrated system content (e.g., 'system-early-spanish-0')
     class_id UUID REFERENCES classes(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_questions_era ON custom_questions(era_id);
+CREATE INDEX idx_questions_creator ON custom_questions(created_by);
 
 CREATE TABLE question_choices (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     question_id UUID NOT NULL REFERENCES custom_questions(id) ON DELETE CASCADE,
     content_en TEXT NOT NULL,
     content_tl TEXT,
-    is_correct BOOLEAN DEFAULT FALSE
+    is_correct BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_choices_question ON question_choices(question_id);
 
 CREATE TABLE custom_lessons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    era_key TEXT, -- Frontend uses keys
-    created_by UUID REFERENCES profiles(id),
+    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    lesson_order INTEGER NOT NULL,
     title_en TEXT NOT NULL,
+    title_tl TEXT,
     content_en TEXT NOT NULL,
+    content_tl TEXT,
+    icon TEXT DEFAULT '📖',
     is_active BOOLEAN DEFAULT TRUE,
     is_approved BOOLEAN DEFAULT FALSE,
     is_system BOOLEAN DEFAULT FALSE,
-    source_id TEXT UNIQUE, -- For tracking migrated system content (e.g., 'system-early-spanish-1')
     class_id UUID REFERENCES classes(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -139,74 +191,177 @@ CREATE INDEX idx_lessons_era ON custom_lessons(era_id);
 CREATE TABLE progress (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    era_key TEXT NOT NULL, -- FRONTEND REQUIRES THIS (not era_id UUID)
-    
-    -- Frontend specifically looks for these exact column names:
-    lessons_complete BOOLEAN DEFAULT FALSE, 
+    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    is_era_completed BOOLEAN DEFAULT FALSE,
     boss_defeated BOOLEAN DEFAULT FALSE,
     current_lesson_index INTEGER DEFAULT 0,
     battle_score INTEGER DEFAULT 0,
     enemies_defeated INTEGER DEFAULT 0,
     highest_streak INTEGER DEFAULT 0,
-    
-    -- Arrays required by progress-sync.js
-    lessons_completed JSONB DEFAULT '[]'::jsonb, 
-    unlocked_heroes JSONB DEFAULT '[0]'::jsonb,
-    
+    time_spent_seconds INTEGER DEFAULT 0,
     last_played_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, era_key)
+    UNIQUE(user_id, era_id)
+);
+
+CREATE INDEX idx_progress_user ON progress(user_id);
+CREATE INDEX idx_progress_era ON progress(era_id);
+
+-- Normalized Lesson Progress
+CREATE TABLE student_lesson_progress (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    lesson_id UUID NOT NULL REFERENCES custom_lessons(id) ON DELETE CASCADE,
+    completed_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, lesson_id)
+);
+
+-- Normalized Unlocked Heroes (assuming heroes are associated with eras or simple IDs)
+-- Since heroes were JSONB indices often, we might strictly define them later.
+-- For now, we will track them by a simple integer ID or text key if we had a proper heroes table.
+-- Given previous schema used JSON 'unlocked_heroes', we will create a simple table.
+CREATE TABLE student_unlocked_heroes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    hero_index INTEGER NOT NULL, -- Corresponds to client-side hero array index or ID
+    unlocked_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, hero_index)
+);
+
+CREATE TABLE achievements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    achievement_id UUID NOT NULL REFERENCES achievement_definitions(id) ON DELETE CASCADE,
+    unlocked_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, achievement_id)
+);
+
+CREATE TABLE game_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    era_id UUID NOT NULL REFERENCES eras(id) ON DELETE CASCADE,
+    session_type TEXT NOT NULL CHECK (session_type IN ('learning', 'battle')),
+    started_at TIMESTAMPTZ DEFAULT NOW(),
+    ended_at TIMESTAMPTZ,
+    questions_answered INTEGER DEFAULT 0,
+    correct_answers INTEGER DEFAULT 0,
+    score INTEGER DEFAULT 0
 );
 
 CREATE TABLE app_settings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     setting_key TEXT UNIQUE NOT NULL,
-    setting_value JSONB NOT NULL DEFAULT '{}'::jsonb
+    setting_value JSONB NOT NULL DEFAULT '{}'::jsonb,
+    updated_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- [Step 7: Policies - INCLUDES SELF-REPAIR]
+-- ============================================
+-- STEP 7: ROW LEVEL SECURITY (RLS)
+-- ============================================
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE registered_students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE classes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE class_enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE custom_questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE custom_lessons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
 
--- Functions
-CREATE OR REPLACE FUNCTION get_user_role() RETURNS TEXT AS $$
+-- Helper Functions
+CREATE OR REPLACE FUNCTION get_user_role()
+RETURNS TEXT AS $$
+DECLARE
+    user_role TEXT;
 BEGIN
-    RETURN (SELECT role FROM profiles WHERE id = auth.uid());
+    SELECT role INTO user_role FROM profiles WHERE id = auth.uid();
+    RETURN COALESCE(user_role, 'student');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN get_user_role() = 'admin';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+CREATE OR REPLACE FUNCTION is_teacher()
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN get_user_role() = 'teacher';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+-- Function to delete user (admin check done on client side)
+CREATE OR REPLACE FUNCTION delete_user_completely(user_id_to_delete UUID)
+RETURNS JSON AS $$
+BEGIN
+    -- Prevent deleting yourself
+    IF user_id_to_delete = auth.uid() THEN
+        RETURN json_build_object(
+            'success', false,
+            'error', 'You cannot delete your own account'
+        );
+    END IF;
+    
+    -- Check if user exists
+    IF NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id_to_delete) THEN
+        RETURN json_build_object(
+            'success', false,
+            'error', 'User not found'
+        );
+    END IF;
+    
+    -- Delete from auth.users (this will cascade to profiles due to ON DELETE CASCADE)
+    DELETE FROM auth.users WHERE id = user_id_to_delete;
+    
+    RETURN json_build_object(
+        'success', true,
+        'message', 'User deleted successfully'
+    );
+    
+EXCEPTION WHEN OTHERS THEN
+    RETURN json_build_object(
+        'success', false,
+        'error', SQLERRM
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Policies
 
-CREATE OR REPLACE FUNCTION is_admin() RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN (get_user_role() = 'admin');
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION is_teacher() RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN (get_user_role() = 'teacher');
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- CRITICAL: Profiles Policies (Including Self-Repair)
+-- Profiles
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id); -- SELF REPAIR
 CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (is_admin());
 CREATE POLICY "Admins can update any profile" ON profiles FOR UPDATE USING (is_admin());
-CREATE POLICY "Teachers can view student profiles" ON profiles FOR SELECT USING (is_teacher() AND role = 'student');
+CREATE POLICY "Teachers can view all student profiles" ON profiles FOR SELECT USING (is_teacher() AND role = 'student');
+CREATE POLICY "Teachers can update student profiles" ON profiles FOR UPDATE USING (is_teacher() AND role = 'student');
 
 -- Registered Students
 CREATE POLICY "Admins can manage registered students" ON registered_students FOR ALL USING (is_admin());
-CREATE POLICY "Anyone can validate ID" ON registered_students FOR SELECT USING (true);
+CREATE POLICY "Anyone can validate student ID" ON registered_students FOR SELECT USING (true);
+
+-- Classes
+CREATE POLICY "Teachers can manage own classes" ON classes FOR ALL USING (teacher_id = auth.uid());
+CREATE POLICY "Admins can view all classes" ON classes FOR SELECT USING (is_admin());
+CREATE POLICY "Students can view active classes" ON classes FOR SELECT USING (is_active = true);
+
+-- Enrollments
+CREATE POLICY "Teachers can manage class enrollments" ON class_enrollments FOR ALL 
+    USING (EXISTS (SELECT 1 FROM classes WHERE classes.id = class_enrollments.class_id AND classes.teacher_id = auth.uid()));
+CREATE POLICY "Students can view own enrollments" ON class_enrollments FOR SELECT USING (student_id = auth.uid());
+CREATE POLICY "Students can enroll themselves" ON class_enrollments FOR INSERT WITH CHECK (student_id = auth.uid());
+CREATE POLICY "Admins can manage all enrollments" ON class_enrollments FOR ALL USING (is_admin());
 
 -- Progress
 CREATE POLICY "Users can manage own progress" ON progress FOR ALL USING (user_id = auth.uid());
-CREATE POLICY "Admins can view progress" ON progress FOR SELECT USING (is_admin());
+CREATE POLICY "Admins can view all progress" ON progress FOR SELECT USING (is_admin());
 CREATE POLICY "Teachers can view student progress" ON progress FOR SELECT 
     USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = progress.user_id AND profiles.teacher_id = auth.uid()));
 
@@ -219,11 +374,11 @@ CREATE POLICY "Users can manage own achievements" ON achievements FOR ALL USING 
 CREATE POLICY "Admins can view all achievements" ON achievements FOR SELECT USING (is_admin());
 
 -- Questions & Lessons (Content)
-CREATE POLICY "Teachers can manage all questions" ON custom_questions FOR ALL USING (is_teacher() OR is_admin());
+CREATE POLICY "Teachers can manage own questions" ON custom_questions FOR ALL USING (created_by = auth.uid());
 CREATE POLICY "Admins can manage all questions" ON custom_questions FOR ALL USING (is_admin());
 CREATE POLICY "Anyone can view approved questions" ON custom_questions FOR SELECT USING (is_active = true AND is_approved = true);
 
-CREATE POLICY "Teachers can manage all lessons" ON custom_lessons FOR ALL USING (is_teacher() OR is_admin());
+CREATE POLICY "Teachers can manage own lessons" ON custom_lessons FOR ALL USING (created_by = auth.uid());
 CREATE POLICY "Admins can manage all lessons" ON custom_lessons FOR ALL USING (is_admin());
 CREATE POLICY "Anyone can view approved lessons" ON custom_lessons FOR SELECT USING (is_active = true AND is_approved = true);
 
@@ -625,4 +780,193 @@ BEGIN
     
     PERFORM seed_lesson('ww2'::text, 5, 'Liberation and Independence'::text, 'Pagpapalaya at Kalayaan'::text, '<div class="space-y-4"><h3 class="text-xl font-bold mb-3">July 4, 1946</h3><p class="mb-3">On <strong>July 4, 1946</strong>, the Philippines gained full independence.</p></div>'::text, '<div class="space-y-4"><h3 class="text-xl font-bold mb-3">Hulyo 4, 1946</h3><p class="mb-3">Noong <strong>Hulyo 4, 1946</strong>, nakuha ng Pilipinas ang buong kalayaan.</p></div>'::text, '5'::text);
 
+END $$;
+
+
+
+-- Add index for faster lookups
+DROP POLICY IF EXISTS "Teachers can manage own questions" ON custom_questions;
+DROP POLICY IF EXISTS "Teachers can manage own lessons" ON custom_lessons;
+
+-- Create new policies that allow teachers to manage all questions (including system ones)
+CREATE POLICY "Teachers can manage all questions" ON custom_questions 
+    FOR ALL USING (is_teacher() OR is_admin());
+
+CREATE POLICY "Teachers can manage all lessons" ON custom_lessons 
+    FOR ALL USING (is_teacher() OR is_admin());
+
+-- Also add policy for question_choices so teachers can delete choices
+DROP POLICY IF EXISTS "Teachers can manage question choices" ON question_choices;
+CREATE POLICY "Teachers can manage question choices" ON question_choices 
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM custom_questions 
+            WHERE custom_questions.id = question_choices.question_id 
+            AND (is_teacher() OR is_admin())
+        )
+    );
+
+
+
+-- Add source_id columns to track migrated system content
+-- Run this in Supabase SQL Editor
+
+-- Add source_id to custom_questions table
+ALTER TABLE custom_questions 
+ADD COLUMN IF NOT EXISTS source_id TEXT UNIQUE;
+
+-- Add index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_questions_source_id ON custom_questions(source_id);
+
+-- Add source_id to custom_lessons table
+ALTER TABLE custom_lessons 
+ADD COLUMN IF NOT EXISTS source_id TEXT UNIQUE;
+
+-- Add index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_lessons_source_id ON custom_lessons(source_id);
+
+-- Add comments
+COMMENT ON COLUMN custom_questions.source_id IS 'Tracks migrated system content (e.g., system-early-spanish-0)';
+COMMENT ON COLUMN custom_lessons.source_id IS 'Tracks migrated system content (e.g., system-early-spanish-1)';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Fix RLS policies - Run this NOW in Supabase SQL Editor
+DROP POLICY IF EXISTS "Teachers can manage own questions" ON custom_questions;
+DROP POLICY IF EXISTS "Teachers can manage own lessons" ON custom_lessons;
+DROP POLICY IF EXISTS "Teachers can view questions" ON custom_questions;
+DROP POLICY IF EXISTS "Teachers can view lessons" ON custom_lessons;
+
+-- Allow teachers full access to all questions and lessons
+CREATE POLICY "Teachers can manage all questions" ON custom_questions 
+    FOR ALL USING (
+        (SELECT role FROM profiles WHERE id = auth.uid()) IN ('teacher', 'admin')
+    );
+
+CREATE POLICY "Teachers can manage all lessons" ON custom_lessons 
+    FOR ALL USING (
+        (SELECT role FROM profiles WHERE id = auth.uid()) IN ('teacher', 'admin')
+    );
+
+-- Fix question_choices RLS (needed for reading questions)
+ALTER TABLE question_choices ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can view choices" ON question_choices;
+CREATE POLICY "Anyone can view choices" ON question_choices 
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Teachers can manage choices" ON question_choices;
+CREATE POLICY "Teachers can manage choices" ON question_choices 
+    FOR ALL USING (
+        (SELECT role FROM profiles WHERE id = auth.uid()) IN ('teacher', 'admin')
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DROP POLICY IF EXISTS "Enable read access for all users" ON app_settings;
+DROP POLICY IF EXISTS "Enable insert/update for authenticated users" ON app_settings;
+-- Create policies for app_settings
+ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
+-- Allow everyone to read settings (including guest/anon)
+CREATE POLICY "Enable read access for all users"
+ON app_settings FOR SELECT
+USING (true);
+-- Allow authenticated users (teachers/admins) to update/insert settings
+CREATE POLICY "Enable insert/update for authenticated users"
+ON app_settings FOR ALL
+TO authenticated
+USING (true)
+WITH CHECK (true);
+-- 2. Fix Registered Students RLS failure (Error 42501 on Insert)
+-- Drop existing restricted policies if needed
+DROP POLICY IF EXISTS "Allow teachers to insert registered students" ON registered_students;
+DROP POLICY IF EXISTS "Allow teachers to update registered students" ON registered_students;
+DROP POLICY IF EXISTS "Allow teachers to delete registered students" ON registered_students;
+-- Enable RLS
+ALTER TABLE registered_students ENABLE ROW LEVEL SECURITY;
+-- Allow teachers/admins to do everything on registered_students
+CREATE POLICY "Allow teachers to manage registered students"
+ON registered_students FOR ALL
+TO authenticated
+USING (true)
+WITH CHECK (true);
+
+
+
+    -- ============================================
+-- MIGRATION: Fix schema issues
+-- Run this in your Supabase SQL Editor if you already have the database set up
+-- ============================================
+
+-- Add is_registered column to profiles table
+ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS is_registered BOOLEAN DEFAULT TRUE;
+
+-- Update existing rows to have is_registered = TRUE
+UPDATE profiles 
+SET is_registered = TRUE 
+WHERE is_registered IS NULL;
+
+-- Note: custom_questions and custom_lessons already use era_id (UUID foreign key)
+-- If you have any old data using era_key (text), you would need to migrate it.
+-- However, based on the schema, these tables should already be using era_id.
+
+-- Verify the structure
+DO $$
+BEGIN
+    -- Check if profiles has is_registered
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_name='profiles' 
+        AND column_name='is_registered'
+    ) THEN
+        RAISE EXCEPTION 'profiles.is_registered column not found';
+    END IF;
+
+    -- Check if custom_questions has era_id
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_name='custom_questions' 
+        AND column_name='era_id'
+    ) THEN
+        RAISE EXCEPTION 'custom_questions.era_id column not found - schema may need complete refresh';
+    END IF;
+
+    -- Check if custom_lessons has era_id
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_name='custom_lessons' 
+        AND column_name='era_id'
+    ) THEN
+        RAISE EXCEPTION 'custom_lessons.era_id column not found - schema may need complete refresh';
+    END IF;
+
+    RAISE NOTICE 'Migration completed successfully!';
 END $$;
