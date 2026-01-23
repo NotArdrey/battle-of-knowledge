@@ -169,6 +169,8 @@
             background-repeat: no-repeat;
             border-top: 6px solid #92400e;
             padding: 12px;
+            /* Add extra padding at bottom for mobile navigation bars */
+            padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -749,6 +751,7 @@
             .question-area {
                 flex: 0 0 46%;
                 padding: 10px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
                 gap: 8px;
                 background-size: cover;
                 background-position: center;
@@ -781,6 +784,8 @@
 
             .answers-grid {
                 gap: 8px;
+                /* Add extra margin at bottom as fallback for mobile nav bars */
+                margin-bottom: 8px;
             }
 
             .answer-btn {
@@ -812,6 +817,7 @@
             .question-area {
                 flex: 0 0 46%;
                 padding: 15px;
+                padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
                 gap: 12px;
                 background-size: cover;
                 background-position: center;
@@ -858,6 +864,7 @@
             .question-area {
                 flex: 0 0 46%;
                 padding: 18px;
+                padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
                 gap: 12px;
                 background-size: cover;
                 background-position: center;
@@ -934,6 +941,7 @@
             .question-area {
                 flex: 0 0 50%;
                 padding: 8px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
                 gap: 6px;
                 background-size: cover;
                 background-position: center;
@@ -1031,6 +1039,14 @@
 
         .question-area::-webkit-scrollbar {
             display: none;
+        }
+
+        /* Mobile navbar fallback - for devices where safe-area-inset doesn't work */
+        @media (max-width: 768px) and (pointer: coarse) {
+            .question-area {
+                /* Add minimum bottom padding for touch devices (likely mobile with nav bars) */
+                padding-bottom: max(20px, calc(12px + env(safe-area-inset-bottom, 8px)));
+            }
         }
 
         /* Question header */
