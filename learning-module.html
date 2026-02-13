@@ -1155,7 +1155,7 @@
                 const isCurrent = index === currentLessonIndex;
 
                 const indicator = document.createElement('div');
-                indicator.className = `lesson - indicator ${isCurrent ? 'current' : isCompleted ? 'completed' : 'upcoming'} `;
+                indicator.className = `lesson-indicator ${isCurrent ? 'current' : isCompleted ? 'completed' : 'upcoming'}`;
                 indicator.textContent = index + 1;
                 indicator.title = lesson.title;
 
