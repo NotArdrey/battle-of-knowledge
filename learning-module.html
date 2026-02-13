@@ -826,14 +826,22 @@
                         currentCaptions = [];
                     }
 
+                    // Determine which video to show based on language
+                    let videoId = lessonData.youtubeId; // Default to English
+
+                    // If language is Tagalog and we have a Tagalog video, use that
+                    if (currentLang === 'tl' && lessonData.youtubeIdTl) {
+                        videoId = lessonData.youtubeIdTl;
+                    }
+
                     // Check if YouTube video exists
-                    if (lessonData.youtubeId) {
+                    if (videoId) {
                         // Show YouTube iframe
                         videoContainer.innerHTML = `
                             <div class="youtube-container">
                                 <iframe 
                                     id="lessonVideo"
-                                    src="https://www.youtube.com/embed/${lessonData.youtubeId}?enablejsapi=1&rel=0&modestbranding=1"
+                                    src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1"
                                     title="${lessonData.title}"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -856,7 +864,7 @@
                     } else if (lessonData.videoFile) {
                         // Show actual video (fallback for local videos)
                         videoContainer.innerHTML = `
-                            <video id="lessonVideo" controls>
+                            < video id = "lessonVideo" controls >
                                 <source src="${lessonData.videoFile}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
@@ -881,10 +889,10 @@
                     } else {
                         // Show placeholder with captions slideshow
                         videoContainer.innerHTML = `
-                            <div class="video-placeholder">
+                            < div class="video-placeholder" >
                                 <div class="video-placeholder-icon">📜</div>
                                 <div class="video-placeholder-text">Chapter ${lessonId}: ${lessonData.title}</div>
-                            </div>
+                            </div >
                             <div id="captionContainer" class="caption-container" style="display: block;">
                                 <p id="captionText" class="caption-text"></p>
                             </div>
@@ -915,11 +923,11 @@
         function showVideoPlaceholder() {
             const videoContainer = document.getElementById('lessonVideoContainer');
             videoContainer.innerHTML = `
-                <div class="video-placeholder">
+                            < div class="video-placeholder" >
                     <div class="video-placeholder-icon">🎬</div>
                     <div class="video-placeholder-text">Video Coming Soon</div>
-                </div>
-            `;
+                </div >
+                            `;
         }
 
         // Sync captions with video time
@@ -1089,7 +1097,7 @@
                     }
                 } else {
                     // Fallback to localStorage if ProgressSync not available
-                    const savedProgress = localStorage.getItem(`learning_${currentEraKey}`);
+                    const savedProgress = localStorage.getItem(`learning_${currentEraKey} `);
                     if (savedProgress) {
                         completedLessons = new Set(JSON.parse(savedProgress));
                     }
@@ -1147,7 +1155,7 @@
                 const isCurrent = index === currentLessonIndex;
 
                 const indicator = document.createElement('div');
-                indicator.className = `lesson-indicator ${isCurrent ? 'current' : isCompleted ? 'completed' : 'upcoming'}`;
+                indicator.className = `lesson - indicator ${isCurrent ? 'current' : isCompleted ? 'completed' : 'upcoming'} `;
                 indicator.textContent = index + 1;
                 indicator.title = lesson.title;
 
