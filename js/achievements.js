@@ -10,56 +10,56 @@ const AchievementManager = {
             id: 'first_win',
             title: 'First Victory',
             description: 'Win your first battle.',
-            icon: 'assets/Achievements/first_win.png', // Placeholder
+            icon: 'assets/Achievements/first_win.svg', // Placeholder
             category: 'battle'
         },
         {
             id: 'promising_student',
             title: 'Promising Student',
             description: 'Complete your first lesson.',
-            icon: 'assets/Achievements/student.png',
+            icon: 'assets/Achievements/student.svg',
             category: 'learning'
         },
         {
             id: 'knowledge_seeker',
             title: 'Knowledge Seeker',
             description: 'Complete all lessons in a single era.',
-            icon: 'assets/Achievements/seeker.png',
+            icon: 'assets/Achievements/seeker.svg',
             category: 'learning'
         },
         {
             id: 'boss_slayer',
             title: 'Boss Slayer',
             description: 'Defeat a Boss for the first time.',
-            icon: 'assets/Achievements/boss.png',
+            icon: 'assets/Achievements/boss.svg',
             category: 'battle'
         },
         {
             id: 'unstoppable',
             title: 'Unstoppable',
             description: 'Win 5 battles in a row.',
-            icon: 'assets/Achievements/streak.png',
+            icon: 'assets/Achievements/streak.svg',
             category: 'battle'
         },
         {
             id: 'collector',
             title: 'Collector',
             description: 'Unlock a new hero.',
-            icon: 'assets/Achievements/collector.png',
+            icon: 'assets/Achievements/collector.svg',
             category: 'collection'
         },
         {
             id: 'historian',
             title: 'Master Historian',
             description: 'Complete all eras.',
-            icon: 'assets/Achievements/historian.png',
+            icon: 'assets/Achievements/historian.svg',
             category: 'progression'
         },
         {
             id: 'survivor',
             title: 'Close Call',
             description: 'Win a battle with less than 10 HP.',
-            icon: 'assets/Achievements/survivor.png',
+            icon: 'assets/Achievements/survivor.svg',
             category: 'battle'
         }
     ],
@@ -151,7 +151,7 @@ const AchievementManager = {
 
         notification.innerHTML = `
             <div class="achievement-icon-container">
-                <img src="${iconSrc}" alt="Icon" class="achievement-icon" onerror="this.src='assets/Buttons/medal_icon.png'">
+                <img src="${iconSrc}" alt="Icon" class="achievement-icon" onerror="this.src='assets/Buttons/medal_icon.svg'">
             </div>
             <div class="achievement-text">
                 <div class="achievement-title">Achievement Unlocked</div>

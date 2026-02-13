@@ -317,9 +317,8 @@
                 <!-- ACHIEVEMENTS Button as Image -->
                 <button onclick="navigateTo('achievements.html', this)" class="image-button" data-protect="achievements"
                     data-protect-duration="2000">
-                    <img id="achievementsButtonImg" src="assets/Buttons/ACHIEVEMENTS Button.png"
-                        onerror="this.src='assets/Buttons/COLLECTION Button.png'; this.style.filter='hue-rotate(45deg)'"
-                        alt="ACHIEVEMENTS" class="button-img collection-button-img">
+                    <img id="achievementsButtonImg" src="assets/Buttons/ACHIEVEMENTS Button.svg" alt="ACHIEVEMENTS"
+                        class="button-img collection-button-img">
                 </button>
             </div>
         </div>
@@ -334,7 +333,7 @@
 
     <!-- User Auth Status Bar -->
     <div id="authStatusBar"
-        class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
+        class="hidden fixed top-4 left-4 z-50 bg-gradient-to-r from-amber-100 to-amber-200 border-2 border-amber-400 rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
         <span id="userNameDisplay" class="font-semibold text-amber-900"></span>
         <span id="userRoleBadge" class="text-xs px-2 py-1 rounded-full bg-amber-500 text-white font-bold"></span>
         <button onclick="handleLogout()"
@@ -455,6 +454,8 @@
                     startButtonImg.alt = 'SIMULA';
                     collectionButtonImg.src = 'assets/Buttons/KOLEKSYON Button.png';
                     collectionButtonImg.alt = 'KOLEKSYON';
+                    document.getElementById('achievementsButtonImg').src = 'assets/Buttons/MGA TAGUMPAY Button.svg';
+                    document.getElementById('achievementsButtonImg').alt = 'MGA TAGUMPAY';
                 } else {
                     // Switch to English
                     englishTitle.style.display = 'block';
@@ -465,6 +466,8 @@
                     startButtonImg.alt = 'START';
                     collectionButtonImg.src = 'assets/Buttons/COLLECTION Button.png';
                     collectionButtonImg.alt = 'COLLECTION';
+                    document.getElementById('achievementsButtonImg').src = 'assets/Buttons/ACHIEVEMENTS Button.svg';
+                    document.getElementById('achievementsButtonImg').alt = 'ACHIEVEMENTS';
                 }
             }
 
@@ -474,14 +477,16 @@
 
                 if (isTagalog) {
                     // Preload English images for next toggle
-                    imagesToPreload.push('assets/BUTTONS/TOGGLE/Toggle-English.png');
-                    imagesToPreload.push('assets/BUTTONS/START/Start-English.png');
-                    imagesToPreload.push('assets/BUTTONS/COLLECTION/Collection-English.png');
+                    imagesToPreload.push('assets/Buttons/TOGGLE/Toggle-English.png');
+                    imagesToPreload.push('assets/Buttons/START/Start-English.png');
+                    imagesToPreload.push('assets/Buttons/COLLECTION/Collection-English.png');
+                    imagesToPreload.push('assets/Buttons/ACHIEVEMENTS Button.svg');
                 } else {
                     // Preload Tagalog images for next toggle
-                    imagesToPreload.push('assets/BUTTONS/TOGGLE/Toggle-Tagalog.png');
-                    imagesToPreload.push('assets/BUTTONS/START/Start-Tagalog.png');
-                    imagesToPreload.push('assets/BUTTONS/COLLECTION/Collection-Tagalog.png');
+                    imagesToPreload.push('assets/Buttons/TOGGLE/Toggle-Tagalog.png');
+                    imagesToPreload.push('assets/Buttons/START/Start-Tagalog.png');
+                    imagesToPreload.push('assets/Buttons/COLLECTION/Collection-Tagalog.png');
+                    imagesToPreload.push('assets/Buttons/MGA TAGUMPAY Button.svg');
                 }
 
                 imagesToPreload.forEach(src => {
