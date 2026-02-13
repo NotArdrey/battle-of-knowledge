@@ -161,6 +161,12 @@ const ProgressSync = {
         const heroArray = [...unlocked].sort((a, b) => a - b);
         this.progress.unlockedHeroes[eraKey] = heroArray;
         await this.saveUnlockedHeroes(eraKey, heroArray);
+
+        // Trigger achievement
+        if (window.AchievementManager) {
+            window.AchievementManager.unlock('collector');
+        }
+
         return heroArray;
     },
 

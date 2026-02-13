@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Achievements - Battle of Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="stylesheet" href="styles/achievements.css">
+    <script src="js/ui-utils.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive;
+            background: linear-gradient(to bottom right, #fef3c7, #fde68a, #fef3c7);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url('assets/Background/Start Menu/Start Menu.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 60px;
+            /* Space for back button */
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #78350f;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .stats-bar {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 2px solid rgba(251, 191, 36, 0.5);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #b45309;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #78350f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .back-btn img {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-overlay"></div>
+
+    <div class="main-container">
+        <!-- Back Button -->
+        <button onclick="navigateTo('menu.html', this)" class="back-btn" data-protect="back">
+            <img src="assets/Buttons/era-selection/back.png" alt="Back">
+        </button>
+
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Achievements</h1>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-value" id="unlockedCount">0/0</span>
+                        <span class="stat-label">Unlocked</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="completionRate">0%</span>
+                        <span class="stat-label">Completion</span>
+                    </div>
+                </div>
+                <p class="page-subtitle">Track your milestones and victories</p>
+            </div>
+
+            <div id="achievementsGrid" class="achievements-grid">
+                <!-- Achievements injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/supabase-config.js"></script>
+    <script src="js/progress-sync.js"></script>
+    <script src="js/achievements.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for dependencies to init
+            if (window.AchievementManager) {
+                // Short delay to ensure sync
+                setTimeout(renderAchievements, 500);
+            } else {
+                console.error('AchievementManager not found');
+            }
+        });
+
+        function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            const allAchievements = AchievementManager.getAllAchievements();
+
+            // Update stats
+            const unlockedCount = allAchievements.filter(a => a.unlocked).length;
+            const total = allAchievements.length;
+            document.getElementById('unlockedCount').textContent = `${unlockedCount}/${total}`;
+            document.getElementById('completionRate').textContent = `${Math.round((unlockedCount / total) * 100)}%`;
+
+            grid.innerHTML = '';
+
+            allAchievements.forEach(achievement => {
+                const card = document.createElement('div');
+                card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+
+                // Format date if possible (though we don't store date yet, maybe generic "Unlocked" text)
+                const statusText = achievement.unlocked ? 'UNLOCKED' : 'LOCKED';
+                const statusIcon = achievement.unlocked ? '✓' : '🔒';
+
+                card.innerHTML = `
+                    <div class="achievement-card-icon-wrapper">
+                        <img src="${achievement.icon}" onerror="this.src='assets/Buttons/medal_icon.png'" class="achievement-card-icon" alt="${achievement.title}">
+                    </div>
+                    <h3 class="achievement-card-title">${achievement.title}</h3>
+                    <p class="achievement-card-desc">${achievement.description}</p>
+                    <div class="achievement-status">
+                        <span>${statusIcon}</span>
+                        <span>${statusText}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+
+</html>

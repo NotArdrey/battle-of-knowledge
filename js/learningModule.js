@@ -37,23 +37,23 @@ let currentModuleBGM = null;
 // Play era-specific background music
 function playModuleBackgroundMusic(eraKey) {
     if (!eraKey || !moduleBackgroundMusic[eraKey]) return;
-    
+
     try {
         // Stop any currently playing music
         stopModuleBackgroundMusic();
-        
+
         // Play the current era's music
         currentModuleBGM = moduleBackgroundMusic[eraKey];
         currentModuleBGM.currentTime = 0;
         currentModuleBGM.volume = 0.2;
-        
+
         // Try to play automatically
         currentModuleBGM.play().catch(e => {
             console.log('Module BGM autoplay blocked:', e);
             // Add click handler to start music on user interaction
             document.addEventListener('click', function startBGM() {
                 if (currentModuleBGM) {
-                    currentModuleBGM.play().catch(() => {});
+                    currentModuleBGM.play().catch(() => { });
                 }
                 document.removeEventListener('click', startBGM);
             }, { once: true });
@@ -102,13 +102,13 @@ async function initLearningModule() {
 
     // Ensure progress record exists for the current era
     await updateEraProgress(currentEraKey, {});
-    
+
     // Load completed lessons from ProgressSync (DB-backed)
     const lessonList = window.ProgressSync
         ? window.ProgressSync.getCompletedLessons(currentEraKey)
         : [];
     completedLessons = new Set(lessonList);
-    
+
     // Restore current lesson index from database
     if (window.ProgressSync) {
         const eraProgress = window.ProgressSync.getEraProgress(currentEraKey);
@@ -116,7 +116,7 @@ async function initLearningModule() {
             currentLessonIndex = eraProgress.currentLessonIndex;
         }
     }
-    
+
     loadEraContent();
     setupLessonNavigation();
     updateProgress();
@@ -126,18 +126,18 @@ async function initLearningModule() {
 // Load era content
 function loadEraContent() {
     const eraContent = learningData[currentEraKey][currentLang];
-    
+
     if (!eraContent) {
         console.error('No content found for era:', currentEraKey, 'language:', currentLang);
         return;
     }
-    
+
     // Update title
     document.getElementById('eraTitle').textContent = eraContent.title;
-    
+
     // Store lessons
     currentEraLessons = eraContent.lessons;
-    
+
     // Create lesson indicators
     createLessonIndicators();
 }
@@ -146,16 +146,16 @@ function loadEraContent() {
 function createLessonIndicators() {
     const container = document.getElementById('lessonIndicators');
     container.innerHTML = '';
-    
+
     currentEraLessons.forEach((lesson, index) => {
         const isCompleted = completedLessons.has(lesson.id);
         const isCurrent = index === currentLessonIndex;
-        
+
         const indicator = document.createElement('div');
         indicator.className = `lesson-indicator ${isCurrent ? 'current' : isCompleted ? 'completed' : 'upcoming'}`;
         indicator.textContent = index + 1;
         indicator.title = lesson.title;
-        
+
         if (!isCurrent) {
             indicator.onclick = () => {
                 // Only allow clicking on completed lessons or the next uncompleted lesson
@@ -165,7 +165,7 @@ function createLessonIndicators() {
                     createLessonIndicators();
                 }
             };
-            
+
             // Add pointer cursor only if clickable
             if (isCompleted || index === getNextUncompletedIndex()) {
                 indicator.style.cursor = 'pointer';
@@ -176,7 +176,7 @@ function createLessonIndicators() {
         } else {
             indicator.style.cursor = 'default';
         }
-        
+
         container.appendChild(indicator);
     });
 }
@@ -194,29 +194,29 @@ function getNextUncompletedIndex() {
 // Load current lesson
 async function loadCurrentLesson() {
     if (currentEraLessons.length === 0) return;
-    
+
     const lesson = currentEraLessons[currentLessonIndex];
     const isCompleted = completedLessons.has(lesson.id);
-    
+
     // Save current lesson index to database
     if (window.ProgressSync) {
         await window.ProgressSync.updateEraProgress(currentEraKey, { currentLessonIndex: currentLessonIndex });
     }
-    
+
     // Update lesson display
     document.getElementById('currentLessonIcon').textContent = lesson.icon;
     document.getElementById('currentLessonTitle').textContent = lesson.title;
     document.getElementById('currentLessonContent').innerHTML = lesson.content;
     document.getElementById('currentLessonNumber').textContent = `${currentLessonIndex + 1} / ${currentEraLessons.length}`;
-    
+
     // Update navigation buttons
     updateNavigationButtons();
-    
+
     // Update complete button
     const completeBtn = document.getElementById('completeLessonBtn');
     const completeText = translations && translations[currentLang] ? translations[currentLang]['markComplete'] : 'Mark as Complete';
     const completedText = translations && translations[currentLang] ? translations[currentLang]['Completed'] : 'Completed';
-    
+
     if (isCompleted) {
         completeBtn.disabled = true;
         completeBtn.classList.remove('complete-button');
@@ -228,7 +228,7 @@ async function loadCurrentLesson() {
         completeBtn.classList.add('complete-button');
         completeBtn.querySelector('span').textContent = completeText;
     }
-    
+
     // Auto-scroll to top of lesson content
     document.getElementById('currentLessonContent').scrollTop = 0;
 }
@@ -237,14 +237,14 @@ async function loadCurrentLesson() {
 function updateNavigationButtons() {
     const prevBtn = document.getElementById('prevLessonBtn');
     const nextBtn = document.getElementById('nextLessonBtn');
-    
+
     // Previous button
     prevBtn.disabled = currentLessonIndex === 0;
-    
+
     // Next button - only enabled if current lesson is completed
     const isCurrentCompleted = completedLessons.has(currentEraLessons[currentLessonIndex].id);
     nextBtn.disabled = !isCurrentCompleted || currentLessonIndex === currentEraLessons.length - 1;
-    
+
     // Update battle button
     checkBattleUnlock();
 }
@@ -254,36 +254,47 @@ async function completeCurrentLesson() {
     // Prevent spam clicks
     if (isButtonLocked('complete')) return;
     lockButton('complete', 1500);
-    
+
     if (currentEraLessons.length === 0) return;
-    
+
     const lesson = currentEraLessons[currentLessonIndex];
-    
+
     // Already completed - skip
     if (completedLessons.has(lesson.id)) return;
-    
+
     // Mark as complete
     completedLessons.add(lesson.id);
-    
+
     // Save progress - use ProgressSync if available
     if (window.ProgressSync) {
         await window.ProgressSync.markLessonComplete(currentEraKey, lesson.id);
     }
-    
+
+    // Trigger 'Promising Student' achievement
+    if (window.AchievementManager) {
+        window.AchievementManager.unlock('promising_student');
+    }
+
     // Show completion animation
     showLessonCompletion();
-    
+
     // Update UI
     updateProgress();
     updateNavigationButtons();
     createLessonIndicators();
-    
+
     // If all lessons completed, show celebration
     if (completedLessons.size === currentEraLessons.length) {
         await updateEraProgress(currentEraKey, { lessonsComplete: true });
+
+        // Trigger 'Knowledge Seeker' achievement
+        if (window.AchievementManager) {
+            window.AchievementManager.unlock('knowledge_seeker');
+        }
+
         setTimeout(showAllLessonsCompleted, 500);
     }
-    
+
     // If this wasn't the last lesson, automatically move to next after a delay
     if (currentLessonIndex < currentEraLessons.length - 1) {
         setTimeout(() => {
@@ -298,21 +309,21 @@ async function completeCurrentLesson() {
 function showLessonCompletion() {
     const completeBtn = document.getElementById('completeLessonBtn');
     const originalText = completeBtn.querySelector('span').textContent;
-    
+
     // Change button text briefly
     completeBtn.querySelector('span').textContent = 'Done!';
     completeBtn.style.background = 'linear-gradient(to right, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9))';
     completeBtn.style.borderColor = 'rgba(21, 128, 61, 0.6)';
     completeBtn.style.color = 'white';
-    
+
     // Create confetti effect
     createConfetti();
-    
+
     // Revert button after delay
     setTimeout(() => {
         const lesson = currentEraLessons[currentLessonIndex];
         const isCompleted = completedLessons.has(lesson.id);
-        
+
         if (isCompleted) {
             completeBtn.disabled = true;
             completeBtn.classList.remove('complete-button');
@@ -325,7 +336,7 @@ function showLessonCompletion() {
 // Create confetti effect
 function createConfetti() {
     const colors = ['#fbbf24', '#f59e0b', '#10b981', '#34d399', '#3b82f6', '#6366f1'];
-    
+
     for (let i = 0; i < 50; i++) {
         const confetti = document.createElement('div');
         confetti.style.position = 'fixed';
@@ -337,9 +348,9 @@ function createConfetti() {
         confetti.style.top = '-20px';
         confetti.style.zIndex = '9999';
         confetti.style.pointerEvents = 'none';
-        
+
         document.body.appendChild(confetti);
-        
+
         // Animation
         const animation = confetti.animate([
             { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
@@ -348,7 +359,7 @@ function createConfetti() {
             duration: 1000 + Math.random() * 1000,
             easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
         });
-        
+
         animation.onfinish = () => confetti.remove();
     }
 }
@@ -365,9 +376,9 @@ function showAllLessonsCompleted() {
             <p class="text-base md:text-lg mt-2">You can now start the battle!</p>
         </div>
     `;
-    
+
     document.body.appendChild(celebration);
-    
+
     // Remove after 3 seconds
     setTimeout(() => {
         celebration.remove();
@@ -378,7 +389,7 @@ function showAllLessonsCompleted() {
 function previousLesson() {
     if (isButtonLocked('prev')) return;
     lockButton('prev', 500);
-    
+
     if (currentLessonIndex > 0) {
         currentLessonIndex--;
         loadCurrentLesson();
@@ -390,10 +401,10 @@ function previousLesson() {
 function nextLesson() {
     if (isButtonLocked('next')) return;
     lockButton('next', 500);
-    
+
     const lesson = currentEraLessons[currentLessonIndex];
     const isCompleted = completedLessons.has(lesson.id);
-    
+
     if (isCompleted && currentLessonIndex < currentEraLessons.length - 1) {
         currentLessonIndex++;
         loadCurrentLesson();
@@ -406,7 +417,7 @@ function updateProgress() {
     const totalLessons = currentEraLessons.length;
     const completed = completedLessons.size;
     const percentage = (completed / totalLessons) * 100;
-    
+
     document.getElementById('progressBar').style.width = `${percentage}%`;
     document.getElementById('lessonProgress').textContent = `${completed} / ${totalLessons}`;
 }
@@ -417,7 +428,7 @@ function checkBattleUnlock() {
     const completed = completedLessons.size;
     const startButton = document.getElementById('startBattleBtn');
     const hint = document.getElementById('completionHint');
-    
+
     if (completed >= totalLessons) {
         startButton.disabled = false;
         startButton.onclick = startBattle;
@@ -453,9 +464,9 @@ function setupLessonNavigation() {
 function startBattle() {
     if (isButtonLocked('startBattle')) return;
     lockButton('startBattle', 2000);
-    
+
     const selectedEra = localStorage.getItem('selectedEra');
-    
+
     // Always show character selection for eras with multiple heroes
     if (eraData[selectedEra] && eraData[selectedEra].heroes.length > 1) {
         // Show character selection modal
@@ -477,14 +488,14 @@ function showCharacterSelect() {
     const modal = document.createElement('div');
     modal.id = 'characterSelectModal';
     modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
-    
+
     const heroes = eraData[era].heroes;
     const unlockedIndices = getUnlockedHeroesForEra(era);
     let heroesHTML = '';
-    
+
     heroes.forEach((hero, index) => {
         const isUnlocked = unlockedIndices.includes(index);
-        
+
         if (isUnlocked) {
             heroesHTML += `
                 <div class="bg-gradient-to-br from-blue-400 to-cyan-400 border-3 md:border-4 border-blue-600 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-pointer hover:-translate-y-2 hover:scale-105 transition-all duration-300 shadow-xl" onclick="selectCharacter(${index})">
@@ -509,7 +520,7 @@ function showCharacterSelect() {
             `;
         }
     });
-    
+
     modal.innerHTML = `
         <div class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl md:rounded-3xl border-4 md:border-8 border-amber-800 max-w-4xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
             <div class="p-6 md:p-8">
@@ -527,7 +538,7 @@ function showCharacterSelect() {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
 }
 
@@ -536,11 +547,11 @@ function selectCharacter(heroIndex) {
     // Prevent double clicks
     if (isButtonLocked('selectCharacter')) return;
     lockButton('selectCharacter', 2000);
-    
+
     // Clear any previous battle progress to start a fresh session
     localStorage.removeItem('battleProgress');
     localStorage.setItem('selectedHero', heroIndex);
-    
+
     // Show loading and navigate
     if (window.showPageLoading) window.showPageLoading('Preparing Battle');
     setTimeout(() => {
@@ -585,7 +596,7 @@ window.addEventListener('storage', (e) => {
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     initLearningModule();
-    
+
     // Setup language toggle
     const langToggle = document.getElementById('langToggle');
     if (langToggle) {

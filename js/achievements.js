@@ -1,23 +1,196 @@
-// Achievements system placeholder
-document.addEventListener('DOMContentLoaded', () => {
-    const achievementCards = document.getElementById('achievementCards');
-    
-    if (achievementCards) {
-        // You can add achievement tracking here
-        const achievements = [
-            { name: 'Lapu-Lapu', unlocked: true },
-            { name: 'Jose Rizal', unlocked: false },
-            { name: 'Andres Bonifacio', unlocked: false }
-        ];
-        
-        achievements.forEach(achievement => {
-            const card = document.createElement('div');
-            card.className = `p-4 rounded-xl border-2 ${achievement.unlocked ? 'bg-yellow-100 border-yellow-500' : 'bg-gray-300 border-gray-500 opacity-50'}`;
-            card.innerHTML = `
-                <p class="font-bold text-sm">${achievement.name}</p>
-                <p class="text-xs">${achievement.unlocked ? 'Unlocked' : 'Locked'}</p>
-            `;
-            achievementCards.appendChild(card);
+/**
+ * AchievementManager
+ * Handles achievement tracking, unlocking, and notifications.
+ * Integrates with ProgressSync for persistence.
+ */
+
+const AchievementManager = {
+    achievements: [
+        {
+            id: 'first_win',
+            title: 'First Victory',
+            description: 'Win your first battle.',
+            icon: 'assets/Achievements/first_win.png', // Placeholder
+            category: 'battle'
+        },
+        {
+            id: 'promising_student',
+            title: 'Promising Student',
+            description: 'Complete your first lesson.',
+            icon: 'assets/Achievements/student.png',
+            category: 'learning'
+        },
+        {
+            id: 'knowledge_seeker',
+            title: 'Knowledge Seeker',
+            description: 'Complete all lessons in a single era.',
+            icon: 'assets/Achievements/seeker.png',
+            category: 'learning'
+        },
+        {
+            id: 'boss_slayer',
+            title: 'Boss Slayer',
+            description: 'Defeat a Boss for the first time.',
+            icon: 'assets/Achievements/boss.png',
+            category: 'battle'
+        },
+        {
+            id: 'unstoppable',
+            title: 'Unstoppable',
+            description: 'Win 5 battles in a row.',
+            icon: 'assets/Achievements/streak.png',
+            category: 'battle'
+        },
+        {
+            id: 'collector',
+            title: 'Collector',
+            description: 'Unlock a new hero.',
+            icon: 'assets/Achievements/collector.png',
+            category: 'collection'
+        },
+        {
+            id: 'historian',
+            title: 'Master Historian',
+            description: 'Complete all eras.',
+            icon: 'assets/Achievements/historian.png',
+            category: 'progression'
+        },
+        {
+            id: 'survivor',
+            title: 'Close Call',
+            description: 'Win a battle with less than 10 HP.',
+            icon: 'assets/Achievements/survivor.png',
+            category: 'battle'
+        }
+    ],
+
+    unlockedAchievements: new Set(),
+    isInitialized: false,
+
+    async init() {
+        if (this.isInitialized) return;
+
+        // Wait for ProgressSync
+        if (window.ProgressSync) {
+            // Ensure ProgressSync is initialized
+            if (!window.ProgressSync.userId && window.ProgressSync.init) {
+                await window.ProgressSync.init();
+            }
+
+            // Load achievements from ProgressSync
+            const syncedAchievements = await window.ProgressSync.getAchievements();
+            if (syncedAchievements && Array.isArray(syncedAchievements)) {
+                syncedAchievements.forEach(id => this.unlockedAchievements.add(id));
+            }
+        }
+
+        // Inject styles if not present
+        if (!document.getElementById('achievements-css')) {
+            const link = document.createElement('link');
+            link.id = 'achievements-css';
+            link.rel = 'stylesheet';
+            link.href = 'styles/achievements.css';
+            document.head.appendChild(link);
+        }
+
+        this.isInitialized = true;
+        console.log('AchievementManager initialized. Unlocked:', this.unlockedAchievements.size);
+    },
+
+    isUnlocked(id) {
+        return this.unlockedAchievements.has(id);
+    },
+
+    getAchievement(id) {
+        return this.achievements.find(a => a.id === id);
+    },
+
+    getAllAchievements() {
+        return this.achievements.map(a => ({
+            ...a,
+            unlocked: this.isUnlocked(a.id)
+        }));
+    },
+
+    async unlock(id) {
+        if (!this.isInitialized) await this.init();
+
+        if (this.isUnlocked(id)) return; // Already unlocked
+
+        const achievement = this.getAchievement(id);
+        if (!achievement) {
+            console.warn(`Achievement ID '${id}' not found.`);
+            return;
+        }
+
+        // Add to local set
+        this.unlockedAchievements.add(id);
+
+        // Save to server/storage
+        if (window.ProgressSync) {
+            await window.ProgressSync.saveAchievement(id);
+        }
+
+        // Show notification
+        this.showNotification(achievement);
+
+        // Play sound
+        this.playUnlockSound();
+
+        console.log(`Achievement Unlocked: ${achievement.title}`);
+    },
+
+    showNotification(achievement) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'achievement-notification';
+
+        // Use a generic icon if specific one fails or is missing (handle via onerror in img tag)
+        // For now, using a placeholder logic for icons
+        let iconSrc = achievement.icon;
+
+        notification.innerHTML = `
+            <div class="achievement-icon-container">
+                <img src="${iconSrc}" alt="Icon" class="achievement-icon" onerror="this.src='assets/Buttons/medal_icon.png'">
+            </div>
+            <div class="achievement-text">
+                <div class="achievement-title">Achievement Unlocked</div>
+                <div class="achievement-name">${achievement.title}</div>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Trigger animation
+        requestAnimationFrame(() => {
+            notification.classList.add('show');
         });
+
+        // Remove after delay
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 600); // Wait for transition to finish
+        }, 4000);
+    },
+
+    playUnlockSound() {
+        try {
+            // Create audio object just for this instance to avoid overlaps cutting off
+            const audio = new Audio('assets/SFX/Achievement/achievement_unlock.mp3'); // Need to ensure this path exists or use a fallback
+            audio.volume = 0.4;
+            audio.play().catch(e => console.log('Audio play failed', e));
+        } catch (e) {
+            console.warn('Could not play achievement sound', e);
+        }
     }
+};
+
+// Expose to window
+window.AchievementManager = AchievementManager;
+
+// Auto-init on load
+document.addEventListener('DOMContentLoaded', () => {
+    AchievementManager.init();
 });

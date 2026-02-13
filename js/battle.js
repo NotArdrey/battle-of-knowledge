@@ -1931,6 +1931,30 @@ function victory() {
     setTimeout(() => {
         checkBattleEnd();
     }, 1000);
+
+    // Achievement Checks
+    if (window.AchievementManager) {
+        // First Victory
+        window.AchievementManager.unlock('first_win');
+
+        // Survivor (Low HP)
+        if (playerHp > 0 && playerHp < 10) {
+            window.AchievementManager.unlock('survivor');
+        }
+
+        // Streak Logic
+        let currentStreak = parseInt(localStorage.getItem('battleStreak') || '0') + 1;
+        localStorage.setItem('battleStreak', currentStreak.toString());
+
+        if (currentStreak >= 5) {
+            window.AchievementManager.unlock('unstoppable');
+        }
+
+        // Sync stats including streak
+        if (window.ProgressSync) {
+            window.ProgressSync.updateBattleStats(currentEra, { streak: currentStreak });
+        }
+    }
 }
 
 // Defeat
@@ -1944,6 +1968,9 @@ function defeat() {
     setCharacterState('player', 'hurt');
     setCharacterState('enemy', 'victory');
     document.getElementById('enemyCharacter').classList.add('victory');
+
+    // Reset streak on defeat
+    localStorage.setItem('battleStreak', '0');
 
     setTimeout(() => {
         document.getElementById('defeatModal').classList.remove('hidden');
@@ -2032,6 +2059,11 @@ async function unlockHeroAndShowVictory() {
         victoryTitle.textContent = '🎖️ BOSS DEFEATED! 🎖️';
         victoryTitle.classList.add('text-red-700');
         victoryTitle.classList.remove('text-amber-800');
+
+        // Boss Slayer Achievement
+        if (window.AchievementManager) {
+            window.AchievementManager.unlock('boss_slayer');
+        }
     }
 
     // Try to unlock the next hero (now async)
